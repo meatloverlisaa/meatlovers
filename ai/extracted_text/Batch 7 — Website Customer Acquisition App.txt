@@ -1,0 +1,831 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 7 — Website Customer Acquisition App
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Batch 7 — Website Customer Acquisition App
+Meat Lovers CIMS powered by YohPal
+
+7A.
+apps/website/package.json
+{
+"name": "meat-lovers-website",
+"private": true,
+"version": "1.0.0",
+"type": "module",
+"scripts": {
+"dev": "vite --host",
+"build": "vite build",
+"preview": "vite preview --host"
+},
+"dependencies": {
+"@vitejs/plugin-react": "^4.3.1",
+"axios": "^1.7.7",
+"vite": "^5.4.8",
+"react": "^18.3.1",
+"react-dom": "^18.3.1",
+"react-router-dom": "^6.27.0"
+},
+"devDependencies": {}
+}
+
+7B.
+apps/website/.env.example
+VITE_API_BASE_URL=http://localhost/backend/public/api
+VITE_APP_NAME="Meat Lovers CIMS powered by YohPal"
+
+7C.
+apps/website/public/index.html
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meat Lovers powered by YohPal</title>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>
+
+7D.
+apps/website/src/main.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './styles/index.css'
+import App from './app/App'
+ReactDOM.createRoot(document.getElementById('root')).render(
+<React.StrictMode>
+
+Tue, 16 Jun at 08:11
+
+<App />
+</React.StrictMode>
+)
+
+7E.
+apps/website/src/app/App.jsx
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import AppRoutes from './routes'
+export default function App() {
+return (
+<BrowserRouter>
+<AppRoutes />
+</BrowserRouter>
+)
+}
+
+7F.
+apps/website/src/app/routes.jsx
+import React from 'react'
+import { Route, Routes } from 'react-router-dom'
+import WebsiteLayout from '../layouts/WebsiteLayout'
+import HomePage from '../features/home/pages/HomePage'
+import AiLeadCapturePage from '../features/lead-capture/pages/AiLeadCapturePage'
+import FoodMenuPage from '../features/menu/pages/FoodMenuPage'
+import SoftDrinksPage from '../features/menu/pages/SoftDrinksPage'
+import AlcoholicDrinksPage from '../features/menu/pages/AlcoholicDrinksPage'
+import OffersPage from '../features/offers/pages/OffersPage'
+import CateringEnquiryPage from '../features/catering/pages/CateringEnquiryPage'
+import DeliveryEnquiryPage from '../features/delivery/pages/DeliveryEnquiryPage'
+import FeedbackPage from '../features/feedback/pages/FeedbackPage'
+import NotFound from '../pages/NotFound'
+export default function AppRoutes() {
+return (
+<Routes>
+<Route element={<WebsiteLayout />}>
+<Route path="/" element={<HomePage />} />
+<Route path="/ai-order-assistant" element={<AiLeadCapturePage />} />
+<Route path="/menu/food" element={<FoodMenuPage />} />
+<Route path="/menu/soft-drinks" element={<SoftDrinksPage />} />
+<Route path="/menu/alcoholic-drinks" element={<AlcoholicDrinksPage />} />
+<Route path="/offers" element={<OffersPage />} />
+<Route path="/catering" element={<CateringEnquiryPage />} />
+<Route path="/delivery" element={<DeliveryEnquiryPage />} />
+<Route path="/feedback" element={<FeedbackPage />} />
+</Route>
+<Route path="*" element={<NotFound />} />
+</Routes>
+)
+}
+
+7G.
+apps/website/src/styles/index.css
+:root {
+font-family: Arial, sans-serif;
+color: #111827;
+background: #fffaf5;
+}
+* {
+box-sizing: border-box;
+}
+body {
+margin: 0;
+background: #fffaf5;
+}
+a {
+color: inherit;
+text-decoration: none;
+
+}
+button,
+input,
+textarea,
+select {
+font: inherit;
+}
+.container {
+width: min(1120px, calc(100% - 32px));
+margin: 0 auto;
+}
+.section {
+padding: 56px 0;
+}
+.grid {
+display: grid;
+gap: 20px;
+}
+.card {
+background: #ffffff;
+border: 1px solid #f1e3d5;
+border-radius: 18px;
+padding: 22px;
+box-shadow: 0 10px 25px rgba(17, 24, 39, 0.06);
+}
+.btn {
+background: #111827;
+color: white;
+border: none;
+border-radius: 999px;
+padding: 12px 18px;
+cursor: pointer;
+}
+.btn-secondary {
+background: #fff;
+color: #111827;
+border: 1px solid #111827;
+}
+.input {
+width: 100%;
+padding: 12px 14px;
+border: 1px solid #d1d5db;
+border-radius: 12px;
+}
+.hero {
+padding: 72px 0;
+background: linear-gradient(135deg, #2b1408, #7c2d12);
+color: white;
+}
+.hero h1 {
+font-size: clamp(34px, 6vw, 64px);
+line-height: 1.02;
+margin: 0 0 18px;
+}
+.hero p {
+font-size: 18px;
+color: #ffedd5;
+}
+.nav {
+background: #111827;
+color: white;
+padding: 14px 0;
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.nav-inner {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+}
+.nav-links {
+
+display: flex;
+gap: 16px;
+flex-wrap: wrap;
+}
+.footer {
+background: #111827;
+color: white;
+padding: 28px 0;
+}
+@media (max-width: 760px) {
+.nav-inner {
+align-items: flex-start;
+flex-direction: column;
+}
+.grid-3 {
+grid-template-columns: 1fr !important;
+}
+.hero {
+padding: 48px 0;
+}
+}
+
+7H.
+apps/website/src/layouts/WebsiteLayout.jsx
+import React from 'react'
+import { Link, Outlet } from 'react-router-dom'
+export default function WebsiteLayout() {
+return (
+<>
+<header className="nav">
+<div className="container nav-inner">
+<Link to="/">
+<strong>Meat Lovers powered by YohPal</strong>
+</Link>
+<nav className="nav-links">
+<Link to="/menu/food">Food</Link>
+<Link to="/menu/soft-drinks">Soft Drinks</Link>
+<Link to="/menu/alcoholic-drinks">Bar</Link>
+<Link to="/offers">Offers</Link>
+<Link to="/catering">Catering</Link>
+<Link to="/delivery">Delivery</Link>
+<Link to="/ai-order-assistant">AI Assistant</Link>
+</nav>
+</div>
+</header>
+<Outlet />
+<footer className="footer">
+<div className="container">
+<strong>Meat Lovers CIMS powered by YohPal</strong>
+<p>Smart restaurant operations, customer acquisition, and sales growth system.</p>
+</div>
+</footer>
+</>
+)
+}
+
+7I.
+apps/website/src/lib/apiClient.js
+import axios from 'axios'
+const apiClient = axios.create({
+baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost/backend/public/api',
+timeout: 10000,
+})
+export default apiClient
+
+7J.
+
+apps/website/src/features/website/api/websiteApi.js
+import apiClient from '../../../lib/apiClient'
+export const websiteApi = {
+submitLead: async (payload) => {
+const { data } = await apiClient.post('/website/leads', payload)
+return data
+},
+submitCatering: async (payload) => {
+const { data } = await apiClient.post('/website/catering-enquiries', payload)
+return data
+},
+submitDelivery: async (payload) => {
+const { data } = await apiClient.post('/website/delivery-enquiries', payload)
+return data
+},
+submitFeedback: async (payload) => {
+const { data } = await apiClient.post('/website/feedback', payload)
+return data
+},
+}
+
+7K.
+apps/website/src/components/LeadForm.jsx
+import React, { useState } from 'react'
+import { websiteApi } from '../features/website/api/websiteApi'
+export default function LeadForm({ type = 'GENERAL' }) {
+const [form, setForm] = useState({
+full_name: '',
+phone: '',
+email: '',
+message: '',
+interest_type: type,
+})
+const [status, setStatus] = useState('')
+async function submit(e) {
+e.preventDefault()
+setStatus('Submitting...')
+try {
+await websiteApi.submitLead(form)
+setStatus('Thank you. Meat Lovers will contact you shortly.')
+setForm({
+full_name: '',
+phone: '',
+email: '',
+message: '',
+interest_type: type,
+})
+} catch (error) {
+setStatus('Could not submit now. Please call or WhatsApp Meat Lovers directly.')
+}
+}
+return (
+<form onSubmit={submit} className="grid">
+<input
+className="input"
+placeholder="Your name"
+value={form.full_name}
+onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+/>
+<input
+className="input"
+placeholder="Phone number"
+value={form.phone}
+onChange={(e) => setForm({ ...form, phone: e.target.value })}
+/>
+<input
+className="input"
+placeholder="Email optional"
+value={form.email}
+onChange={(e) => setForm({ ...form, email: e.target.value })}
+
+/>
+<textarea
+className="input"
+rows="4"
+placeholder="Tell us what you need"
+value={form.message}
+onChange={(e) => setForm({ ...form, message: e.target.value })}
+/>
+<button className="btn" type="submit">
+Send Enquiry
+</button>
+{status ? <p>{status}</p> : null}
+</form>
+)
+}
+
+7L.
+apps/website/src/features/home/pages/HomePage.jsx
+import React from 'react'
+import { Link } from 'react-router-dom'
+import LeadForm from '../../../components/LeadForm'
+export default function HomePage() {
+return (
+<>
+<section className="hero">
+<div className="container">
+<h1>Meat Lovers powered by YohPal</h1>
+<p>
+Discover great food, drinks, offers, deliveries, catering, and smart restaurant service.
+</p>
+<div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 24 }}>
+<Link className="btn" to="/ai-order-assistant">
+Ask AI What To Order
+</Link>
+<Link className="btn btn-secondary" to="/menu/food">
+View Menu
+</Link>
+</div>
+</div>
+</section>
+<section className="section">
+<div className="container grid grid-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+<div className="card">
+<h3>Food</h3>
+<p>Choma, meals, sides, and restaurant specials.</p>
+<Link to="/menu/food">Explore food →</Link>
+</div>
+<div className="card">
+<h3>Soft Drinks</h3>
+<p>Refreshments, water, juices, and soft drinks.</p>
+<Link to="/menu/soft-drinks">Explore drinks →</Link>
+</div>
+<div className="card">
+<h3>Bar</h3>
+<p>Alcoholic drinks served under controlled bar operations.</p>
+<Link to="/menu/alcoholic-drinks">Explore bar →</Link>
+</div>
+</div>
+</section>
+<section className="section" style={{ background: '#fff' }}>
+<div className="container grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+<div>
+<h2>Need catering, delivery, or group booking?</h2>
+<p>
+Send your request and our team will contact you.
+</p>
+</div>
+<div className="card">
+<LeadForm type="GENERAL" />
+</div>
+</div>
+</section>
+
+</>
+)
+}
+
+7M.
+apps/website/src/features/lead-capture/pages/AiLeadCapturePage.jsx
+import React, { useState } from 'react'
+import LeadForm from '../../../components/LeadForm'
+export default function AiLeadCapturePage() {
+const [preference, setPreference] = useState('')
+const [suggestion, setSuggestion] = useState('')
+function generateSuggestion() {
+const text = preference.toLowerCase()
+if (text.includes('meat') || text.includes('beef')) {
+setSuggestion('AI Suggestion: Try Beef Choma Plate with Ugali, Kachumbari, and a cold soft drink.')
+return
+}
+if (text.includes('chicken')) {
+setSuggestion('AI Suggestion: Try Chicken Choma Plate with Chips and fresh juice.')
+return
+}
+if (text.includes('drink') || text.includes('bar')) {
+setSuggestion('AI Suggestion: Visit our bar menu and ask the waiter for today’s controlled stock
+specials.')
+return
+}
+setSuggestion('AI Suggestion: Try our best-selling choma meal and ask about today’s offer.')
+}
+return (
+<section className="section">
+<div className="container grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+<div>
+<h1>AI Order Assistant</h1>
+<p>
+Tell us what you feel like eating or drinking. Our AI-enabled assistant will guide you.
+</p>
+<textarea
+className="input"
+rows="5"
+placeholder="Example: I want beef, ugali, and something cold"
+value={preference}
+onChange={(e) => setPreference(e.target.value)}
+/>
+<br />
+<br />
+<button className="btn" onClick={generateSuggestion}>
+Generate Suggestion
+</button>
+{suggestion ? (
+<div className="card" style={{ marginTop: 20 }}>
+{suggestion}
+</div>
+) : null}
+</div>
+<div className="card">
+<h3>Want us to contact you?</h3>
+<LeadForm type="AI_ORDER_ASSISTANT" />
+</div>
+</div>
+</section>
+)
+}
+
+7N.
+apps/website/src/features/menu/pages/FoodMenuPage.jsx
+import React from 'react'
+
+import LeadForm from '../../../components/LeadForm'
+const foodItems = [
+['Beef Choma Plate', '650'],
+['Chicken Choma Plate', '750'],
+['Pork Ribs Plate', '850'],
+['Ugali', '100'],
+['Chips', '250'],
+['Kachumbari', '100'],
+['Mukimo', '200'],
+['Pilau', '350'],
+]
+export default function FoodMenuPage() {
+return (
+<section className="section">
+<div className="container">
+<h1>Food Menu</h1>
+<p>Food items are separated from soft drinks and alcoholic drinks for better service and
+accountability.</p>
+<div className="grid grid-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 24 }}>
+{foodItems.map(([name, price]) => (
+<div className="card" key={name}>
+<h3>{name}</h3>
+<p>KES {price}</p>
+</div>
+))}
+</div>
+<div className="card" style={{ marginTop: 32 }}>
+<h3>Want to reserve or order?</h3>
+<LeadForm type="FOOD_ORDER" />
+</div>
+</div>
+</section>
+)
+}
+
+7O.
+apps/website/src/features/menu/pages/SoftDrinksPage.jsx
+import React from 'react'
+import LeadForm from '../../../components/LeadForm'
+const drinks = [
+['Coca-Cola 500ml', '120'],
+['Fanta 500ml', '120'],
+['Sprite 500ml', '120'],
+['Stoney 500ml', '120'],
+['Water 500ml', '100'],
+['Fresh Juice Glass', '200'],
+]
+export default function SoftDrinksPage() {
+return (
+<section className="section">
+<div className="container">
+<h1>Soft Drinks</h1>
+<p>Soft drinks are tracked separately for accurate stock and sales control.</p>
+<div className="grid grid-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 24 }}>
+{drinks.map(([name, price]) => (
+<div className="card" key={name}>
+<h3>{name}</h3>
+<p>KES {price}</p>
+</div>
+))}
+</div>
+<div className="card" style={{ marginTop: 32 }}>
+<h3>Ask about drinks availability</h3>
+<LeadForm type="SOFT_DRINKS" />
+</div>
+</div>
+</section>
+)
+}
+
+7P.
+
+apps/website/src/features/menu/pages/AlcoholicDrinksPage.jsx
+import React from 'react'
+import LeadForm from '../../../components/LeadForm'
+const alcoholicDrinks = [
+['Tusker Lager', '300'],
+['Tusker Malt', '350'],
+['White Cap', '350'],
+['Guinness', '350'],
+['Balozi', '300'],
+['House Wine Glass', '450'],
+]
+export default function AlcoholicDrinksPage() {
+return (
+<section className="section">
+<div className="container">
+<h1>Alcoholic Drinks</h1>
+<p>Bar items are separated from food and soft drinks for accountability and stock control.</p>
+<div className="grid grid-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 24 }}>
+{alcoholicDrinks.map(([name, price]) => (
+<div className="card" key={name}>
+<h3>{name}</h3>
+<p>KES {price}</p>
+</div>
+))}
+</div>
+<div className="card" style={{ marginTop: 32 }}>
+<h3>Ask about bar menu</h3>
+<LeadForm type="ALCOHOLIC_DRINKS" />
+</div>
+</div>
+</section>
+)
+}
+
+7Q.
+apps/website/src/features/offers/pages/OffersPage.jsx
+import React from 'react'
+import LeadForm from '../../../components/LeadForm'
+export default function OffersPage() {
+return (
+<section className="section">
+<div className="container">
+<h1>Offers</h1>
+<p>Meat Lovers promotions help convert website visitors into real customers.</p>
+<div className="grid grid-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 24 }}>
+<div className="card">
+<h3>Lunch Combo</h3>
+<p>Ask about today’s lunch combo offer.</p>
+</div>
+<div className="card">
+<h3>Group Meal</h3>
+<p>Ideal for friends, students, office groups, and events.</p>
+</div>
+<div className="card">
+<h3>Weekend Choma</h3>
+<p>Weekend meat specials and group table bookings.</p>
+</div>
+</div>
+<div className="card" style={{ marginTop: 32 }}>
+<h3>Claim or ask about an offer</h3>
+<LeadForm type="OFFERS" />
+</div>
+</div>
+</section>
+)
+}
+
+7R.
+apps/website/src/features/catering/pages/CateringEnquiryPage.jsx
+
+import React, { useState } from 'react'
+import { websiteApi } from '../../website/api/websiteApi'
+export default function CateringEnquiryPage() {
+const [form, setForm] = useState({
+full_name: '',
+phone: '',
+event_date: '',
+guest_count: '',
+location: '',
+message: '',
+})
+const [status, setStatus] = useState('')
+async function submit(e) {
+e.preventDefault()
+setStatus('Submitting...')
+try {
+await websiteApi.submitCatering(form)
+setStatus('Catering enquiry submitted. Our team will contact you.')
+} catch (error) {
+setStatus('Could not submit now. Please call Meat Lovers directly.')
+}
+}
+return (
+<section className="section">
+<div className="container grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+<div>
+<h1>Catering Enquiry</h1>
+<p>
+Request catering for events, office meals, family gatherings, student groups, and corporate
+functions.
+</p>
+</div>
+<div className="card">
+<form onSubmit={submit} className="grid">
+<input className="input" placeholder="Full name" value={form.full_name} onChange={(e) => setForm({
+...form, full_name: e.target.value })} />
+<input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form,
+phone: e.target.value })} />
+<input className="input" type="date" value={form.event_date} onChange={(e) => setForm({ ...form,
+event_date: e.target.value })} />
+<input className="input" placeholder="Guest count" value={form.guest_count} onChange={(e) =>
+setForm({ ...form, guest_count: e.target.value })} />
+<input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm({
+...form, location: e.target.value })} />
+<textarea className="input" rows="4" placeholder="Message" value={form.message} onChange={(e) =>
+setForm({ ...form, message: e.target.value })} />
+<button className="btn" type="submit">Submit Catering Enquiry</button>
+{status ? <p>{status}</p> : null}
+</form>
+</div>
+</div>
+</section>
+)
+}
+
+7S.
+apps/website/src/features/delivery/pages/DeliveryEnquiryPage.jsx
+import React, { useState } from 'react'
+import { websiteApi } from '../../website/api/websiteApi'
+export default function DeliveryEnquiryPage() {
+const [form, setForm] = useState({
+full_name: '',
+phone: '',
+delivery_address: '',
+order_request: '',
+})
+const [status, setStatus] = useState('')
+async function submit(e) {
+e.preventDefault()
+setStatus('Submitting...')
+try {
+await websiteApi.submitDelivery(form)
+
+setStatus('Delivery enquiry submitted. Our team will contact you.')
+} catch (error) {
+setStatus('Could not submit now. Please call or WhatsApp Meat Lovers directly.')
+}
+}
+return (
+<section className="section">
+<div className="container grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+<div>
+<h1>Delivery Enquiry</h1>
+<p>
+Request food delivery and our team will confirm availability, price, and dispatch.
+</p>
+</div>
+<div className="card">
+<form onSubmit={submit} className="grid">
+<input className="input" placeholder="Full name" value={form.full_name} onChange={(e) => setForm({
+...form, full_name: e.target.value })} />
+<input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form,
+phone: e.target.value })} />
+<textarea className="input" rows="3" placeholder="Delivery address" value={form.delivery_address}
+onChange={(e) => setForm({ ...form, delivery_address: e.target.value })} />
+<textarea className="input" rows="4" placeholder="What would you like to order?" value=
+{form.order_request} onChange={(e) => setForm({ ...form, order_request: e.target.value })} />
+<button className="btn" type="submit">Submit Delivery Enquiry</button>
+{status ? <p>{status}</p> : null}
+</form>
+</div>
+</div>
+</section>
+)
+}
+
+7T.
+apps/website/src/features/feedback/pages/FeedbackPage.jsx
+import React, { useState } from 'react'
+import { websiteApi } from '../../website/api/websiteApi'
+export default function FeedbackPage() {
+const [form, setForm] = useState({
+full_name: '',
+phone: '',
+rating: '5',
+message: '',
+})
+const [status, setStatus] = useState('')
+async function submit(e) {
+e.preventDefault()
+setStatus('Submitting...')
+try {
+await websiteApi.submitFeedback(form)
+setStatus('Thank you for your feedback.')
+} catch (error) {
+setStatus('Could not submit feedback now.')
+}
+}
+return (
+<section className="section">
+<div className="container grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+<div>
+<h1>Customer Feedback</h1>
+<p>
+Your feedback helps Meat Lovers improve food, service, delivery, and customer experience.
+</p>
+</div>
+<div className="card">
+<form onSubmit={submit} className="grid">
+<input className="input" placeholder="Full name" value={form.full_name} onChange={(e) => setForm({
+...form, full_name: e.target.value })} />
+<input className="input" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form,
+phone: e.target.value })} />
+<select className="input" value={form.rating} onChange={(e) => setForm({ ...form, rating:
+e.target.value })}>
+<option value="5">5 - Excellent</option>
+
+<option value="4">4 - Good</option>
+<option value="3">3 - Average</option>
+<option value="2">2 - Poor</option>
+<option value="1">1 - Very Poor</option>
+</select>
+<textarea className="input" rows="4" placeholder="Your feedback" value={form.message} onChange={(e)
+=> setForm({ ...form, message: e.target.value })} />
+<button className="btn" type="submit">Submit Feedback</button>
+{status ? <p>{status}</p> : null}
+</form>
+</div>
+</div>
+</section>
+)
+}
+
+7U.
+apps/website/src/pages/NotFound.jsx
+import React from 'react'
+import { Link } from 'react-router-dom'
+export default function NotFound() {
+return (
+<section className="section">
+<div className="container">
+<h1>Page not found</h1>
+<p>The page you are looking for does not exist.</p>
+<Link className="btn" to="/">Go Home</Link>
+</div>
+</section>
+)
+}
+
+Batch 7 Outcome
+Website customer acquisition app now includes:
+customer-facing homepage
+AI-enabled lead capture page
+food menu page
+soft drinks page
+alcoholic drinks page
+offers page
+catering enquiry page
+delivery enquiry page
+customer feedback page
+website API integration layer
+mobile-first layout
+Meat Lovers powered by YohPal branding
+
+Next Smart Move
+Build Batch 8 — Website Backend Lead Capture API, including:
+website leads table
+catering enquiries table
+delivery enquiries table
+feedback table
+website controller
+website routes
+CRM integration
+audit logging for website submissions
+
+

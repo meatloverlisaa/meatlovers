@@ -1,0 +1,482 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 15 — Monitoring Dashboard Live Control UI
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Tue, 16 Jun at 08:15
+
+Batch 15 — Monitoring Dashboard Live Control UI
+Meat Lovers CIMS powered by YohPal
+
+15A. Update
+backend/routes/api.php
+Add routes:
+$router->get('/api/monitoring/live-control', [MonitoringController::class, 'liveControl']);
+$router->get('/api/monitoring/low-stock-alerts', [MonitoringController::class, 'lowStockAlerts']);
+$router->get('/api/monitoring/pending-approvals', [MonitoringController::class, 'pendingApprovals']);
+$router->get('/api/monitoring/pending-mpesa', [MonitoringController::class, 'pendingMpesa']);
+$router->get('/api/monitoring/unsold-food-alerts', [MonitoringController::class, 'unsoldFoodAlerts']);
+
+15B. Update
+backend/app/Controllers/MonitoringController.php
+Add these methods inside the class:
+public function liveControl(): void
+{
+$db = Database::connection();
+$sales = $db->query(
+"SELECT COALESCE(SUM(total_amount), 0) AS total
+FROM orders
+WHERE order_status = 'PAID'
+AND DATE(created_at) = CURDATE()"
+)->fetch();
+$orders = $db->query(
+"SELECT COUNT(*) AS total
+FROM orders
+WHERE DATE(created_at) = CURDATE()"
+)->fetch();
+$paidOrders = $db->query(
+"SELECT COUNT(*) AS total
+FROM orders
+WHERE order_status = 'PAID'
+AND DATE(created_at) = CURDATE()"
+)->fetch();
+$lowStock = $db->query(
+"SELECT COUNT(*) AS total
+FROM stock_items
+WHERE current_quantity <= reorder_level"
+)->fetch();
+$pendingApprovals = $db->query(
+"SELECT COUNT(*) AS total
+FROM approval_requests
+WHERE approval_status = 'PENDING'"
+)->fetch();
+$pendingMpesa = $db->query(
+"SELECT COUNT(*) AS total
+FROM payments
+WHERE payment_method = 'MPESA'
+AND payment_status = 'PENDING'"
+)->fetch();
+$unsoldFood = $db->query(
+"SELECT COUNT(*) AS total
+
+FROM unsold_food
+WHERE DATE(created_at) = CURDATE()"
+)->fetch();
+$kitchenQueue = $db->query(
+"SELECT COUNT(*) AS total
+FROM orders
+WHERE order_status IN ('PENDING', 'PREPARING')"
+)->fetch();
+$barLowStock = $db->query(
+"SELECT COUNT(*) AS total
+FROM stock_items si
+JOIN products p ON p.id = si.product_id
+WHERE p.product_category = 'ALCOHOLIC_DRINK'
+AND si.current_quantity <= si.reorder_level"
+)->fetch();
+$cashSettlements = $db->query(
+"SELECT COUNT(*) AS total
+FROM payments
+WHERE payment_method = 'CASH'
+AND payment_status = 'SUCCESS'
+AND DATE(created_at) = CURDATE()"
+)->fetch();
+Response::success([
+'today_sales' => (float) $sales['total'],
+'today_orders' => (int) $orders['total'],
+'paid_orders' => (int) $paidOrders['total'],
+'low_stock_count' => (int) $lowStock['total'],
+'pending_approvals_count' => (int) $pendingApprovals['total'],
+'pending_mpesa_count' => (int) $pendingMpesa['total'],
+'unsold_food_count' => (int) $unsoldFood['total'],
+'kitchen_queue_count' => (int) $kitchenQueue['total'],
+'bar_low_stock_count' => (int) $barLowStock['total'],
+'cashier_settlement_count' => (int) $cashSettlements['total'],
+]);
+}
+public function lowStockAlerts(): void
+{
+$stmt = Database::connection()->query(
+"SELECT
+p.product_name,
+p.product_category,
+si.current_quantity,
+si.reorder_level
+FROM stock_items si
+JOIN products p ON p.id = si.product_id
+WHERE si.current_quantity <= si.reorder_level
+ORDER BY si.current_quantity ASC"
+);
+Response::success(['low_stock_alerts' => $stmt->fetchAll()]);
+}
+public function pendingApprovals(): void
+{
+$stmt = Database::connection()->query(
+"SELECT
+ar.*,
+u.full_name AS requested_by_name
+FROM approval_requests ar
+JOIN users u ON u.id = ar.requested_by
+WHERE ar.approval_status = 'PENDING'
+ORDER BY ar.created_at ASC"
+);
+Response::success(['pending_approvals' => $stmt->fetchAll()]);
+}
+public function pendingMpesa(): void
+{
+$stmt = Database::connection()->query(
+"SELECT
+p.*,
+o.order_number,
+o.table_number,
+o.total_amount
+FROM payments p
+JOIN orders o ON o.id = p.order_id
+WHERE p.payment_method = 'MPESA'
+AND p.payment_status = 'PENDING'
+ORDER BY p.created_at ASC"
+);
+
+Response::success(['pending_mpesa' => $stmt->fetchAll()]);
+}
+public function unsoldFoodAlerts(): void
+{
+$stmt = Database::connection()->query(
+"SELECT
+uf.*,
+p.product_name,
+u.full_name AS declared_by_name
+FROM unsold_food uf
+JOIN products p ON p.id = uf.product_id
+LEFT JOIN users u ON u.id = uf.declared_by
+WHERE DATE(uf.created_at) = CURDATE()
+ORDER BY uf.created_at DESC"
+);
+Response::success(['unsold_food_alerts' => $stmt->fetchAll()]);
+}
+
+15C.
+apps/monitoring-web/src/features/live-control/api/liveControlApi.js
+import apiClient from '../../../lib/apiClient'
+export const liveControlApi = {
+summary: async () => {
+const { data } = await apiClient.get('/monitoring/live-control')
+return data.data
+},
+lowStockAlerts: async () => {
+const { data } = await apiClient.get('/monitoring/low-stock-alerts')
+return data.data.low_stock_alerts
+},
+pendingApprovals: async () => {
+const { data } = await apiClient.get('/monitoring/pending-approvals')
+return data.data.pending_approvals
+},
+pendingMpesa: async () => {
+const { data } = await apiClient.get('/monitoring/pending-mpesa')
+return data.data.pending_mpesa
+},
+unsoldFoodAlerts: async () => {
+const { data } = await apiClient.get('/monitoring/unsold-food-alerts')
+return data.data.unsold_food_alerts
+},
+}
+
+15D.
+apps/monitoring-web/src/features/live-control/pages/OwnerDashboardPage.jsx
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Page from '../../../components/ui/Page'
+import Card from '../../../components/ui/Card'
+import LoadingBlock from '../../../components/ui/LoadingBlock'
+import StatusMessage from '../../../components/ui/StatusMessage'
+import { liveControlApi } from '../api/liveControlApi'
+export default function OwnerDashboardPage() {
+const { data, isLoading, error } = useQuery({
+queryKey: ['owner-live-control-summary'],
+queryFn: liveControlApi.summary,
+refetchInterval: 15000,
+})
+return (
+<Page title="Owner Live Control" subtitle="Real-time business control dashboard">
+{isLoading ? <LoadingBlock label="Loading owner dashboard..." /> : null}
+{error ? <StatusMessage error={error.message} /> : null}
+{data ? (
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 16 }}>
+<Card title="Today Sales"><strong>KES {data.today_sales}</strong></Card>
+<Card title="Today Orders"><strong>{data.today_orders}</strong></Card>
+<Card title="Paid Orders"><strong>{data.paid_orders}</strong></Card>
+
+<Card title="Low Stock"><strong>{data.low_stock_count}</strong></Card>
+<Card title="Pending Approvals"><strong>{data.pending_approvals_count}</strong></Card>
+<Card title="Pending M-Pesa"><strong>{data.pending_mpesa_count}</strong></Card>
+<Card title="Unsold Food"><strong>{data.unsold_food_count}</strong></Card>
+<Card title="Kitchen Queue"><strong>{data.kitchen_queue_count}</strong></Card>
+<Card title="Bar Low Stock"><strong>{data.bar_low_stock_count}</strong></Card>
+<Card title="Cash Settlements"><strong>{data.cashier_settlement_count}</strong></Card>
+</div>
+) : null}
+</Page>
+)
+}
+
+15E.
+apps/monitoring-web/src/features/live-control/pages/LowStockAlertsPage.jsx
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Page from '../../../components/ui/Page'
+import Card from '../../../components/ui/Card'
+import DataTable from '../../../components/ui/DataTable'
+import LoadingBlock from '../../../components/ui/LoadingBlock'
+import StatusMessage from '../../../components/ui/StatusMessage'
+import { liveControlApi } from '../api/liveControlApi'
+export default function LowStockAlertsPage() {
+const { data, isLoading, error } = useQuery({
+queryKey: ['monitoring-low-stock-alerts'],
+queryFn: liveControlApi.lowStockAlerts,
+refetchInterval: 15000,
+})
+return (
+<Page title="Low Stock Alerts" subtitle="Store, kitchen, and bar stock below reorder level">
+<Card>
+{isLoading ? <LoadingBlock label="Loading low stock alerts..." /> : null}
+{error ? <StatusMessage error={error.message} /> : null}
+{!isLoading && !error ? (
+<DataTable
+columns={[
+{ key: 'product_name', label: 'Product' },
+{ key: 'product_category', label: 'Category' },
+{ key: 'current_quantity', label: 'Current Qty' },
+{ key: 'reorder_level', label: 'Reorder Level' },
+]}
+rows={data || []}
+/>
+) : null}
+</Card>
+</Page>
+)
+}
+
+15F.
+apps/monitoring-web/src/features/live-control/pages/PendingApprovalsPage.jsx
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Page from '../../../components/ui/Page'
+import Card from '../../../components/ui/Card'
+import DataTable from '../../../components/ui/DataTable'
+import LoadingBlock from '../../../components/ui/LoadingBlock'
+import StatusMessage from '../../../components/ui/StatusMessage'
+import { liveControlApi } from '../api/liveControlApi'
+export default function PendingApprovalsPage() {
+const { data, isLoading, error } = useQuery({
+queryKey: ['monitoring-pending-approvals'],
+queryFn: liveControlApi.pendingApprovals,
+refetchInterval: 15000,
+})
+return (
+<Page title="Pending Approvals" subtitle="Discounts, cancellations, stock adjustments, and refunds awaiting
+approval">
+<Card>
+{isLoading ? <LoadingBlock label="Loading pending approvals..." /> : null}
+{error ? <StatusMessage error={error.message} /> : null}
+{!isLoading && !error ? (
+<DataTable
+
+columns={[
+{ key: 'approval_type', label: 'Type' },
+{ key: 'requested_by_name', label: 'Requested By' },
+{ key: 'reference_id', label: 'Reference' },
+{ key: 'request_reason', label: 'Reason' },
+{ key: 'created_at', label: 'Created' },
+]}
+rows={data || []}
+/>
+) : null}
+</Card>
+</Page>
+)
+}
+
+15G.
+apps/monitoring-web/src/features/live-control/pages/PendingMpesaPage.jsx
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Page from '../../../components/ui/Page'
+import Card from '../../../components/ui/Card'
+import DataTable from '../../../components/ui/DataTable'
+import LoadingBlock from '../../../components/ui/LoadingBlock'
+import StatusMessage from '../../../components/ui/StatusMessage'
+import { liveControlApi } from '../api/liveControlApi'
+export default function PendingMpesaPage() {
+const { data, isLoading, error } = useQuery({
+queryKey: ['monitoring-pending-mpesa'],
+queryFn: liveControlApi.pendingMpesa,
+refetchInterval: 15000,
+})
+return (
+<Page title="Pending M-Pesa" subtitle="M-Pesa payments awaiting real confirmation">
+<Card>
+{isLoading ? <LoadingBlock label="Loading pending M-Pesa..." /> : null}
+{error ? <StatusMessage error={error.message} /> : null}
+{!isLoading && !error ? (
+<DataTable
+columns={[
+{ key: 'order_number', label: 'Order' },
+{ key: 'table_number', label: 'Table' },
+{ key: 'amount', label: 'Amount' },
+{ key: 'transaction_reference', label: 'Reference' },
+{ key: 'payment_status', label: 'Status' },
+{ key: 'created_at', label: 'Created' },
+]}
+rows={data || []}
+/>
+) : null}
+</Card>
+</Page>
+)
+}
+
+15H.
+apps/monitoring-web/src/features/live-control/pages/UnsoldFoodAlertsPage.jsx
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Page from '../../../components/ui/Page'
+import Card from '../../../components/ui/Card'
+import DataTable from '../../../components/ui/DataTable'
+import LoadingBlock from '../../../components/ui/LoadingBlock'
+import StatusMessage from '../../../components/ui/StatusMessage'
+import { liveControlApi } from '../api/liveControlApi'
+export default function UnsoldFoodAlertsPage() {
+const { data, isLoading, error } = useQuery({
+queryKey: ['monitoring-unsold-food-alerts'],
+queryFn: liveControlApi.unsoldFoodAlerts,
+refetchInterval: 15000,
+})
+return (
+<Page title="Unsold Food Alerts" subtitle="Cooked food declared as unsold today">
+<Card>
+{isLoading ? <LoadingBlock label="Loading unsold food alerts..." /> : null}
+
+{error ? <StatusMessage error={error.message} /> : null}
+{!isLoading && !error ? (
+<DataTable
+columns={[
+{ key: 'product_name', label: 'Product' },
+{ key: 'quantity', label: 'Quantity' },
+{ key: 'reason', label: 'Reason' },
+{ key: 'declared_by_name', label: 'Declared By' },
+{ key: 'created_at', label: 'Created' },
+]}
+rows={data || []}
+/>
+) : null}
+</Card>
+</Page>
+)
+}
+
+15I. Update
+apps/monitoring-web/src/app/routes.jsx
+Add imports:
+import OwnerDashboardPage from '../features/live-control/pages/OwnerDashboardPage'
+import LowStockAlertsPage from '../features/live-control/pages/LowStockAlertsPage'
+import PendingApprovalsPage from '../features/live-control/pages/PendingApprovalsPage'
+import PendingMpesaPage from '../features/live-control/pages/PendingMpesaPage'
+import UnsoldFoodAlertsPage from '../features/live-control/pages/UnsoldFoodAlertsPage'
+Add routes:
+<Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
+<Route path="/low-stock-alerts" element={<LowStockAlertsPage />} />
+<Route path="/pending-approvals" element={<PendingApprovalsPage />} />
+<Route path="/pending-mpesa" element={<PendingMpesaPage />} />
+<Route path="/unsold-food-alerts" element={<UnsoldFoodAlertsPage />} />
+
+15J. Update
+apps/monitoring-web/src/components/common/MonitoringNav.jsx
+Replace file with:
+import React from 'react'
+import { Link } from 'react-router-dom'
+export default function MonitoringNav() {
+return (
+<div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' }}>
+<Link to="/owner-dashboard">Owner Dashboard</Link>
+<Link to="/low-stock-alerts">Low Stock</Link>
+<Link to="/pending-approvals">Approvals</Link>
+<Link to="/pending-mpesa">M-Pesa</Link>
+<Link to="/unsold-food-alerts">Unsold Food</Link>
+<Link to="/overview">Overview</Link>
+<Link to="/alerts">Alerts</Link>
+</div>
+)
+}
+
+15K.
+docs/MONITORING_LIVE_CONTROL_UI.md
+# Batch 15 — Monitoring Dashboard Live Control UI
+## System
+Meat Lovers CIMS powered by YohPal
+## Purpose
+This batch gives the owner and management a live control dashboard for daily restaurant operations.
+## Monitoring Cards
+The owner dashboard shows:
+1. Today sales
+
+2. Today orders
+3. Paid orders
+4. Low stock count
+5. Pending approvals
+6. Pending M-Pesa
+7. Unsold food count
+8. Kitchen queue count
+9. Bar low-stock count
+10. Cashier settlement count
+## Alert Pages
+### Low Stock Alerts
+Shows products where current quantity is at or below reorder level.
+### Pending Approvals
+Shows approval requests for:
+- cancellation
+- discount
+- stock adjustment
+- refund
+### Pending M-Pesa
+Shows payments marked as pending M-Pesa.
+### Unsold Food Alerts
+Shows cooked food declared unsold today.
+## Refresh Rule
+Monitoring pages refresh every 15 seconds.
+## Control Purpose
+This dashboard helps management detect:
+- poor sales
+- unpaid orders
+- low stock
+- pending approvals
+- M-Pesa delays
+- cooked food wastage
+- kitchen backlog
+- bar shortages
+- cashier settlement activity
+
+Batch 15 Outcome
+Monitoring dashboard now includes:
+owner dashboard
+sales summary cards
+low stock alerts
+pending approvals
+pending M-Pesa
+unsold food alerts
+kitchen queue count
+bar low-stock count
+cashier settlement count
+
+Next Smart Move
+Build Batch 16 — Approval Management UI, including:
+approval list page
+approve action
+reject action
+approval status history
+cancellation approval handling
+discount approval handling
+stock adjustment approval handling
+refund approval placeholder
+
+

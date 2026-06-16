@@ -1,0 +1,360 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 2 — Database Schema Foundation
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Batch 2 — Database Schema Foundation
+Meat Lovers CIMS powered by YohPal
+Objective: Create the complete database foundation before building the PHP API.
+Rule: Every table must have:
+id
+created_at
+updated_at
+audit capability where applicable
+
+2A.
+database/migrations/002_users.sql
+CREATE TABLE users (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+full_name VARCHAR(255) NOT NULL,
+email VARCHAR(255) UNIQUE,
+phone VARCHAR(50) UNIQUE,
+password_hash TEXT NOT NULL,
+role ENUM(
+'SUPER_ADMIN',
+'ADMIN',
+'MANAGER',
+'CASHIER',
+'WAITER',
+'CHEF',
+'STOREKEEPER',
+'BARMAN',
+'DISPATCHER',
+'ACCOUNTANT',
+'HR'
+) NOT NULL,
+is_active BOOLEAN DEFAULT TRUE,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2B.
+database/migrations/003_customers.sql
+CREATE TABLE customers (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+full_name VARCHAR(255) NOT NULL,
+phone VARCHAR(50),
+email VARCHAR(255),
+customer_type ENUM(
+'WALK_IN',
+'REGULAR',
+'VIP',
+'CORPORATE',
+'DELIVERY'
+
+Tue, 16 Jun at 08:04
+
+) DEFAULT 'WALK_IN',
+loyalty_points DECIMAL(12,2) DEFAULT 0,
+notes TEXT,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2C.
+database/migrations/004_suppliers.sql
+CREATE TABLE suppliers (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+supplier_name VARCHAR(255) NOT NULL,
+contact_person VARCHAR(255),
+phone VARCHAR(50),
+email VARCHAR(255),
+physical_address TEXT,
+supplier_type ENUM(
+'FOOD',
+'SOFT_DRINKS',
+'ALCOHOL',
+'GENERAL'
+) NOT NULL,
+status ENUM(
+'ACTIVE',
+'SUSPENDED'
+) DEFAULT 'ACTIVE',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2D.
+database/migrations/005_products.sql
+CREATE TABLE products (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+product_name VARCHAR(255) NOT NULL,
+product_category ENUM(
+'FOOD',
+'SOFT_DRINK',
+'ALCOHOLIC_DRINK'
+) NOT NULL,
+selling_price DECIMAL(12,2) NOT NULL,
+cost_price DECIMAL(12,2) NOT NULL,
+barcode VARCHAR(255),
+is_active BOOLEAN DEFAULT TRUE,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2E.
+database/migrations/006_stock_items.sql
+CREATE TABLE stock_items (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+product_id BIGINT NOT NULL,
+
+current_quantity DECIMAL(12,2) DEFAULT 0,
+reorder_level DECIMAL(12,2) DEFAULT 0,
+FOREIGN KEY (product_id)
+REFERENCES products(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2F.
+database/migrations/007_stock_movements.sql
+CREATE TABLE stock_movements (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+product_id BIGINT NOT NULL,
+movement_type ENUM(
+'PURCHASE',
+'STORE_TO_KITCHEN',
+'STORE_TO_BAR',
+'BAR_SALE',
+'KITCHEN_USAGE',
+'WASTAGE',
+'ADJUSTMENT'
+) NOT NULL,
+quantity DECIMAL(12,2) NOT NULL,
+reference_number VARCHAR(255),
+notes TEXT,
+user_id BIGINT,
+FOREIGN KEY (product_id)
+REFERENCES products(id),
+FOREIGN KEY (user_id)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2G.
+database/migrations/008_orders.sql
+CREATE TABLE orders (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+order_number VARCHAR(255) UNIQUE,
+customer_id BIGINT,
+waiter_id BIGINT,
+table_number VARCHAR(50),
+order_status ENUM(
+'PENDING',
+'PREPARING',
+'READY',
+'SERVED',
+'PAID',
+'CANCELLED'
+) DEFAULT 'PENDING',
+subtotal DECIMAL(12,2) DEFAULT 0,
+discount_amount DECIMAL(12,2) DEFAULT 0,
+total_amount DECIMAL(12,2) DEFAULT 0,
+FOREIGN KEY (customer_id)
+REFERENCES customers(id),
+
+FOREIGN KEY (waiter_id)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2H.
+database/migrations/009_order_items.sql
+CREATE TABLE order_items (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+order_id BIGINT NOT NULL,
+product_id BIGINT NOT NULL,
+quantity DECIMAL(12,2) NOT NULL,
+unit_price DECIMAL(12,2) NOT NULL,
+total_price DECIMAL(12,2) NOT NULL,
+FOREIGN KEY (order_id)
+REFERENCES orders(id),
+FOREIGN KEY (product_id)
+REFERENCES products(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2I.
+database/migrations/010_payments.sql
+CREATE TABLE payments (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+order_id BIGINT NOT NULL,
+payment_method ENUM(
+'CASH',
+'MPESA',
+'CARD'
+) NOT NULL,
+amount DECIMAL(12,2) NOT NULL,
+transaction_reference VARCHAR(255),
+payment_status ENUM(
+'PENDING',
+'SUCCESS',
+'FAILED'
+) DEFAULT 'PENDING',
+FOREIGN KEY (order_id)
+REFERENCES orders(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2J.
+database/migrations/011_assets.sql
+CREATE TABLE assets (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+asset_name VARCHAR(255) NOT NULL,
+asset_category VARCHAR(255),
+serial_number VARCHAR(255),
+
+purchase_cost DECIMAL(12,2),
+asset_status ENUM(
+'ACTIVE',
+'DAMAGED',
+'DISPOSED'
+) DEFAULT 'ACTIVE',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2K.
+database/migrations/012_unsold_food.sql
+CREATE TABLE unsold_food (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+product_id BIGINT NOT NULL,
+quantity DECIMAL(12,2) NOT NULL,
+reason TEXT,
+declared_by BIGINT,
+FOREIGN KEY (product_id)
+REFERENCES products(id),
+FOREIGN KEY (declared_by)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2L.
+database/migrations/013_deliveries.sql
+CREATE TABLE deliveries (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+order_id BIGINT NOT NULL,
+customer_id BIGINT NOT NULL,
+delivery_status ENUM(
+'PENDING',
+'DISPATCHED',
+'DELIVERED',
+'FAILED'
+) DEFAULT 'PENDING',
+rider_name VARCHAR(255),
+rider_phone VARCHAR(50),
+delivery_address TEXT,
+FOREIGN KEY (order_id)
+REFERENCES orders(id),
+FOREIGN KEY (customer_id)
+REFERENCES customers(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2M.
+database/migrations/014_audit_logs.sql
+CREATE TABLE audit_logs (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+user_id BIGINT,
+module_name VARCHAR(255),
+action_name VARCHAR(255),
+entity_id BIGINT,
+old_data JSON,
+new_data JSON,
+ip_address VARCHAR(255),
+FOREIGN KEY (user_id)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2N.
+database/migrations/015_finance_transactions.sql
+CREATE TABLE finance_transactions (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+transaction_type ENUM(
+'INCOME',
+'EXPENSE'
+) NOT NULL,
+category VARCHAR(255),
+amount DECIMAL(12,2) NOT NULL,
+reference_number VARCHAR(255),
+notes TEXT,
+created_by BIGINT,
+FOREIGN KEY (created_by)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2O.
+database/migrations/016_staff_performance.sql
+CREATE TABLE staff_performance (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+staff_id BIGINT NOT NULL,
+report_date DATE NOT NULL,
+sales_amount DECIMAL(12,2) DEFAULT 0,
+orders_served INT DEFAULT 0,
+customer_rating DECIMAL(5,2) DEFAULT 0,
+bonus_amount DECIMAL(12,2) DEFAULT 0,
+FOREIGN KEY (staff_id)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+Batch 2 Outcome
+
+Database now supports:
+Users
+Customers
+Suppliers
+Products
+Food / Soft Drinks / Alcohol separation
+Stock Control
+Orders
+Payments
+Asset Register
+Unsold Food Tracking
+Deliveries
+Audit Logs
+Finance
+Staff Motivation & Performance
+
+Next Smart Move
+Build Batch 3 — Database Seed Data, including:
+Super Admin
+Manager
+Cashier
+Waiter
+Chef
+Storekeeper
+Barman
+Sample food menu
+Sample soft drinks
+Sample alcoholic drinks
+Sample suppliers
+Sample customers
+Sample tables
+Sample asset inventory
+This allows the system to boot with realistic restaurant data from day one.
+
+

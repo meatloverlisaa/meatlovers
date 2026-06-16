@@ -1,0 +1,16 @@
+CREATE TABLE audit_logs (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+
+user_id BIGINT,
+module_name VARCHAR(255),
+action_name VARCHAR(255),
+entity_id BIGINT,
+old_data JSON,
+new_data JSON,
+ip_address VARCHAR(255),
+FOREIGN KEY (user_id)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

@@ -1,0 +1,11 @@
+CREATE TABLE recipe_items (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+recipe_id BIGINT NOT NULL,
+ingredient_product_id BIGINT NOT NULL,
+quantity_required DECIMAL(12,2) NOT NULL,
+unit_cost DECIMAL(12,2) DEFAULT 0,
+FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+FOREIGN KEY (ingredient_product_id) REFERENCES products(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

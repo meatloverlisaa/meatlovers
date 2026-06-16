@@ -1,0 +1,22 @@
+CREATE TABLE asset_writeoff_requests (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+asset_id BIGINT NOT NULL,
+requested_by BIGINT NOT NULL,
+request_reason TEXT NOT NULL,
+estimated_loss DECIMAL(12,2) DEFAULT 0,
+
+
+writeoff_status ENUM(
+'PENDING',
+'APPROVED',
+'REJECTED',
+'APPLIED'
+) DEFAULT 'PENDING',
+approved_by BIGINT,
+approved_at TIMESTAMP NULL,
+FOREIGN KEY (asset_id) REFERENCES assets(id),
+FOREIGN KEY (requested_by) REFERENCES users(id),
+FOREIGN KEY (approved_by) REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

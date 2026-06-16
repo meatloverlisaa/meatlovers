@@ -1,0 +1,13 @@
+CREATE TABLE asset_repair_logs (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+asset_id BIGINT NOT NULL,
+repair_date DATE NOT NULL,
+repair_cost DECIMAL(12,2) DEFAULT 0,
+repair_description TEXT,
+repaired_by VARCHAR(255),
+recorded_by BIGINT,
+FOREIGN KEY (asset_id) REFERENCES assets(id),
+FOREIGN KEY (recorded_by) REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

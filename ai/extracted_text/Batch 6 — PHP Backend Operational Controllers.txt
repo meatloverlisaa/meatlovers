@@ -1,0 +1,611 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 6 — PHP Backend Operational Controllers
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Batch 6 — PHP Backend Operational Controllers
+Meat Lovers CIMS powered by YohPal
+
+6A. Update
+backend/routes/api.php
+Add imports:
+use Controllers\BarController;
+use Controllers\KitchenController;
+use Controllers\DispatchController;
+use Controllers\UnsoldFoodController;
+use Controllers\AssetsController;
+use Controllers\HRMController;
+use Controllers\StaffPerformanceController;
+use Controllers\FinanceController;
+use Controllers\IncomeStatementController;
+Add routes:
+$router->get('/api/bar/stock', [BarController::class, 'stock']);
+$router->post('/api/bar/stock-issue', [BarController::class, 'stockIssue']);
+$router->get('/api/kitchen/orders', [KitchenController::class, 'orders']);
+$router->post('/api/kitchen/orders/{id}/mark-ready', [KitchenController::class, 'markReady']);
+$router->get('/api/dispatch/orders', [DispatchController::class, 'orders']);
+$router->post('/api/dispatch/orders/{id}/dispatch', [DispatchController::class, 'dispatch']);
+$router->post('/api/dispatch/orders/{id}/deliver', [DispatchController::class, 'deliver']);
+$router->get('/api/unsold-food', [UnsoldFoodController::class, 'index']);
+$router->post('/api/unsold-food', [UnsoldFoodController::class, 'store']);
+$router->get('/api/assets', [AssetsController::class, 'index']);
+$router->post('/api/assets', [AssetsController::class, 'store']);
+$router->get('/api/hrm/staff', [HRMController::class, 'staff']);
+$router->post('/api/hrm/staff', [HRMController::class, 'storeStaff']);
+$router->get('/api/staff-performance', [StaffPerformanceController::class, 'index']);
+$router->post('/api/staff-performance', [StaffPerformanceController::class, 'store']);
+$router->get('/api/finance/transactions', [FinanceController::class, 'index']);
+$router->post('/api/finance/transactions', [FinanceController::class, 'store']);
+$router->get('/api/income-statement/daily', [IncomeStatementController::class, 'daily']);
+$router->get('/api/income-statement/weekly', [IncomeStatementController::class, 'weekly']);
+$router->get('/api/income-statement/monthly', [IncomeStatementController::class, 'monthly']);
+$router->get('/api/income-statement/annual', [IncomeStatementController::class, 'annual']);
+
+6B.
+backend/app/Controllers/BarController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+
+Tue, 16 Jun at 08:06
+
+class BarController
+{
+public function stock(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);
+$stmt = Database::connection()->query(
+"SELECT
+p.id,
+p.product_name,
+p.product_category,
+si.current_quantity,
+si.reorder_level
+FROM stock_items si
+JOIN products p ON p.id = si.product_id
+WHERE p.product_category = 'ALCOHOLIC_DRINK'
+ORDER BY p.product_name ASC"
+);
+Response::success(['bar_stock' => $stmt->fetchAll()]);
+}
+public function stockIssue(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);
+$data = Request::body();
+$db = Database::connection();
+$db->beginTransaction();
+$stmt = $db->prepare(
+"INSERT INTO stock_movements
+(product_id, movement_type, quantity, reference_number, notes, user_id)
+VALUES (:product_id, 'BAR_SALE', :quantity, :reference, :notes, :user_id)"
+);
+$stmt->execute([
+'product_id' => $data['product_id'],
+'quantity' => $data['quantity'],
+'reference' => $data['reference_number'] ?? null,
+'notes' => $data['notes'] ?? 'Bar stock issued',
+'user_id' => $user['id'],
+]);
+$update = $db->prepare(
+'UPDATE stock_items
+SET current_quantity = current_quantity - :quantity
+WHERE product_id = :product_id'
+);
+$update->execute([
+'quantity' => $data['quantity'],
+'product_id' => $data['product_id'],
+]);
+AuditLogger::log(
+(int) $user['id'],
+'BAR',
+'BAR_STOCK_ISSUE',
+(int) $data['product_id'],
+null,
+$data
+);
+$db->commit();
+Response::success([], 'Bar stock issued');
+}
+}
+
+6C.
+backend/app/Controllers/KitchenController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Response;
+
+use Support\AuditLogger;
+class KitchenController
+{
+public function orders(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+$stmt = Database::connection()->query(
+"SELECT
+o.id,
+o.order_number,
+o.table_number,
+o.order_status,
+o.created_at
+FROM orders o
+WHERE o.order_status IN ('PENDING', 'PREPARING')
+ORDER BY o.created_at ASC"
+);
+Response::success(['kitchen_orders' => $stmt->fetchAll()]);
+}
+public function markReady(int $orderId): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+$stmt = Database::connection()->prepare(
+"UPDATE orders
+SET order_status = 'READY'
+WHERE id = :id"
+);
+$stmt->execute(['id' => $orderId]);
+AuditLogger::log(
+(int) $user['id'],
+'KITCHEN',
+'MARK_ORDER_READY',
+$orderId
+);
+Response::success([], 'Order marked as ready');
+}
+}
+
+6D.
+backend/app/Controllers/DispatchController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class DispatchController
+{
+public function orders(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'DISPATCHER']);
+$stmt = Database::connection()->query(
+"SELECT
+d.*,
+o.order_number,
+c.full_name AS customer_name
+FROM deliveries d
+JOIN orders o ON o.id = d.order_id
+JOIN customers c ON c.id = d.customer_id
+ORDER BY d.created_at DESC"
+);
+Response::success(['deliveries' => $stmt->fetchAll()]);
+}
+public function dispatch(int $orderId): void
+{
+
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'DISPATCHER']);
+$data = Request::body();
+$stmt = Database::connection()->prepare(
+"UPDATE deliveries
+SET delivery_status = 'DISPATCHED',
+rider_name = :rider_name,
+rider_phone = :rider_phone
+WHERE order_id = :order_id"
+);
+$stmt->execute([
+'order_id' => $orderId,
+'rider_name' => $data['rider_name'] ?? null,
+'rider_phone' => $data['rider_phone'] ?? null,
+]);
+AuditLogger::log(
+(int) $user['id'],
+'DISPATCH',
+'DISPATCH_ORDER',
+$orderId,
+null,
+$data
+);
+Response::success([], 'Order dispatched');
+}
+public function deliver(int $orderId): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'DISPATCHER']);
+$stmt = Database::connection()->prepare(
+"UPDATE deliveries
+SET delivery_status = 'DELIVERED'
+WHERE order_id = :order_id"
+);
+$stmt->execute(['order_id' => $orderId]);
+AuditLogger::log(
+(int) $user['id'],
+'DISPATCH',
+'MARK_DELIVERED',
+$orderId
+);
+Response::success([], 'Order marked as delivered');
+}
+}
+
+6E.
+backend/app/Controllers/UnsoldFoodController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class UnsoldFoodController
+{
+public function index(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+$stmt = Database::connection()->query(
+"SELECT
+uf.*,
+p.product_name,
+u.full_name AS declared_by_name
+FROM unsold_food uf
+JOIN products p ON p.id = uf.product_id
+LEFT JOIN users u ON u.id = uf.declared_by
+ORDER BY uf.created_at DESC"
+);
+
+Response::success(['unsold_food' => $stmt->fetchAll()]);
+}
+public function store(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+$data = Request::body();
+$stmt = Database::connection()->prepare(
+'INSERT INTO unsold_food
+(product_id, quantity, reason, declared_by)
+VALUES (:product_id, :quantity, :reason, :declared_by)'
+);
+$stmt->execute([
+'product_id' => $data['product_id'],
+'quantity' => $data['quantity'],
+'reason' => $data['reason'] ?? null,
+'declared_by' => $user['id'],
+]);
+AuditLogger::log(
+(int) $user['id'],
+'UNSOLD_FOOD',
+'DECLARE_UNSOLD_FOOD',
+(int) $data['product_id'],
+null,
+$data
+);
+Response::success([], 'Unsold food declared');
+}
+}
+
+6F.
+backend/app/Controllers/AssetsController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class AssetsController
+{
+public function index(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+$stmt = Database::connection()->query(
+'SELECT * FROM assets ORDER BY created_at DESC'
+);
+Response::success(['assets' => $stmt->fetchAll()]);
+}
+public function store(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+$data = Request::body();
+$stmt = Database::connection()->prepare(
+'INSERT INTO assets
+(asset_name, asset_category, serial_number, purchase_cost, asset_status)
+VALUES (:name, :category, :serial, :cost, :status)'
+);
+$stmt->execute([
+'name' => $data['asset_name'],
+'category' => $data['asset_category'] ?? null,
+'serial' => $data['serial_number'] ?? null,
+'cost' => $data['purchase_cost'] ?? 0,
+'status' => $data['asset_status'] ?? 'ACTIVE',
+]);
+AuditLogger::log(
+
+(int) $user['id'],
+'ASSETS',
+'CREATE_ASSET',
+null,
+null,
+$data
+);
+Response::success([], 'Asset created');
+}
+}
+
+6G.
+backend/app/Controllers/HRMController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class HRMController
+{
+public function staff(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR']);
+$stmt = Database::connection()->query(
+"SELECT
+id,
+full_name,
+email,
+phone,
+role,
+is_active,
+created_at
+FROM users
+ORDER BY created_at DESC"
+);
+Response::success(['staff' => $stmt->fetchAll()]);
+}
+public function storeStaff(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR']);
+$data = Request::body();
+$passwordHash = password_hash(
+$data['password'] ?? 'ChangeMe123',
+PASSWORD_BCRYPT
+);
+$stmt = Database::connection()->prepare(
+'INSERT INTO users
+(full_name, email, phone, password_hash, role, is_active)
+VALUES (:name, :email, :phone, :password_hash, :role, 1)'
+);
+$stmt->execute([
+'name' => $data['full_name'],
+'email' => $data['email'] ?? null,
+'phone' => $data['phone'] ?? null,
+'password_hash' => $passwordHash,
+'role' => $data['role'],
+]);
+AuditLogger::log(
+(int) $user['id'],
+'HRM',
+'CREATE_STAFF',
+null,
+null,
+[
+'full_name' => $data['full_name'],
+'email' => $data['email'] ?? null,
+'phone' => $data['phone'] ?? null,
+
+'role' => $data['role'],
+]
+);
+Response::success([], 'Staff user created');
+}
+}
+
+6H.
+backend/app/Controllers/StaffPerformanceController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class StaffPerformanceController
+{
+public function index(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR']);
+$stmt = Database::connection()->query(
+"SELECT
+sp.*,
+u.full_name AS staff_name,
+u.role
+FROM staff_performance sp
+JOIN users u ON u.id = sp.staff_id
+ORDER BY sp.report_date DESC"
+);
+Response::success(['staff_performance' => $stmt->fetchAll()]);
+}
+public function store(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR']);
+$data = Request::body();
+$stmt = Database::connection()->prepare(
+'INSERT INTO staff_performance
+(staff_id, report_date, sales_amount, orders_served, customer_rating, bonus_amount)
+VALUES (:staff_id, :report_date, :sales_amount, :orders_served, :rating, :bonus)'
+);
+$stmt->execute([
+'staff_id' => $data['staff_id'],
+'report_date' => $data['report_date'],
+'sales_amount' => $data['sales_amount'] ?? 0,
+'orders_served' => $data['orders_served'] ?? 0,
+'rating' => $data['customer_rating'] ?? 0,
+'bonus' => $data['bonus_amount'] ?? 0,
+]);
+AuditLogger::log(
+(int) $user['id'],
+'STAFF_PERFORMANCE',
+'CREATE_PERFORMANCE_RECORD',
+(int) $data['staff_id'],
+null,
+$data
+);
+Response::success([], 'Staff performance record created');
+}
+}
+
+6I.
+backend/app/Controllers/FinanceController.php
+<?php
+
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Request;
+use Support\Response;
+use Support\AuditLogger;
+class FinanceController
+{
+public function index(): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+$stmt = Database::connection()->query(
+"SELECT
+ft.*,
+u.full_name AS created_by_name
+FROM finance_transactions ft
+LEFT JOIN users u ON u.id = ft.created_by
+ORDER BY ft.created_at DESC"
+);
+Response::success(['finance_transactions' => $stmt->fetchAll()]);
+}
+public function store(): void
+{
+$user = Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+$data = Request::body();
+$stmt = Database::connection()->prepare(
+'INSERT INTO finance_transactions
+(transaction_type, category, amount, reference_number, notes, created_by)
+VALUES (:type, :category, :amount, :reference, :notes, :created_by)'
+);
+$stmt->execute([
+'type' => $data['transaction_type'],
+'category' => $data['category'] ?? null,
+'amount' => $data['amount'],
+'reference' => $data['reference_number'] ?? null,
+'notes' => $data['notes'] ?? null,
+'created_by' => $user['id'],
+]);
+AuditLogger::log(
+(int) $user['id'],
+'FINANCE',
+'CREATE_FINANCE_TRANSACTION',
+null,
+null,
+$data
+);
+Response::success([], 'Finance transaction created');
+}
+}
+
+6J.
+backend/app/Controllers/IncomeStatementController.php
+<?php
+declare(strict_types=1);
+namespace Controllers;
+use Support\Auth;
+use Support\Database;
+use Support\Response;
+class IncomeStatementController
+{
+public function daily(): void
+{
+$this->statement("DATE(created_at) = CURDATE()", 'Daily income statement');
+}
+public function weekly(): void
+{
+
+$this->statement("YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)", 'Weekly income statement');
+}
+public function monthly(): void
+{
+$this->statement("YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())",
+'Monthly income statement');
+}
+public function annual(): void
+{
+$this->statement("YEAR(created_at) = YEAR(CURDATE())", 'Annual income statement');
+}
+private function statement(string $where, string $label): void
+{
+Auth::requireRole(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+$db = Database::connection();
+$income = $db->query(
+"SELECT COALESCE(SUM(amount), 0) AS total
+FROM finance_transactions
+WHERE transaction_type = 'INCOME'
+AND $where"
+)->fetch();
+$expenses = $db->query(
+"SELECT COALESCE(SUM(amount), 0) AS total
+FROM finance_transactions
+WHERE transaction_type = 'EXPENSE'
+AND $where"
+)->fetch();
+$sales = $db->query(
+"SELECT COALESCE(SUM(total_amount), 0) AS total
+FROM orders
+WHERE order_status = 'PAID'
+AND $where"
+)->fetch();
+$totalIncome = (float) $income['total'] + (float) $sales['total'];
+$totalExpenses = (float) $expenses['total'];
+$profit = $totalIncome - $totalExpenses;
+Response::success([
+'label' => $label,
+'sales_income' => (float) $sales['total'],
+'other_income' => (float) $income['total'],
+'total_income' => $totalIncome,
+'total_expenses' => $totalExpenses,
+'net_profit' => $profit,
+]);
+}
+}
+
+Batch 6 Outcome
+Backend now includes operational controllers for:
+Bar
+Kitchen
+Dispatch
+Unsold cooked food
+Asset inventory
+HRM
+Staff performance
+Finance
+Daily income statement
+Weekly income statement
+Monthly income statement
+Annual income statement
+
+Next Smart Move
+Build Batch 7 — Website Customer Acquisition App, including:
+customer-facing homepage
+AI-enabled lead capture page
+food menu page
+
+soft drinks page
+alcoholic drinks page
+offers page
+catering enquiry page
+delivery enquiry page
+customer feedback page
+website API integration layer
+
+

@@ -1,0 +1,12 @@
+CREATE TABLE receiving_note_items (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+receiving_note_id BIGINT NOT NULL,
+product_id BIGINT NOT NULL,
+quantity_received DECIMAL(12,2) NOT NULL,
+unit_cost DECIMAL(12,2) NOT NULL,
+total_cost DECIMAL(12,2) NOT NULL,
+FOREIGN KEY (receiving_note_id) REFERENCES receiving_notes(id),
+FOREIGN KEY (product_id) REFERENCES products(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

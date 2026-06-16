@@ -1,0 +1,23 @@
+CREATE TABLE margin_alerts (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+product_id BIGINT NOT NULL,
+product_category ENUM(
+'FOOD',
+'SOFT_DRINK',
+'ALCOHOLIC_DRINK'
+) NOT NULL,
+selling_price DECIMAL(12,2),
+cost_price DECIMAL(12,2),
+margin_percent DECIMAL(5,2),
+alert_status ENUM(
+'OPEN',
+'REVIEWED',
+'RESOLVED',
+'CLOSED'
+) DEFAULT 'OPEN',
+notes TEXT,
+FOREIGN KEY (product_id)
+REFERENCES products(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

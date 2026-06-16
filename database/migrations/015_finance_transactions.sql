@@ -1,0 +1,16 @@
+CREATE TABLE finance_transactions (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+transaction_type ENUM(
+'INCOME',
+'EXPENSE'
+) NOT NULL,
+category VARCHAR(255),
+amount DECIMAL(12,2) NOT NULL,
+reference_number VARCHAR(255),
+notes TEXT,
+created_by BIGINT,
+FOREIGN KEY (created_by)
+REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

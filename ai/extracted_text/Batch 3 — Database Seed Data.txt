@@ -1,0 +1,727 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 3 — Database Seed Data
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Tue, 16 Jun at 08:04
+
+Batch 3 — Database Seed Data
+Meat Lovers CIMS powered by YohPal
+Objective: Load realistic starter data so the system can boot with usable users, products, suppliers, customers, tables, and assets.
+
+3A.
+database/seeds/001_users_seed.sql
+INSERT INTO users (
+full_name,
+email,
+phone,
+password_hash,
+role,
+is_active
+) VALUES
+(
+'Super Admin',
+'admin@meatlovers.local',
+'0700000001',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'SUPER_ADMIN',
+TRUE
+),
+(
+'Restaurant Manager',
+'manager@meatlovers.local',
+'0700000002',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'MANAGER',
+TRUE
+),
+(
+'Main Cashier',
+'cashier@meatlovers.local',
+'0700000003',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'CASHIER',
+TRUE
+),
+(
+'Service Waiter',
+'waiter@meatlovers.local',
+'0700000004',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'WAITER',
+TRUE
+),
+(
+'Kitchen Chef',
+'chef@meatlovers.local',
+'0700000005',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'CHEF',
+TRUE
+),
+(
+'Store Keeper',
+'store@meatlovers.local',
+'0700000006',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'STOREKEEPER',
+TRUE
+),
+(
+'Bar Attendant',
+
+'bar@meatlovers.local',
+'0700000007',
+'$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION',
+'BARMAN',
+TRUE
+);
+
+3B.
+database/seeds/002_suppliers_seed.sql
+INSERT INTO suppliers (
+supplier_name,
+contact_person,
+phone,
+email,
+physical_address,
+supplier_type,
+status
+) VALUES
+(
+'Fresh Farm Foods Ltd',
+'Peter Mwangi',
+'0711000001',
+'freshfarm@example.com',
+'Nairobi Wholesale Market',
+'FOOD',
+'ACTIVE'
+),
+(
+'Prime Butchery Supplies',
+'James Otieno',
+'0711000002',
+'primebutchery@example.com',
+'Nairobi Industrial Area',
+'FOOD',
+'ACTIVE'
+),
+(
+'Soft Drinks Distributors Ltd',
+'Mary Wanjiku',
+'0711000003',
+'softdrinks@example.com',
+'Nairobi CBD',
+'SOFT_DRINKS',
+'ACTIVE'
+),
+(
+'Licensed Alcohol Suppliers Ltd',
+'Brian Kariuki',
+'0711000004',
+'alcoholsuppliers@example.com',
+'Nairobi',
+'ALCOHOL',
+'ACTIVE'
+),
+(
+'General Restaurant Supplies',
+'Lucy Achieng',
+'0711000005',
+'general@example.com',
+'Nairobi',
+'GENERAL',
+'ACTIVE'
+);
+
+3C.
+database/seeds/003_products_food_seed.sql
+INSERT INTO products (
+product_name,
+product_category,
+selling_price,
+cost_price,
+barcode,
+is_active
+) VALUES
+(
+'Beef Choma Plate',
+'FOOD',
+
+650.00,
+380.00,
+'FOOD-001',
+TRUE
+),
+(
+'Chicken Choma Plate',
+'FOOD',
+750.00,
+430.00,
+'FOOD-002',
+TRUE
+),
+(
+'Pork Ribs Plate',
+'FOOD',
+850.00,
+500.00,
+'FOOD-003',
+TRUE
+),
+(
+'Ugali',
+'FOOD',
+100.00,
+40.00,
+'FOOD-004',
+TRUE
+),
+(
+'Chips',
+'FOOD',
+250.00,
+120.00,
+'FOOD-005',
+TRUE
+),
+(
+'Kachumbari',
+'FOOD',
+100.00,
+40.00,
+'FOOD-006',
+TRUE
+),
+(
+'Mukimo',
+'FOOD',
+200.00,
+90.00,
+'FOOD-007',
+TRUE
+),
+(
+'Pilau',
+'FOOD',
+350.00,
+180.00,
+'FOOD-008',
+TRUE
+);
+
+3D.
+database/seeds/004_products_soft_drinks_seed.sql
+INSERT INTO products (
+product_name,
+product_category,
+selling_price,
+cost_price,
+barcode,
+is_active
+) VALUES
+(
+'Coca-Cola 500ml',
+'SOFT_DRINK',
+120.00,
+70.00,
+'SOFT-001',
+TRUE
+),
+(
+'Fanta 500ml',
+
+'SOFT_DRINK',
+120.00,
+70.00,
+'SOFT-002',
+TRUE
+),
+(
+'Sprite 500ml',
+'SOFT_DRINK',
+120.00,
+70.00,
+'SOFT-003',
+TRUE
+),
+(
+'Stoney 500ml',
+'SOFT_DRINK',
+120.00,
+70.00,
+'SOFT-004',
+TRUE
+),
+(
+'Water 500ml',
+'SOFT_DRINK',
+100.00,
+45.00,
+'SOFT-005',
+TRUE
+),
+(
+'Fresh Juice Glass',
+'SOFT_DRINK',
+200.00,
+90.00,
+'SOFT-006',
+TRUE
+);
+
+3E.
+database/seeds/005_products_alcoholic_drinks_seed.sql
+INSERT INTO products (
+product_name,
+product_category,
+selling_price,
+cost_price,
+barcode,
+is_active
+) VALUES
+(
+'Tusker Lager',
+'ALCOHOLIC_DRINK',
+300.00,
+190.00,
+'ALC-001',
+TRUE
+),
+(
+'Tusker Malt',
+'ALCOHOLIC_DRINK',
+350.00,
+220.00,
+'ALC-002',
+TRUE
+),
+(
+'White Cap',
+'ALCOHOLIC_DRINK',
+350.00,
+220.00,
+'ALC-003',
+TRUE
+),
+(
+'Guinness',
+'ALCOHOLIC_DRINK',
+350.00,
+230.00,
+'ALC-004',
+TRUE
+),
+(
+
+'Balozi',
+'ALCOHOLIC_DRINK',
+300.00,
+190.00,
+'ALC-005',
+TRUE
+),
+(
+'House Wine Glass',
+'ALCOHOLIC_DRINK',
+450.00,
+260.00,
+'ALC-006',
+TRUE
+);
+
+3F.
+database/seeds/006_stock_items_seed.sql
+INSERT INTO stock_items (
+product_id,
+current_quantity,
+reorder_level
+)
+SELECT
+id,
+0,
+10
+FROM products;
+
+3G.
+database/seeds/007_customers_seed.sql
+INSERT INTO customers (
+full_name,
+phone,
+email,
+customer_type,
+loyalty_points,
+notes
+) VALUES
+(
+'Walk In Customer',
+NULL,
+NULL,
+'WALK_IN',
+0,
+'Default walk-in customer'
+),
+(
+'Corporate Client One',
+'0722000001',
+'corporate1@example.com',
+'CORPORATE',
+0,
+'Potential catering and group booking customer'
+),
+(
+'Regular Customer One',
+'0722000002',
+'regular1@example.com',
+'REGULAR',
+25,
+'Repeat customer'
+),
+(
+'VIP Customer One',
+'0722000003',
+'vip1@example.com',
+'VIP',
+100,
+'VIP customer for priority service'
+),
+(
+'Delivery Customer One',
+'0722000004',
+'delivery1@example.com',
+'DELIVERY',
+10,
+
+'Customer usually orders for delivery'
+);
+
+3H.
+database/migrations/017_restaurant_tables.sql
+CREATE TABLE restaurant_tables (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+table_number VARCHAR(50) UNIQUE NOT NULL,
+table_name VARCHAR(255),
+seating_capacity INT DEFAULT 4,
+table_status ENUM(
+'AVAILABLE',
+'OCCUPIED',
+'RESERVED',
+'DISABLED'
+) DEFAULT 'AVAILABLE',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+3I.
+database/seeds/008_restaurant_tables_seed.sql
+INSERT INTO restaurant_tables (
+table_number,
+table_name,
+seating_capacity,
+table_status
+) VALUES
+(
+'T01',
+'Table 1',
+4,
+'AVAILABLE'
+),
+(
+'T02',
+'Table 2',
+4,
+'AVAILABLE'
+),
+(
+'T03',
+'Table 3',
+4,
+'AVAILABLE'
+),
+(
+'T04',
+'Table 4',
+6,
+'AVAILABLE'
+),
+(
+'T05',
+'Table 5',
+6,
+'AVAILABLE'
+),
+(
+'VIP01',
+'VIP Table 1',
+8,
+'AVAILABLE'
+),
+(
+'BAR01',
+'Bar Counter 1',
+2,
+'AVAILABLE'
+),
+(
+'TAKEAWAY',
+
+'Take Away Counter',
+0,
+'AVAILABLE'
+);
+
+3J.
+database/seeds/009_assets_seed.sql
+INSERT INTO assets (
+asset_name,
+asset_category,
+serial_number,
+purchase_cost,
+asset_status
+) VALUES
+(
+'Main POS Terminal',
+'ICT',
+'ML-POS-001',
+45000.00,
+'ACTIVE'
+),
+(
+'Kitchen Printer',
+'PRINTER',
+'ML-KITCHEN-PRINTER-001',
+18000.00,
+'ACTIVE'
+),
+(
+'Bar Printer',
+'PRINTER',
+'ML-BAR-PRINTER-001',
+18000.00,
+'ACTIVE'
+),
+(
+'Cash Drawer',
+'CASH_CONTROL',
+'ML-CASHDRAWER-001',
+12000.00,
+'ACTIVE'
+),
+(
+'Deep Freezer',
+'KITCHEN_EQUIPMENT',
+'ML-FREEZER-001',
+85000.00,
+'ACTIVE'
+),
+(
+'Grill Machine',
+'KITCHEN_EQUIPMENT',
+'ML-GRILL-001',
+120000.00,
+'ACTIVE'
+),
+(
+'Bar Fridge',
+'BAR_EQUIPMENT',
+'ML-BARFRIDGE-001',
+65000.00,
+'ACTIVE'
+),
+(
+'CCTV System',
+'SECURITY',
+'ML-CCTV-001',
+95000.00,
+'ACTIVE'
+);
+
+3K.
+database/seeds/010_opening_stock_movements_seed.sql
+INSERT INTO stock_movements (
+product_id,
+movement_type,
+quantity,
+
+reference_number,
+notes,
+user_id
+)
+SELECT
+p.id,
+'PURCHASE',
+CASE
+WHEN p.product_category = 'FOOD' THEN 20
+WHEN p.product_category = 'SOFT_DRINK' THEN 48
+WHEN p.product_category = 'ALCOHOLIC_DRINK' THEN 36
+ELSE 0
+END,
+'OPENING-STOCK',
+'Opening stock loaded during system setup',
+6
+FROM products p;
+
+3L.
+database/seeds/011_update_stock_items_from_opening_stock.sql
+UPDATE stock_items si
+JOIN (
+SELECT
+product_id,
+SUM(quantity) AS total_quantity
+FROM stock_movements
+WHERE reference_number = 'OPENING-STOCK'
+GROUP BY product_id
+) sm ON si.product_id = sm.product_id
+SET si.current_quantity = sm.total_quantity;
+
+3M.
+database/seeds/012_finance_opening_seed.sql
+INSERT INTO finance_transactions (
+transaction_type,
+category,
+amount,
+reference_number,
+notes,
+created_by
+) VALUES
+(
+'EXPENSE',
+'OPENING_STOCK',
+150000.00,
+'OPENING-STOCK-COST',
+'Estimated opening stock cost for system testing',
+2
+),
+(
+'EXPENSE',
+'ASSET_REGISTER',
+458000.00,
+'OPENING-ASSETS',
+'Opening asset register value for system testing',
+2
+);
+
+3N.
+database/seeds/013_seed_loader.sql
+-- Meat Lovers CIMS powered by YohPal
+-- Master Seed Loader
+SOURCE database/seeds/001_users_seed.sql;
+SOURCE database/seeds/002_suppliers_seed.sql;
+SOURCE database/seeds/003_products_food_seed.sql;
+SOURCE database/seeds/004_products_soft_drinks_seed.sql;
+SOURCE database/seeds/005_products_alcoholic_drinks_seed.sql;
+SOURCE database/seeds/006_stock_items_seed.sql;
+SOURCE database/seeds/007_customers_seed.sql;
+SOURCE database/migrations/017_restaurant_tables.sql;
+SOURCE database/seeds/008_restaurant_tables_seed.sql;
+
+SOURCE database/seeds/009_assets_seed.sql;
+SOURCE database/seeds/010_opening_stock_movements_seed.sql;
+SOURCE database/seeds/011_update_stock_items_from_opening_stock.sql;
+SOURCE database/seeds/012_finance_opening_seed.sql;
+
+3O.
+docs/SEED_DATA_MANUAL.md
+# Meat Lovers CIMS powered by YohPal — Seed Data Manual
+## Purpose
+Seed data allows the system to boot with realistic restaurant data from day one.
+## Seeded Users
+| Role | Email |
+|---|---|
+| Super Admin | admin@meatlovers.local |
+| Manager | manager@meatlovers.local |
+| Cashier | cashier@meatlovers.local |
+| Waiter | waiter@meatlovers.local |
+| Chef | chef@meatlovers.local |
+| Storekeeper | store@meatlovers.local |
+| Barman | bar@meatlovers.local |
+## Important Password Rule
+The seeded `password_hash` values are placeholders.
+Before real login testing, developers must replace:
+```text
+$2y$10$CHANGE_THIS_HASH_BEFORE_PRODUCTION
+with a real PHP password hash generated using:
+password_hash('your-password', PASSWORD_BCRYPT);
+
+Seeded Product Categories
+The system separates products into:
+1. Food
+2. Soft drinks
+3. Alcoholic drinks
+This supports:
+bar accountability
+kitchen accountability
+stock separation
+sales analysis
+P&L separation
+
+Seed Execution Order
+Run migrations first, then seeds.
+Recommended order:
+SOURCE database/migrations/002_users.sql;
+SOURCE database/migrations/003_customers.sql;
+SOURCE database/migrations/004_suppliers.sql;
+SOURCE database/migrations/005_products.sql;
+SOURCE database/migrations/006_stock_items.sql;
+SOURCE database/migrations/007_stock_movements.sql;
+SOURCE database/migrations/008_orders.sql;
+SOURCE database/migrations/009_order_items.sql;
+SOURCE database/migrations/010_payments.sql;
+SOURCE database/migrations/011_assets.sql;
+SOURCE database/migrations/012_unsold_food.sql;
+SOURCE database/migrations/013_deliveries.sql;
+SOURCE database/migrations/014_audit_logs.sql;
+SOURCE database/migrations/015_finance_transactions.sql;
+SOURCE database/migrations/016_staff_performance.sql;
+SOURCE database/migrations/017_restaurant_tables.sql;
+SOURCE database/seeds/013_seed_loader.sql;
+
+Seed Data Purpose
+This seed pack allows developers to immediately test:
+login users
+product listing
+food menu
+drinks menu
+supplier listing
+stock opening balance
+table selection
+asset inventory
+finance opening entries
+reports
+--# Batch 3 Outcome
+Seed data now supports:
+Super Admin
+Manager
+Cashier
+Waiter
+Chef
+Storekeeper
+Barman
+Food menu
+Soft drinks
+Alcoholic drinks
+Suppliers
+Customers
+Restaurant tables
+Assets
+Opening stock
+Opening finance entries
+# Next Smart Move
+Build **Batch 4 — PHP Backend Foundation**, including:
+- backend boot file
+- database connection
+- response helper
+- request helper
+- router
+- auth controller
+- products controller
+- suppliers controller
+- customers controller
+- inventory controller
+- orders controller
+- payments controller
+- reports controller
+- monitoring controller
+
+

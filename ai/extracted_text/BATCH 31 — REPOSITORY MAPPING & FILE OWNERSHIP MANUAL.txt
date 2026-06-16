@@ -1,0 +1,399 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+BATCH 31 — REPOSITORY MAPPING & FILE OWNERSHIP MANUAL
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Tue, 16 Jun at 08:34
+
+This document should be issued together with the Run-to-Green Manual and Developer Handover Memo.
+
+BATCH 31 — REPOSITORY MAPPING & FILE OWNERSHIP MANUAL
+Meat Lovers CIMS powered by YohPal
+VERSION: 1.0
+STATUS: MANDATORY
+PURPOSE
+This manual defines:
+Repository structure
+Folder ownership
+Module ownership
+Dependency chain
+Responsible developer/team
+Change control boundaries
+No developer may modify a module outside their ownership without approval.
+
+1. MASTER REPOSITORY STRUCTURE
+meat-lovers-cims/
+│
+├── apps/
+│
+├── website/
+│
+├── admin-web/
+│
+├── pos-pwa/
+│
+└── monitoring-web/
+│
+├── backend/
+│
+├── database/
+│
+├── migrations/
+│
+├── seeds/
+│
+└── backups/
+│
+├── deployment/
+│
+├── docs/
+│
+├── .env
+└── README.md
+
+2. WEBSITE MODULE
+FOLDER
+apps/website/
+OWNER
+Website Team
+PURPOSE
+Customer acquisition engine.
+
+RESPONSIBLE FOR
+Homepage
+Menu pages
+Lead capture
+Catering enquiries
+Delivery enquiries
+Feedback
+MUST NOT OWN
+Finance
+HRM
+Stock
+Enforcement
+DEPENDENCIES
+Website
+↓
+CRM
+
+3. ADMIN DASHBOARD MODULE
+FOLDER
+apps/admin-web/
+OWNER
+Operations Team
+PURPOSE
+Business operations dashboard.
+RESPONSIBLE FOR
+Suppliers
+Products
+Stock
+Kitchen
+Bar
+Dispatch
+Finance
+HRM
+CRM
+Assets
+Enforcement
+DEPENDENCIES
+Admin
+↓
+Backend API
+↓
+Database
+
+4. POS MODULE
+FOLDER
+apps/pos-pwa/
+OWNER
+POS Team
+PURPOSE
+Restaurant sales operations.
+RESPONSIBLE FOR
+Waiter app
+Kitchen mobile
+
+Bar mobile
+Cashier mobile
+Receipts
+DEPENDENCIES
+POS
+↓
+Orders
+↓
+Payments
+↓
+Stock
+
+5. MONITORING MODULE
+FOLDER
+apps/monitoring-web/
+OWNER
+Management Intelligence Team
+PURPOSE
+Real-time visibility.
+RESPONSIBLE FOR
+KPI dashboard
+Alerts
+Monitoring
+Risk visibility
+DEPENDENCIES
+All modules
+↓
+Monitoring
+
+6. BACKEND MODULE
+FOLDER
+backend/
+OWNER
+Backend Team
+PURPOSE
+System of record.
+RESPONSIBLE FOR
+Authentication
+APIs
+Business logic
+Enforcement
+Reporting
+DEPENDENCIES
+Database
+↓
+Backend
+↓
+All Frontends
+
+7. DATABASE MODULE
+FOLDER
+
+database/
+OWNER
+Database Team
+SUBFOLDERS
+migrations/
+seeds/
+backups/
+RESPONSIBLE FOR
+Schema
+Data integrity
+Backup validation
+NO FRONTEND CHANGES ALLOWED HERE
+
+8. DEPLOYMENT MODULE
+FOLDER
+deployment/
+OWNER
+DevOps Team
+RESPONSIBLE FOR
+Nginx
+Apache
+Backups
+LAN deployment
+Server configuration
+
+9. DOCUMENTATION MODULE
+FOLDER
+docs/
+OWNER
+Architecture Team
+RESPONSIBLE FOR
+Manuals
+SOPs
+Runbooks
+Certification documents
+
+10. DATABASE OWNERSHIP
+CRM Tables
+OWNER
+CRM Team
+Tables:
+customers
+customer_visit_history
+customer_follow_ups
+loyalty_transactions
+website_leads
+customer_feedback
+
+Storekeeping Tables
+
+OWNER
+Storekeeping Team
+Tables:
+suppliers
+supplier_invoices
+receiving_notes
+stock_items
+stock_movements
+stock_transfers
+
+Production Tables
+OWNER
+Kitchen Team
+Tables:
+recipes
+recipe_items
+kitchen_production_plans
+ingredient_consumption
+food_wastage
+
+Bar Tables
+OWNER
+Bar Team
+Tables:
+bar stock
+bar movement records
+
+Finance Tables
+OWNER
+Finance Team
+Tables:
+finance_transactions
+income_statement_snapshots
+cashier_reconciliations
+variance_alerts
+
+HRM Tables
+OWNER
+HR Team
+Tables:
+staff_shifts
+duty_rosters
+attendance
+absence_reports
+payroll_placeholders
+
+Asset Tables
+OWNER
+Asset Management Team
+Tables:
+assets
+asset_assignments
+
+maintenance
+repair_logs
+damage_reports
+writeoff_requests
+
+Enforcement Tables
+OWNER
+Enforcement Team
+Tables:
+audit_logs
+approval_requests
+staff_incidents
+risk_scores
+enforcement_actions
+
+11. FRONTEND OWNERSHIP MATRIX
+Website Team
+apps/website/**
+Admin Team
+apps/admin-web/**
+POS Team
+apps/pos-pwa/**
+Monitoring Team
+apps/monitoring-web/**
+
+12. BACKEND OWNERSHIP MATRIX
+Auth Team
+AuthController
+Middleware
+JWT
+Operations Team
+Orders
+Products
+Kitchen
+Bar
+Dispatch
+Finance Team
+FinanceController
+IncomeStatementController
+CRM Team
+CustomersController
+CRM APIs
+Enforcement Team
+EnforcementController
+Approvals
+Risk Engine
+
+13. DEPENDENCY CHAIN
+Website
+Website
+↓
+CRM
+
+↓
+Database
+POS
+POS
+↓
+Orders
+↓
+Payments
+↓
+Finance
+Kitchen
+Kitchen
+↓
+Production
+↓
+Inventory
+Storekeeping
+Storekeeping
+↓
+Inventory
+↓
+Finance
+Enforcement
+Audit Logs
+Approvals
+Incidents
+Attendance
+Variance
+↓
+Risk Score
+↓
+Dashboard
+
+14. CHANGE CONTROL
+Developers may change:
+Files owned by their team
+Developers may NOT change:
+Other module ownership
+Database ownership
+Security ownership
+Enforcement ownership
+Without approval.
+
+15. HIGH-RISK FILES
+Changes require approval.
+AuthController
+EnforcementController
+FinanceController
+IncomeStatementController
+AuditLogger
+Approval Engine
+Database Migrations
+Deployment Configs
+
+16. FINAL RULE
+Every file must have:
+1. Owner
+2. Purpose
+3. Dependency chain
+
+If ownership is unclear:
+DO NOT MODIFY.
+Escalate for approval.
+END OF DOCUMENT
+
+Batch 31 Outcome
+Repository structure mapped
+Folder ownership defined
+Module ownership defined
+Database ownership defined
+Dependency chains documented
+High-risk files identified
+Change-control boundaries established
+
+

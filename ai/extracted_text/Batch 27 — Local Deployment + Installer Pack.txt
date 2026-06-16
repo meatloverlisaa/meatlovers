@@ -1,0 +1,238 @@
+Daniel Macharia <danielmacharia43@gmail.com>
+
+Batch 27 — Local Deployment + Installer Pack
+Daniel Macharia <danielmacharia43@gmail.com>
+To: <daniel@ics.ac.ke>
+
+Batch 27 — Local Deployment + Installer Pack
+Meat Lovers CIMS powered by YohPal
+
+27A. Final Local Server Folder Layout
+meat-lovers-cims/
+├── apps/
+│
+├── admin-web/
+│
+├── pos-pwa/
+│
+├── monitoring-web/
+│
+└── website/
+├── backend/
+├── database/
+│
+├── migrations/
+│
+├── seeds/
+│
+└── backups/
+├── deployment/
+│
+├── nginx/
+│
+├── apache/
+│
+├── scripts/
+│
+└── windows/
+├── docs/
+├── .env
+└── README.md
+
+27B. Root
+.env.example
+APP_NAME="Meat Lovers CIMS powered by YohPal"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://192.168.1.10
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=meat_lovers_cims
+DB_USERNAME=root
+DB_PASSWORD=
+JWT_SECRET=CHANGE_THIS_LOCAL_SECRET
+ADMIN_WEB_URL=http://192.168.1.10/admin
+POS_PWA_URL=http://192.168.1.10/pos
+MONITORING_WEB_URL=http://192.168.1.10/monitoring
+WEBSITE_URL=http://192.168.1.10
+
+27C. Frontend
+.env.example
+Place this in each frontend app:
+VITE_API_BASE_URL=http://192.168.1.10/api
+VITE_APP_NAME="Meat Lovers CIMS powered by YohPal"
+Apps:
+apps/admin-web/.env
+apps/pos-pwa/.env
+apps/monitoring-web/.env
+apps/website/.env
+
+Tue, 16 Jun at 08:28
+
+27D.
+deployment/nginx/meat-lovers-cims.conf
+server {
+listen 80;
+server_name _;
+root /var/www/meat-lovers-cims/apps/website/dist;
+index index.html;
+location / {
+try_files $uri $uri/ /index.html;
+}
+location /admin {
+alias /var/www/meat-lovers-cims/apps/admin-web/dist;
+try_files $uri $uri/ /admin/index.html;
+}
+location /pos {
+alias /var/www/meat-lovers-cims/apps/pos-pwa/dist;
+try_files $uri $uri/ /pos/index.html;
+}
+location /monitoring {
+alias /var/www/meat-lovers-cims/apps/monitoring-web/dist;
+try_files $uri $uri/ /monitoring/index.html;
+}
+location /api {
+alias /var/www/meat-lovers-cims/backend/public;
+try_files $uri $uri/ /index.php?$query_string;
+}
+location ~ \.php$ {
+include snippets/fastcgi-php.conf;
+fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+}
+}
+
+27E.
+deployment/apache/meat-lovers-cims.conf
+<VirtualHost *:80>
+ServerName meat-lovers.local
+DocumentRoot /var/www/meat-lovers-cims/apps/website/dist
+Alias /admin /var/www/meat-lovers-cims/apps/admin-web/dist
+Alias /pos /var/www/meat-lovers-cims/apps/pos-pwa/dist
+Alias /monitoring /var/www/meat-lovers-cims/apps/monitoring-web/dist
+Alias /api /var/www/meat-lovers-cims/backend/public
+<Directory /var/www/meat-lovers-cims>
+AllowOverride All
+Require all granted
+</Directory>
+</VirtualHost>
+
+27F. Ubuntu Local Server Setup
+sudo apt update
+sudo apt install nginx mysql-server php php-fpm php-mysql php-cli unzip curl git nodejs npm -y
+sudo mkdir -p /var/www/meat-lovers-cims
+sudo cp -r meat-lovers-cims/* /var/www/meat-lovers-cims/
+cd /var/www/meat-lovers-cims
+cp .env.example .env
+
+27G. MySQL Setup
+sudo mysql
+CREATE DATABASE meat_lovers_cims;
+CREATE USER 'meat_lovers_user'@'localhost' IDENTIFIED BY 'StrongLocalPassword';
+GRANT ALL PRIVILEGES ON meat_lovers_cims.* TO 'meat_lovers_user'@'localhost';
+
+FLUSH PRIVILEGES;
+EXIT;
+Update .env:
+DB_DATABASE=meat_lovers_cims
+DB_USERNAME=meat_lovers_user
+DB_PASSWORD=StrongLocalPassword
+Run migrations/seeds:
+mysql -u meat_lovers_user -p meat_lovers_cims < database/migrations/001_initial.sql
+mysql -u meat_lovers_user -p meat_lovers_cims < database/seeds/001_seed.sql
+Developers must run all migration files in order, then all seed files in order.
+
+27H. Frontend Build Commands
+cd apps/website
+npm install
+npm run build
+cd ../admin-web
+npm install
+npm run build
+cd ../pos-pwa
+npm install
+npm run build
+cd ../monitoring-web
+npm install
+npm run build
+
+27I. Backend Startup Test
+cd backend
+php -S 0.0.0.0:8000 -t public
+Test:
+curl http://localhost:8000/api/monitoring/live-control
+
+27J. Apply Nginx Config
+sudo cp deployment/nginx/meat-lovers-cims.conf /etc/nginx/sites-available/meat-lovers-cims
+sudo ln -s /etc/nginx/sites-available/meat-lovers-cims /etc/nginx/sites-enabled/meat-lovers-cims
+sudo nginx -t
+sudo systemctl restart nginx
+
+27K. Backup Script
+deployment/scripts/backup_mysql.sh
+#!/bin/bash
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+BACKUP_DIR="/var/www/meat-lovers-cims/database/backups"
+DB_NAME="meat_lovers_cims"
+DB_USER="meat_lovers_user"
+DB_PASS="StrongLocalPassword"
+mkdir -p "$BACKUP_DIR"
+mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_DIR/meat_lovers_$DATE.sql"
+find "$BACKUP_DIR" -type f -mtime +14 -delete
+Make executable:
+chmod +x deployment/scripts/backup_mysql.sh
+Cron daily backup:
+crontab -e
+0 23 * * * /var/www/meat-lovers-cims/deployment/scripts/backup_mysql.sh
+
+27L. LAN Access Guide
+Find server IP:
+ip addr
+Example:
+192.168.1.10
+Access from phones/tablets/computers on same Wi-Fi:
+Website:
+Admin:
+POS:
+Monitoring:
+API:
+
+http://192.168.1.10
+http://192.168.1.10/admin
+http://192.168.1.10/pos
+http://192.168.1.10/monitoring
+http://192.168.1.10/api
+
+27M. Production Checklist
+[ ] MySQL database created
+[ ] All migrations executed in order
+[ ] All seeds executed in order
+[ ] Backend .env configured
+[ ] Frontend .env files configured
+[ ] Website build completed
+[ ] Admin build completed
+[ ] POS build completed
+[ ] Monitoring build completed
+[ ] Nginx/Apache config enabled
+[ ] LAN IP confirmed
+[ ] POS opens on waiter phone
+[ ] Admin opens on manager computer
+[ ] Monitoring opens on owner screen
+[ ] Backup script tested
+[ ] Daily backup cron enabled
+
+Batch 27 Outcome
+Local deployment pack now includes:
+local server folder layout
+Apache/Nginx config
+.env templates
+MySQL setup
+frontend build commands
+backend startup instructions
+backup scripts
+LAN access guide
+
+Next Smart Move
+Build Batch 28 — Final Developer Run-to-Green Manual, combining all batches into one strict execution order from database setup to
+backend, frontend, POS, monitoring, enforcement, backups, LAN launch, and production verification.
+
+

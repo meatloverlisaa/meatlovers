@@ -1,0 +1,28 @@
+CREATE TABLE asset_assignments (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+asset_id BIGINT NOT NULL,
+assigned_to BIGINT,
+department ENUM(
+'STORE',
+'KITCHEN',
+'SERVICE',
+'DISPATCH',
+'BAR',
+'HRM',
+'FINANCE',
+'ADMIN'
+) NOT NULL,
+assigned_date DATE NOT NULL,
+returned_date DATE NULL,
+assignment_status ENUM(
+'ASSIGNED',
+'RETURNED',
+'LOST',
+'DAMAGED'
+) DEFAULT 'ASSIGNED',
+notes TEXT,
+FOREIGN KEY (asset_id) REFERENCES assets(id),
+FOREIGN KEY (assigned_to) REFERENCES users(id),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
