@@ -6,11 +6,13 @@ import LowStockAlertsPage from '../features/live-control/pages/LowStockAlertsPag
 import PendingApprovalsPage from '../features/live-control/pages/PendingApprovalsPage'
 import PendingMpesaPage from '../features/live-control/pages/PendingMpesaPage'
 import UnsoldFoodAlertsPage from '../features/live-control/pages/UnsoldFoodAlertsPage'
+import LoginPage from '../features/auth/pages/LoginPage'
 import NotFound from '../pages/NotFound'
 
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
       <Route element={<MonitoringLayout />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<OwnerDashboardPage />} />
