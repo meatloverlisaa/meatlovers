@@ -23,3 +23,13 @@ Meat Lovers CIMS powered by YohPal
     - [ ] Add API tests for pricing rule endpoints and audit logging
     - [ ] Run API test suite
 
+  - [x] 3.4 UI: Pricing Control & Margin Alerts Dashboard
+    - [x] 3.4.1 API: Margin alerts endpoints (list + update status/notes)
+    - [x] 3.4.2 UI: Admin pricing control dashboard page (summary + alerts table + actions)
+
+    - [ ] 3.4.3 Test UI & API integration
+
+
+
+  - [ ] 3.5 UI: Navigation (link to Pricing Control dashboard from admin)
+
