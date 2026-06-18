@@ -1,9 +1,19 @@
-# TODO
+# Project TODO
 
-## Current Feature/Step: 4.4 Testing — Verify quantity updates on stock movements
+## Orders API: Order Creation & Order Items (Table, Waiter assignment)
 
-- [ ] Inspect stock movement + inventory models (Prisma schema) and existing stock logic.
-- [ ] Add unit/e2e tests that assert inventory quantity deltas for stock-in/out movements.
-- [ ] Ensure tests run via `cd api && npm test` and/or `npm test:e2e`.
-- [ ] Track failures against current placeholder implementation (expected red tests until Step 4.3 is implemented).
+- [ ] Update Prisma schema: add `Table`, `Order`, `OrderItem` models + relations to `User` (waiter) and `Product`.
+- [ ] Add/adjust enums as needed (e.g., `OrderStatus`).
+- [ ] Create Prisma migration.
+- [ ] Implement `OrdersModule` (controller + service).
+- [ ] Implement DTOs for order creation: tableId, waiterId, items[{productId, quantity}].
+- [ ] Implement controller endpoint `POST /orders` returning created order with items.
+- [ ] Implement service logic with validation + transaction:
+  - validate table exists
+  - validate waiter exists and role == WAITER
+  - validate products exist/active
+  - compute unitPrice/lineTotal and order total
+  - persist Order + OrderItems in a single transaction
+- [ ] Wire `OrdersModule` into `AppModule`.
+- [ ] Run `npm test` / `npm run build` and verify API starts.
 
