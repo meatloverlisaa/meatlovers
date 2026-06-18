@@ -6,3 +6,4 @@ dist
 vendor
 backend/storage/logs/*
 database/dumps/*
+zips/
