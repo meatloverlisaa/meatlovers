@@ -1,19 +1,9 @@
 # TODO
 
-## Admin Stock Operational Page (4.2)
+## Current Feature/Step: 4.4 Testing — Verify quantity updates on stock movements
 
-- [x] Inspect existing API/UI for stock placeholders
-- [x] Add UI route: `ui/src/app/admin/stock/page.tsx` (current balance + stock-in form)
-- [x] Add link to stock page from `ui/src/app/admin/products/page.tsx`
-- [ ] (Next) Implement backend stock endpoints + Prisma models:
-  - GET `/stock/balance`
-  - POST `/stock/stock-in`
-- [ ] Build/test UI and API once backend endpoints exist
-
-## Bar Stock Issue Interface (4.3)
-
-- [x] Add UI section for departmental transfers (issue-to-department form)
-- [x] Wire to expected endpoint: `POST /stock/issue-to-department`
-- [ ] Test UI behavior once backend endpoints exist
-
+- [ ] Inspect stock movement + inventory models (Prisma schema) and existing stock logic.
+- [ ] Add unit/e2e tests that assert inventory quantity deltas for stock-in/out movements.
+- [ ] Ensure tests run via `cd api && npm test` and/or `npm test:e2e`.
+- [ ] Track failures against current placeholder implementation (expected red tests until Step 4.3 is implemented).
 
