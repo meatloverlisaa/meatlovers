@@ -1,0 +1,100 @@
+Meat Lovers CIMS powered by YohPal
+Detailed Implementation Path: Feature-by-Feature (API -> UI -> Test -> Merge)
+
+1. SYSTEM FOUNDATION & AUTHENTICATION
+   1.1 Database Migration & Seed (Users, Roles, Permissions)
+   1.2 Backend: Authentication API (Login, JWT, Role Middleware, Profile)
+   1.3 UI: Multi-App Login Screens (Admin, POS, Monitoring)
+   1.4 Testing: Verification of role-based access control.
+
+2. SUPPLIER MANAGEMENT
+   2.1 API: Supplier CRUD Endpoints (Create, List, Update, Status)
+   2.2 UI: Admin Supplier Operational Page (List view, Create form)
+   2.3 Testing: Verify supplier registration and status toggling.
+
+3. PRODUCT SEGMENTATION & PRICING CONTROL
+   3.1 API: Product CRUD with Segmentation (Food, Soft Drink, Alcohol)
+   3.2 API: Pricing Rules & Price Change Audit Trail
+   3.3 UI: Admin Product Page (Management of items by category)
+   3.4 UI: Pricing Control & Margin Alerts Dashboard
+   3.5 Testing: Verify pricing rule enforcement and audit logging.
+
+4. INVENTORY & STOCK CONTROL
+   4.1 API: Stock Items & Movements (Purchase, Adjustment, Store-to-Dept)
+   4.2 UI: Admin Stock Operational Page (Current balance, Stock-in form)
+   4.3 UI: Bar Stock Issue Interface (Departmental transfers)
+   4.4 Testing: Verify quantity updates on stock movements.
+
+5. POS & ORDERING SYSTEM
+   5.1 API: Order Creation & Order Items (Table, Waiter assignment)
+   5.2 UI: POS PWA Menu Interface (Category browsing, Item selection)
+   5.3 UI: Cart & Order Submission Flow
+   5.4 UI: Order Status Tracking (Pending, Preparing, Ready, Served)
+   5.5 Testing: Verify order life-cycle from creation to serving.
+
+6. PAYMENTS & CASHIER SETTLEMENT
+   6.1 API: Payment Settlement (Cash, M-Pesa, Card, Multi-pay)
+   6.2 UI: Cashier Settlement Screen (Payment recording, Transaction ref)
+   6.3 UI: Receipt Generation Logic (Print/Digital)
+   6.4 Testing: Verify financial accuracy and payment status updates.
+
+7. KITCHEN & BAR OPERATIONS
+   7.1 API: Kitchen Queue & Ready State Updates
+   7.2 UI: Kitchen Monitoring Screen (Food preparation queue)
+   7.3 UI: Bar Issue/Sale Tracking Screen
+   7.4 Testing: Verify real-time status updates between POS and Kitchen/Bar.
+
+8. PRODUCTION & MENU ENGINEERING
+   8.1 API: Recipe (BOM) & Ingredient consumption logic
+   8.2 API: Kitchen Production Plans (Planned vs Produced)
+   8.3 UI: Recipe Setup & Management Interface
+   8.4 UI: Production Planning & Consumption Tracking
+   8.5 Testing: Verify ingredient deduction from stock on production.
+
+9. DISPATCH & DELIVERY MANAGEMENT
+   9.1 API: Delivery Tracking (Order assignment, Rider details, Status)
+   9.2 UI: Dispatch Operational Page (Rider assignment form)
+   9.3 UI: Delivery Progress & Completion Tracking
+   9.4 Testing: Verify rider communication and delivery status flow.
+
+10. THEFT & WASTE CONTROL (UNSOLD FOOD)
+    10.1 API: Unsold Cooked Food Declaration & Waste Recording
+    10.2 UI: Admin Unsold Food Page (Reason, Quantity, Declaration)
+    10.3 Testing: Verify waste impact on P&L and inventory audit.
+
+11. FINANCE & P&L REPORTING
+    11.1 API: Finance Transactions (Income vs Expense recording)
+    11.2 API: P&L Generation (Daily, Weekly, Monthly, Annual)
+    11.3 UI: Admin Finance Dashboard (Transaction logs, Statement view)
+    11.4 Testing: Verify reconciliation of sales vs expenses.
+
+12. ASSET MANAGEMENT
+    12.1 API: Asset Register & Lifecycle (Maintenance, Damage, Disposal)
+    12.2 UI: Admin Assets Operational Page (Inventory, Status tracking)
+    12.3 Testing: Verify asset depreciation and maintenance logs.
+
+13. HRM & STAFF PERFORMANCE
+    13.1 API: Staff Management, Shifts & Duty Rosters
+    13.2 API: Attendance Clock-in/out (Lateness & Absence tracking)
+    13.3 API: Performance Metrics (Sales volume, Orders served, Rating)
+    13.4 UI: HRM Dashboard & Duty Roster Management
+    13.5 UI: Staff Performance Leaderboard
+    13.6 Testing: Verify lateness calculation and performance scoring.
+
+14. CRM & WEBSITE LEADS
+    14.1 API: Website Lead Capture & Catering Enquiries
+    14.2 API: Customer CRM (Loyalty points, Visit history)
+    14.3 UI: Admin Website Leads Dashboard
+    14.4 UI: CRM Retention Engine (Customer segmentation)
+    14.5 Testing: Verify lead conversion and loyalty point accrual.
+
+15. APPROVALS & ENFORCEMENT ENGINE
+    15.1 API: Approval Request System (Cancellations, Discounts, Adjustments)
+    15.2 API: Enforcement Risk Scores (Incident logs, Score generation)
+    15.3 UI: Admin Approval Management Interface
+    15.4 UI: Enforcement Dashboard (Risk-level visibility)
+    15.5 Testing: Verify that sensitive actions remain blocked until approved.
+
+16. LIVE MONITORING & OWNER DASHBOARD
+    16.1 UI: Owner/Live Monitoring Dashboard (Global sales, High-risk alerts)
+    16.2 Testing: Final end-to-end integration and data consistency check.
