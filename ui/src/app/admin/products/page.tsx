@@ -72,14 +72,22 @@ export default async function AdminProductsPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Products</h1>
-          <Link
-            href="/admin/products/new"
-            className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-          >
-            + Create product
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/stock"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+            >
+              View stock →
+            </Link>
+            <Link
+              href="/admin/products/new"
+              className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+            >
+              + Create product
+            </Link>
+          </div>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
