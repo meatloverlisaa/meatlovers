@@ -70,6 +70,31 @@ async function postStockIn(payload: {
   return res.json();
 }
 
+async function postIssueToDepartment(payload: {
+  product_id: string;
+  quantity: number;
+  destination: string;
+  notes?: string;
+}) {
+  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+
+  const res = await fetch(`${baseUrl}/stock/issue-to-department`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `Failed to issue to department: ${res.status}${text ? ` - ${text}` : ""}`,
+    );
+  }
+
+  return res.json();
+}
+
+
 export default async function AdminStockOperationalPage() {
   let products: Product[] = [];
   let balance: StockBalanceRow[] = [];
@@ -117,6 +142,8 @@ export default async function AdminStockOperationalPage() {
           {/* Current balance */}
           <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+
+
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Current balance</h2>
@@ -169,6 +196,7 @@ export default async function AdminStockOperationalPage() {
 
           {/* Stock-in form */}
           <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+
             <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
               <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Stock-in</h2>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -280,7 +308,139 @@ export default async function AdminStockOperationalPage() {
               </form>
             </div>
           </div>
+
+          {/* Bar stock issue to departments */}
+          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+
+            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+                Bar Stock Issue (Departmental transfers)
+              </h2>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                Issue/bar stock out to another department.
+              </p>
+            </div>
+
+            <div className="p-4">
+              <form
+                className="grid grid-cols-1 gap-4"
+                action={async (formData) => {
+                  "use server";
+
+                  const product_id = String(formData.get("product_id") ?? "").trim();
+                  const quantityRaw = String(formData.get("quantity") ?? "").trim();
+                  const destinationPreset = String(formData.get("destination_preset") ?? "").trim();
+                  const destinationOther = String(formData.get("destination_other") ?? "").trim();
+                  const notes = String(formData.get("notes") ?? "").trim();
+
+                  const quantity = Number(quantityRaw);
+
+                  let destination = destinationPreset;
+                  if (destinationPreset === "OTHER") destination = destinationOther;
+
+                  if (!product_id) throw new Error("Product is required.");
+                  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+                  if (!destination || destination.length < 2) throw new Error("Destination department is required.");
+
+                  await postIssueToDepartment({
+                    product_id,
+                    quantity,
+                    destination,
+                    notes: notes.length ? notes : undefined,
+                  });
+
+                  if (typeof window !== "undefined") {
+                    window.location.reload();
+                  }
+                }}
+              >
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Product</label>
+                  <select
+                    name="product_id"
+                    defaultValue={products[0] ? (typeof products[0].id === "bigint" ? products[0].id.toString() : String(products[0].id)) : ""}
+                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                    disabled={products.length === 0}
+                  >
+                    {products.length === 0 ? <option value="">No products loaded</option> : null}
+                    {products.map((p) => {
+                      const id = typeof p.id === "bigint" ? p.id.toString() : String(p.id);
+                      return (
+                        <option key={id} value={id}>
+                          {p.product_name} ({p.product_category})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Quantity</label>
+                    <input
+                      name="quantity"
+                      type="number"
+                      min={0}
+                      step={1}
+                      defaultValue={"0"}
+                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Destination</label>
+                    <select
+                      name="destination_preset"
+                      defaultValue={"BAR"}
+                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                    >
+                      <option value="BAR">BAR</option>
+                      <option value="KITCHEN">KITCHEN</option>
+                      <option value="DISPATCH">DISPATCH</option>
+                      <option value="STORE">STORE</option>
+                      <option value="OTHER">Other...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Destination (if Other)</label>
+                  <input
+                    name="destination_other"
+                    type="text"
+                    placeholder="e.g. FUNCTIONS, BANQUETING..."
+                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Notes (optional)</label>
+                  <input
+                    name="notes"
+                    type="text"
+                    placeholder="e.g. Transfer reference / reason"
+                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={products.length === 0}
+                  className="mt-1 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:hover:bg-zinc-900 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+                >
+                  Issue to department
+                </button>
+
+                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Backend endpoint expected: <span className="font-mono">POST /stock/issue-to-department</span>.
+                </div>
+              </form>
+            </div>
+          </div>
+
         </div>
+
       </div>
     </div>
   );

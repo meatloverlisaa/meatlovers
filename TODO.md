@@ -10,3 +10,10 @@
   - POST `/stock/stock-in`
 - [ ] Build/test UI and API once backend endpoints exist
 
+## Bar Stock Issue Interface (4.3)
+
+- [x] Add UI section for departmental transfers (issue-to-department form)
+- [x] Wire to expected endpoint: `POST /stock/issue-to-department`
+- [ ] Test UI behavior once backend endpoints exist
+
+
