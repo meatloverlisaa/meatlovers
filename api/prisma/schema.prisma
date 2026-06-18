@@ -49,6 +49,12 @@ enum SupplierStatus {
   SUSPENDED
 }
 
+enum ProductCategory {
+  FOOD
+  SOFT_DRINK
+  ALCOHOLIC_DRINK
+}
+
 model Supplier {
   id               BigInt         @id @default(autoincrement())
   supplier_name    String         @db.VarChar(255)
@@ -63,3 +69,18 @@ model Supplier {
 
   @@map("suppliers")
 }
+
+model Product {
+  id               BigInt          @id @default(autoincrement())
+  product_name    String          @db.VarChar(255)
+  product_category ProductCategory
+  selling_price   Decimal         @db.Decimal(12, 2)
+  cost_price      Decimal         @db.Decimal(12, 2)
+  barcode          String?         @db.VarChar(255)
+  is_active        Boolean         @default(true)
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+
+  @@map("products")
+}
+

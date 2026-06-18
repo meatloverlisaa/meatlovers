@@ -1,22 +1,23 @@
-import { SupplierService } from './supplier.service';
+import { ProductController } from './product.controller';
 import { describe, beforeEach, it, expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 
 
-describe('SupplierService', () => {
-  let service: SupplierService;
+describe('ProductController', () => {
+  let controller: ProductController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SupplierService],
+      controllers: [ProductController],
     })
       .useMocker(() => ({}))
       .compile();
 
-    service = module.get<SupplierService>(SupplierService);
+    controller = module.get<ProductController>(ProductController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });
+

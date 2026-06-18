@@ -1,5 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { SupplierController } from './supplier.controller';
+import { describe, beforeEach, it, expect } from '@jest/globals';
+import { Test, TestingModule } from '@nestjs/testing';
+
 
 describe('SupplierController', () => {
   let controller: SupplierController;
@@ -7,7 +9,9 @@ describe('SupplierController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SupplierController],
-    }).compile();
+    })
+      .useMocker(() => ({}))
+      .compile();
 
     controller = module.get<SupplierController>(SupplierController);
   });
