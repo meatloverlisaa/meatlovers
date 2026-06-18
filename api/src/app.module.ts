@@ -5,12 +5,13 @@ import { SupplierModule } from './supplier/supplier.module';
 import { ProductModule } from './product/product.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MarginAlertsModule } from './margin-alerts/margin-alert.module';
-
+import { StockModule } from './stock/stock.module';
 
 
 @Module({
-  imports: [PrismaModule, SupplierModule, ProductModule, MarginAlertsModule],
+  imports: [PrismaModule, SupplierModule, ProductModule, MarginAlertsModule, StockModule],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+

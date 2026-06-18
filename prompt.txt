@@ -59,3 +59,6 @@ Step 10 → Await my greenlight before proceeding to Feature [N+1]
 - UI must reflect the style/layout patterns from the zip inspirations
 - Write clean, modular, production-ready code at every step
 - After each step, summarise: what was done, what was committed, and what the next step will be
+
+
+add any new feature to its own branch to make dedugging easy

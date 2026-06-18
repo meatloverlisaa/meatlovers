@@ -28,6 +28,10 @@ Meat Lovers CIMS powered by YohPal
     - [x] 3.4.2 UI: Admin pricing control dashboard page (summary + alerts table + actions)
 
     - [ ] 3.4.3 Test UI & API integration
+      - [ ] Run api test suite (jest)
+      - [ ] Start api and verify GET/PATCH /margin-alerts
+      - [ ] Start ui and verify /admin/pricing-control loads + can submit update
+      - [ ] Full integration check
 
 
 
