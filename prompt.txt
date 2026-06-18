@@ -1,0 +1,61 @@
+## Project Build Prompt
+
+NEST JS FOR API, NEXT FOR UI, TAILWIND FOR STYLING.
+
+**Context files (always attached):**
+- `db.txt` — complete data schema for the project
+- `features.txt` — ordered list of features to implement
+- Zip file(s) — UI/UX inspiration references
+
+---
+
+**Build order (strict — no skipping, no mixing):**
+1. DB initialisation → fully complete and committed
+2. API layer → fully complete and committed
+3. UI layer → fully complete and committed
+4. Authentication is implemented LAST, following the same order above
+
+---
+
+**Per-feature workflow (repeat for each feature):**
+Step 1 → Initialise / migrate DB for Feature [N]
+Step 2 → Commit all DB files individually (see Git rules below)
+Step 3 → Implement Feature [N] — API layer
+Step 4 → Test API
+Step 5 → Commit all API files individually
+Step 6 → Implement Feature [N] — UI layer, guided by the zip inspirations
+Step 7 → Test UI
+Step 8 → Full integration test
+Step 9 → Commit all UI files individually
+Step 10 → Await my greenlight before proceeding to Feature [N+1]
+
+---
+
+**Git commit rules (strictly enforced):**
+- Every committable file gets its own individual commit — never batch files in one commit
+- Commit message format: conventional commits scoped to layer, e.g.:
+    feat(db): add orders table migration
+    feat(api): implement GET /orders endpoint
+    feat(ui): add orders list page
+    fix(api): handle null user on order fetch
+    chore(db): seed initial product categories
+- Never commit files from two different features in the same commit
+- Never commit across layers in the same commit (no mixing db + api, api + ui, etc.)
+- A feature is only considered done when all its commits are in — not before
+- Commit only after the relevant test step passes
+
+---
+
+**Active session:**
+- Current feature: [REPLACE WITH FEATURE NUMBER & NAME]
+- Current step: [REPLACE WITH STEP e.g. "Step 3 — API"]
+- Stack: [REPLACE — e.g. "Next.js / PostgreSQL / Prisma"]
+
+---
+
+**Standing rules:**
+- Do not proceed to the next step or feature without my explicit approval ("greenlight")
+- Follow the schema in db.txt exactly — no assumptions or additions
+- UI must reflect the style/layout patterns from the zip inspirations
+- Write clean, modular, production-ready code at every step
+- After each step, summarise: what was done, what was committed, and what the next step will be
