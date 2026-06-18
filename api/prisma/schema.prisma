@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  CASHIER
+  WAITER
+  CHEF
+  STOREKEEPER
+  BARMAN
+  DISPATCHER
+  ACCOUNTANT
+  HR
+}
+
+model User {
+  id            BigInt   @id @default(autoincrement())
+  full_name     String   @db.VarChar(255)
+  email         String?  @unique @db.VarChar(255)
+  phone         String?  @unique @db.VarChar(50)
+  password_hash String   @db.Text
+  role          Role
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum SupplierType {
+  FOOD
+  SOFT_DRINKS
+  ALCOHOL
+  GENERAL
+}
+
+enum SupplierStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model Supplier {
+  id               BigInt         @id @default(autoincrement())
+  supplier_name    String         @db.VarChar(255)
+  contact_person   String?        @db.VarChar(255)
+  phone            String?        @db.VarChar(50)
+  email            String?        @db.VarChar(255)
+  physical_address String?        @db.Text
+  supplier_type    SupplierType
+  status           SupplierStatus @default(ACTIVE)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  @@map("suppliers")
+}
