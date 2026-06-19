@@ -1,3 +1,5 @@
+"use client";
+
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
     {children}
@@ -16,7 +18,7 @@ type CreateProductPayload = {
 };
 
 async function createProduct(payload: CreateProductPayload) {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/products`, {
     method: "POST",
@@ -48,9 +50,9 @@ export default function AdminProductsNewPage() {
 
         <form
           className="mt-6 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
-          action={async (formData) => {
-            "use server";
-
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
             const payload: CreateProductPayload = {
               product_name: String(formData.get("product_name") ?? "").trim(),
               product_category: String(formData.get("product_category") ?? "") as ProductCategory,
@@ -60,10 +62,11 @@ export default function AdminProductsNewPage() {
               is_active: (formData.get("is_active") as string) === "true",
             };
 
-            await createProduct(payload);
-
-            if (typeof window !== "undefined") {
+            try {
+              await createProduct(payload);
               window.location.href = "/admin/products";
+            } catch (error) {
+              alert(error instanceof Error ? error.message : "Failed to create product");
             }
           }}
         >

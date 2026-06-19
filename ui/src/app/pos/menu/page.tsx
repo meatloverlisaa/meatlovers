@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
 import { OrderStatusTracker } from "@/components/order-status-tracker";
 
@@ -24,7 +26,7 @@ function normalizeId(id: bigint | number): string {
 const categories: ProductCategory[] = ["FOOD", "SOFT_DRINK", "ALCOHOLIC_DRINK"];
 
 async function fetchProducts(): Promise<Product[]> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
   if (!res.ok) {
@@ -213,8 +215,6 @@ export default function PosMenuPage() {
 
   const [activeOrderStatus, setActiveOrderStatus] = useState<"PENDING" | "PREPARING" | "READY" | "SERVED" | null>(null);
 
-  const [activeOrderId, setActiveOrderId] = useState<number | null>(null);
-
 
   function coercePositiveInt(value: string) {
     const n = Number(value);
@@ -248,7 +248,7 @@ export default function PosMenuPage() {
       quantity: it.quantity,
     }));
 
-    const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
     try {
       setSubmitting(true);
@@ -278,11 +278,6 @@ export default function PosMenuPage() {
       // Try to set active status if backend returned the created order.
       if (created?.status) {
         setActiveOrderStatus(created.status as "PENDING" | "PREPARING" | "READY" | "SERVED");
-
-        if (created.id !== undefined && created.id !== null) {
-          const asNum = typeof created.id === "number" ? created.id : Number(created.id);
-          if (Number.isFinite(asNum)) setActiveOrderId(asNum);
-        }
       }
 
 

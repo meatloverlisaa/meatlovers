@@ -268,4 +268,22 @@ export class StockService {
       },
     });
   }
+
+  async getBalance() {
+    return this.prisma.stockItem.findMany({
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_name: true,
+            product_category: true,
+            cost_price: true,
+          },
+        },
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+    });
+  }
 }

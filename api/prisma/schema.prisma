@@ -215,6 +215,12 @@ enum MovementType {
   WASTE
 }
 
+enum MarginAlertStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+}
+
 model StockItem {
   id          BigInt   @id @default(autoincrement())
   product_id  BigInt   @unique
@@ -262,4 +268,14 @@ model Payment {
 
   @@map("payments")
   @@index([order_id])
+}
+
+model MarginAlert {
+  id           BigInt           @id @default(autoincrement())
+  alert_status MarginAlertStatus @default(OPEN)
+  notes        String?          @db.Text
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+
+  @@map("margin_alerts")
 }

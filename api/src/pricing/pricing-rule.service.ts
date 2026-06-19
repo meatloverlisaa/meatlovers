@@ -76,10 +76,10 @@ export class PricingRuleService {
     const currentSelling = Number(product.selling_price);
     const newSelling = this.calculateNewPrice({
       ruleType: rule.rule_type as PricingRuleType,
-      value: rule.value,
+      value: rule.value.toString(),
       currentSelling,
-      minSellingPrice: rule.min_selling_price,
-      maxSellingPrice: rule.max_selling_price,
+      minSellingPrice: rule.min_selling_price?.toString() ?? null,
+      maxSellingPrice: rule.max_selling_price?.toString() ?? null,
     });
 
     return this.prisma.$transaction(async (tx) => {

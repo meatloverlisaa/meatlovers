@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import React from "react";
 
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
@@ -23,7 +24,7 @@ type StockBalanceRow = {
 };
 
 async function getProducts(): Promise<Product[]> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
 
   if (!res.ok) {
@@ -34,7 +35,7 @@ async function getProducts(): Promise<Product[]> {
 }
 
 async function getStockBalance(): Promise<StockBalanceRow[]> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   // Expected endpoint for this feature.
   // If the backend hasn’t implemented it yet, this will show a clear message.
@@ -54,7 +55,7 @@ async function postStockIn(payload: {
   unit_cost: number;
   notes?: string;
 }) {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/stock/stock-in`, {
     method: "POST",
@@ -76,7 +77,7 @@ async function postIssueToDepartment(payload: {
   destination: string;
   notes?: string;
 }) {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/stock/issue-to-department`, {
     method: "POST",
@@ -229,9 +230,7 @@ export default async function AdminStockOperationalPage() {
                     notes: notes.length ? notes : undefined,
                   });
 
-                  if (typeof window !== "undefined") {
-                    window.location.reload();
-                  }
+                  revalidatePath("/admin/stock");
                 }}
               >
                 <div>
@@ -349,9 +348,7 @@ export default async function AdminStockOperationalPage() {
                     notes: notes.length ? notes : undefined,
                   });
 
-                  if (typeof window !== "undefined") {
-                    window.location.reload();
-                  }
+                  revalidatePath("/admin/stock");
                 }}
               >
                 <div>

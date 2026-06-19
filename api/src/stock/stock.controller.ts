@@ -29,4 +29,14 @@ export class StockController {
   async getAllStockItems() {
     return this.stockService.getAllStockItems();
   }
+
+  @Get('balance')
+  async getBalance() {
+    return this.stockService.getBalance();
+  }
+
+  @Post('stock-in')
+  async stockIn(@Body(ValidationPipe) body: any) {
+    return this.stockService.createPurchase(body);
+  }
 }

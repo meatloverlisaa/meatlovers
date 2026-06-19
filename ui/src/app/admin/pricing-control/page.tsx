@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import React from "react";
 
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
@@ -17,7 +18,7 @@ type MarginAlert = {
 };
 
 async function getMarginAlerts(): Promise<MarginAlert[]> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/margin-alerts`, {
     cache: "no-store",
@@ -31,7 +32,7 @@ async function getMarginAlerts(): Promise<MarginAlert[]> {
 }
 
 async function updateMarginAlert(id: string, payload: { alert_status: MarginAlertStatus; notes?: string }) {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/margin-alerts/${id}`, {
     method: "PATCH",
@@ -144,9 +145,7 @@ export default async function AdminPricingControlPage() {
                               notes: notes.length ? notes : undefined,
                             });
 
-                            if (typeof window !== "undefined") {
-                              window.location.reload();
-                            }
+                            revalidatePath("/admin/pricing-control");
                           }}
                         >
                           <select

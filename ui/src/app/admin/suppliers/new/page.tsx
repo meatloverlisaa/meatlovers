@@ -1,9 +1,10 @@
+"use client";
+
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
     {children}
   </a>
 );
-
 
 type SupplierType = "FOOD" | "SOFT_DRINKS" | "ALCOHOL" | "GENERAL";
 
@@ -17,8 +18,7 @@ type CreateSupplierPayload = {
 };
 
 async function createSupplier(payload: CreateSupplierPayload) {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/suppliers`, {
     method: "POST",
@@ -51,11 +51,9 @@ export default function AdminSuppliersNewPage() {
 
         <form
           className="mt-6 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
-          action={async (formData) => {
-            "use server";
-
-
-
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
             const payload: CreateSupplierPayload = {
               supplier_name: String(formData.get("supplier_name") ?? "").trim(),
               supplier_type: String(formData.get("supplier_type") ?? "") as SupplierType,
@@ -65,14 +63,12 @@ export default function AdminSuppliersNewPage() {
               physical_address: String(formData.get("physical_address") ?? "").trim() || undefined,
             };
 
-            await createSupplier(payload);
-
-            // Redirect after success.
-            // (Using a client-side redirect for compatibility with simple form actions.)
-            if (typeof window !== "undefined") {
+            try {
+              await createSupplier(payload);
               window.location.href = "/admin/suppliers";
+            } catch (error) {
+              alert(error instanceof Error ? error.message : "Failed to create supplier");
             }
-
           }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

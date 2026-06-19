@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
     {children}
@@ -6,10 +10,7 @@ const Link = ({ href, className, children }: { href: string; className?: string;
 
 type SupplierStatus = "ACTIVE" | "SUSPENDED";
 
-
-
 type Supplier = {
-
   id: bigint | number;
   supplier_name: string;
   contact_person?: string | null;
@@ -23,8 +24,7 @@ type Supplier = {
 };
 
 async function getSuppliers(): Promise<Supplier[]> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/suppliers`, {
     cache: "no-store",
@@ -38,8 +38,7 @@ async function getSuppliers(): Promise<Supplier[]> {
 }
 
 async function toggleSupplierStatus(id: string, current: SupplierStatus): Promise<Supplier> {
-  const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const next: SupplierStatus = current === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
 
@@ -56,18 +55,51 @@ async function toggleSupplierStatus(id: string, current: SupplierStatus): Promis
   return res.json();
 }
 
-export default async function AdminSuppliersPage() {
-  let suppliers: Supplier[] = [];
+export default function AdminSuppliersPage() {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  try {
-    suppliers = await getSuppliers();
-  } catch (e) {
-    const message = e instanceof Error ? e.message : "Unknown error";
+  useEffect(() => {
+    async function loadSuppliers() {
+      try {
+        const data = await getSuppliers();
+        setSuppliers(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSuppliers();
+  }, []);
+
+  const handleToggleStatus = async (id: string, currentStatus: SupplierStatus) => {
+    try {
+      await toggleSupplierStatus(id, currentStatus);
+      window.location.reload();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to toggle status");
+    }
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
-          <p className="mt-4 text-sm text-red-600">{message}</p>
+          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
+          <p className="mt-4 text-sm text-red-600">{error}</p>
         </div>
       </div>
     );
@@ -116,19 +148,13 @@ export default async function AdminSuppliersPage() {
                         {s.created_at ? new Date(s.created_at).toLocaleDateString() : "-"}
                       </td>
                       <td className="px-4 py-3">
-                        <form
-                          action={async () => {
-                            "use server";
-                            await toggleSupplierStatus(id, s.status);
-                          }}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(id, s.status)}
+                          className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
                         >
-                          <button
-                            type="submit"
-                            className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                          >
-                            Toggle status
-                          </button>
-                        </form>
+                          Toggle status
+                        </button>
                       </td>
                     </tr>
                   );
