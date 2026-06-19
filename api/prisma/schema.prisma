@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://meat_lovers_user:StrongLocalPassword@127.0.0.1:3306/meat_lovers_cims"
 }
 
 enum Role {
