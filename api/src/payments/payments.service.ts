@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePaymentDto, PaymentStatus } from './dto/create-payment.dto';
+import { CreatePaymentDto, PaymentStatus, RefundPaymentDto, SettlementSummaryDto } from './dto/create-payment.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -63,6 +63,19 @@ export class PaymentsService {
     });
   }
 
+  async findOne(id: number) {
+    const payment = await (this.prisma as any).payment.findUnique({
+      where: { id: BigInt(id) },
+      include: { order: true },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment with ID ${id} not found`);
+    }
+
+    return payment;
+  }
+
   async findByOrder(orderId: number) {
     const order = await (this.prisma as any).order.findUnique({
       where: { id: BigInt(orderId) },
@@ -91,5 +104,133 @@ export class PaymentsService {
       where: { id: BigInt(id) },
       data: { payment_status: status },
     });
+  }
+
+  async refundPayment(id: number, refundPaymentDto: RefundPaymentDto) {
+    const payment = await (this.prisma as any).payment.findUnique({
+      where: { id: BigInt(id) },
+      include: { order: true },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment with ID ${id} not found`);
+    }
+
+    if (payment.payment_status !== PaymentStatus.SUCCESS) {
+      throw new BadRequestException(`Cannot refund payment with status ${payment.payment_status}`);
+    }
+
+    if (refundPaymentDto.refund_amount > Number(payment.amount)) {
+      throw new BadRequestException(`Refund amount cannot exceed payment amount`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Update payment status to REFUNDED
+      const updatedPayment = await (tx as any).payment.update({
+        where: { id: BigInt(id) },
+        data: {
+          payment_status: PaymentStatus.REFUNDED,
+          transaction_reference: refundPaymentDto.refund_reference || payment.transaction_reference,
+        },
+      });
+
+      // Update order status back to SERVED if fully refunded
+      if (refundPaymentDto.refund_amount >= Number(payment.amount)) {
+        await (tx as any).order.update({
+          where: { id: payment.order_id },
+          data: { status: 'SERVED' },
+        });
+      }
+
+      return updatedPayment;
+    });
+  }
+
+  async getSettlementSummary(query: SettlementSummaryDto) {
+    const where: any = {
+      payment_status: PaymentStatus.SUCCESS,
+    };
+
+    if (query.payment_method) {
+      where.payment_method = query.payment_method;
+    }
+
+    if (query.start_date || query.end_date) {
+      where.created_at = {};
+      if (query.start_date) {
+        where.created_at.gte = new Date(query.start_date);
+      }
+      if (query.end_date) {
+        where.created_at.lte = new Date(query.end_date);
+      }
+    }
+
+    const payments = await (this.prisma as any).payment.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+    });
+
+    const summary = {
+      total_payments: payments.length,
+      total_amount: payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0),
+      by_method: {
+        CASH: 0,
+        MPESA: 0,
+        CARD: 0,
+      },
+      payments,
+    };
+
+    payments.forEach((p: any) => {
+      if (summary.by_method[p.payment_method] !== undefined) {
+        summary.by_method[p.payment_method] += Number(p.amount);
+      }
+    });
+
+    return summary;
+  }
+
+  async generateReceipt(id: number) {
+    const payment = await (this.prisma as any).payment.findUnique({
+      where: { id: BigInt(id) },
+      include: {
+        order: {
+          include: {
+            items: true,
+            waiter: true,
+            table: true,
+          },
+        },
+      },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment with ID ${id} not found`);
+    }
+
+    const receipt = {
+      receipt_number: `RCP-${payment.id}`,
+      payment_id: payment.id,
+      order_id: payment.order_id,
+      payment_method: payment.payment_method,
+      amount_paid: Number(payment.amount),
+      transaction_reference: payment.transaction_reference,
+      payment_status: payment.payment_status,
+      payment_date: payment.created_at,
+      order_details: {
+        order_number: payment.order.id,
+        table: payment.order.table?.table_name || 'N/A',
+        waiter: payment.order.waiter?.full_name || 'N/A',
+        items: payment.order.items.map((item: any) => ({
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          line_total: item.line_total,
+        })),
+        subtotal: payment.order.items.reduce((sum: number, item: any) => sum + item.line_total, 0),
+      },
+    };
+
+    return receipt;
   }
 }

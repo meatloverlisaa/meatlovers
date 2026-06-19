@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNumber, IsOptional, IsString, Min, ArrayMinSize, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsOptional, IsString, Min, ArrayMinSize, ValidateNested, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum PaymentMethod {
@@ -11,6 +11,7 @@ export enum PaymentStatus {
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
 }
 
 class PaymentItemDto {
@@ -36,4 +37,32 @@ export class CreatePaymentDto {
   @ValidateNested({ each: true })
   @Type(() => PaymentItemDto)
   payments!: PaymentItemDto[];
+}
+
+export class RefundPaymentDto {
+  @IsNumber()
+  @Min(0.01)
+  refund_amount!: number;
+
+  @IsOptional()
+  @IsString()
+  reason?: string;
+
+  @IsOptional()
+  @IsString()
+  refund_reference?: string;
+}
+
+export class SettlementSummaryDto {
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @IsOptional()
+  @IsDateString()
+  end_date?: string;
+
+  @IsOptional()
+  @IsEnum(PaymentMethod)
+  payment_method?: PaymentMethod;
 }
