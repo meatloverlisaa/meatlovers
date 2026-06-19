@@ -1,19 +1,16 @@
-# Project TODO
+# TODO
 
-## Orders API: Order Creation & Order Items (Table, Waiter assignment)
-
-- [ ] Update Prisma schema: add `Table`, `Order`, `OrderItem` models + relations to `User` (waiter) and `Product`.
-- [ ] Add/adjust enums as needed (e.g., `OrderStatus`).
-- [ ] Create Prisma migration.
-- [ ] Implement `OrdersModule` (controller + service).
-- [ ] Implement DTOs for order creation: tableId, waiterId, items[{productId, quantity}].
-- [ ] Implement controller endpoint `POST /orders` returning created order with items.
-- [ ] Implement service logic with validation + transaction:
-  - validate table exists
-  - validate waiter exists and role == WAITER
-  - validate products exist/active
-  - snapshot unitPrice and compute lineTotal and order total
-  - persist Order + OrderItems in a single transaction
-- [ ] Wire `OrdersModule` into `AppModule`.
-- [ ] Run `npm test` / `npm run build` and verify API starts.
+- [ ] 5.3 UI: Cart & Order Submission Flow
+  - [ ] Update `ui/src/app/pos/menu/page.tsx` to add:
+    - [ ] Cart summary (selected items)
+    - [ ] Inputs for `tableId` and `waiterId`
+    - [ ] Submit Order button
+    - [ ] POST `/orders` integration
+    - [ ] Client-side validation
+    - [ ] Success + error UI
+    - [ ] Clear cart on success
+  - [ ] Test end-to-end (manual):
+    - [ ] UI loads products
+    - [ ] Select items, fill IDs, submit order
+    - [ ] Verify cart clears and response shows success
 

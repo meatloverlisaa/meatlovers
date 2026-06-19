@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
+
 type Product = {
   id: bigint | number;
   product_name: string;
@@ -187,6 +188,92 @@ export default function PosMenuPage() {
     });
   }
 
+  const cartItems = useMemo(() => {
+    const list = Object.entries(quantities)
+      .map(([productId, quantity]) => {
+        const product = products.find((p) => normalizeId(p.id) === productId);
+        return product
+          ? { productId, quantity, productName: product.product_name, unitPrice: product.selling_price }
+          : { productId, quantity, productName: productId, unitPrice: "" };
+      })
+      .filter((x) => x.quantity > 0);
+
+    list.sort((a, b) => a.productName.localeCompare(b.productName));
+    return list;
+  }, [products, quantities]);
+
+  const [tableId, setTableId] = useState<string>("1");
+  const [waiterId, setWaiterId] = useState<string>("1");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  function coercePositiveInt(value: string) {
+    const n = Number(value);
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1) return null;
+    return n;
+  }
+
+  async function submitOrder() {
+    setSubmitError(null);
+
+    if (cartItems.length === 0) {
+      setSubmitError("Select at least one item.");
+      return;
+    }
+
+    const coercedTableId = coercePositiveInt(tableId);
+    const coercedWaiterId = coercePositiveInt(waiterId);
+
+    if (!coercedTableId) {
+      setSubmitError("tableId must be a positive integer.");
+      return;
+    }
+
+    if (!coercedWaiterId) {
+      setSubmitError("waiterId must be a positive integer.");
+      return;
+    }
+
+    const items = cartItems.map((it) => ({
+      productId: Number(it.productId),
+      quantity: it.quantity,
+    }));
+
+    const baseUrl = (globalThis as any).process?.env?.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+
+    try {
+      setSubmitting(true);
+      const res = await fetch(`${baseUrl}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tableId: coercedTableId, waiterId: coercedWaiterId, items }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Order submission failed: ${res.status}${text ? ` - ${text}` : ""}`);
+      }
+
+      // Backend returns the created order; we don't need its shape for the UI.
+      await res.json().catch(() => null);
+
+      // Clear cart
+      setQuantities({});
+      setSubmitError(null);
+
+      // Soft reset inputs to defaults
+      setTableId("1");
+      setWaiterId("1");
+
+      alert("Order submitted successfully!");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      setSubmitError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <div className="mx-auto max-w-6xl px-4 py-6">
@@ -194,7 +281,7 @@ export default function PosMenuPage() {
           <div>
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">POS Menu</h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-              Browse categories and select items (cart/order submission comes next).
+              Browse categories, build a cart, and submit an order.
             </p>
           </div>
 
@@ -203,6 +290,7 @@ export default function PosMenuPage() {
             <div className="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-50">{selectedCount}</div>
           </div>
         </div>
+
 
         <div className="mt-5 rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="flex items-center justify-between gap-4">
@@ -217,8 +305,77 @@ export default function PosMenuPage() {
           </div>
         ) : null}
 
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_340px]">
+          <div className="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Cart</div>
+
+            <div className="mt-3 flex flex-col gap-3">
+              {cartItems.length === 0 ? (
+                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300">
+                  Cart is empty. Select items from the menu.
+                </div>
+              ) : (
+                cartItems.map((it) => (
+                  <div key={it.productId} className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">{it.productName}</div>
+                      <div className="text-xs text-zinc-600 dark:text-zinc-300">Qty: {it.quantity}</div>
+                    </div>
+                    <div className="shrink-0 text-xs font-semibold text-zinc-600 dark:text-zinc-300">#{String(it.productId).slice(-6)}</div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800">
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Table & waiter</div>
+              <div className="mt-3 grid grid-cols-1 gap-3">
+                <label className="block">
+                  <div className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">tableId</div>
+                  <input
+                    value={tableId}
+                    onChange={(e) => setTableId(e.target.value)}
+                    inputMode="numeric"
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                  />
+                </label>
+
+                <label className="block">
+                  <div className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">waiterId</div>
+                  <input
+                    value={waiterId}
+                    onChange={(e) => setWaiterId(e.target.value)}
+                    inputMode="numeric"
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+                  />
+                </label>
+
+                {submitError ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+                    {submitError}
+                  </div>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={submitOrder}
+                  disabled={submitting}
+                  className="mt-1 inline-flex h-11 w-full items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  {submitting ? "Submitting..." : "Submit Order"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div />
+        </div>
+
+        {/** Menu grid below */}
+
         <div className="mt-4">
           {loading ? (
+
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 9 }).map((_, i) => (
                 <div
