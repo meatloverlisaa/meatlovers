@@ -1,4 +1,8 @@
 import React, { useMemo, useState } from "react";
+import { OrderStatusTracker } from "@/components/order-status-tracker";
+
+export type { OrderStatus } from "@/components/order-status-tracker";
+
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -207,6 +211,11 @@ export default function PosMenuPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const [activeOrderStatus, setActiveOrderStatus] = useState<"PENDING" | "PREPARING" | "READY" | "SERVED" | null>(null);
+
+  const [activeOrderId, setActiveOrderId] = useState<number | null>(null);
+
+
   function coercePositiveInt(value: string) {
     const n = Number(value);
     if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1) return null;
@@ -265,7 +274,20 @@ export default function PosMenuPage() {
       setTableId("1");
       setWaiterId("1");
 
+      const created = await res.json().catch(() => null);
+      // Try to set active status if backend returned the created order.
+      if (created?.status) {
+        setActiveOrderStatus(created.status as "PENDING" | "PREPARING" | "READY" | "SERVED");
+
+        if (created.id !== undefined && created.id !== null) {
+          const asNum = typeof created.id === "number" ? created.id : Number(created.id);
+          if (Number.isFinite(asNum)) setActiveOrderId(asNum);
+        }
+      }
+
+
       alert("Order submitted successfully!");
+
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error";
       setSubmitError(message);
@@ -289,6 +311,17 @@ export default function PosMenuPage() {
             <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Selected items</div>
             <div className="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-50">{selectedCount}</div>
           </div>
+
+          <div className="hidden md:block">
+            <OrderStatusTracker status={activeOrderStatus} />
+          </div>
+
+          {/* Mobile */}
+          <div className="md:hidden mt-3">
+            <OrderStatusTracker status={activeOrderStatus} />
+          </div>
+
+
         </div>
 
 

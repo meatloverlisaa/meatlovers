@@ -61,6 +61,13 @@ enum PricingRuleType {
   PERCENT_DECREASE
 }
 
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  SERVED
+}
+
 model PricingRule {
   id                BigInt           @id @default(autoincrement())
   name              String          @db.VarChar(255)
@@ -132,4 +139,53 @@ model Product {
 
   @@map("products")
 }
+
+model Table {
+  id         BigInt   @id @default(autoincrement())
+  table_name String?  @db.VarChar(255)
+
+  orders     Order[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("tables")
+}
+
+model Order {
+  id            BigInt       @id @default(autoincrement())
+  table_id      BigInt
+  waiter_id     BigInt
+  status        OrderStatus @default(PENDING)
+  total_amount  Float
+
+  items         OrderItem[]
+
+  waiter        User         @relation(fields: [waiter_id], references: [id])
+  table         Table        @relation(fields: [table_id], references: [id])
+
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  @@map("orders")
+  @@index([table_id])
+  @@index([waiter_id])
+}
+
+model OrderItem {
+  id           BigInt  @id @default(autoincrement())
+  order_id     BigInt
+  product_id   BigInt?
+  product_name String  @db.VarChar(255)
+
+  quantity     Int
+  unit_price   Float
+  line_total   Float
+
+  order        Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+  @@index([order_id])
+}
+
 
