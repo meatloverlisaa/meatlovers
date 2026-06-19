@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = "mysql://meat_lovers_user:StrongLocalPassword@127.0.0.1:3306/meat_lovers_cims"
 }
 
 enum Role {
@@ -33,6 +34,9 @@ model User {
   is_active     Boolean  @default(true)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+
+  price_change_audits PriceChangeAuditTrail[]
+  orders Order[]
 
   @@map("users")
 }
@@ -137,6 +141,9 @@ model Product {
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt
 
+  price_change_audits PriceChangeAuditTrail[]
+  stock_item         StockItem?
+
   @@map("products")
 }
 
@@ -188,4 +195,41 @@ model OrderItem {
   @@index([order_id])
 }
 
+enum MovementType {
+  PURCHASE
+  ADJUSTMENT
+  TRANSFER
+  WASTE
+}
 
+model StockItem {
+  id          BigInt   @id @default(autoincrement())
+  product_id  BigInt   @unique
+  quantity    Int      @default(0)
+  location    String   @default("MAIN_STORE") @db.VarChar(100)
+
+  product     Product  @relation(fields: [product_id], references: [id])
+  movements   StockMovement[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("stock_items")
+  @@index([product_id])
+}
+
+model StockMovement {
+  id            BigInt       @id @default(autoincrement())
+  stock_item_id BigInt
+  movement_type MovementType
+  quantity      Int
+  reference     String?      @db.VarChar(255)
+  notes         String?      @db.Text
+
+  stock_item    StockItem    @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
+
+  created_at    DateTime     @default(now())
+
+  @@map("stock_movements")
+  @@index([stock_item_id])
+}
