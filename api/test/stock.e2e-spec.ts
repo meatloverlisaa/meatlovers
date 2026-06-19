@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -15,6 +15,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -25,11 +26,11 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.$transaction([
-      prisma.$executeRawUnsafe('DELETE FROM stock_movements'),
-      prisma.$executeRawUnsafe('DELETE FROM stock_items'),
-      prisma.$executeRawUnsafe('DELETE FROM products'),
-    ]);
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
+    await prisma.$executeRawUnsafe('DELETE FROM stock_movements');
+    await prisma.$executeRawUnsafe('DELETE FROM stock_items');
+    await prisma.$executeRawUnsafe('DELETE FROM products');
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
   });
 
   describe('Purchase Stock Movements', () => {

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -15,6 +15,7 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -25,12 +26,12 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.$transaction([
-      prisma.$executeRawUnsafe('DELETE FROM price_change_audit_trails'),
-      prisma.$executeRawUnsafe('DELETE FROM pricing_rules'),
-      prisma.$executeRawUnsafe('DELETE FROM products'),
-      prisma.$executeRawUnsafe('DELETE FROM users'),
-    ]);
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
+    await prisma.$executeRawUnsafe('DELETE FROM price_change_audit_trails');
+    await prisma.$executeRawUnsafe('DELETE FROM pricing_rules');
+    await prisma.$executeRawUnsafe('DELETE FROM products');
+    await prisma.$executeRawUnsafe('DELETE FROM users');
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
   });
 
   describe('Pricing Rule CRUD Operations', () => {
@@ -560,10 +561,10 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
       `;
 
       expect(audits).toHaveLength(2);
-      expect(audits[0].old_selling_price).toBe('20.00');
-      expect(audits[0].new_selling_price).toBe('22.00');
-      expect(audits[1].old_selling_price).toBe('22.00');
-      expect(audits[1].new_selling_price).toBe('19.80');
+      expect(Number(audits[0].old_selling_price).toFixed(2)).toBe('20.00');
+      expect(Number(audits[0].new_selling_price).toFixed(2)).toBe('22.00');
+      expect(Number(audits[1].old_selling_price).toFixed(2)).toBe('22.00');
+      expect(Number(audits[1].new_selling_price).toFixed(2)).toBe('19.80');
     });
 
     it('should maintain transactional integrity - both product and audit created together', async () => {
@@ -674,10 +675,10 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
       `;
 
       expect(audits).toHaveLength(2);
-      expect(audits[0].old_selling_price).toBe(originalPrice);
-      expect(audits[0].new_selling_price).toBe('22.00');
-      expect(audits[1].old_selling_price).toBe('22.00');
-      expect(audits[1].new_selling_price).toBe('19.80');
+      expect(Number(audits[0].old_selling_price).toFixed(2)).toBe(Number(originalPrice).toFixed(2));
+      expect(Number(audits[0].new_selling_price).toFixed(2)).toBe('22.00');
+      expect(Number(audits[1].old_selling_price).toFixed(2)).toBe('22.00');
+      expect(Number(audits[1].new_selling_price).toFixed(2)).toBe('19.80');
     });
   });
 

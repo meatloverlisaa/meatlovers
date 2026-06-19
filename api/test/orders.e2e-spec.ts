@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -15,6 +15,7 @@ describe('Orders Life-cycle (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -25,13 +26,13 @@ describe('Orders Life-cycle (e2e)', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.$transaction([
-      prisma.$executeRawUnsafe('DELETE FROM order_items'),
-      prisma.$executeRawUnsafe('DELETE FROM orders'),
-      prisma.$executeRawUnsafe('DELETE FROM tables'),
-      prisma.$executeRawUnsafe('DELETE FROM users'),
-      prisma.$executeRawUnsafe('DELETE FROM products'),
-    ]);
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
+    await prisma.$executeRawUnsafe('DELETE FROM order_items');
+    await prisma.$executeRawUnsafe('DELETE FROM orders');
+    await prisma.$executeRawUnsafe('DELETE FROM tables');
+    await prisma.$executeRawUnsafe('DELETE FROM users');
+    await prisma.$executeRawUnsafe('DELETE FROM products');
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
   });
 
   describe('Order Creation', () => {
@@ -281,7 +282,7 @@ describe('Orders Life-cycle (e2e)', () => {
 
       const orderId = createResponse.body.id;
       expect(createResponse.body.status).toBe('PENDING');
-      expect(createResponse.body.total_amount).toBe(43.00); // 2*15 + 1*5 + 2*3
+      expect(createResponse.body.total_amount).toBe(41.00); // 2*15 + 1*5 + 2*3
       expect(createResponse.body.items).toHaveLength(3);
 
       // Step 2: Kitchen starts preparing (PREPARING)
