@@ -12,7 +12,7 @@
   - validate table exists
   - validate waiter exists and role == WAITER
   - validate products exist/active
-  - compute unitPrice/lineTotal and order total
+  - snapshot unitPrice and compute lineTotal and order total
   - persist Order + OrderItems in a single transaction
 - [ ] Wire `OrdersModule` into `AppModule`.
 - [ ] Run `npm test` / `npm run build` and verify API starts.
