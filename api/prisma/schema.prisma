@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -69,6 +70,18 @@ enum OrderStatus {
   PREPARING
   READY
   SERVED
+}
+
+enum PaymentMethod {
+  CASH
+  MPESA
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 model PricingRule {
@@ -166,6 +179,7 @@ model Order {
   total_amount  Float
 
   items         OrderItem[]
+  payments      Payment[]
 
   waiter        User         @relation(fields: [waiter_id], references: [id])
   table         Table        @relation(fields: [table_id], references: [id])
@@ -231,4 +245,21 @@ model StockMovement {
 
   @@map("stock_movements")
   @@index([stock_item_id])
+}
+
+model Payment {
+  id                   BigInt         @id @default(autoincrement())
+  order_id             BigInt
+  payment_method       PaymentMethod
+  amount               Decimal        @db.Decimal(12, 2)
+  transaction_reference String?        @db.VarChar(255)
+  payment_status       PaymentStatus  @default(PENDING)
+
+  order                Order          @relation(fields: [order_id], references: [id])
+
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+
+  @@map("payments")
+  @@index([order_id])
 }

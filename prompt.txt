@@ -47,9 +47,9 @@ Step 10 → Await my greenlight before proceeding to Feature [N+1]
 ---
 
 **Active session:**
-- Current feature: [REPLACE WITH FEATURE NUMBER & NAME]
-- Current step: [REPLACE WITH STEP e.g. "Step 3 — API"]
-- Stack: [REPLACE — e.g. "Next.js / PostgreSQL / Prisma"]
+- Current feature: 6. PAYMENTS & CASHIER SETTLEMENT
+- Current step: Step 3 — API
+- Stack: NestJS / MySQL / Prisma
 
 ---
 

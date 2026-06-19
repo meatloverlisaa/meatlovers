@@ -4,9 +4,11 @@ import { AppService } from './app.service';
 import { SupplierModule } from './supplier/supplier.module';
 import { ProductModule } from './product/product.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { MarginAlertsModule } from './margin-alerts/margin-alert.module';
+// import { MarginAlertsModule } from './margin-alerts/margin-alert.module';
 import { StockModule } from './stock/stock.module';
 import { OrdersModule } from './orders/orders.module';
+import { PricingModule } from './pricing/pricing.module';
+import { PaymentsModule } from './payments/payments.module';
 
 
 @Module({
@@ -14,9 +16,11 @@ import { OrdersModule } from './orders/orders.module';
     PrismaModule,
     SupplierModule,
     ProductModule,
-    MarginAlertsModule,
+    // MarginAlertsModule, // Temporarily disabled due to missing enum in schema
     StockModule,
     OrdersModule,
+    PricingModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
