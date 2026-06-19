@@ -49,7 +49,7 @@ async function getPayments(): Promise<Payment[]> {
 async function getOrders(): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/orders`, {
+  const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, {
     cache: "no-store",
   });
 

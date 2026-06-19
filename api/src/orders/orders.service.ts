@@ -131,6 +131,21 @@ export class OrdersService {
     });
   }
 
+  async findAll(status?: string) {
+    const where: any = {};
+    if (status) where.status = status;
+
+    return (this.prisma as any).order.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+      include: {
+        items: true,
+        waiter: true,
+        table: true,
+      },
+    });
+  }
+
   async updateStatus({ id, status }: { id: string } & UpdateOrderStatusDto) {
     const order = await (this.prisma as any).order.findUnique({
       where: { id: BigInt(id) },

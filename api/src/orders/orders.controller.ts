@@ -18,6 +18,11 @@ export class OrdersController {
     return this.ordersService.findLatest(query);
   }
 
+  @Get('all')
+  findAll(@Query('status') status?: string) {
+    return this.ordersService.findAll(status);
+  }
+
   @Patch(':id/status')
   updateStatus(
     @Param('id') id: string,
