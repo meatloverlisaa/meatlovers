@@ -157,7 +157,7 @@ model Product {
   updated_at       DateTime        @updatedAt
 
   price_change_audits PriceChangeAuditTrail[]
-  stock_item         StockItem?
+  stock_items        StockItem[]
 
   @@map("products")
 }
@@ -226,7 +226,7 @@ enum MarginAlertStatus {
 
 model StockItem {
   id          BigInt   @id @default(autoincrement())
-  product_id  BigInt   @unique
+  product_id  BigInt
   quantity    Int      @default(0)
   location    String   @default("MAIN_STORE") @db.VarChar(100)
 
@@ -236,6 +236,7 @@ model StockItem {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
+  @@unique([product_id, location])
   @@map("stock_items")
   @@index([product_id])
 }
