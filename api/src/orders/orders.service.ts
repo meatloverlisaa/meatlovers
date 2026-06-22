@@ -4,10 +4,14 @@ import { CreateOrderDto } from './dto/create-order.dto';
 
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { RecipesService } from '../recipes/recipes.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly recipesService: RecipesService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     const { tableId, waiterId, items } = createOrderDto;
@@ -168,6 +172,27 @@ export class OrdersService {
     if (status !== expectedNext && status !== order.status) {
       // allow no-op, but otherwise enforce sequential progression
       throw new BadRequestException(`Invalid status transition from ${order.status} to ${status}`);
+    }
+
+    // Consume ingredients when status changes to PREPARING
+    if (status === 'PREPARING' && order.status !== 'PREPARING') {
+      for (const item of order.items) {
+        if (item.product_id) {
+          try {
+            await this.recipesService.consumeIngredients(
+              item.product_id.toString(),
+              item.quantity,
+            );
+          } catch (error) {
+            // Log the error but don't fail the status update
+            // This allows the order to proceed even if ingredient tracking fails
+            console.error(
+              `Failed to consume ingredients for product ${item.product_id}:`,
+              error,
+            );
+          }
+        }
+      }
     }
 
     return (this.prisma as any).order.update({
