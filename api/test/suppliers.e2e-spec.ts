@@ -10,6 +10,11 @@ describe('Suppliers (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    // BigInt serialization fix
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -275,7 +280,7 @@ describe('Suppliers (e2e)', () => {
         .get(`/suppliers/${Number(supplier.id)}`)
         .expect(200);
 
-      expect(response.body.id).toBe(Number(supplier.id));
+      expect(response.body.id).toBe(String(supplier.id));
       expect(response.body.supplier_name).toBe('Specific Supplier');
       expect(response.body.supplier_type).toBe('ALCOHOL');
       expect(response.body.contact_person).toBe('Bob Johnson');

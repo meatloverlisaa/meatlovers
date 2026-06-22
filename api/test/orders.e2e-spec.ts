@@ -10,6 +10,11 @@ describe('Orders Life-cycle (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    // BigInt serialization fix
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

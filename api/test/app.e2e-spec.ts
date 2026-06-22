@@ -8,6 +8,11 @@ describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
+    // BigInt serialization fix
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
