@@ -11,6 +11,7 @@ import { PricingModule } from './pricing/pricing.module';
 import { PaymentsModule } from './payments/payments.module';
 import { KitchenModule } from './kitchen/kitchen.module';
 import { BarModule } from './bar/bar.module';
+import { RecipesModule } from './recipes/recipes.module';
 
 
 @Module({
@@ -25,6 +26,7 @@ import { BarModule } from './bar/bar.module';
     PaymentsModule,
     KitchenModule,
     BarModule,
+    RecipesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
