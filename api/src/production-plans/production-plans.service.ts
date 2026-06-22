@@ -183,6 +183,21 @@ export class ProductionPlansService {
   async updateProducedQuantity(id: string, producedQuantity: number) {
     const productionPlan = await this.prisma.productionPlan.findUnique({
       where: { id: BigInt(id) },
+      include: {
+        recipe: {
+          include: {
+            ingredients: {
+              include: {
+                stock_item: {
+                  include: {
+                    product: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!productionPlan) {
@@ -191,6 +206,53 @@ export class ProductionPlansService {
 
     if (producedQuantity > productionPlan.planned_quantity) {
       throw new BadRequestException('Produced quantity cannot exceed planned quantity');
+    }
+
+    // Calculate the additional quantity being produced
+    const additionalQuantity = producedQuantity - productionPlan.produced_quantity;
+
+    // If we're increasing production, consume ingredients
+    if (additionalQuantity > 0 && productionPlan.recipe?.ingredients) {
+      await this.prisma.$transaction(async (tx) => {
+        for (const ingredient of productionPlan.recipe!.ingredients) {
+          const requiredQuantity = Number(ingredient.quantity) * additionalQuantity;
+          const stockItem = ingredient.stock_item;
+
+          // Check if sufficient stock exists
+          const currentStockItem = await tx.stockItem.findUnique({
+            where: { id: stockItem.id },
+          });
+
+          if (!currentStockItem) {
+            throw new NotFoundException(`Stock item not found for ${stockItem.product?.product_name}`);
+          }
+
+          if (currentStockItem.quantity < requiredQuantity) {
+            throw new BadRequestException(
+              `Insufficient stock for ${stockItem.product?.product_name}. Required: ${requiredQuantity}, Available: ${currentStockItem.quantity}`
+            );
+          }
+
+          // Update stock quantity
+          await tx.stockItem.update({
+            where: { id: stockItem.id },
+            data: {
+              quantity: currentStockItem.quantity - requiredQuantity,
+            },
+          });
+
+          // Create stock movement record for production consumption
+          await tx.stockMovement.create({
+            data: {
+              stock_item_id: stockItem.id,
+              movement_type: 'WASTE',
+              quantity: -requiredQuantity,
+              reference: `Production Plan #${productionPlan.id}`,
+              notes: `Consumed ${requiredQuantity} ${ingredient.unit} for ${additionalQuantity} unit(s) of ${productionPlan.recipe?.name}`,
+            },
+          });
+        }
+      });
     }
 
     const updatedPlan = await this.prisma.productionPlan.update({
