@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -10,11 +10,17 @@ describe('Suppliers (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    // BigInt serialization fix
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -274,7 +280,7 @@ describe('Suppliers (e2e)', () => {
         .get(`/suppliers/${Number(supplier.id)}`)
         .expect(200);
 
-      expect(response.body.id).toBe(Number(supplier.id));
+      expect(response.body.id).toBe(String(supplier.id));
       expect(response.body.supplier_name).toBe('Specific Supplier');
       expect(response.body.supplier_type).toBe('ALCOHOL');
       expect(response.body.contact_person).toBe('Bob Johnson');

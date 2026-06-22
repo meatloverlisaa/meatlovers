@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -10,11 +10,17 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    // BigInt serialization fix
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
