@@ -23,6 +23,7 @@ export function Navigation() {
     { href: "/admin/stock", label: "Stock" },
     { href: "/admin/suppliers", label: "Suppliers" },
     { href: "/admin/suppliers/new", label: "Add Supplier" },
+    { href: "/admin/production-plans", label: "Production Plans" },
   ];
 
   const isActive = (href: string) => {

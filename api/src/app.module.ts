@@ -13,6 +13,7 @@ import { KitchenModule } from './kitchen/kitchen.module';
 import { BarModule } from './bar/bar.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { ProductionPlansModule } from './production-plans/production-plans.module';
+import { DeliveriesModule } from './deliveries/deliveries.module';
 
 
 @Module({
@@ -29,6 +30,7 @@ import { ProductionPlansModule } from './production-plans/production-plans.modul
     BarModule,
     RecipesModule,
     ProductionPlansModule,
+    DeliveriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -24,7 +24,7 @@ type StockBalanceRow = {
 };
 
 async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
   const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
 
   if (!res.ok) {
