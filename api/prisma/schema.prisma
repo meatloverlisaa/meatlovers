@@ -296,6 +296,7 @@ model Recipe {
 
   product     Product            @relation(fields: [product_id], references: [id])
   ingredients RecipeIngredient[]
+  production_plans ProductionPlan[]
 
   @@map("recipes")
   @@index([product_id])
@@ -314,4 +315,32 @@ model RecipeIngredient {
   @@map("recipe_ingredients")
   @@index([recipe_id])
   @@index([stock_item_id])
+}
+
+enum ProductionPlanStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model ProductionPlan {
+  id                BigInt                @id @default(autoincrement())
+  recipe_id         BigInt
+  planned_quantity  Int
+  produced_quantity Int                   @default(0)
+  status            ProductionPlanStatus   @default(PLANNED)
+  planned_date      DateTime
+  completed_date    DateTime?
+  notes             String?               @db.Text
+
+  recipe            Recipe                @relation(fields: [recipe_id], references: [id])
+
+  created_at        DateTime              @default(now())
+  updated_at        DateTime              @updatedAt
+
+  @@map("production_plans")
+  @@index([recipe_id])
+  @@index([status])
+  @@index([planned_date])
 }

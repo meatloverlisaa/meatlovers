@@ -12,6 +12,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { KitchenModule } from './kitchen/kitchen.module';
 import { BarModule } from './bar/bar.module';
 import { RecipesModule } from './recipes/recipes.module';
+import { ProductionPlansModule } from './production-plans/production-plans.module';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { RecipesModule } from './recipes/recipes.module';
     KitchenModule,
     BarModule,
     RecipesModule,
+    ProductionPlansModule,
   ],
   controllers: [AppController],
   providers: [AppService],
