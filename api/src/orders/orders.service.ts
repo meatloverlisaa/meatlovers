@@ -133,7 +133,9 @@ export class OrdersService {
 
   async findAll(status?: string) {
     const where: any = {};
-    if (status) where.status = status;
+    if (status) {
+      where.status = status;
+    }
 
     return (this.prisma as any).order.findMany({
       where,
