@@ -43,8 +43,11 @@ export class StockService {
         throw new BadRequestException('Quantity must be positive');
       }
 
-      let stockItem = await tx.stockItem.findUnique({
-        where: { product_id: BigInt(dto.productId) },
+      let stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: 'MAIN_STORE',
+        },
       });
 
       if (!stockItem) {
@@ -98,8 +101,11 @@ export class StockService {
         throw new NotFoundException(`Product with ID ${dto.productId} not found`);
       }
 
-      let stockItem = await tx.stockItem.findUnique({
-        where: { product_id: BigInt(dto.productId) },
+      let stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: 'MAIN_STORE',
+        },
       });
 
       if (!stockItem) {
@@ -243,8 +249,11 @@ export class StockService {
   }
 
   async getStockItem(productId: number) {
-    const stockItem = await this.prisma.stockItem.findUnique({
-      where: { product_id: BigInt(productId) },
+    const stockItem = await this.prisma.stockItem.findFirst({
+      where: {
+        product_id: BigInt(productId),
+        location: 'MAIN_STORE',
+      },
       include: {
         product: true,
         movements: {

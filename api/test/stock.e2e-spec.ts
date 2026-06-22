@@ -31,11 +31,11 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.$transaction([
-      prisma.$executeRawUnsafe('DELETE FROM stock_movements'),
-      prisma.$executeRawUnsafe('DELETE FROM stock_items'),
-      prisma.$executeRawUnsafe('DELETE FROM products'),
-    ]);
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
+    await prisma.$executeRawUnsafe('DELETE FROM stock_movements');
+    await prisma.$executeRawUnsafe('DELETE FROM stock_items');
+    await prisma.$executeRawUnsafe('DELETE FROM products');
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
   });
 
   describe('Purchase Stock Movements', () => {
