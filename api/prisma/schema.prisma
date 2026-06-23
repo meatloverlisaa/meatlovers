@@ -39,6 +39,7 @@ model User {
   orders Order[]
   rider Rider?
   waste_declarations WasteDeclaration[]
+  finance_transactions FinanceTransaction[]
 
   @@map("users")
 }
@@ -433,4 +434,45 @@ model WasteDeclaration {
   @@index([declared_by])
   @@index([reason])
   @@index([declared_at])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionCategory {
+  SALES
+  SUPPLIER_PAYMENT
+  SALARY
+  RENT
+  UTILITIES
+  MAINTENANCE
+  EQUIPMENT
+  MARKETING
+  WASTE_LOSS
+  DELIVERY
+  OTHER
+}
+
+model FinanceTransaction {
+  id          BigInt             @id @default(autoincrement())
+  type        TransactionType
+  category    TransactionCategory
+  amount      Decimal            @db.Decimal(12, 2)
+  description String?            @db.Text
+  reference   String?            @db.VarChar(255)
+  recorded_by BigInt
+  transaction_date DateTime      @default(now())
+
+  recorder    User               @relation(fields: [recorded_by], references: [id])
+
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+
+  @@map("finance_transactions")
+  @@index([type])
+  @@index([category])
+  @@index([recorded_by])
+  @@index([transaction_date])
 }

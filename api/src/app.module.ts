@@ -15,6 +15,7 @@ import { RecipesModule } from './recipes/recipes.module';
 import { ProductionPlansModule } from './production-plans/production-plans.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
 import { WasteModule } from './waste/waste.module';
+import { FinanceModule } from './finance/finance.module';
 
 
 @Module({
@@ -33,6 +34,7 @@ import { WasteModule } from './waste/waste.module';
     ProductionPlansModule,
     DeliveriesModule,
     WasteModule,
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
