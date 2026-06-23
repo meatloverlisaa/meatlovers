@@ -311,6 +311,86 @@ describe('Finance Transactions (e2e)', () => {
       expect(response.body.totalIncome).toBe(8000.00);
       expect(response.body.totalExpenses).toBe(0);
     });
+
+    it('should reconcile sales income against operating expenses for a reporting period', async () => {
+      await prisma.financeTransaction.deleteMany();
+
+      const reportStart = '2024-02-01T00:00:00.000Z';
+      const reportEnd = '2024-02-01T23:59:59.999Z';
+      const reportDate = new Date('2024-02-01T12:00:00.000Z');
+      const outsideReportDate = new Date('2024-02-02T12:00:00.000Z');
+
+      await prisma.financeTransaction.createMany({
+        data: [
+          {
+            type: TransactionType.INCOME,
+            category: TransactionCategory.SALES,
+            amount: 12000.00,
+            recorded_by: testUser.id,
+            transaction_date: reportDate,
+          },
+          {
+            type: TransactionType.INCOME,
+            category: TransactionCategory.SALES,
+            amount: 3500.00,
+            recorded_by: testUser.id,
+            transaction_date: reportDate,
+          },
+          {
+            type: TransactionType.EXPENSE,
+            category: TransactionCategory.SUPPLIER_PAYMENT,
+            amount: 4200.00,
+            recorded_by: testUser.id,
+            transaction_date: reportDate,
+          },
+          {
+            type: TransactionType.EXPENSE,
+            category: TransactionCategory.SALARY,
+            amount: 1800.00,
+            recorded_by: testUser.id,
+            transaction_date: reportDate,
+          },
+          {
+            type: TransactionType.EXPENSE,
+            category: TransactionCategory.UTILITIES,
+            amount: 650.00,
+            recorded_by: testUser.id,
+            transaction_date: reportDate,
+          },
+          {
+            type: TransactionType.INCOME,
+            category: TransactionCategory.SALES,
+            amount: 9999.00,
+            recorded_by: testUser.id,
+            transaction_date: outsideReportDate,
+          },
+          {
+            type: TransactionType.EXPENSE,
+            category: TransactionCategory.RENT,
+            amount: 9999.00,
+            recorded_by: testUser.id,
+            transaction_date: outsideReportDate,
+          },
+        ],
+      });
+
+      const response = await request(app.getHttpServer())
+        .get('/finance-transactions/summary')
+        .query({ startDate: reportStart, endDate: reportEnd })
+        .expect(200);
+
+      expect(response.body.totalTransactions).toBe(5);
+      expect(response.body.totalIncome).toBe(15500.00);
+      expect(response.body.totalExpenses).toBe(6650.00);
+      expect(response.body.netProfit).toBe(8850.00);
+      expect(response.body.byType[TransactionType.INCOME]).toBe(15500.00);
+      expect(response.body.byType[TransactionType.EXPENSE]).toBe(6650.00);
+      expect(response.body.byCategory[TransactionCategory.SALES]).toBe(15500.00);
+      expect(response.body.byCategory[TransactionCategory.SUPPLIER_PAYMENT]).toBe(4200.00);
+      expect(response.body.byCategory[TransactionCategory.SALARY]).toBe(1800.00);
+      expect(response.body.byCategory[TransactionCategory.UTILITIES]).toBe(650.00);
+      expect(response.body.byCategory[TransactionCategory.RENT]).toBeUndefined();
+    });
   });
 
   describe('GET /finance-transactions/:id', () => {
