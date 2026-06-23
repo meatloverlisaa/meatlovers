@@ -27,11 +27,6 @@ export class WasteController {
     return this.wasteService.getWasteSummary(startDate, endDate);
   }
 
-  @Get(':id')
-  findOneWasteDeclaration(@Param('id') id: string) {
-    return this.wasteService.findOneWasteDeclaration(id);
-  }
-
   @Get('product/:productId')
   findByProductId(@Param('productId') productId: string) {
     return this.wasteService.findByProductId(productId);
@@ -40,6 +35,11 @@ export class WasteController {
   @Get('declarer/:declarerId')
   findByDeclarer(@Param('declarerId') declarerId: string) {
     return this.wasteService.findByDeclarer(declarerId);
+  }
+
+  @Get(':id')
+  findOneWasteDeclaration(@Param('id') id: string) {
+    return this.wasteService.findOneWasteDeclaration(id);
   }
 
   @Patch(':id')
