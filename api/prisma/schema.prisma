@@ -38,6 +38,7 @@ model User {
   price_change_audits PriceChangeAuditTrail[]
   orders Order[]
   rider Rider?
+  waste_declarations WasteDeclaration[]
 
   @@map("users")
 }
@@ -160,6 +161,7 @@ model Product {
   price_change_audits PriceChangeAuditTrail[]
   stock_item         StockItem?
   recipe             Recipe?
+  waste_declarations WasteDeclaration[]
 
   @@map("products")
 }
@@ -398,4 +400,37 @@ model Delivery {
   @@index([order_id])
   @@index([rider_id])
   @@index([status])
+}
+
+enum WasteReason {
+  EXPIRED
+  SPOILED
+  OVERPRODUCTION
+  QUALITY_ISSUE
+  CUSTOMER_RETURN
+  THEFT
+  OTHER
+}
+
+model WasteDeclaration {
+  id          BigInt       @id @default(autoincrement())
+  product_id  BigInt
+  quantity    Int
+  reason      WasteReason
+  notes       String?      @db.Text
+  declared_by BigInt
+  cost_value  Decimal      @db.Decimal(12, 2)
+  declared_at DateTime     @default(now())
+
+  product     Product      @relation(fields: [product_id], references: [id])
+  declarer    User         @relation(fields: [declared_by], references: [id])
+
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  @@map("waste_declarations")
+  @@index([product_id])
+  @@index([declared_by])
+  @@index([reason])
+  @@index([declared_at])
 }
