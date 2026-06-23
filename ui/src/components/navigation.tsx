@@ -25,6 +25,7 @@ export function Navigation() {
     { href: "/admin/suppliers/new", label: "Add Supplier" },
     { href: "/admin/production-plans", label: "Production Plans" },
     { href: "/admin/dispatch", label: "Dispatch" },
+    { href: "/admin/delivery-tracking", label: "Delivery Tracking" },
   ];
 
   const isActive = (href: string) => {
