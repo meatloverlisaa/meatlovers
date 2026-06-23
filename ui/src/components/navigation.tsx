@@ -24,6 +24,7 @@ export function Navigation() {
     { href: "/admin/suppliers", label: "Suppliers" },
     { href: "/admin/suppliers/new", label: "Add Supplier" },
     { href: "/admin/production-plans", label: "Production Plans" },
+    { href: "/admin/waste", label: "Waste Management" },
     { href: "/admin/dispatch", label: "Dispatch" },
     { href: "/admin/delivery-tracking", label: "Delivery Tracking" },
   ];
