@@ -16,6 +16,9 @@ import { ProductionPlansModule } from './production-plans/production-plans.modul
 import { DeliveriesModule } from './deliveries/deliveries.module';
 import { WasteModule } from './waste/waste.module';
 import { FinanceModule } from './finance/finance.module';
+import { WebsiteModule } from './website/website.module';
+import { CmsModule } from './cms/cms.module';
+import { CrmModule } from './crm/crm.module';
 
 
 @Module({
@@ -35,6 +38,9 @@ import { FinanceModule } from './finance/finance.module';
     DeliveriesModule,
     WasteModule,
     FinanceModule,
+    WebsiteModule,
+    CmsModule,
+    CrmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

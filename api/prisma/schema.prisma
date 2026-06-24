@@ -476,3 +476,67 @@ model FinanceTransaction {
   @@index([recorded_by])
   @@index([transaction_date])
 }
+
+enum PageType {
+  HOMEPAGE
+  ABOUT
+  MENU
+  CONTACT
+  CUSTOM
+}
+
+model ContentPage {
+  id          BigInt   @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  page_type   PageType @default(CUSTOM)
+  content     String   @db.Text
+  is_published Boolean @default(false)
+  meta_title  String?  @db.VarChar(255)
+  meta_description String? @db.Text
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("content_pages")
+  @@index([slug])
+  @@index([is_published])
+}
+
+enum LeadSource {
+  LANDING_PAGE
+  CATERING_ENQUIRY
+  EVENT_BOOKING
+  RESERVATION
+  SOCIAL_MEDIA
+  REFERRAL
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+model WebsiteLead {
+  id          BigInt     @id @default(autoincrement())
+  name        String     @db.VarChar(255)
+  email       String?    @db.VarChar(255)
+  phone       String?    @db.VarChar(50)
+  source      LeadSource
+  status      LeadStatus @default(NEW)
+  enquiry_type String?   @db.VarChar(100)
+  message     String?    @db.Text
+  event_date  DateTime?
+  guest_count Int?
+  notes       String?    @db.Text
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  @@map("website_leads")
+  @@index([source])
+  @@index([status])
+  @@index([created_at])
+}

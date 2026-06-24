@@ -61,6 +61,7 @@ export function Navigation() {
   ];
 
   const adminItems = [
+    { href: "/admin/cms", label: "Website CMS" },
     { href: "/admin/payments", label: "Payments" },
     { href: "/admin/pricing-control", label: "Pricing Control" },
     { href: "/admin/products", label: "Products" },
