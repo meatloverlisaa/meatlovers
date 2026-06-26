@@ -21,6 +21,7 @@ import { WebsiteModule } from './website/website.module';
 import { CmsModule } from './cms/cms.module';
 import { CrmModule } from './crm/crm.module';
 import { StaffDashboardModule } from './staff-dashboard/staff-dashboard.module';
+import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 
 
 @Module({
@@ -45,6 +46,7 @@ import { StaffDashboardModule } from './staff-dashboard/staff-dashboard.module';
     CmsModule,
     CrmModule,
     StaffDashboardModule,
+    AdminDashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
