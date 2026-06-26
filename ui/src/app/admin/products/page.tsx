@@ -1,16 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ProductTable } from "./components/ProductTable";
+import { ProductCreateForm } from "./components/ProductCreateForm";
+import { ProductEditDrawer } from "./components/ProductEditDrawer";
+import { CategoryFilter } from "./components/CategoryFilter";
 
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
+export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
-type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
-
-type Product = {
+export type Product = {
   id: bigint | number;
   product_name: string;
   product_category: ProductCategory;
@@ -22,10 +20,14 @@ type Product = {
   updated_at?: string | null;
 };
 
-async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/products`, {
+async function getProducts(category?: ProductCategory): Promise<Product[]> {
+  const url = category 
+    ? `${API_BASE_URL}/products?category=${category}`
+    : `${API_BASE_URL}/products`;
+  
+  const res = await fetch(url, {
     cache: "no-store",
   });
 
@@ -37,14 +39,10 @@ async function getProducts(): Promise<Product[]> {
 }
 
 async function toggleProductActive(id: string, current: boolean): Promise<Product> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
-  const next = !current;
-
-  const res = await fetch(`${baseUrl}/products/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/products/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ is_active: next }),
+    body: JSON.stringify({ is_active: !current }),
   });
 
   if (!res.ok) {
@@ -54,24 +52,40 @@ async function toggleProductActive(id: string, current: boolean): Promise<Produc
   return res.json();
 }
 
+async function deleteProduct(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete product: ${res.status}`);
+  }
+}
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "ALL">("ALL");
+
+  const loadProducts = async (category?: ProductCategory) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getProducts(category);
+      setProducts(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadProducts();
-  }, []);
+    loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+  }, [selectedCategory]);
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     try {
@@ -85,110 +99,105 @@ export default function AdminProductsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Products</h1>
-          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+  };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Products</h1>
-          <p className="mt-4 text-sm text-red-600">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
+
+    try {
+      await deleteProduct(id);
+      setProducts(products.filter(prod => {
+        const prodId = typeof prod.id === "bigint" ? prod.id.toString() : String(prod.id);
+        return prodId !== id;
+      }));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete product");
+    }
+  };
+
+  const handleProductCreated = () => {
+    setShowCreateForm(false);
+    loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+  };
+
+  const handleProductUpdated = () => {
+    setEditingProduct(null);
+    loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Products</h1>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin/stock"
-              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
-            >
-              View stock →
-            </Link>
-            <Link
-              href="/admin/products/new"
-              className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-            >
-              + Create product
-            </Link>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Product Management
+            </h1>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              Manage products across food, drinks, and alcohol categories
+            </p>
           </div>
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+          >
+            + Create Product
+          </button>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-zinc-50 dark:bg-zinc-900">
-                <tr className="text-zinc-600 dark:text-zinc-300">
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Category</th>
-                  <th className="px-4 py-3 font-medium">Selling price</th>
-                  <th className="px-4 py-3 font-medium">Cost price</th>
-                  <th className="px-4 py-3 font-medium">Active</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {products.map((p) => {
-                  const id = typeof p.id === "bigint" ? p.id.toString() : String(p.id);
-                  const activeColor = p.is_active
-                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
-                    : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200";
-
-                  return (
-                    <tr key={id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
-                      <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50">{p.product_name}</td>
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{p.product_category}</td>
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{p.selling_price}</td>
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{p.cost_price}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${activeColor}`}>
-                          {p.is_active ? "ACTIVE" : "INACTIVE"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                        {p.created_at ? new Date(p.created_at).toLocaleDateString() : "-"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStatus(id, p.is_active)}
-                          className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                        >
-                          Toggle status
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-
-                {products.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-8 text-center text-zinc-600 dark:text-zinc-300" colSpan={7}>
-                      No products found.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
+        {/* Category Filter */}
+        <div className="mb-6">
+          <CategoryFilter
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
         </div>
+
+        {/* Loading/Error States */}
+        {loading && (
+          <div className="text-center py-12">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">Loading products...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Product Table */}
+        {!loading && !error && (
+          <ProductTable
+            products={products}
+            onToggleStatus={handleToggleStatus}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        )}
+
+        {/* Create Form Modal */}
+        {showCreateForm && (
+          <ProductCreateForm
+            onClose={() => setShowCreateForm(false)}
+            onSuccess={handleProductCreated}
+          />
+        )}
+
+        {/* Edit Drawer */}
+        {editingProduct && (
+          <ProductEditDrawer
+            product={editingProduct}
+            onClose={() => setEditingProduct(null)}
+            onSuccess={handleProductUpdated}
+          />
+        )}
       </div>
     </div>
   );
 }
-
