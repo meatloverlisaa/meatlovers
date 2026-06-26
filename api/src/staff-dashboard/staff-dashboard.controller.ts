@@ -1,9 +1,11 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { StaffDashboardService } from './staff-dashboard.service';
 import { Role } from '@prisma/client';
 
 @Controller('staff/dashboard')
+@UseGuards(JwtAuthGuard)
 @Roles(Role.ACCOUNTANT, Role.HR, Role.STOREKEEPER)
 export class StaffDashboardController {
   constructor(private readonly staffDashboardService: StaffDashboardService) {}
