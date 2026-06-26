@@ -14,22 +14,21 @@ type NavItem = {
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: "📊" },
-  { href: "/admin/cms", label: "Website CMS", icon: "🌐", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/products", label: "Products", icon: "🍖", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/pricing-control", label: "Pricing", icon: "💰", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/suppliers", label: "Suppliers", icon: "🏭", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
-  { href: "/admin/stock", label: "Stock", icon: "📦", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
-  { href: "/admin/production-plans", label: "Production", icon: "👨‍🍳", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/payments", label: "Payments", icon: "💳", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
-  { href: "/admin/dispatch", label: "Dispatch", icon: "🚴", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/waste", label: "Waste", icon: "♻️", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/reports", label: "Reports", icon: "📈", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
-  { href: "/admin/users", label: "Users", icon: "👥", roles: ["SUPER_ADMIN", "HR"] },
+  { href: "/staff", label: "Dashboard", icon: "📊" },
+  { href: "/staff/payments", label: "Payments", icon: "💳", roles: ["ACCOUNTANT"] },
+  { href: "/staff/reports", label: "Reports", icon: "📈", roles: ["ACCOUNTANT"] },
+  { href: "/staff/finance", label: "Finance", icon: "💰", roles: ["ACCOUNTANT"] },
+  { href: "/staff/employees", label: "Employees", icon: "👥", roles: ["HR"] },
+  { href: "/staff/attendance", label: "Attendance", icon: "📅", roles: ["HR"] },
+  { href: "/staff/payroll", label: "Payroll", icon: "💵", roles: ["HR"] },
+  { href: "/staff/stock", label: "Stock Control", icon: "📦", roles: ["STOREKEEPER"] },
+  { href: "/staff/suppliers", label: "Suppliers", icon: "🏭", roles: ["STOREKEEPER"] },
+  { href: "/staff/receiving", label: "Receiving", icon: "📥", roles: ["STOREKEEPER"] },
+  { href: "/staff/profile", label: "My Profile", icon: "👤" },
 ];
 
-// ─── Admin Layout Component ───────────────────────────────────────────────────
-export default function AdminLayout({
+// ─── Staff Layout Component ───────────────────────────────────────────────────
+export default function StaffLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -38,10 +37,10 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   // Mock user role - in production, get from auth context
-  const userRole = "SUPER_ADMIN";
+  const userRole = "ACCOUNTANT"; // Change to test different roles: ACCOUNTANT, HR, STOREKEEPER
 
   const isActive = (href: string) => {
-    if (href === "/admin") return pathname === "/admin";
+    if (href === "/staff") return pathname === "/staff";
     return pathname?.startsWith(href);
   };
 
@@ -65,7 +64,7 @@ export default function AdminLayout({
           <span className="text-2xl">🍖</span>
           <div>
             <p className="font-black text-zinc-950">Meat Lovers</p>
-            <p className="text-xs text-zinc-500">Admin Portal</p>
+            <p className="text-xs text-zinc-500">Staff Portal</p>
           </div>
         </div>
 
@@ -79,7 +78,7 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-red-50 text-red-800"
+                    ? "bg-emerald-50 text-emerald-800"
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
@@ -93,11 +92,11 @@ export default function AdminLayout({
         {/* User Profile */}
         <div className="border-t border-zinc-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-800">
-              A
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-800">
+              {userRole[0]}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-zinc-950">Admin User</p>
+              <p className="text-sm font-bold text-zinc-950">Staff User</p>
               <p className="text-xs text-zinc-500">{userRole}</p>
             </div>
           </div>
@@ -136,7 +135,7 @@ export default function AdminLayout({
           </button>
           <div className="flex items-center gap-2">
             <span className="text-xl">🍖</span>
-            <span className="font-black text-zinc-950">Meat Lovers</span>
+            <span className="font-black text-zinc-950">Meat Lovers Staff</span>
           </div>
         </header>
 

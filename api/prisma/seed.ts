@@ -226,7 +226,16 @@ async function main() {
     console.log(`  ↳ Skipping demo leads — ${existingLeads} already exist`);
   }
 
-  console.log('\nSeed completed successfully!');
+  // ─── seed_dashboard_shortcuts ────────────────────────────────────────────
+  // Note: Dashboard uses existing data from orders, payments, products, etc.
+  // Audit logs for activity timeline will be added when that table is created
+
+  console.log('\n✅ Seed completed successfully!');
+  console.log('\n📊 Dashboard data ready:');
+  console.log('  • Content pages for website');
+  console.log('  • Demo website leads for CRM dashboard');
+  console.log('  • Dashboard indexes ready (migration 20260626000000)');
+  console.log('  • Uses existing: orders, payments, products, users');
 }
 
 main()
