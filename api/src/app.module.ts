@@ -20,6 +20,7 @@ import { FinanceModule } from './finance/finance.module';
 import { WebsiteModule } from './website/website.module';
 import { CmsModule } from './cms/cms.module';
 import { CrmModule } from './crm/crm.module';
+import { StaffDashboardModule } from './staff-dashboard/staff-dashboard.module';
 
 
 @Module({
@@ -43,6 +44,7 @@ import { CrmModule } from './crm/crm.module';
     WebsiteModule,
     CmsModule,
     CrmModule,
+    StaffDashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
