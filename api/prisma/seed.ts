@@ -1,86 +1,71 @@
-import { PrismaClient } from '@prisma/client';
-import { PageType, LeadSource } from '@prisma/client';
+import { PrismaClient, PageType, LeadSource, LeadStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting seed...');
 
-  // Seed homepage content
-  const homepage = await prisma.contentPage.upsert({
-    where: { slug: 'home' },
-    update: {},
-    create: {
-      title: 'Homepage',
+  // ─── seed_homepage_content ───────────────────────────────────────────────
+  const contentPages = [
+    {
       slug: 'home',
+      title: 'Homepage',
       page_type: PageType.HOMEPAGE,
+      is_published: true,
+      meta_title: 'Meat Lovers — Restaurant, Bar & Catering in Nairobi',
+      meta_description:
+        'Flame-grilled meals, cold drinks, and catering services. Dine-in, takeaway, and delivery in Nairobi.',
       content: JSON.stringify({
         hero_title: 'Meat Lovers',
-        hero_subtitle: 'Flame-grilled meals, cold drinks, fast table service, and catering support for gatherings that deserve serious food.',
+        hero_subtitle:
+          'Flame-grilled meals, cold drinks, fast table service, and catering support for gatherings that deserve serious food.',
         hero_cta_primary: 'View Menu Highlights',
         hero_cta_secondary: 'Contact Us',
         about_title: 'Built for guests who care about flavour, speed and consistency',
-        about_description: 'Meat Lovers brings together grilled meals, bar service, table ordering, and delivery support in one restaurant experience.',
+        about_description:
+          'Meat Lovers brings together grilled meals, bar service, table ordering, and delivery support in one restaurant experience.',
       }),
-      is_published: true,
-      meta_title: 'Meat Lovers - Restaurant, Bar & Catering in Nairobi',
-      meta_description: 'Flame-grilled meals, cold drinks, and catering services. Visit Meat Lovers for dine-in, takeaway, and delivery in Nairobi.',
     },
-  });
-
-  console.log('Created homepage:', homepage);
-
-  // Seed about page
-  const aboutPage = await prisma.contentPage.upsert({
-    where: { slug: 'about' },
-    update: {},
-    create: {
-      title: 'About Us',
+    {
       slug: 'about',
+      title: 'About Us',
       page_type: PageType.ABOUT,
+      is_published: true,
+      meta_title: 'About Meat Lovers — Our Story',
+      meta_description:
+        'Learn about Meat Lovers restaurant, our kitchen quality, service focus, and commitment to great food.',
       content: JSON.stringify({
         title: 'About Meat Lovers',
-        description: 'Meat Lovers brings together grilled meals, bar service, table ordering, and delivery support in one restaurant experience. The team focuses on reliable preparation, clear service flow, and food that arrives hot, generous, and ready to share.',
-        kitchen_quality: 'Meals are prepared around clear recipes, fresh stock, and controlled production.',
-        service_focus: 'Dine-in, takeaway, catering, and delivery requests are handled with one coordinated team.',
+        description:
+          'Meat Lovers brings together grilled meals, bar service, table ordering, and delivery in one restaurant experience.',
+        kitchen_quality:
+          'Meals are prepared around clear recipes, fresh stock, and controlled production.',
+        service_focus:
+          'Dine-in, takeaway, catering, and delivery requests are handled with one coordinated team.',
       }),
-      is_published: true,
-      meta_title: 'About Meat Lovers - Our Story',
-      meta_description: 'Learn about Meat Lovers restaurant, our kitchen quality, service focus, and commitment to great food.',
     },
-  });
-
-  console.log('Created about page:', aboutPage);
-
-  // Seed menu page
-  const menuPage = await prisma.contentPage.upsert({
-    where: { slug: 'menu' },
-    update: {},
-    create: {
-      title: 'Menu',
+    {
       slug: 'menu',
+      title: 'Menu',
       page_type: PageType.MENU,
+      is_published: true,
+      meta_title: 'Meat Lovers Menu — Food, Drinks & Platters',
+      meta_description:
+        'Explore our menu featuring flame-grilled food, refreshing drinks, and shareable platters.',
       content: JSON.stringify({
         title: 'Our Menu',
         description: 'Food, soft drinks, alcoholic drinks, platters and specials',
         categories: ['Food', 'Soft Drinks', 'Alcoholic Drinks', 'Platters'],
       }),
-      is_published: true,
-      meta_title: 'Meat Lovers Menu - Food, Drinks & Platters',
-      meta_description: 'Explore our menu featuring flame-grilled food, refreshing drinks, and shareable platters.',
     },
-  });
-
-  console.log('Created menu page:', menuPage);
-
-  // Seed contact page
-  const contactPage = await prisma.contentPage.upsert({
-    where: { slug: 'contact' },
-    update: {},
-    create: {
-      title: 'Contact Us',
+    {
       slug: 'contact',
+      title: 'Contact Us',
       page_type: PageType.CONTACT,
+      is_published: true,
+      meta_title: 'Contact Meat Lovers — Orders, Catering & Reservations',
+      meta_description:
+        'Get in touch for orders, catering enquiries, reservations, and delivery in Nairobi.',
       content: JSON.stringify({
         title: 'Contact Us',
         description: 'Ask about orders, catering, reservations or delivery',
@@ -88,80 +73,160 @@ async function main() {
         email: 'orders@meatlovers.local',
         location: 'Meat Lovers restaurant, Nairobi',
       }),
-      is_published: true,
-      meta_title: 'Contact Meat Lovers - Orders, Catering & Reservations',
-      meta_description: 'Get in touch with Meat Lovers for orders, catering enquiries, reservations, and delivery in Nairobi.',
-    },
-  });
-
-  console.log('Created contact page:', contactPage);
-
-  // Seed sample leads for testing analytics
-  const sampleLeads = [
-    {
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+254711111111',
-      source: LeadSource.LANDING_PAGE,
-      status: 'NEW' as const,
-      enquiry_type: 'General enquiry',
-      message: 'I would like to know more about your services.',
-    },
-    {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+254722222222',
-      source: LeadSource.CATERING_ENQUIRY,
-      status: 'CONTACTED' as const,
-      enquiry_type: 'Catering',
-      message: 'Need catering for 50 people next weekend.',
-      event_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      guest_count: 50,
-    },
-    {
-      name: 'Michael Johnson',
-      email: 'michael@example.com',
-      phone: '+254733333333',
-      source: LeadSource.EVENT_BOOKING,
-      status: 'QUALIFIED' as const,
-      enquiry_type: 'Reservation',
-      message: 'Birthday party reservation for 20 people.',
-      event_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      guest_count: 20,
-    },
-    {
-      name: 'Sarah Williams',
-      email: 'sarah@example.com',
-      phone: '+254744444444',
-      source: LeadSource.REFERRAL,
-      status: 'CONVERTED' as const,
-      enquiry_type: 'Catering',
-      message: 'Referred by a friend, booked corporate lunch.',
-      event_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      guest_count: 30,
-    },
-    {
-      name: 'David Brown',
-      email: 'david@example.com',
-      phone: '+254755555555',
-      source: LeadSource.LANDING_PAGE,
-      status: 'LOST' as const,
-      enquiry_type: 'General enquiry',
-      message: 'Was interested but chose another venue.',
     },
   ];
 
-  for (const lead of sampleLeads) {
-    await prisma.websiteLead.upsert({
-      where: { id: BigInt(0) },
-      update: {},
-      create: lead,
+  // ─── seed_menu_highlights ────────────────────────────────────────────────
+  const menuHighlightPages = [
+    {
+      slug: 'homepage-food-highlights',
+      title: 'Homepage — Food Highlights',
+      page_type: PageType.HOMEPAGE,
+      is_published: true,
+      meta_title: null,
+      meta_description: null,
+      content: JSON.stringify({
+        section: 'menu_highlights',
+        category: 'FOOD',
+        items: [
+          {
+            name: 'Flame-Grilled Platters',
+            description:
+              'Shareable cuts, house sauces, sides, and table-ready service for groups.',
+            price: 'From KSh 1,850',
+          },
+          {
+            name: 'Signature Burgers',
+            description:
+              'Stacked patties, fresh buns, crisp toppings, and bold Meat Lovers seasoning.',
+            price: 'From KSh 950',
+          },
+          {
+            name: 'Grilled Ribs',
+            description: 'Slow-cooked baby back ribs with signature dry rub and house BBQ sauce.',
+            price: 'From KSh 1,200',
+          },
+        ],
+      }),
+    },
+    {
+      slug: 'homepage-drinks-highlights',
+      title: 'Homepage — Drinks Highlights',
+      page_type: PageType.HOMEPAGE,
+      is_published: true,
+      meta_title: null,
+      meta_description: null,
+      content: JSON.stringify({
+        section: 'menu_highlights',
+        category: 'DRINKS',
+        items: [
+          {
+            name: 'Fresh Coolers',
+            description: 'Juices, mocktails, sodas, and refreshing non-alcoholic pairings.',
+            price: 'From KSh 250',
+          },
+          {
+            name: 'Bar Pairings',
+            description: 'Beer, wine, and classic pours curated for grilled meals and late service.',
+            price: 'Ask at the bar',
+          },
+        ],
+      }),
+    },
+  ];
+
+  for (const page of [...contentPages, ...menuHighlightPages]) {
+    await prisma.contentPage.upsert({
+      where: { slug: page.slug },
+      update: {
+        title: page.title,
+        content: page.content,
+        is_published: page.is_published,
+        meta_title: page.meta_title,
+        meta_description: page.meta_description,
+      },
+      create: page,
     });
+    console.log(`  ✓ content_page: ${page.slug}`);
   }
 
-  console.log('Created sample leads');
+  // ─── seed_default_lead_sources (demo WebsiteLeads) ───────────────────────
+  // Check if any leads already exist before seeding demos
+  const existingLeads = await prisma.websiteLead.count();
+  if (existingLeads === 0) {
+    const demoLeads: Array<{
+      name: string;
+      email: string;
+      phone: string;
+      source: LeadSource;
+      status: LeadStatus;
+      enquiry_type: string;
+      message: string;
+      event_date?: Date;
+      guest_count?: number;
+    }> = [
+      {
+        name: 'John Kamau',
+        email: 'john.kamau@example.com',
+        phone: '+254711000001',
+        source: LeadSource.LANDING_PAGE,
+        status: LeadStatus.NEW,
+        enquiry_type: 'General enquiry',
+        message: 'I would like to know more about your menu and opening hours.',
+      },
+      {
+        name: 'Grace Wanjiku',
+        email: 'grace.wanjiku@example.com',
+        phone: '+254722000002',
+        source: LeadSource.CATERING_ENQUIRY,
+        status: LeadStatus.CONTACTED,
+        enquiry_type: 'Catering',
+        message: 'Need catering for a corporate team lunch of 40 people.',
+        event_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+        guest_count: 40,
+      },
+      {
+        name: 'Peter Omondi',
+        email: 'peter.omondi@example.com',
+        phone: '+254733000003',
+        source: LeadSource.EVENT_BOOKING,
+        status: LeadStatus.QUALIFIED,
+        enquiry_type: 'Reservation',
+        message: 'Birthday dinner for 15 guests, need a private section.',
+        event_date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+        guest_count: 15,
+      },
+      {
+        name: 'Sarah Njeri',
+        email: 'sarah.njeri@example.com',
+        phone: '+254744000004',
+        source: LeadSource.REFERRAL,
+        status: LeadStatus.CONVERTED,
+        enquiry_type: 'Catering',
+        message: 'Referred by a colleague. Booked a platter package for a weekend event.',
+        event_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        guest_count: 25,
+      },
+      {
+        name: 'David Mwangi',
+        email: 'david.mwangi@example.com',
+        phone: '+254755000005',
+        source: LeadSource.SOCIAL_MEDIA,
+        status: LeadStatus.NEW,
+        enquiry_type: 'Delivery',
+        message: 'Saw your post on Instagram. Do you deliver to Westlands?',
+      },
+    ];
 
-  console.log('Seed completed successfully!');
+    for (const lead of demoLeads) {
+      await prisma.websiteLead.create({ data: lead });
+      console.log(`  ✓ website_lead: ${lead.name} (${lead.source})`);
+    }
+  } else {
+    console.log(`  ↳ Skipping demo leads — ${existingLeads} already exist`);
+  }
+
+  console.log('\nSeed completed successfully!');
 }
 
 main()
