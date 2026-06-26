@@ -1,185 +1,298 @@
-import { revalidatePath } from "next/cache";
-import React from "react";
+"use client";
 
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
+import { useState, useEffect } from "react";
+import { PricingRuleForm } from "./components/PricingRuleForm";
+import { PricingRuleTable } from "./components/PricingRuleTable";
+import { MarginAlertPanel } from "./components/MarginAlertPanel";
+import { PriceAuditTimeline } from "./components/PriceAuditTimeline";
 
-type MarginAlertStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED";
+export type PricingRuleType = "FIXED_PRICE" | "PERCENT_INCREASE" | "PERCENT_DECREASE";
+export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
+export type MarginAlertStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED";
 
-type MarginAlert = {
+export type PricingRule = {
   id: bigint | number;
-  alert_status: MarginAlertStatus;
-  notes?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+  name: string;
+  rule_type: PricingRuleType;
+  value: string;
+  product_category: ProductCategory | null;
+  min_selling_price: string | null;
+  max_selling_price: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
-async function getMarginAlerts(): Promise<MarginAlert[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+export type MarginAlert = {
+  id: bigint | number;
+  alert_status: MarginAlertStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
-  const res = await fetch(`${baseUrl}/margin-alerts`, {
+export type PriceAudit = {
+  id: bigint | number;
+  product_id: bigint | number;
+  pricing_rule_id: bigint | number | null;
+  actor_user_id: bigint | number;
+  old_selling_price: string;
+  new_selling_price: string;
+  note: string | null;
+  created_at: string;
+};
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+
+async function getPricingRules(): Promise<PricingRule[]> {
+  const res = await fetch(`${API_BASE_URL}/pricing-rules`, {
     cache: "no-store",
   });
-
-  if (!res.ok) {
-    throw new Error(`Failed to load margin alerts: ${res.status}`);
-  }
-
+  if (!res.ok) throw new Error(`Failed to load pricing rules: ${res.status}`);
   return res.json();
 }
 
-async function updateMarginAlert(id: string, payload: { alert_status: MarginAlertStatus; notes?: string }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/margin-alerts/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+async function getMarginAlerts(): Promise<MarginAlert[]> {
+  const res = await fetch(`${API_BASE_URL}/margin-alerts`, {
+    cache: "no-store",
   });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Failed to update margin alert: ${res.status} ${text}`);
-  }
-
+  if (!res.ok) throw new Error(`Failed to load margin alerts: ${res.status}`);
   return res.json();
 }
 
-type StatusChipProps = { status: MarginAlertStatus };
+export default function PricingControlPage() {
+  const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
+  const [marginAlerts, setMarginAlerts] = useState<MarginAlert[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showRuleForm, setShowRuleForm] = useState(false);
+  const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
+  const [activeTab, setActiveTab] = useState<"rules" | "alerts" | "audit">("rules");
 
-function StatusChip({ status }: StatusChipProps) {
-  const color =
-    status === "RESOLVED"
-      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
-      : status === "UNDER_REVIEW"
-        ? "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-200"
-        : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200";
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [rulesData, alertsData] = await Promise.all([
+        getPricingRules(),
+        getMarginAlerts(),
+      ]);
+      setPricingRules(rulesData);
+      setMarginAlerts(alertsData);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return (
-    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color}`}>{status}</span>
-  );
-}
+  useEffect(() => {
+    loadData();
+  }, []);
 
-export default async function AdminPricingControlPage() {
-  let alerts: MarginAlert[] = [];
+  const handleRuleCreated = () => {
+    setShowRuleForm(false);
+    setEditingRule(null);
+    loadData();
+  };
 
-  try {
-    alerts = await getMarginAlerts();
-  } catch (e) {
-    const message = e instanceof Error ? e.message : "Unknown error";
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Pricing Control & Margin Alerts</h1>
-          <p className="mt-4 text-sm text-red-600">{message}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleEdit = (rule: PricingRule) => {
+    setEditingRule(rule);
+    setShowRuleForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this pricing rule?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/pricing-rules/${id}`, {
+        method: "DELETE",
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to delete pricing rule: ${res.status}`);
+      }
+      
+      loadData();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete pricing rule");
+    }
+  };
+
+  const openAlerts = marginAlerts.filter(a => a.alert_status === "OPEN");
+  const reviewAlerts = marginAlerts.filter(a => a.alert_status === "UNDER_REVIEW");
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Pricing Control & Margin Alerts</h1>
-          <Link
-            href="/admin/products"
-            className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
-          >
-            ← Back to Products
-          </Link>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+            Pricing Control
+          </h1>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            Manage pricing rules, margin alerts, and price change history
+          </p>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <div className="text-zinc-900 dark:text-zinc-50">Total alerts: <span className="font-semibold">{alerts.length}</span></div>
+        {/* Alert Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">Active Rules</p>
+                <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+                  {pricingRules.filter(r => r.is_active).length}
+                </p>
+              </div>
+              <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3">
+                <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-zinc-50 dark:bg-zinc-900">
-                <tr className="text-zinc-600 dark:text-zinc-300">
-                  <th className="px-4 py-3 font-medium">ID</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Notes</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {alerts.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-10 text-center text-zinc-600 dark:text-zinc-300" colSpan={5}>
-                      No margin alerts found.
-                    </td>
-                  </tr>
-                ) : null}
+          <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-red-600 dark:text-red-400">Open Alerts</p>
+                <p className="mt-1 text-2xl font-semibold text-red-900 dark:text-red-50">
+                  {openAlerts.length}
+                </p>
+              </div>
+              <div className="rounded-full bg-red-100 dark:bg-red-900/50 p-3">
+                <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-                {alerts.map((a) => {
-                  const id = typeof a.id === "bigint" ? a.id.toString() : String(a.id);
-
-                  return (
-                    <tr key={id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{id}</td>
-                      <td className="px-4 py-3">
-                        <StatusChip status={a.alert_status} />
-                      </td>
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{a.notes ?? "-"}</td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">{a.created_at ? new Date(a.created_at).toLocaleString() : "-"}</td>
-                      <td className="px-4 py-3">
-                        <form
-                          className="flex flex-col gap-2 sm:flex-row sm:items-center"
-                          action={async (formData) => {
-                            "use server";
-
-                            const alert_status = formData.get("alert_status") as MarginAlertStatus;
-                            const notes = String(formData.get("notes") ?? "").trim();
-
-                            await updateMarginAlert(id, {
-                              alert_status,
-                              notes: notes.length ? notes : undefined,
-                            });
-
-                            revalidatePath("/admin/pricing-control");
-                          }}
-                        >
-                          <select
-                            name="alert_status"
-                            defaultValue={a.alert_status}
-                            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                          >
-                            <option value="OPEN">OPEN</option>
-                            <option value="UNDER_REVIEW">UNDER_REVIEW</option>
-                            <option value="RESOLVED">RESOLVED</option>
-                          </select>
-                          <input
-                            name="notes"
-                            defaultValue={a.notes ?? ""}
-                            placeholder="Update notes"
-                            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                          />
-                          <button
-                            type="submit"
-                            className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                          >
-                            Save
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-amber-600 dark:text-amber-400">Under Review</p>
+                <p className="mt-1 text-2xl font-semibold text-amber-900 dark:text-amber-50">
+                  {reviewAlerts.length}
+                </p>
+              </div>
+              <div className="rounded-full bg-amber-100 dark:bg-amber-900/50 p-3">
+                <svg className="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Tab Navigation */}
+        <div className="border-b border-zinc-200 dark:border-zinc-800 mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab("rules")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "rules"
+                  ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
+                  : "border-transparent text-zinc-600 hover:text-zinc-900 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-50 dark:hover:border-zinc-700"
+              }`}
+            >
+              Pricing Rules
+            </button>
+            <button
+              onClick={() => setActiveTab("alerts")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "alerts"
+                  ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
+                  : "border-transparent text-zinc-600 hover:text-zinc-900 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-50 dark:hover:border-zinc-700"
+              }`}
+            >
+              Margin Alerts
+              {openAlerts.length > 0 && (
+                <span className="ml-2 rounded-full bg-red-100 dark:bg-red-900/30 px-2 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
+                  {openAlerts.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("audit")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "audit"
+                  ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
+                  : "border-transparent text-zinc-600 hover:text-zinc-900 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-50 dark:hover:border-zinc-700"
+              }`}
+            >
+              Price Audit Trail
+            </button>
+          </nav>
+        </div>
+
+        {/* Loading/Error States */}
+        {loading && (
+          <div className="text-center py-12">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">Loading pricing control data...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 mb-6">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Tab Content */}
+        {!loading && !error && (
+          <>
+            {activeTab === "rules" && (
+              <div className="space-y-6">
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      setEditingRule(null);
+                      setShowRuleForm(true);
+                    }}
+                    className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+                  >
+                    + Create Pricing Rule
+                  </button>
+                </div>
+
+                <PricingRuleTable
+                  rules={pricingRules}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              </div>
+            )}
+
+            {activeTab === "alerts" && (
+              <MarginAlertPanel
+                alerts={marginAlerts}
+                onUpdate={loadData}
+              />
+            )}
+
+            {activeTab === "audit" && (
+              <PriceAuditTimeline />
+            )}
+          </>
+        )}
+
+        {/* Pricing Rule Form Modal */}
+        {showRuleForm && (
+          <PricingRuleForm
+            rule={editingRule}
+            onClose={() => {
+              setShowRuleForm(false);
+              setEditingRule(null);
+            }}
+            onSuccess={handleRuleCreated}
+          />
+        )}
       </div>
     </div>
   );
 }
-
