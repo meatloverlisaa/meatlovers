@@ -38,6 +38,8 @@ model User {
   price_change_audits PriceChangeAuditTrail[]
   orders Order[]
   rider Rider?
+  waste_declarations WasteDeclaration[]
+  finance_transactions FinanceTransaction[]
 
   @@map("users")
 }
@@ -160,6 +162,7 @@ model Product {
   price_change_audits PriceChangeAuditTrail[]
   stock_item         StockItem?
   recipe             Recipe?
+  waste_declarations WasteDeclaration[]
 
   @@map("products")
 }
@@ -399,4 +402,142 @@ model Delivery {
   @@index([order_id])
   @@index([rider_id])
   @@index([status])
+}
+
+enum WasteReason {
+  EXPIRED
+  SPOILED
+  OVERPRODUCTION
+  QUALITY_ISSUE
+  CUSTOMER_RETURN
+  THEFT
+  OTHER
+}
+
+model WasteDeclaration {
+  id          BigInt       @id @default(autoincrement())
+  product_id  BigInt
+  quantity    Int
+  reason      WasteReason
+  notes       String?      @db.Text
+  declared_by BigInt
+  cost_value  Decimal      @db.Decimal(12, 2)
+  declared_at DateTime     @default(now())
+
+  product     Product      @relation(fields: [product_id], references: [id])
+  declarer    User         @relation(fields: [declared_by], references: [id])
+
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  @@map("waste_declarations")
+  @@index([product_id])
+  @@index([declared_by])
+  @@index([reason])
+  @@index([declared_at])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionCategory {
+  SALES
+  SUPPLIER_PAYMENT
+  SALARY
+  RENT
+  UTILITIES
+  MAINTENANCE
+  EQUIPMENT
+  MARKETING
+  WASTE_LOSS
+  DELIVERY
+  OTHER
+}
+
+model FinanceTransaction {
+  id          BigInt             @id @default(autoincrement())
+  type        TransactionType
+  category    TransactionCategory
+  amount      Decimal            @db.Decimal(12, 2)
+  description String?            @db.Text
+  reference   String?            @db.VarChar(255)
+  recorded_by BigInt
+  transaction_date DateTime      @default(now())
+
+  recorder    User               @relation(fields: [recorded_by], references: [id])
+
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+
+  @@map("finance_transactions")
+  @@index([type])
+  @@index([category])
+  @@index([recorded_by])
+  @@index([transaction_date])
+}
+
+enum PageType {
+  HOMEPAGE
+  ABOUT
+  MENU
+  CONTACT
+  CUSTOM
+}
+
+model ContentPage {
+  id          BigInt   @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  page_type   PageType @default(CUSTOM)
+  content     String   @db.Text
+  is_published Boolean @default(false)
+  meta_title  String?  @db.VarChar(255)
+  meta_description String? @db.Text
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("content_pages")
+  @@index([slug])
+  @@index([is_published])
+}
+
+enum LeadSource {
+  LANDING_PAGE
+  CATERING_ENQUIRY
+  EVENT_BOOKING
+  RESERVATION
+  SOCIAL_MEDIA
+  REFERRAL
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+model WebsiteLead {
+  id          BigInt     @id @default(autoincrement())
+  name        String     @db.VarChar(255)
+  email       String?    @db.VarChar(255)
+  phone       String?    @db.VarChar(50)
+  source      LeadSource
+  status      LeadStatus @default(NEW)
+  enquiry_type String?   @db.VarChar(100)
+  message     String?    @db.Text
+  event_date  DateTime?
+  guest_count Int?
+  notes       String?    @db.Text
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  @@map("website_leads")
+  @@index([source])
+  @@index([status])
+  @@index([created_at])
 }

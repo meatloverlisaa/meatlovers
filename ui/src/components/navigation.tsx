@@ -8,6 +8,51 @@ export function Navigation() {
   const pathname = usePathname();
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
 
+  if (pathname === "/") {
+    const publicItems = [
+      { href: "#home", label: "Home" },
+      { href: "#menu", label: "Menu" },
+      { href: "#catering", label: "Catering" },
+      { href: "#about", label: "About" },
+      { href: "#contact", label: "Contact" },
+    ];
+
+    return (
+      <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+          <Link href="#home" className="text-xl font-black text-red-900">
+            Meat Lovers
+          </Link>
+          <div className="hidden items-center gap-1 md:flex">
+            {publicItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-md px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 hover:text-red-800"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="#menu"
+              className="hidden rounded-md border border-zinc-300 px-4 py-2 text-sm font-bold text-zinc-900 transition hover:border-red-700 hover:text-red-800 sm:inline-flex"
+            >
+              Order
+            </Link>
+            <Link
+              href="#contact"
+              className="rounded-md bg-red-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-800"
+            >
+              Contact
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
   const navItems = [
     { href: "/", label: "Home"},
     { href: "/pos/menu", label: "POS" },
@@ -16,6 +61,7 @@ export function Navigation() {
   ];
 
   const adminItems = [
+    { href: "/admin/cms", label: "Website CMS" },
     { href: "/admin/payments", label: "Payments" },
     { href: "/admin/pricing-control", label: "Pricing Control" },
     { href: "/admin/products", label: "Products" },
@@ -24,7 +70,9 @@ export function Navigation() {
     { href: "/admin/suppliers", label: "Suppliers" },
     { href: "/admin/suppliers/new", label: "Add Supplier" },
     { href: "/admin/production-plans", label: "Production Plans" },
+    { href: "/admin/waste", label: "Waste Management" },
     { href: "/admin/dispatch", label: "Dispatch" },
+    { href: "/admin/delivery-tracking", label: "Delivery Tracking" },
   ];
 
   const isActive = (href: string) => {

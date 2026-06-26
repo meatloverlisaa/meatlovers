@@ -16,6 +16,7 @@ Decimal.prototype.toJSON = function () {
   return this.toFixed(2);
 };
 
+import { AuthModule } from './auth/auth.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { ProductModule } from './product/product.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -29,10 +30,16 @@ import { BarModule } from './bar/bar.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { ProductionPlansModule } from './production-plans/production-plans.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
+import { WasteModule } from './waste/waste.module';
+import { FinanceModule } from './finance/finance.module';
+import { WebsiteModule } from './website/website.module';
+import { CmsModule } from './cms/cms.module';
+import { CrmModule } from './crm/crm.module';
 
 
 @Module({
   imports: [
+    AuthModule,
     PrismaModule,
     SupplierModule,
     ProductModule,
@@ -46,6 +53,11 @@ import { DeliveriesModule } from './deliveries/deliveries.module';
     RecipesModule,
     ProductionPlansModule,
     DeliveriesModule,
+    WasteModule,
+    FinanceModule,
+    WebsiteModule,
+    CmsModule,
+    CrmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

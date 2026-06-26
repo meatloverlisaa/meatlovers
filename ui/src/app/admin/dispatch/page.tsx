@@ -204,7 +204,7 @@ export default function DispatchPage() {
         order_id: selectedOrderId,
         rider_id: selectedRiderId,
         pickup_address: pickupAddress || undefined,
-        delivery_address,
+        delivery_address: deliveryAddress,
         delivery_notes: deliveryNotes || undefined,
       });
       setShowAssignModal(false);
