@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
 import { WebsiteService } from './website.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
+import { Public } from '../auth/public.decorator';
 
+/** All website endpoints are public — no auth required. */
 @Controller('website')
+@Public()
 export class WebsiteController {
   constructor(private readonly websiteService: WebsiteService) {}
 
@@ -22,6 +25,7 @@ export class WebsiteController {
   }
 
   @Post('leads')
+  @HttpCode(HttpStatus.CREATED)
   createLead(@Body() createLeadDto: CreateLeadDto) {
     return this.websiteService.createLead(createLeadDto);
   }
