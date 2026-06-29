@@ -147,8 +147,63 @@ export class KitchenStockController {
 }
 
 // Bar-specific endpoints
-@Controller('bar/stock')
+@Controller('stock')
 export class BarStockController {
+  constructor(private readonly stockService: StockService) {}
+
+  /**
+   * GET /stock/bar — Bar stock balance view
+   * Access: BARMAN
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.BARMAN)
+  @Get('bar')
+  async getBarStock() {
+    return this.stockService.getBarStock();
+  }
+
+  /**
+   * POST /stock/bar-sale — Record bar sale stock deduction
+   * Access: BARMAN
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.BARMAN)
+  @Post('bar-sale')
+  async barSale(@Body(ValidationPipe) body: any) {
+    return this.stockService.createBarSale(body);
+  }
+
+  /**
+   * POST /stock/bar-adjustment — Record bar adjustment request
+   * Access: BARMAN
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.BARMAN)
+  @Post('bar-adjustment')
+  async barAdjustment(@Body(ValidationPipe) body: any) {
+    return this.stockService.createBarAdjustment(body);
+  }
+
+  // Legacy endpoints for backward compatibility
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.BARMAN)
+  @Post('sale-deduction')
+  async saleDeduction(@Body(ValidationPipe) body: any) {
+    return this.stockService.createBarSaleDeduction(body);
+  }
+
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.BARMAN)
+  @Get('transfers')
+  async getTransfers(@Query('limit') limit?: string) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 50;
+    return this.stockService.getBarTransfers(parsedLimit);
+  }
+}
+
+// Legacy Bar endpoints at /bar/stock path
+@Controller('bar/stock')
+export class LegacyBarStockController {
   constructor(private readonly stockService: StockService) {}
 
   @Public() // Temporary for development - remove in production
