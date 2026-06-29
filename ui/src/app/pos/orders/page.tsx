@@ -47,7 +47,106 @@ async function fetchMyOrders(): Promise<Order[]> {
   return res.json();
 }
 
-function OrderDetailCard({ order }: { order: Order }) {
+type EditRequestModalProps = {
+  order: Order;
+  onClose: () => void;
+  onSubmit: (orderId: string, reason: string) => Promise<void>;
+};
+
+function EditRequestModal({ order, onClose, onSubmit }: EditRequestModalProps) {
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    if (!reason.trim()) {
+      setError("Please provide a reason for the edit request");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      await onSubmit(order.id, reason);
+      onClose();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to submit edit request";
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Request Order Edit
+            </h3>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+              Order #{order.order_number}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+          >
+            <svg className="h-5 w-5 text-zinc-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+          This order is already being prepared. An approval request will be sent to the manager.
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-2 block text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            Reason for edit request
+          </label>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            rows={4}
+            placeholder="Explain why you need to modify this order..."
+            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+          />
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+            {error}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            disabled={submitting}
+            className="flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="flex-1 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            {submitting ? "Submitting..." : "Submit Request"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrderDetailCard({ order, onEditRequest }: { 
+  order: Order;
+  onEditRequest: (orderId: string) => void;
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const statusColor = statusColors[order.status];
   
@@ -65,6 +164,9 @@ function OrderDetailCard({ order }: { order: Order }) {
   const itemsTotal = order.items?.reduce((sum, item) => {
     return sum + (parseFloat(item.unit_price) * item.quantity);
   }, 0) || 0;
+
+  const canEdit = order.status === "PENDING";
+  const needsApproval = order.status === "PREPARING" || order.status === "READY";
   
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
@@ -144,6 +246,21 @@ function OrderDetailCard({ order }: { order: Order }) {
             KES {itemsTotal.toFixed(2)}
           </span>
         </div>
+
+        {/* Edit Request Button */}
+        {(canEdit || needsApproval) && (
+          <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <button
+              onClick={() => onEditRequest(order.id)}
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              {canEdit ? "Edit Order" : "Request Edit Approval"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -154,6 +271,8 @@ export default function MyOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "ALL">("ALL");
+  const [editModalOrder, setEditModalOrder] = useState<Order | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,6 +307,39 @@ export default function MyOrdersPage() {
       clearInterval(interval);
     };
   }, []);
+
+  // Auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  async function handleEditRequest(orderId: string, reason: string) {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    
+    const res = await fetch(`${baseUrl}/orders/${orderId}/edit-request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Failed to submit edit request: ${res.status}${text ? ` - ${text}` : ""}`);
+    }
+
+    setSuccessMessage("Edit request submitted successfully! Waiting for manager approval.");
+    setEditModalOrder(null);
+  }
+
+  function openEditModal(orderId: string) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      setEditModalOrder(order);
+    }
+  }
 
   const filteredOrders = statusFilter === "ALL" 
     ? orders 
@@ -253,6 +405,18 @@ export default function MyOrdersPage() {
           </div>
         )}
 
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-200">
+            <div className="flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              {successMessage}
+            </div>
+          </div>
+        )}
+
         {/* Orders List */}
         {loading ? (
           <div className="space-y-3">
@@ -286,7 +450,11 @@ export default function MyOrdersPage() {
         ) : (
           <div className="space-y-3">
             {filteredOrders.map((order) => (
-              <OrderDetailCard key={order.id} order={order} />
+              <OrderDetailCard 
+                key={order.id} 
+                order={order}
+                onEditRequest={openEditModal}
+              />
             ))}
           </div>
         )}
@@ -321,6 +489,15 @@ export default function MyOrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Request Modal */}
+      {editModalOrder && (
+        <EditRequestModal
+          order={editModalOrder}
+          onClose={() => setEditModalOrder(null)}
+          onSubmit={handleEditRequest}
+        />
+      )}
     </div>
   );
 }
