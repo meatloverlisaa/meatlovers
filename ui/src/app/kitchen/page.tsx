@@ -1,36 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
-
-type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID" | "CANCELLED";
-
-type OrderItem = {
-  id: bigint | number;
-  product_id?: bigint | number | null;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  line_total: number;
-};
-
-type Order = {
-  id: bigint | number;
-  table_id: bigint | number;
-  waiter_id: bigint | number;
-  status: OrderStatus;
-  total_amount: number;
-  created_at: string;
-  updated_at: string;
-  items: OrderItem[];
-  waiter?: {
-    id: bigint | number;
-    full_name: string;
-  };
-  table?: {
-    id: bigint | number;
-    table_name?: string | null;
-  };
-};
+import Link from "next/link";
 
 type KitchenSummary = {
   pending: number;
@@ -39,265 +7,203 @@ type KitchenSummary = {
   total: number;
 };
 
-async function getKitchenQueue(status?: string): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const url = status ? `${baseUrl}/kitchen/queue?status=${status}` : `${baseUrl}/kitchen/queue`;
-  
-  const res = await fetch(url, {
-    cache: "no-store",
-  });
+async function getKitchenSummary(): Promise<KitchenSummary | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    const res = await fetch(`${baseUrl}/kitchen/summary`, { cache: "no-store" });
 
-  if (!res.ok) {
-    throw new Error(`Failed to load kitchen queue: ${res.status}`);
-  }
-
-  return res.json();
-}
-
-async function getKitchenSummary(): Promise<KitchenSummary> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/kitchen/summary`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to load kitchen summary: ${res.status}`);
-  }
-
-  return res.json();
-}
-
-async function updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/kitchen/queue/${id}/status`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to update order status: ${res.status}`);
-  }
-
-  return res.json();
-}
-
-function getStatusColor(status: OrderStatus): string {
-  switch (status) {
-    case "PENDING":
-      return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200";
-    case "PREPARING":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200";
-    case "READY":
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200";
-    case "SERVED":
-      return "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-200";
-    case "PAID":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200";
-    case "CANCELLED":
-      return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
-    default:
-      return "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-200";
-  }
-}
-
-function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
-  switch (currentStatus) {
-    case "PENDING":
-      return "PREPARING";
-    case "PREPARING":
-      return "READY";
-    case "READY":
-      return "SERVED";
-    default:
+    if (!res.ok) {
       return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.warn("Failed to load kitchen summary:", error);
+    return null;
   }
 }
 
-export default function KitchenPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [summary, setSummary] = useState<KitchenSummary>({ pending: 0, preparing: 0, ready: 0, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>("");
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [queueData, summaryData] = await Promise.all([
-          getKitchenQueue(filter || undefined),
-          getKitchenSummary(),
-        ]);
-        setOrders(queueData);
-        setSummary(summaryData);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-
-    // Auto-refresh every 10 seconds for real-time updates
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
-  }, [filter]);
-
-  const handleStatusUpdate = async (orderId: string, currentStatus: OrderStatus) => {
-    const nextStatus = getNextStatus(currentStatus);
-    if (!nextStatus) return;
-
-    try {
-      await updateOrderStatus(orderId, nextStatus);
-      // Reload data
-      const [queueData, summaryData] = await Promise.all([
-        getKitchenQueue(filter || undefined),
-        getKitchenSummary(),
-      ]);
-      setOrders(queueData);
-      setSummary(summaryData);
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to update status");
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Kitchen Monitor</h1>
-          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Kitchen Monitor</h1>
-          <p className="mt-4 text-sm text-red-600">{error}</p>
-        </div>
-      </div>
-    );
-  }
+export default async function KitchenDashboardPage() {
+  const summary = await getKitchenSummary();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Kitchen Monitor</h1>
-          <div className="flex items-center gap-3">
-            <a
-              href="/kitchen/stock"
-              className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
-              📦 Stock Usage
-            </a>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-            >
-              <option value="">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="PREPARING">Preparing</option>
-              <option value="READY">Ready</option>
-            </select>
-          </div>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            Kitchen Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+            Welcome to the kitchen management portal
+          </p>
         </div>
 
-        {/* Summary Cards */}
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Total Orders</div>
-            <div className="mt-2 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{summary.total}</div>
-          </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
-            <div className="text-sm font-medium text-amber-700 dark:text-amber-300">Pending</div>
-            <div className="mt-2 text-2xl font-semibold text-amber-900 dark:text-amber-50">{summary.pending}</div>
-          </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
-            <div className="text-sm font-medium text-blue-700 dark:text-blue-300">Preparing</div>
-            <div className="mt-2 text-2xl font-semibold text-blue-900 dark:text-blue-50">{summary.preparing}</div>
-          </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950">
-            <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Ready</div>
-            <div className="mt-2 text-2xl font-semibold text-emerald-900 dark:text-emerald-50">{summary.ready}</div>
-          </div>
-        </div>
-
-        {/* Orders Grid */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {orders.map((order) => {
-            const id = typeof order.id === "bigint" ? order.id.toString() : String(order.id);
-            const nextStatus = getNextStatus(order.status);
-            const statusColor = getStatusColor(order.status);
-
-            return (
-              <div key={id} className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                        Table {order.table?.table_name || order.table_id}
-                      </span>
-                      <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${statusColor}`}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-                      Waiter: {order.waiter?.full_name || "Unknown"}
-                    </div>
-                    <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                      {new Date(order.created_at).toLocaleTimeString()}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  {order.items.map((item, idx) => {
-                    const itemId = typeof item.id === "bigint" ? item.id.toString() : String(item.id);
-                    return (
-                      <div key={itemId} className="flex items-center justify-between text-sm">
-                        <div>
-                          <span className="font-medium text-zinc-900 dark:text-zinc-50">{item.product_name}</span>
-                          <span className="ml-2 text-zinc-600 dark:text-zinc-300">x{item.quantity}</span>
-                        </div>
-                        <div className="text-zinc-700 dark:text-zinc-200">
-                          ${(item.line_total).toFixed(2)}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                  <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                    Total: ${order.total_amount.toFixed(2)}
-                  </div>
-                  {nextStatus && (
-                    <button
-                      type="button"
-                      onClick={() => handleStatusUpdate(id, order.status)}
-                      className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                    >
-                      Mark as {nextStatus}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-
-          {orders.length === 0 ? (
-            <div className="col-span-full rounded-xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-950">
-              <p className="text-zinc-600 dark:text-zinc-300">No orders in the kitchen queue.</p>
+        {/* Summary Stats */}
+        {summary && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
+              <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Total Orders</div>
+              <div className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">{summary.total}</div>
             </div>
-          ) : null}
+            <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20 p-6">
+              <div className="text-sm font-medium text-amber-700 dark:text-amber-300">Pending</div>
+              <div className="mt-2 text-3xl font-bold text-amber-900 dark:text-amber-50">{summary.pending}</div>
+            </div>
+            <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
+              <div className="text-sm font-medium text-blue-700 dark:text-blue-300">Preparing</div>
+              <div className="mt-2 text-3xl font-bold text-blue-900 dark:text-blue-50">{summary.preparing}</div>
+            </div>
+            <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20 p-6">
+              <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Ready</div>
+              <div className="mt-2 text-3xl font-bold text-emerald-900 dark:text-emerald-50">{summary.ready}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Order Queue Card */}
+          <Link
+            href="/kitchen/queue"
+            className="group block rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 transition hover:border-red-300 dark:hover:border-red-700 hover:shadow-lg"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-2xl">
+                🍽️
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-red-700 dark:group-hover:text-red-400">
+                  Order Queue
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Manage incoming orders
+                </p>
+              </div>
+            </div>
+            {summary && summary.pending > 0 && (
+              <div className="mt-4 rounded-lg bg-amber-100 dark:bg-amber-900/30 px-3 py-2 text-sm font-semibold text-amber-800 dark:text-amber-200">
+                {summary.pending} pending order{summary.pending !== 1 ? "s" : ""}
+              </div>
+            )}
+          </Link>
+
+          {/* Kitchen Stock Card */}
+          <Link
+            href="/kitchen/stock"
+            className="group block rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 transition hover:border-red-300 dark:hover:border-red-700 hover:shadow-lg"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-2xl">
+                📦
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-red-700 dark:group-hover:text-red-400">
+                  Kitchen Stock
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  View & record usage
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Recipes Card - Placeholder */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
+                📝
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Recipes
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Coming soon
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Production Plans Card - Placeholder */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
+                📅
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Production Plans
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Coming soon
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Waste Tracking Card - Placeholder */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
+                ♻️
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Waste Tracking
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Coming soon
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Reports Card - Placeholder */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
+                📊
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Reports
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Coming soon
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Info */}
+        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
+              <p className="font-semibold mb-2">Chef Quick Guide</p>
+              <ul className="space-y-1 list-disc list-inside">
+                <li>Monitor and manage incoming orders in the Order Queue</li>
+                <li>Track kitchen stock usage and request replenishment</li>
+                <li>Update order status from Pending → Preparing → Ready</li>
+                <li>View real-time kitchen performance metrics</li>
+                <li>Orders auto-refresh every 10 seconds for live updates</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
