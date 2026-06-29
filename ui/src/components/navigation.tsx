@@ -61,18 +61,19 @@ export function Navigation() {
   ];
 
   const adminItems = [
+    { href: "/admin", label: "Dashboard" },
     { href: "/admin/cms", label: "Website CMS" },
-    { href: "/admin/payments", label: "Payments" },
-    { href: "/admin/pricing-control", label: "Pricing Control" },
     { href: "/admin/products", label: "Products" },
     { href: "/admin/products/new", label: "Add Product" },
-    { href: "/admin/stock", label: "Stock" },
+    { href: "/admin/pricing-control", label: "Pricing Control" },
+    { href: "/admin/stock", label: "Stock Control" },
     { href: "/admin/suppliers", label: "Suppliers" },
     { href: "/admin/suppliers/new", label: "Add Supplier" },
     { href: "/admin/production-plans", label: "Production Plans" },
     { href: "/admin/waste", label: "Waste Management" },
     { href: "/admin/dispatch", label: "Dispatch" },
     { href: "/admin/delivery-tracking", label: "Delivery Tracking" },
+    { href: "/admin/payments", label: "Payments" },
   ];
 
   const isActive = (href: string) => {
