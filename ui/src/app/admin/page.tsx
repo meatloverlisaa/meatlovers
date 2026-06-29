@@ -300,6 +300,7 @@ function AlertBanner({ alerts }: { alerts: Alert[] }) {
 
 // ─── Quick Actions Module Grid ────────────────────────────────────────────────
 const adminModules = [
+  { href: "/admin/orders", label: "Order Management", icon: "📋", desc: "View & manage all orders" },
   { href: "/admin/cms", label: "Website CMS", icon: "🌐", desc: "Pages, leads, analytics" },
   { href: "/admin/products", label: "Products", icon: "🍖", desc: "Menu & product catalogue" },
   { href: "/admin/pricing-control", label: "Pricing Control", icon: "💰", desc: "Rules & margin alerts" },
