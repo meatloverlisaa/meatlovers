@@ -413,6 +413,157 @@ export class StockService {
     return movements;
   }
 
+  // Kitchen-specific methods
+  async getKitchenStock() {
+    return this.prisma.stockItem.findMany({
+      where: {
+        location: 'Kitchen',
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_name: true,
+            product_category: true,
+            cost_price: true,
+            barcode: true,
+          },
+        },
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+    });
+  }
+
+  async createKitchenUsage(dto: CreateAdjustmentDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: BigInt(dto.productId) },
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+      }
+
+      if (dto.quantity <= 0) {
+        throw new BadRequestException('Quantity must be positive');
+      }
+
+      const stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: 'Kitchen',
+        },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(`Product not found at Kitchen location`);
+      }
+
+      if (stockItem.quantity < dto.quantity) {
+        throw new BadRequestException(
+          `Insufficient quantity. Available: ${stockItem.quantity}, Requested: ${dto.quantity}`,
+        );
+      }
+
+      const newQuantity = stockItem.quantity - dto.quantity;
+
+      const updatedStockItem = await tx.stockItem.update({
+        where: { id: stockItem.id },
+        data: { quantity: newQuantity },
+      });
+
+      const movement = await tx.stockMovement.create({
+        data: {
+          stock_item_id: stockItem.id,
+          movement_type: MovementType.USAGE,
+          quantity: -dto.quantity,
+          reference: dto.reference,
+          notes: dto.notes ? `Kitchen Usage: ${dto.notes}` : 'Kitchen Usage',
+        },
+      });
+
+      return {
+        stockItem: {
+          id: updatedStockItem.id,
+          productId: updatedStockItem.product_id,
+          quantity: updatedStockItem.quantity,
+          location: updatedStockItem.location,
+        },
+        movement: {
+          id: movement.id,
+          type: movement.movement_type,
+          quantity: movement.quantity,
+        },
+      };
+    });
+  }
+
+  async createWaste(dto: CreateAdjustmentDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: BigInt(dto.productId) },
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+      }
+
+      if (dto.quantity <= 0) {
+        throw new BadRequestException('Quantity must be positive');
+      }
+
+      const stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: 'Kitchen',
+        },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(`Product not found at Kitchen location`);
+      }
+
+      if (stockItem.quantity < dto.quantity) {
+        throw new BadRequestException(
+          `Insufficient quantity. Available: ${stockItem.quantity}, Requested: ${dto.quantity}`,
+        );
+      }
+
+      const newQuantity = stockItem.quantity - dto.quantity;
+
+      const updatedStockItem = await tx.stockItem.update({
+        where: { id: stockItem.id },
+        data: { quantity: newQuantity },
+      });
+
+      const movement = await tx.stockMovement.create({
+        data: {
+          stock_item_id: stockItem.id,
+          movement_type: MovementType.WASTE,
+          quantity: -dto.quantity,
+          reference: dto.reference,
+          notes: dto.notes ? `Kitchen Waste: ${dto.notes}` : 'Kitchen Waste',
+        },
+      });
+
+      return {
+        stockItem: {
+          id: updatedStockItem.id,
+          productId: updatedStockItem.product_id,
+          quantity: updatedStockItem.quantity,
+          location: updatedStockItem.location,
+        },
+        movement: {
+          id: movement.id,
+          type: movement.movement_type,
+          quantity: movement.quantity,
+        },
+      };
+    });
+  }
+
   // Bar-specific methods
   async createBarSaleDeduction(dto: CreateAdjustmentDto) {
     return this.prisma.$transaction(async (tx) => {

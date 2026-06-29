@@ -107,6 +107,45 @@ export class StockController {
   }
 }
 
+// Kitchen-specific endpoints
+@Controller('stock')
+export class KitchenStockController {
+  constructor(private readonly stockService: StockService) {}
+
+  /**
+   * GET /stock/kitchen — Kitchen-relevant stock view
+   * Access: CHEF
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.CHEF)
+  @Get('kitchen')
+  async getKitchenStock() {
+    return this.stockService.getKitchenStock();
+  }
+
+  /**
+   * POST /stock/kitchen-usage — Record kitchen usage movement
+   * Access: CHEF
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.CHEF)
+  @Post('kitchen-usage')
+  async kitchenUsage(@Body(ValidationPipe) body: any) {
+    return this.stockService.createKitchenUsage(body);
+  }
+
+  /**
+   * POST /stock/waste — Record kitchen wastage movement
+   * Access: CHEF
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.CHEF)
+  @Post('waste')
+  async recordWaste(@Body(ValidationPipe) body: any) {
+    return this.stockService.createWaste(body);
+  }
+}
+
 // Bar-specific endpoints
 @Controller('bar/stock')
 export class BarStockController {

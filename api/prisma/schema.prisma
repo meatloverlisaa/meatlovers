@@ -160,7 +160,7 @@ model Product {
   updated_at       DateTime        @updatedAt
 
   price_change_audits PriceChangeAuditTrail[]
-  stock_item         StockItem?
+  stock_items        StockItem[]
   recipe             Recipe?
   waste_declarations WasteDeclaration[]
 
@@ -221,6 +221,7 @@ enum MovementType {
   PURCHASE
   ADJUSTMENT
   TRANSFER
+  USAGE
   WASTE
 }
 
