@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { ListOrdersQueryDto } from './dto/list-orders-query.dto';
+import { ApplyDiscountDto } from './dto/apply-discount.dto';
 import { RecipesService } from '../recipes/recipes.service';
 
 @Injectable()
@@ -200,6 +201,404 @@ export class OrdersService {
       data: { status },
       include: { items: true, waiter: true, table: true },
     });
+  }
+
+  /**
+   * GET /orders — List orders with filters (OVERSIGHT)
+   */
+  async listOrders(query: ListOrdersQueryDto) {
+    const {
+      status,
+      tableId,
+      waiterId,
+      dateFrom,
+      dateTo,
+      limit = 50,
+      offset = 0,
+    } = query;
+
+    const where: any = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (tableId) {
+      where.table_id = BigInt(tableId);
+    }
+
+    if (waiterId) {
+      where.waiter_id = BigInt(waiterId);
+    }
+
+    if (dateFrom || dateTo) {
+      where.created_at = {};
+      if (dateFrom) {
+        where.created_at.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.created_at.lte = new Date(dateTo);
+      }
+    }
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        take: limit,
+        skip: offset,
+        include: {
+          items: true,
+          waiter: {
+            select: { id: true, full_name: true, role: true },
+          },
+          table: {
+            select: { id: true, table_name: true },
+          },
+          customer: {
+            select: { id: true, name: true, phone: true },
+          },
+          payments: {
+            select: {
+              id: true,
+              payment_method: true,
+              amount: true,
+              payment_status: true,
+            },
+          },
+          approval_requests: {
+            where: { status: 'PENDING' },
+            select: {
+              id: true,
+              request_type: true,
+              status: true,
+              reason: true,
+              created_at: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.serializeOrder(order)),
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + orders.length < total,
+      },
+    };
+  }
+
+  /**
+   * GET /orders/:id — Get full order detail (OVERSIGHT)
+   */
+  async getOrderById(id: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+      include: {
+        items: true,
+        waiter: {
+          select: { id: true, full_name: true, role: true, phone: true },
+        },
+        table: {
+          select: { id: true, table_name: true },
+        },
+        customer: {
+          select: { id: true, name: true, phone: true, email: true },
+        },
+        payments: {
+          select: {
+            id: true,
+            payment_method: true,
+            amount: true,
+            payment_status: true,
+            transaction_reference: true,
+            created_at: true,
+          },
+        },
+        approval_requests: {
+          select: {
+            id: true,
+            request_type: true,
+            status: true,
+            reason: true,
+            metadata: true,
+            requested_by: true,
+            reviewed_by: true,
+            created_at: true,
+            updated_at: true,
+            requester: {
+              select: { id: true, full_name: true, role: true },
+            },
+            reviewer: {
+              select: { id: true, full_name: true, role: true },
+            },
+          },
+        },
+        delivery: {
+          select: {
+            id: true,
+            status: true,
+            delivery_address: true,
+            rider: {
+              select: {
+                id: true,
+                phone: true,
+                user: {
+                  select: { full_name: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return this.serializeOrder(order);
+  }
+
+  /**
+   * PATCH /orders/:id/status — Update order status with authorization (OVERSIGHT)
+   */
+  async updateOrderStatus(id: string, userId: bigint, updateDto: UpdateOrderStatusDto) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    const { status } = updateDto;
+
+    // Validate status transitions
+    const validTransitions: Record<string, string[]> = {
+      PENDING: ['PREPARING', 'CANCELLED'],
+      PREPARING: ['READY', 'CANCELLED'],
+      READY: ['SERVED', 'CANCELLED'],
+      SERVED: ['PAID'],
+      PAID: [], // Terminal state
+      CANCELLED: [], // Terminal state
+    };
+
+    const allowedStatuses = validTransitions[order.status as string] || [];
+
+    if (!allowedStatuses.includes(status)) {
+      throw new BadRequestException(
+        `Invalid status transition from ${order.status} to ${status}. Allowed: ${allowedStatuses.join(', ')}`,
+      );
+    }
+
+    // Consume ingredients when status changes to PREPARING
+    if (status === 'PREPARING' && order.status !== 'PREPARING') {
+      for (const item of order.items) {
+        if (item.product_id) {
+          try {
+            await this.recipesService.consumeIngredients(
+              item.product_id.toString(),
+              item.quantity,
+            );
+          } catch (error) {
+            console.error(
+              `Failed to consume ingredients for product ${item.product_id}:`,
+              error,
+            );
+          }
+        }
+      }
+    }
+
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: BigInt(id) },
+      data: { status },
+      include: {
+        items: true,
+        waiter: { select: { id: true, full_name: true, role: true } },
+        table: { select: { id: true, table_name: true } },
+        customer: { select: { id: true, name: true, phone: true } },
+      },
+    });
+
+    return this.serializeOrder(updatedOrder);
+  }
+
+  /**
+   * PATCH /orders/:id/discount — Apply discount or create approval request (OVERSIGHT)
+   */
+  async applyDiscount(
+    id: string,
+    userId: bigint,
+    userRole: string,
+    applyDto: ApplyDiscountDto,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    // Cannot apply discount to cancelled or paid orders
+    if (order.status === 'CANCELLED' || order.status === 'PAID') {
+      throw new BadRequestException(
+        `Cannot apply discount to ${order.status} order`,
+      );
+    }
+
+    const { discountPercent, discountAmount, reason } = applyDto;
+
+    if (!discountPercent && !discountAmount) {
+      throw new BadRequestException(
+        'Either discountPercent or discountAmount must be provided',
+      );
+    }
+
+    if (discountPercent && discountAmount) {
+      throw new BadRequestException(
+        'Provide either discountPercent or discountAmount, not both',
+      );
+    }
+
+    const originalTotal = order.total_amount;
+    let discountValue = 0;
+
+    if (discountPercent) {
+      discountValue = (originalTotal * discountPercent) / 100;
+    } else if (discountAmount) {
+      discountValue = discountAmount;
+    }
+
+    const newTotal = originalTotal - discountValue;
+
+    if (newTotal < 0) {
+      throw new BadRequestException('Discount cannot exceed order total');
+    }
+
+    // Check if approval is needed (discount > 10%)
+    const discountPercentActual = (discountValue / originalTotal) * 100;
+    const needsApproval = discountPercentActual > 10;
+
+    if (needsApproval && !['ADMIN', 'SUPER_ADMIN', 'MANAGER'].includes(userRole)) {
+      // Create approval request
+      const approvalRequest = await this.prisma.approvalRequest.create({
+        data: {
+          order_id: BigInt(id),
+          request_type: 'DISCOUNT',
+          status: 'PENDING',
+          requested_by: userId,
+          reason:
+            reason ||
+            `${discountPercentActual.toFixed(1)}% discount (${discountValue.toFixed(2)})`,
+          metadata: JSON.stringify({
+            originalTotal,
+            discountValue,
+            discountPercent: discountPercentActual,
+            newTotal,
+          }),
+        },
+      });
+
+      return {
+        message: 'Discount approval request created',
+        approvalRequestId: approvalRequest.id.toString(),
+        status: 'PENDING_APPROVAL',
+        discountRequested: discountValue,
+        discountPercent: discountPercentActual.toFixed(2),
+      };
+    }
+
+    // Apply discount directly
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: BigInt(id) },
+      data: {
+        total_amount: newTotal,
+      },
+      include: {
+        items: true,
+        waiter: { select: { id: true, full_name: true, role: true } },
+        table: { select: { id: true, table_name: true } },
+        customer: { select: { id: true, name: true, phone: true } },
+      },
+    });
+
+    return {
+      message: 'Discount applied successfully',
+      originalTotal,
+      discountApplied: discountValue,
+      discountPercent: discountPercentActual.toFixed(2),
+      newTotal,
+      order: this.serializeOrder(updatedOrder),
+    };
+  }
+
+  /**
+   * Helper: Serialize order for response
+   */
+  private serializeOrder(order: any) {
+    return {
+      id: order.id.toString(),
+      tableId: order.table_id?.toString(),
+      tableName: order.table?.table_name,
+      customerId: order.customer_id?.toString(),
+      customerName: order.customer?.name,
+      customerPhone: order.customer?.phone,
+      customerEmail: order.customer?.email,
+      waiterId: order.waiter_id?.toString(),
+      waiterName: order.waiter?.full_name,
+      waiterPhone: order.waiter?.phone,
+      status: order.status,
+      totalAmount: order.total_amount,
+      items: order.items?.map((item: any) => ({
+        id: item.id.toString(),
+        productId: item.product_id?.toString(),
+        productName: item.product_name,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        lineTotal: item.line_total,
+      })),
+      payments: order.payments?.map((payment: any) => ({
+        id: payment.id.toString(),
+        method: payment.payment_method,
+        amount: Number(payment.amount),
+        status: payment.payment_status,
+        reference: payment.transaction_reference,
+        createdAt: payment.created_at,
+      })),
+      approvalRequests: order.approval_requests?.map((req: any) => ({
+        id: req.id.toString(),
+        type: req.request_type,
+        status: req.status,
+        reason: req.reason,
+        metadata: req.metadata,
+        requestedBy: req.requested_by?.toString(),
+        requesterName: req.requester?.full_name,
+        reviewedBy: req.reviewed_by?.toString(),
+        reviewerName: req.reviewer?.full_name,
+        createdAt: req.created_at,
+        updatedAt: req.updated_at,
+      })),
+      delivery: order.delivery
+        ? {
+            id: order.delivery.id.toString(),
+            status: order.delivery.status,
+            address: order.delivery.delivery_address,
+            riderName: order.delivery.rider?.user?.full_name,
+            riderPhone: order.delivery.rider?.phone,
+          }
+        : null,
+      createdAt: order.created_at,
+      updatedAt: order.updated_at,
+    };
   }
 }
 
