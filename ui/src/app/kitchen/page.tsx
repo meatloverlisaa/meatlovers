@@ -191,6 +191,12 @@ export default function KitchenPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Kitchen Monitor</h1>
           <div className="flex items-center gap-3">
+            <a
+              href="/kitchen/stock"
+              className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              📦 Stock Usage
+            </a>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
