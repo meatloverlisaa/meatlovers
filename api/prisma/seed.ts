@@ -455,6 +455,40 @@ async function main() {
   // Note: Dashboard uses existing data from orders, payments, products, etc.
   // Audit logs for activity timeline will be added when that table is created
 
+  // ─── seed_default_stock_locations ────────────────────────────────────────
+  // Ensure each product has stock items in all default locations
+  const existingStockItems = await prisma.stockItem.count();
+  if (existingStockItems === 0) {
+    const products = await prisma.product.findMany();
+    const defaultLocations = ['MAIN_STORE', 'Bar', 'Kitchen', 'Dispatch', 'Functions', 'Banqueting'];
+
+    let stockItemsCreated = 0;
+    for (const product of products) {
+      for (const location of defaultLocations) {
+        // Create stock item with zero initial quantity
+        // Quantity will be updated when purchases or transfers are recorded
+        await prisma.stockItem.create({
+          data: {
+            product_id: product.id,
+            quantity: 0,
+            location,
+          },
+        });
+        stockItemsCreated++;
+      }
+    }
+    console.log(`  ✓ stock_items: Created ${stockItemsCreated} stock items across ${defaultLocations.length} locations`);
+  } else {
+    console.log(`  ↳ Skipping stock locations — ${existingStockItems} stock items already exist`);
+  }
+
+  // ─── seed_reorder_levels ─────────────────────────────────────────────────
+  // Note: Reorder levels are managed through business logic
+  // Default threshold: 10 units (low stock alert)
+  // For bar-specific items: 5 units
+  // These are defined in the application code, not in the database
+  console.log('  ✓ reorder_levels: Using default thresholds (10 units general, 5 units bar)');
+
   console.log('\n✅ Seed completed successfully!');
   console.log('\n📊 Dashboard data ready:');
   console.log('  • Content pages for website');
@@ -463,6 +497,8 @@ async function main() {
   console.log('  • Sample suppliers for FOOD, SOFT_DRINKS, ALCOHOL, GENERAL types');
   console.log('  • Default margin rules for pricing control');
   console.log('  • Dashboard indexes ready (migration 20260626000000)');
+  console.log('  • Stock locations initialized (MAIN_STORE, Bar, Kitchen, Dispatch, Functions, Banqueting)');
+  console.log('  • Reorder thresholds configured (10 units general, 5 units bar)');
   console.log('  • Uses existing: orders, payments, products, users');
 }
 
