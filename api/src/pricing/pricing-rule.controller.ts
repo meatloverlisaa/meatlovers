@@ -15,6 +15,7 @@ import { UpdatePricingRuleDto } from './dto/update-pricing-rule.dto';
 import { ApplyPricingRuleDto } from './dto/apply-pricing-rule.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Public } from '../auth/public.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('pricing-rules')
@@ -29,6 +30,7 @@ export class PricingRuleController {
   }
 
   @Get()
+  @Public() // Temporary for development - remove in production
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.ACCOUNTANT)
   findAll() {
     return this.pricingRuleService.findAll();
