@@ -340,6 +340,66 @@ async function main() {
     console.log(`  ↳ Skipping sample products — ${existingProducts} already exist`);
   }
 
+  // ─── seed_supplier_types ──────────────────────────────────────────────────────
+  // Check if any suppliers already exist before seeding
+  const existingSuppliers = await prisma.supplier.count();
+  if (existingSuppliers === 0) {
+    const sampleSuppliers = [
+      {
+        supplier_name: 'Fresh Meat Wholesalers Ltd',
+        contact_person: 'James Kariuki',
+        phone: '+254720000001',
+        email: 'james@freshmeat.co.ke',
+        physical_address: 'Industrial Area, Nairobi',
+        supplier_type: 'FOOD' as const,
+        status: 'ACTIVE' as const,
+      },
+      {
+        supplier_name: 'Nairobi Beverages Distributors',
+        contact_person: 'Mary Wanjiru',
+        phone: '+254733000002',
+        email: 'sales@nairobibeverages.co.ke',
+        physical_address: 'Ruaraka, Nairobi',
+        supplier_type: 'SOFT_DRINKS' as const,
+        status: 'ACTIVE' as const,
+      },
+      {
+        supplier_name: 'Premium Wines & Spirits',
+        contact_person: 'David Ochieng',
+        phone: '+254711000003',
+        email: 'david@premiumwines.co.ke',
+        physical_address: 'Westlands, Nairobi',
+        supplier_type: 'ALCOHOL' as const,
+        status: 'ACTIVE' as const,
+      },
+      {
+        supplier_name: 'General Supplies Kenya',
+        contact_person: 'Jane Mutua',
+        phone: '+254722000004',
+        email: 'info@generalsupplies.co.ke',
+        physical_address: 'CBD, Nairobi',
+        supplier_type: 'GENERAL' as const,
+        status: 'ACTIVE' as const,
+      },
+      {
+        supplier_name: 'Organic Farms Co-op',
+        contact_person: 'Peter Kimani',
+        phone: '+254744000005',
+        email: 'peter@organicfarms.co.ke',
+        physical_address: 'Kiambu Road, Nairobi',
+        supplier_type: 'FOOD' as const,
+        status: 'ACTIVE' as const,
+      },
+    ];
+
+    for (const supplier of sampleSuppliers) {
+      await prisma.supplier.create({ data: supplier });
+      console.log(`  ✓ supplier: ${supplier.supplier_name} (${supplier.supplier_type})`);
+    }
+  } else {
+    console.log(`  ↳ Skipping sample suppliers — ${existingSuppliers} already exist`);
+  }
+
   // ─── seed_default_margin_rules ───────────────────────────────────────────────
   // Check if any pricing rules already exist before seeding
   const existingPricingRules = await prisma.pricingRule.count();
@@ -400,6 +460,7 @@ async function main() {
   console.log('  • Content pages for website');
   console.log('  • Demo website leads for CRM dashboard');
   console.log('  • Sample products for FOOD, SOFT_DRINK, ALCOHOLIC_DRINK categories');
+  console.log('  • Sample suppliers for FOOD, SOFT_DRINKS, ALCOHOL, GENERAL types');
   console.log('  • Default margin rules for pricing control');
   console.log('  • Dashboard indexes ready (migration 20260626000000)');
   console.log('  • Uses existing: orders, payments, products, users');
