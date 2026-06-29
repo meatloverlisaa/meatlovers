@@ -295,4 +295,24 @@ export class StockService {
       },
     });
   }
+
+  async getRecentMovements(limit: number = 50) {
+    return this.prisma.stockMovement.findMany({
+      take: limit,
+      orderBy: {
+        created_at: 'desc',
+      },
+      include: {
+        stock_item: {
+          include: {
+            product: {
+              select: {
+                product_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

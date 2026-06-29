@@ -1,11 +1,11 @@
 import { revalidatePath } from "next/cache";
 import React from "react";
-
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
+import { StockBalanceTable } from "./components/StockBalanceTable";
+import { StockInForm } from "./components/StockInForm";
+import { TransferForm } from "./components/TransferForm";
+import { AdjustmentForm } from "./components/AdjustmentForm";
+import { ReorderAlertList } from "./components/ReorderAlertList";
+import { MovementTimeline } from "./components/MovementTimeline";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -15,16 +15,32 @@ type Product = {
   product_category: ProductCategory;
 };
 
-type StockBalanceRow = {
-  product_id: bigint | number;
-  product_name?: string | null;
-  current_quantity: string; // backend may return Decimal as string
-  unit_cost?: string | null;
-  updated_at?: string | null;
+type StockBalance = {
+  id: string | number;
+  product_id: string | number;
+  quantity: number;
+  location: string;
+  product?: {
+    id: string | number;
+    product_name: string;
+    product_category: string;
+    cost_price: string | null;
+  };
+  updated_at: string;
+};
+
+type StockMovement = {
+  id: string | number;
+  stock_item_id: string | number;
+  movement_type: string;
+  quantity: number;
+  reference: string | null;
+  notes: string | null;
+  created_at: string;
 };
 
 async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
 
   if (!res.ok) {
@@ -34,11 +50,8 @@ async function getProducts(): Promise<Product[]> {
   return res.json();
 }
 
-async function getStockBalance(): Promise<StockBalanceRow[]> {
+async function getStockBalance(): Promise<StockBalance[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  // Expected endpoint for this feature.
-  // If the backend hasn’t implemented it yet, this will show a clear message.
   const res = await fetch(`${baseUrl}/stock/balance`, { cache: "no-store" });
 
   if (!res.ok) {
@@ -46,18 +59,59 @@ async function getStockBalance(): Promise<StockBalanceRow[]> {
     throw new Error(`Failed to load stock balance: ${res.status}${text ? ` - ${text}` : ""}`);
   }
 
-  return res.json();
+  const rawBalance = await res.json();
+  
+  // Transform the response to match our StockBalance type
+  return rawBalance.map((item: any) => ({
+    id: item.id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    location: item.location,
+    product: item.product,
+    updated_at: item.updated_at,
+  }));
+}
+
+async function getRecentMovements(): Promise<StockMovement[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  
+  try {
+    // Try to fetch recent movements - this endpoint might not exist yet
+    const allStockItems = await fetch(`${baseUrl}/stock`, { cache: "no-store" });
+    
+    if (!allStockItems.ok) {
+      return [];
+    }
+    
+    const items = await allStockItems.json();
+    
+    // Extract movements from all stock items
+    const allMovements: StockMovement[] = [];
+    for (const item of items) {
+      if (item.movements && Array.isArray(item.movements)) {
+        allMovements.push(...item.movements);
+      }
+    }
+    
+    // Sort by created_at desc and take recent 50
+    return allMovements
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 50);
+  } catch (error) {
+    console.warn("Error loading movements:", error);
+    return [];
+  }
 }
 
 async function postStockIn(payload: {
-  product_id: string;
+  productId: string;
   quantity: number;
-  unit_cost: number;
+  reference?: string;
   notes?: string;
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/stock/stock-in`, {
+  const res = await fetch(`${baseUrl}/stock/purchase`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -71,15 +125,17 @@ async function postStockIn(payload: {
   return res.json();
 }
 
-async function postIssueToDepartment(payload: {
-  product_id: string;
+async function postTransfer(payload: {
+  productId: string;
   quantity: number;
-  destination: string;
+  fromLocation: string;
+  toLocation: string;
+  reference?: string;
   notes?: string;
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/stock/issue-to-department`, {
+  const res = await fetch(`${baseUrl}/stock/transfer`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -87,18 +143,38 @@ async function postIssueToDepartment(payload: {
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(
-      `Failed to issue to department: ${res.status}${text ? ` - ${text}` : ""}`,
-    );
+    throw new Error(`Failed to transfer: ${res.status}${text ? ` - ${text}` : ""}`);
   }
 
   return res.json();
 }
 
+async function postAdjustment(payload: {
+  productId: string;
+  quantity: number;
+  reference?: string;
+  notes?: string;
+}) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-export default async function AdminStockOperationalPage() {
+  const res = await fetch(`${baseUrl}/stock/adjustment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Failed to adjust: ${res.status}${text ? ` - ${text}` : ""}`);
+  }
+
+  return res.json();
+}
+
+export default async function StockControlPage() {
   let products: Product[] = [];
-  let balance: StockBalanceRow[] = [];
+  let balance: StockBalance[] = [];
+  let movements: StockMovement[] = [];
   let productsError: string | null = null;
   let balanceError: string | null = null;
 
@@ -114,332 +190,172 @@ export default async function AdminStockOperationalPage() {
     balanceError = e instanceof Error ? e.message : "Unknown error";
   }
 
+  try {
+    movements = await getRecentMovements();
+  } catch (e) {
+    console.warn("Failed to load movements:", e);
+  }
+
+  const handleStockIn = async (formData: FormData) => {
+    "use server";
+
+    const productId = String(formData.get("product_id") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
+
+    const quantity = Number(quantityRaw);
+
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+
+    await postStockIn({
+      productId,
+      quantity,
+      reference: reference.length ? reference : undefined,
+      notes: notes.length ? notes : undefined,
+    });
+
+    revalidatePath("/admin/stock");
+  };
+
+  const handleTransfer = async (formData: FormData) => {
+    "use server";
+
+    const productId = String(formData.get("productId") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const fromLocation = String(formData.get("fromLocation") ?? "").trim();
+    const toLocation = String(formData.get("toLocation") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
+
+    const quantity = Number(quantityRaw);
+
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+    if (!fromLocation || !toLocation) throw new Error("Both locations are required.");
+    if (fromLocation === toLocation) throw new Error("Source and destination must be different.");
+
+    await postTransfer({
+      productId,
+      quantity,
+      fromLocation,
+      toLocation,
+      reference: reference.length ? reference : undefined,
+      notes: notes.length ? notes : undefined,
+    });
+
+    revalidatePath("/admin/stock");
+  };
+
+  const handleAdjustment = async (formData: FormData) => {
+    "use server";
+
+    const productId = String(formData.get("productId") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
+    const reason = String(formData.get("reason") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
+
+    let quantity = Number(quantityRaw);
+    if (adjustmentType === "decrease") {
+      quantity = -quantity;
+    }
+
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity === 0) throw new Error("Quantity must be non-zero.");
+    if (!reason) throw new Error("Reason is required.");
+    if (!notes) throw new Error("Notes are required for audit trail.");
+
+    await postAdjustment({
+      productId,
+      quantity,
+      reference: reference.length ? reference : undefined,
+      notes: `${reason}: ${notes}`,
+    });
+
+    revalidatePath("/admin/stock");
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Admin Stock Operational</h1>
-          <Link href="/admin/products" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50">
-            ← Back to Products
-          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+              Stock Control
+            </h1>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+              Manage inventory, track movements, and monitor stock levels
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              Access: <span className="font-medium text-zinc-900 dark:text-zinc-50">ADMIN, MANAGER, STOREKEEPER</span>
+            </span>
+          </div>
         </div>
 
+        {/* Error Messages */}
         {(balanceError || productsError) && (
-          <div className="mt-4">
-            {balanceError ? (
+          <div className="space-y-3">
+            {balanceError && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-200">
-                {balanceError}
+                <strong>Stock Balance Error:</strong> {balanceError}
               </div>
-            ) : null}
-            {productsError ? (
-              <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-200">
-                {productsError}
+            )}
+            {productsError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-200">
+                <strong>Products Error:</strong> {productsError}
               </div>
-            ) : null}
+            )}
           </div>
         )}
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Current balance */}
-          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+        {/* Stock Balance Table */}
+        <StockBalanceTable balance={balance} />
 
+        {/* Reorder Alerts */}
+        <ReorderAlertList balance={balance} reorderThreshold={10} />
 
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Current balance</h2>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    Latest quantities by product.
-                  </p>
-                </div>
-                <div className="text-sm text-zinc-600 dark:text-zinc-300">Rows: <span className="font-semibold text-zinc-900 dark:text-zinc-50">{balance.length}</span></div>
-              </div>
-            </div>
+        {/* Operations Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Stock In Form */}
+          <StockInForm products={products} onSubmit={handleStockIn} />
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
-                <thead className="bg-zinc-50 dark:bg-zinc-900">
-                  <tr className="text-zinc-600 dark:text-zinc-300">
-                    <th className="px-4 py-3 font-medium">Product</th>
-                    <th className="px-4 py-3 font-medium">Current quantity</th>
-                    <th className="px-4 py-3 font-medium">Unit cost</th>
-                    <th className="px-4 py-3 font-medium">Updated</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {balance.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-10 text-center text-zinc-600 dark:text-zinc-300">
-                        {balanceError ? "Cannot load balance yet." : "No stock balance rows."}
-                      </td>
-                    </tr>
-                  ) : null}
+          {/* Transfer Form */}
+          <TransferForm products={products} onSubmit={handleTransfer} />
 
-                  {balance.map((row) => {
-                    const productId = typeof row.product_id === "bigint" ? row.product_id.toString() : String(row.product_id);
-                    return (
-                      <tr key={productId} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
-                        <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50">
-                          {row.product_name ?? `#${productId}`}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{row.current_quantity}</td>
-                        <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{row.unit_cost ?? "-"}</td>
-                        <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                          {row.updated_at ? new Date(row.updated_at).toLocaleString() : "-"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Stock-in form */}
-          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-
-            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Stock-in</h2>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                Record inbound stock and update balance.
-              </p>
-            </div>
-
-            <div className="p-4">
-              <form
-                className="grid grid-cols-1 gap-4"
-                action={async (formData) => {
-                  "use server";
-
-                  const product_id = String(formData.get("product_id") ?? "").trim();
-                  const quantityRaw = String(formData.get("quantity") ?? "").trim();
-                  const unitCostRaw = String(formData.get("unit_cost") ?? "").trim();
-                  const notes = String(formData.get("notes") ?? "").trim();
-
-                  const quantity = Number(quantityRaw);
-                  const unit_cost = Number(unitCostRaw);
-
-                  if (!product_id) throw new Error("Product is required.");
-                  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-                  if (!Number.isFinite(unit_cost) || unit_cost < 0) throw new Error("Unit cost must be a valid number.");
-
-                  await postStockIn({
-                    product_id,
-                    quantity,
-                    unit_cost,
-                    notes: notes.length ? notes : undefined,
-                  });
-
-                  revalidatePath("/admin/stock");
-                }}
-              >
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Product</label>
-                  <select
-                    name="product_id"
-                    defaultValue={products[0] ? (typeof products[0].id === "bigint" ? products[0].id.toString() : String(products[0].id)) : ""}
-                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                    disabled={products.length === 0}
-                  >
-                    {products.length === 0 ? (
-                      <option value="">No products loaded</option>
-                    ) : null}
-                    {products.map((p) => {
-                      const id = typeof p.id === "bigint" ? p.id.toString() : String(p.id);
-                      return (
-                        <option key={id} value={id}>
-                          {p.product_name} ({p.product_category})
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Quantity</label>
-                    <input
-                      name="quantity"
-                      type="number"
-                      min={0}
-                      step={1}
-                      defaultValue={"0"}
-                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Unit cost</label>
-                    <input
-                      name="unit_cost"
-                      type="number"
-                      min={0}
-                      step={0.01}
-                      defaultValue={"0"}
-                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Notes (optional)</label>
-                  <input
-                    name="notes"
-                    type="text"
-                    placeholder="e.g. Supplier delivery reference"
-                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={products.length === 0}
-                  className="mt-1 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:hover:bg-zinc-900 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                >
-                  Stock-in
-                </button>
-
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Backend endpoints expected: <span className="font-mono">GET /stock/balance</span> and <span className="font-mono">POST /stock/stock-in</span>.
-                  {balanceError ? <div className="mt-1">The page will start working once those endpoints exist.</div> : null}
-                </div>
-              </form>
-            </div>
-          </div>
-
-          {/* Bar stock issue to departments */}
-          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-
-            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
-                Bar Stock Issue (Departmental transfers)
-              </h2>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                Issue/bar stock out to another department.
-              </p>
-            </div>
-
-            <div className="p-4">
-              <form
-                className="grid grid-cols-1 gap-4"
-                action={async (formData) => {
-                  "use server";
-
-                  const product_id = String(formData.get("product_id") ?? "").trim();
-                  const quantityRaw = String(formData.get("quantity") ?? "").trim();
-                  const destinationPreset = String(formData.get("destination_preset") ?? "").trim();
-                  const destinationOther = String(formData.get("destination_other") ?? "").trim();
-                  const notes = String(formData.get("notes") ?? "").trim();
-
-                  const quantity = Number(quantityRaw);
-
-                  let destination = destinationPreset;
-                  if (destinationPreset === "OTHER") destination = destinationOther;
-
-                  if (!product_id) throw new Error("Product is required.");
-                  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-                  if (!destination || destination.length < 2) throw new Error("Destination department is required.");
-
-                  await postIssueToDepartment({
-                    product_id,
-                    quantity,
-                    destination,
-                    notes: notes.length ? notes : undefined,
-                  });
-
-                  revalidatePath("/admin/stock");
-                }}
-              >
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Product</label>
-                  <select
-                    name="product_id"
-                    defaultValue={products[0] ? (typeof products[0].id === "bigint" ? products[0].id.toString() : String(products[0].id)) : ""}
-                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                    disabled={products.length === 0}
-                  >
-                    {products.length === 0 ? <option value="">No products loaded</option> : null}
-                    {products.map((p) => {
-                      const id = typeof p.id === "bigint" ? p.id.toString() : String(p.id);
-                      return (
-                        <option key={id} value={id}>
-                          {p.product_name} ({p.product_category})
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Quantity</label>
-                    <input
-                      name="quantity"
-                      type="number"
-                      min={0}
-                      step={1}
-                      defaultValue={"0"}
-                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Destination</label>
-                    <select
-                      name="destination_preset"
-                      defaultValue={"BAR"}
-                      className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                    >
-                      <option value="BAR">BAR</option>
-                      <option value="KITCHEN">KITCHEN</option>
-                      <option value="DISPATCH">DISPATCH</option>
-                      <option value="STORE">STORE</option>
-                      <option value="OTHER">Other...</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Destination (if Other)</label>
-                  <input
-                    name="destination_other"
-                    type="text"
-                    placeholder="e.g. FUNCTIONS, BANQUETING..."
-                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">Notes (optional)</label>
-                  <input
-                    name="notes"
-                    type="text"
-                    placeholder="e.g. Transfer reference / reason"
-                    className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={products.length === 0}
-                  className="mt-1 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 disabled:hover:bg-zinc-900 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                >
-                  Issue to department
-                </button>
-
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Backend endpoint expected: <span className="font-mono">POST /stock/issue-to-department</span>.
-                </div>
-              </form>
-            </div>
-          </div>
-
+          {/* Adjustment Form */}
+          <AdjustmentForm products={products} onSubmit={handleAdjustment} />
         </div>
 
+        {/* Movement Timeline */}
+        {movements.length > 0 && (
+          <MovementTimeline movements={movements} />
+        )}
+
+        {/* Info Footer */}
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div className="text-sm text-zinc-700 dark:text-zinc-300">
+              <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">Stock Control Features</p>
+              <ul className="space-y-1 list-disc list-inside">
+                <li><strong>Stock In:</strong> Record incoming stock from suppliers or production</li>
+                <li><strong>Transfer:</strong> Move stock between locations (Store, Bar, Kitchen, Dispatch)</li>
+                <li><strong>Adjustment:</strong> Correct discrepancies, record damages, losses, or spoilage</li>
+                <li><strong>Reorder Alerts:</strong> Automatic notifications for low stock items</li>
+                <li><strong>Movement Timeline:</strong> Complete audit trail of all stock transactions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-

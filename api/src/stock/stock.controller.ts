@@ -35,6 +35,11 @@ export class StockController {
     return this.stockService.getBalance();
   }
 
+  @Get('movements/recent')
+  async getRecentMovements() {
+    return this.stockService.getRecentMovements();
+  }
+
   @Post('stock-in')
   async stockIn(@Body(ValidationPipe) body: any) {
     return this.stockService.createPurchase(body);
