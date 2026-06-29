@@ -320,6 +320,99 @@ export class StockService {
     });
   }
 
+  async getProductStock(productId: number, location?: string) {
+    const whereClause: any = {
+      product_id: BigInt(productId),
+    };
+
+    if (location) {
+      whereClause.location = location;
+    }
+
+    return this.prisma.stockItem.findMany({
+      where: whereClause,
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_name: true,
+            product_category: true,
+            cost_price: true,
+            barcode: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getMovements(filters: {
+    startDate?: string;
+    endDate?: string;
+    movementType?: string;
+    location?: string;
+    productId?: number;
+    limit?: number;
+  }) {
+    const whereClause: any = {};
+
+    // Date filters
+    if (filters.startDate || filters.endDate) {
+      whereClause.created_at = {};
+      if (filters.startDate) {
+        whereClause.created_at.gte = new Date(filters.startDate);
+      }
+      if (filters.endDate) {
+        whereClause.created_at.lte = new Date(filters.endDate);
+      }
+    }
+
+    // Movement type filter
+    if (filters.movementType) {
+      whereClause.movement_type = filters.movementType as MovementType;
+    }
+
+    // Location filter
+    if (filters.location) {
+      whereClause.stock_item = {
+        location: filters.location,
+      };
+    }
+
+    // Product filter
+    if (filters.productId) {
+      if (whereClause.stock_item) {
+        whereClause.stock_item.product_id = BigInt(filters.productId);
+      } else {
+        whereClause.stock_item = {
+          product_id: BigInt(filters.productId),
+        };
+      }
+    }
+
+    const movements = await this.prisma.stockMovement.findMany({
+      where: whereClause,
+      take: filters.limit || 100,
+      orderBy: {
+        created_at: 'desc',
+      },
+      include: {
+        stock_item: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                product_name: true,
+                product_category: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return movements;
+  }
+
   // Bar-specific methods
   async createBarSaleDeduction(dto: CreateAdjustmentDto) {
     return this.prisma.$transaction(async (tx) => {
