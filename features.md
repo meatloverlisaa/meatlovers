@@ -388,11 +388,16 @@ Route: /pos/orders
 Components: OrderStatusTracker, OrderDetailPanel, EditRequestButton, ReadyNotification
 Access guard: WAITER
 
-7.6 — UI (Order Management — CASHIER, ADMIN, MANAGER)
+7.6 — UI (Order Management — CASHIER, ADMIN, MANAGER) ✅ IMPLEMENTED
 Page: Order Management
 Route: /admin/orders
 Components: OrderTable, StatusFilter, OrderDetailDrawer, DiscountRequestPanel
 Access guard: CASHIER, ADMIN, MANAGER
+
+**Landing Pages Created:**
+- ✅ /cashier - Cashier Dashboard (pending settlement, revenue stats)
+- ✅ /manager - Manager Dashboard (operations oversight, alerts)
+- ✅ /admin/orders - Order Management Page (full order control)
 
 Test Criteria:
 
