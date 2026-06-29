@@ -18,7 +18,7 @@ const navigationItems: NavItem[] = [
   { href: "/admin/cms", label: "Website CMS", icon: "🌐", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
   { href: "/admin/products", label: "Products", icon: "🍖", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
   { href: "/admin/pricing-control", label: "Pricing", icon: "💰", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/suppliers", label: "Suppliers", icon: "🏭", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
+  { href: "/admin/suppliers", label: "Suppliers", icon: "🏭", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
   { href: "/admin/stock", label: "Stock", icon: "📦", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
   { href: "/admin/production-plans", label: "Production", icon: "👨‍🍳", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
   { href: "/admin/payments", label: "Payments", icon: "💳", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },

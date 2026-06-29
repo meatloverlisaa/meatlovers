@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
+import { SupplierTable } from "@/components/suppliers/SupplierTable";
+import { SupplierTypeFilter } from "@/components/suppliers/SupplierTypeFilter";
+import { SupplierCreateForm } from "@/components/suppliers/SupplierCreateForm";
+import { SupplierEditForm } from "@/components/suppliers/SupplierEditForm";
+import Link from "next/link";
 
 type SupplierStatus = "ACTIVE" | "SUSPENDED";
+type SupplierType = "FOOD" | "SOFT_DRINKS" | "ALCOHOL" | "GENERAL";
 
 type Supplier = {
   id: bigint | number;
@@ -17,7 +17,7 @@ type Supplier = {
   phone?: string | null;
   email?: string | null;
   physical_address?: string | null;
-  supplier_type: string;
+  supplier_type: SupplierType;
   status: SupplierStatus;
   created_at?: string | null;
   updated_at?: string | null;
@@ -59,6 +59,9 @@ export default function AdminSuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
 
   useEffect(() => {
     async function loadSuppliers() {
@@ -77,16 +80,37 @@ export default function AdminSuppliersPage() {
   const handleToggleStatus = async (id: string, currentStatus: SupplierStatus) => {
     try {
       await toggleSupplierStatus(id, currentStatus);
-      window.location.reload();
+      // Refresh suppliers
+      const data = await getSuppliers();
+      setSuppliers(data);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Failed to toggle status");
     }
   };
 
+  const handleCreateSuccess = () => {
+    setShowCreateForm(false);
+    // Refresh suppliers
+    getSuppliers().then(setSuppliers).catch(console.error);
+  };
+
+  const handleEditSuccess = () => {
+    setEditingSupplier(null);
+    // Refresh suppliers
+    getSuppliers().then(setSuppliers).catch(console.error);
+  };
+
+  // Calculate counts for filter
+  const typeCounts = suppliers.reduce((acc, s) => {
+    acc[s.supplier_type] = (acc[s.supplier_type] || 0) + 1;
+    acc["ALL"] = (acc["ALL"] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
           <p className="mt-4 text-sm text-zinc-600">Loading...</p>
         </div>
@@ -97,7 +121,7 @@ export default function AdminSuppliersPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
           <p className="mt-4 text-sm text-red-600">{error}</p>
         </div>
@@ -105,72 +129,75 @@ export default function AdminSuppliersPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
-          <Link
-            href="/admin/suppliers/new"
-            className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-          >
-            + Create supplier
-          </Link>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-zinc-50 dark:bg-zinc-900">
-                <tr className="text-zinc-600 dark:text-zinc-300">
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {suppliers.map((s) => {
-                  const id = typeof s.id === "bigint" ? s.id.toString() : String(s.id);
-                  const statusColor = s.status === "ACTIVE" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200";
-
-                  return (
-                    <tr key={id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
-                      <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50">{s.supplier_name}</td>
-                      <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">{s.supplier_type}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusColor}`}>
-                          {s.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
-                        {s.created_at ? new Date(s.created_at).toLocaleDateString() : "-"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStatus(id, s.status)}
-                          className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                        >
-                          Toggle status
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-
-                {suppliers.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-8 text-center text-zinc-600 dark:text-zinc-300" colSpan={5}>
-                      No suppliers found.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
+  if (showCreateForm) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Create Supplier</h1>
+            <Link
+              href="/admin/suppliers"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+            >
+              ← Back to list
+            </Link>
+          </div>
+          <div className="mt-6 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <SupplierCreateForm onSuccess={handleCreateSuccess} onCancel={() => setShowCreateForm(false)} />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (editingSupplier) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Edit Supplier</h1>
+            <button
+              onClick={() => setEditingSupplier(null)}
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+            >
+              ← Back to list
+            </button>
+          </div>
+          <div className="mt-6 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <SupplierEditForm supplier={editingSupplier} onSuccess={handleEditSuccess} onCancel={() => setEditingSupplier(null)} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Suppliers</h1>
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+          >
+            + Create Supplier
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <SupplierTypeFilter
+            selectedType={typeFilter}
+            onTypeChange={setTypeFilter}
+            counts={typeCounts}
+          />
+        </div>
+
+        <SupplierTable
+          suppliers={suppliers}
+          typeFilter={typeFilter}
+          onToggleStatus={handleToggleStatus}
+          onEdit={setEditingSupplier}
+        />
       </div>
     </div>
   );
