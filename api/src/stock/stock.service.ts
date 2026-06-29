@@ -278,8 +278,11 @@ export class StockService {
     });
   }
 
-  async getBalance() {
+  async getBalance(location?: string) {
+    const whereClause = location ? { location } : {};
+    
     return this.prisma.stockItem.findMany({
+      where: whereClause,
       include: {
         product: {
           select: {
@@ -287,6 +290,7 @@ export class StockService {
             product_name: true,
             product_category: true,
             cost_price: true,
+            barcode: true,
           },
         },
       },
@@ -314,5 +318,100 @@ export class StockService {
         },
       },
     });
+  }
+
+  // Bar-specific methods
+  async createBarSaleDeduction(dto: CreateAdjustmentDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: BigInt(dto.productId) },
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+      }
+
+      if (dto.quantity <= 0) {
+        throw new BadRequestException('Quantity must be positive');
+      }
+
+      const stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: 'Bar',
+        },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(`Product not found at Bar location`);
+      }
+
+      if (stockItem.quantity < dto.quantity) {
+        throw new BadRequestException(
+          `Insufficient quantity. Available: ${stockItem.quantity}, Requested: ${dto.quantity}`,
+        );
+      }
+
+      const newQuantity = stockItem.quantity - dto.quantity;
+
+      const updatedStockItem = await tx.stockItem.update({
+        where: { id: stockItem.id },
+        data: { quantity: newQuantity },
+      });
+
+      const movement = await tx.stockMovement.create({
+        data: {
+          stock_item_id: stockItem.id,
+          movement_type: MovementType.ADJUSTMENT,
+          quantity: -dto.quantity,
+          reference: dto.reference,
+          notes: dto.notes ? `Bar Sale: ${dto.notes}` : 'Bar Sale',
+        },
+      });
+
+      return {
+        stockItem: {
+          id: updatedStockItem.id,
+          productId: updatedStockItem.product_id,
+          quantity: updatedStockItem.quantity,
+          location: updatedStockItem.location,
+        },
+        movement: {
+          id: movement.id,
+          type: movement.movement_type,
+          quantity: movement.quantity,
+        },
+      };
+    });
+  }
+
+  async getBarTransfers(limit: number = 50) {
+    const transfers = await this.prisma.stockMovement.findMany({
+      where: {
+        movement_type: MovementType.TRANSFER,
+        stock_item: {
+          location: 'Bar',
+        },
+      },
+      take: limit,
+      orderBy: {
+        created_at: 'desc',
+      },
+      include: {
+        stock_item: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                product_name: true,
+                product_category: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return transfers;
   }
 }
