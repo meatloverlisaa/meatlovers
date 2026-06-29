@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { SupplierStatus } from '@prisma/client';
 
 @Injectable()
 export class SupplierService {
@@ -37,6 +38,15 @@ export class SupplierService {
     return this.prisma.supplier.update({
       where: { id: BigInt(id) },
       data: updateSupplierDto,
+    });
+  }
+
+  async updateStatus(id: number, status: SupplierStatus) {
+    await this.findOne(id);
+
+    return this.prisma.supplier.update({
+      where: { id: BigInt(id) },
+      data: { status },
     });
   }
 
