@@ -105,6 +105,31 @@ export class StockController {
     const parsedLimit = limit ? parseInt(limit, 10) : 50;
     return this.stockService.getRecentMovements(parsedLimit);
   }
+
+  /**
+   * GET /stock/valuation — Stock value summary by category/location
+   * Access: ACCOUNTANT, ADMIN
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.ACCOUNTANT, Role.ADMIN)
+  @Get('valuation')
+  async getValuation(
+    @Query('category') category?: string,
+    @Query('location') location?: string,
+  ) {
+    return this.stockService.getStockValuation(category, location);
+  }
+
+  /**
+   * GET /stock/reorder-alerts — Items below reorder level
+   * Access: ACCOUNTANT, ADMIN
+   */
+  @Public() // Temporary for development - remove in production
+  @Roles(Role.ACCOUNTANT, Role.ADMIN)
+  @Get('reorder-alerts')
+  async getReorderAlerts(@Query('location') location?: string) {
+    return this.stockService.getReorderAlerts(location);
+  }
 }
 
 // Kitchen-specific endpoints

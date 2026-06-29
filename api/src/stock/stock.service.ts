@@ -320,6 +320,150 @@ export class StockService {
     });
   }
 
+  async getStockValuation(category?: string, location?: string) {
+    const whereClause: any = {};
+
+    if (location) {
+      whereClause.location = location;
+    }
+
+    if (category) {
+      whereClause.product = {
+        product_category: category,
+      };
+    }
+
+    const stockItems = await this.prisma.stockItem.findMany({
+      where: whereClause,
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_name: true,
+            product_category: true,
+            cost_price: true,
+          },
+        },
+      },
+    });
+
+    // Calculate total value and group by category and location
+    let totalValue = 0;
+    let totalQuantity = 0;
+    const byCategory: Record<string, { value: number; quantity: number; itemCount: number }> = {};
+    const byLocation: Record<string, { value: number; quantity: number; itemCount: number }> = {};
+
+    const items = stockItems.map(item => {
+      const itemValue = Number(item.product.cost_price) * item.quantity;
+      const cat = item.product.product_category;
+      const loc = item.location;
+
+      // Initialize category if not exists
+      if (!byCategory[cat]) {
+        byCategory[cat] = { value: 0, quantity: 0, itemCount: 0 };
+      }
+      // Initialize location if not exists
+      if (!byLocation[loc]) {
+        byLocation[loc] = { value: 0, quantity: 0, itemCount: 0 };
+      }
+
+      // Accumulate totals
+      totalValue += itemValue;
+      totalQuantity += item.quantity;
+      byCategory[cat].value += itemValue;
+      byCategory[cat].quantity += item.quantity;
+      byCategory[cat].itemCount += 1;
+      byLocation[loc].value += itemValue;
+      byLocation[loc].quantity += item.quantity;
+      byLocation[loc].itemCount += 1;
+
+      return {
+        productId: item.product_id,
+        productName: item.product.product_name,
+        category: item.product.product_category,
+        location: item.location,
+        quantity: item.quantity,
+        costPrice: item.product.cost_price,
+        totalValue: itemValue,
+      };
+    });
+
+    return {
+      totalValue,
+      totalQuantity,
+      itemCount: stockItems.length,
+      byCategory,
+      byLocation,
+      items,
+    };
+  }
+
+  async getReorderAlerts(location?: string) {
+    // Reorder level thresholds
+    const REORDER_LEVELS = {
+      MAIN_STORE: 10,
+      Kitchen: 10,
+      Bar: 10,
+      Dispatch: 5,
+      Functions: 5,
+      Banqueting: 5,
+    };
+
+    const whereClause: any = {};
+
+    if (location) {
+      whereClause.location = location;
+    }
+
+    const stockItems = await this.prisma.stockItem.findMany({
+      where: whereClause,
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_name: true,
+            product_category: true,
+            cost_price: true,
+            barcode: true,
+          },
+        },
+      },
+      orderBy: {
+        quantity: 'asc',
+      },
+    });
+
+    // Filter items below reorder level
+    const alerts = stockItems
+      .filter(item => {
+        const reorderLevel = REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
+        return item.quantity <= reorderLevel;
+      })
+      .map(item => {
+        const reorderLevel = REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
+        return {
+          productId: item.product_id,
+          productName: item.product.product_name,
+          category: item.product.product_category,
+          location: item.location,
+          currentQuantity: item.quantity,
+          reorderLevel: reorderLevel,
+          deficit: reorderLevel - item.quantity,
+          costPrice: item.product.cost_price,
+          barcode: item.product.barcode,
+          lastUpdated: item.updated_at,
+          status: item.quantity === 0 ? 'OUT_OF_STOCK' : item.quantity <= reorderLevel / 2 ? 'CRITICAL' : 'LOW',
+        };
+      });
+
+    return {
+      alertCount: alerts.length,
+      criticalCount: alerts.filter(a => a.status === 'CRITICAL').length,
+      outOfStockCount: alerts.filter(a => a.status === 'OUT_OF_STOCK').length,
+      alerts,
+    };
+  }
+
   async getProductStock(productId: number, location?: string) {
     const whereClause: any = {
       product_id: BigInt(productId),
