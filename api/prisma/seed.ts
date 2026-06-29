@@ -489,6 +489,36 @@ async function main() {
   // These are defined in the application code, not in the database
   console.log('  ✓ reorder_levels: Using default thresholds (10 units general, 5 units bar)');
 
+  // ─── seed_default_tables ─────────────────────────────────────────────────
+  // Check if any tables already exist before seeding
+  const existingTables = await prisma.table.count();
+  if (existingTables === 0) {
+    const defaultTables = [
+      { table_name: 'Table 1' },
+      { table_name: 'Table 2' },
+      { table_name: 'Table 3' },
+      { table_name: 'Table 4' },
+      { table_name: 'Table 5' },
+      { table_name: 'Table 6' },
+      { table_name: 'Table 7' },
+      { table_name: 'Table 8' },
+      { table_name: 'Table 9' },
+      { table_name: 'Table 10' },
+      { table_name: 'Bar Counter' },
+      { table_name: 'Outdoor Patio 1' },
+      { table_name: 'Outdoor Patio 2' },
+      { table_name: 'Private Room' },
+      { table_name: 'VIP Section' },
+    ];
+
+    for (const table of defaultTables) {
+      await prisma.table.create({ data: table });
+      console.log(`  ✓ table: ${table.table_name}`);
+    }
+  } else {
+    console.log(`  ↳ Skipping default tables — ${existingTables} already exist`);
+  }
+
   console.log('\n✅ Seed completed successfully!');
   console.log('\n📊 Dashboard data ready:');
   console.log('  • Content pages for website');
@@ -499,6 +529,7 @@ async function main() {
   console.log('  • Dashboard indexes ready (migration 20260626000000)');
   console.log('  • Stock locations initialized (MAIN_STORE, Bar, Kitchen, Dispatch, Functions, Banqueting)');
   console.log('  • Reorder thresholds configured (10 units general, 5 units bar)');
+  console.log('  • Default restaurant tables (15 tables including bar counter, patio, private room, VIP)');
   console.log('  • Uses existing: orders, payments, products, users');
 }
 

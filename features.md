@@ -352,10 +352,17 @@ Branch: feature/7-pos-orders Roles: WAITER, CASHIER, ADMIN, MANAGER
 
 Description: Give waiters a fast mobile POS workflow for table orders, customer selection, cart editing, order submission, and order status tracking.
 
-7.1 — Database
+7.1 — Database ✅ COMPLETE
 Tables: customers, tables, orders, order_items, approval_requests
 Migrations: create_customers_table, create_tables_table, create_orders_table, create_order_items_table
 Seeds: seed_default_tables
+
+**Implementation Notes:**
+- Migration: 20260629000000_feature7_pos_customers_approval_requests
+- customers table: stores customer info (name, phone, email, notes)
+- approval_requests table: handles ITEM_REMOVAL, DISCOUNT, PRICE_OVERRIDE, ORDER_CANCELLATION
+- orders.customer_id: optional link to customer for tracking repeat customers
+- seed_default_tables: 15 tables (Tables 1-10, Bar Counter, 2 Patio, Private Room, VIP)
 
 7.2 — API (Waiter Order Capture — WAITER)
 Endpoints:

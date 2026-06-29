@@ -40,6 +40,8 @@ model User {
   rider Rider?
   waste_declarations WasteDeclaration[]
   finance_transactions FinanceTransaction[]
+  approval_requests_made ApprovalRequest[] @relation("ApprovalRequester")
+  approval_requests_reviewed ApprovalRequest[] @relation("ApprovalReviewer")
 
   @@map("users")
 }
@@ -167,6 +169,21 @@ model Product {
   @@map("products")
 }
 
+model Customer {
+  id           BigInt   @id @default(autoincrement())
+  name         String?  @db.VarChar(255)
+  phone        String?  @db.VarChar(50)
+  email        String?  @db.VarChar(255)
+  notes        String?  @db.Text
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  orders       Order[]
+
+  @@map("customers")
+  @@index([phone])
+}
+
 model Table {
   id         BigInt   @id @default(autoincrement())
   table_name String?  @db.VarChar(255)
@@ -182,6 +199,7 @@ model Table {
 model Order {
   id            BigInt       @id @default(autoincrement())
   table_id      BigInt
+  customer_id   BigInt?
   waiter_id     BigInt
   status        OrderStatus @default(PENDING)
   total_amount  Float
@@ -189,15 +207,18 @@ model Order {
   items         OrderItem[]
   payments      Payment[]
   delivery      Delivery?
+  approval_requests ApprovalRequest[]
 
   waiter        User         @relation(fields: [waiter_id], references: [id])
   table         Table        @relation(fields: [table_id], references: [id])
+  customer      Customer?    @relation(fields: [customer_id], references: [id])
 
   created_at    DateTime     @default(now())
   updated_at    DateTime     @updatedAt
 
   @@map("orders")
   @@index([table_id])
+  @@index([customer_id])
   @@index([waiter_id])
 }
 
@@ -541,4 +562,40 @@ model WebsiteLead {
   @@index([source])
   @@index([status])
   @@index([created_at])
+}
+
+enum ApprovalRequestType {
+  ITEM_REMOVAL
+  DISCOUNT
+  PRICE_OVERRIDE
+  ORDER_CANCELLATION
+}
+
+enum ApprovalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ApprovalRequest {
+  id          BigInt                @id @default(autoincrement())
+  order_id    BigInt
+  request_type ApprovalRequestType
+  status      ApprovalRequestStatus @default(PENDING)
+  requested_by BigInt
+  reviewed_by BigInt?
+  reason      String?               @db.Text
+  metadata    String?               @db.Text
+  created_at  DateTime              @default(now())
+  updated_at  DateTime              @updatedAt
+
+  order       Order                 @relation(fields: [order_id], references: [id])
+  requester   User                  @relation("ApprovalRequester", fields: [requested_by], references: [id])
+  reviewer    User?                 @relation("ApprovalReviewer", fields: [reviewed_by], references: [id])
+
+  @@map("approval_requests")
+  @@index([order_id])
+  @@index([status])
+  @@index([requested_by])
+  @@index([reviewed_by])
 }
