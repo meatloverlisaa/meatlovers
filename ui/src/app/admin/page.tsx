@@ -439,6 +439,12 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <Link
+                href="/admin/orders"
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+              >
+                📋 Orders
+              </Link>
+              <Link
                 href="/"
                 className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
               >
