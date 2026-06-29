@@ -1,4 +1,4 @@
-import { PrismaClient, PageType, LeadSource, LeadStatus } from '@prisma/client';
+import { PrismaClient, PageType, LeadSource, LeadStatus, ProductCategory, PricingRuleType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -226,6 +226,171 @@ async function main() {
     console.log(`  ↳ Skipping demo leads — ${existingLeads} already exist`);
   }
 
+  // ─── seed_default_product_categories ───────────────────────────────────────
+  // Check if any products already exist before seeding
+  const existingProducts = await prisma.product.count();
+  if (existingProducts === 0) {
+    const sampleProducts = [
+      // FOOD items
+      {
+        product_name: 'Flame-Grilled Beef Platter',
+        product_category: ProductCategory.FOOD,
+        selling_price: '1850.00',
+        cost_price: '950.00',
+        barcode: 'FOOD001',
+        is_active: true,
+      },
+      {
+        product_name: 'Signature Beef Burger',
+        product_category: ProductCategory.FOOD,
+        selling_price: '950.00',
+        cost_price: '450.00',
+        barcode: 'FOOD002',
+        is_active: true,
+      },
+      {
+        product_name: 'Grilled Baby Back Ribs',
+        product_category: ProductCategory.FOOD,
+        selling_price: '1200.00',
+        cost_price: '600.00',
+        barcode: 'FOOD003',
+        is_active: true,
+      },
+      {
+        product_name: 'Chicken Wings Platter',
+        product_category: ProductCategory.FOOD,
+        selling_price: '950.00',
+        cost_price: '400.00',
+        barcode: 'FOOD004',
+        is_active: true,
+      },
+      // SOFT_DRINK items
+      {
+        product_name: 'Fresh Orange Juice',
+        product_category: ProductCategory.SOFT_DRINK,
+        selling_price: '250.00',
+        cost_price: '80.00',
+        barcode: 'DRINK001',
+        is_active: true,
+      },
+      {
+        product_name: 'Soda (330ml)',
+        product_category: ProductCategory.SOFT_DRINK,
+        selling_price: '150.00',
+        cost_price: '50.00',
+        barcode: 'DRINK002',
+        is_active: true,
+      },
+      {
+        product_name: 'Sparkling Water',
+        product_category: ProductCategory.SOFT_DRINK,
+        selling_price: '200.00',
+        cost_price: '60.00',
+        barcode: 'DRINK003',
+        is_active: true,
+      },
+      {
+        product_name: 'Iced Tea',
+        product_category: ProductCategory.SOFT_DRINK,
+        selling_price: '220.00',
+        cost_price: '70.00',
+        barcode: 'DRINK004',
+        is_active: true,
+      },
+      // ALCOHOLIC_DRINK items
+      {
+        product_name: 'Draft Beer (500ml)',
+        product_category: ProductCategory.ALCOHOLIC_DRINK,
+        selling_price: '350.00',
+        cost_price: '150.00',
+        barcode: 'ALC001',
+        is_active: true,
+      },
+      {
+        product_name: 'House Wine (Glass)',
+        product_category: ProductCategory.ALCOHOLIC_DRINK,
+        selling_price: '450.00',
+        cost_price: '200.00',
+        barcode: 'ALC002',
+        is_active: true,
+      },
+      {
+        product_name: 'Whiskey (Shot)',
+        product_category: ProductCategory.ALCOHOLIC_DRINK,
+        selling_price: '400.00',
+        cost_price: '180.00',
+        barcode: 'ALC003',
+        is_active: true,
+      },
+      {
+        product_name: 'Cocktail of the Day',
+        product_category: ProductCategory.ALCOHOLIC_DRINK,
+        selling_price: '550.00',
+        cost_price: '250.00',
+        barcode: 'ALC004',
+        is_active: true,
+      },
+    ];
+
+    for (const product of sampleProducts) {
+      await prisma.product.create({ data: product });
+      console.log(`  ✓ product: ${product.product_name} (${product.product_category})`);
+    }
+  } else {
+    console.log(`  ↳ Skipping sample products — ${existingProducts} already exist`);
+  }
+
+  // ─── seed_default_margin_rules ───────────────────────────────────────────────
+  // Check if any pricing rules already exist before seeding
+  const existingPricingRules = await prisma.pricingRule.count();
+  if (existingPricingRules === 0) {
+    const marginRules = [
+      {
+        name: 'Food Minimum Margin Rule',
+        rule_type: PricingRuleType.PERCENT_INCREASE,
+        value: '50.00', // 50% markup on cost
+        product_category: ProductCategory.FOOD,
+        min_selling_price: '500.00',
+        max_selling_price: '5000.00',
+        is_active: true,
+      },
+      {
+        name: 'Soft Drink Minimum Margin Rule',
+        rule_type: PricingRuleType.PERCENT_INCREASE,
+        value: '100.00', // 100% markup on cost
+        product_category: ProductCategory.SOFT_DRINK,
+        min_selling_price: '100.00',
+        max_selling_price: '1000.00',
+        is_active: true,
+      },
+      {
+        name: 'Alcoholic Drink Minimum Margin Rule',
+        rule_type: PricingRuleType.PERCENT_INCREASE,
+        value: '80.00', // 80% markup on cost
+        product_category: ProductCategory.ALCOHOLIC_DRINK,
+        min_selling_price: '200.00',
+        max_selling_price: '2000.00',
+        is_active: true,
+      },
+      {
+        name: 'Maximum Discount Rule',
+        rule_type: PricingRuleType.PERCENT_DECREASE,
+        value: '15.00', // Maximum 15% discount allowed
+        product_category: null, // Applies to all categories
+        min_selling_price: null,
+        max_selling_price: null,
+        is_active: true,
+      },
+    ];
+
+    for (const rule of marginRules) {
+      await prisma.pricingRule.create({ data: rule });
+      console.log(`  ✓ pricing_rule: ${rule.name}`);
+    }
+  } else {
+    console.log(`  ↳ Skipping margin rules — ${existingPricingRules} already exist`);
+  }
+
   // ─── seed_dashboard_shortcuts ────────────────────────────────────────────
   // Note: Dashboard uses existing data from orders, payments, products, etc.
   // Audit logs for activity timeline will be added when that table is created
@@ -234,6 +399,8 @@ async function main() {
   console.log('\n📊 Dashboard data ready:');
   console.log('  • Content pages for website');
   console.log('  • Demo website leads for CRM dashboard');
+  console.log('  • Sample products for FOOD, SOFT_DRINK, ALCOHOLIC_DRINK categories');
+  console.log('  • Default margin rules for pricing control');
   console.log('  • Dashboard indexes ready (migration 20260626000000)');
   console.log('  • Uses existing: orders, payments, products, users');
 }
