@@ -23,6 +23,12 @@ export class KitchenController {
     return this.kitchenService.getOrderById(id);
   }
 
+  @Get('orders/:id/status')
+  @Roles(Role.WAITER, Role.ADMIN, Role.MANAGER)
+  getOrderStatus(@Param('id') id: string) {
+    return this.kitchenService.getOrderById(id);
+  }
+
   @Patch('queue/:id/status')
   updateOrderStatus(
     @Param('id') id: string,
@@ -32,6 +38,7 @@ export class KitchenController {
   }
 
   @Get('summary')
+  @Roles(Role.WAITER, Role.ADMIN, Role.MANAGER)
   getKitchenSummary() {
     return this.kitchenService.getKitchenSummary();
   }
