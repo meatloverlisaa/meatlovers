@@ -662,6 +662,102 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Quick Access Modules */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Quick Access Modules
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <a
+              href="/super-admin/cms"
+              className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-200 dark:border-blue-800"
+            >
+              <span className="text-2xl">📄</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Website CMS</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Manage content</p>
+              </div>
+            </a>
+
+            <a
+              href="/admin"
+              className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors border border-purple-200 dark:border-purple-800"
+            >
+              <span className="text-2xl">⚙️</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Admin Panel</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Full admin access</p>
+              </div>
+            </a>
+
+            <a
+              href="/admin/products"
+              className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors border border-emerald-200 dark:border-emerald-800"
+            >
+              <span className="text-2xl">🍽️</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Products</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Menu items</p>
+              </div>
+            </a>
+
+            <a
+              href="/admin/stock"
+              className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors border border-amber-200 dark:border-amber-800"
+            >
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Stock Control</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Inventory</p>
+              </div>
+            </a>
+
+            <a
+              href="/admin/orders"
+              className="flex items-center gap-3 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors border border-cyan-200 dark:border-cyan-800"
+            >
+              <span className="text-2xl">📋</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Orders</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Order management</p>
+              </div>
+            </a>
+
+            <a
+              href="/admin/suppliers"
+              className="flex items-center gap-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors border border-indigo-200 dark:border-indigo-800"
+            >
+              <span className="text-2xl">🏭</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Suppliers</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Manage suppliers</p>
+              </div>
+            </a>
+
+            <a
+              href="/hr"
+              className="flex items-center gap-3 p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors border border-pink-200 dark:border-pink-800"
+            >
+              <span className="text-2xl">👥</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">HR Management</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Staff & payroll</p>
+              </div>
+            </a>
+
+            <a
+              href="/accountant"
+              className="flex items-center gap-3 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors border border-teal-200 dark:border-teal-800"
+            >
+              <span className="text-2xl">💰</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Finance</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Financial reports</p>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
