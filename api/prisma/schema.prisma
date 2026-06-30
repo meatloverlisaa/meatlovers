@@ -220,6 +220,10 @@ model Order {
   @@index([table_id])
   @@index([customer_id])
   @@index([waiter_id])
+  @@index([status])
+  @@index([created_at])
+  @@index([status, created_at])
+  @@index([status, updated_at])
 }
 
 model OrderItem {
