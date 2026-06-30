@@ -1,101 +1,104 @@
-import Link from "next/link";
+'use client';
 
-export default function BarDashboardPage() {
+import { useBarOrders } from '@/hooks/useBarOrders';
+import { useBarSummary } from '@/hooks/useBarSummary';
+import { useBarTransfers } from '@/hooks/useBarTransfers';
+import { BarQueueBoard } from '@/components/bar/BarQueueBoard';
+import { TransferReceiptPanel } from '@/components/bar/TransferReceiptPanel';
+import { updateOrderStatus } from '@/lib/api/bar';
+import type { OrderStatus } from '@/types/bar';
+
+export default function BarQueuePage() {
+  const { orders, isLoading: ordersLoading, error: ordersError, refresh: refreshOrders } = useBarOrders();
+  const { summary, isLoading: summaryLoading } = useBarSummary();
+  const { transfers, isLoading: transfersLoading } = useBarTransfers();
+
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      // Refresh orders to get updated state
+      await refreshOrders();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      throw error;
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    await refreshOrders();
+  };
+
+  if (ordersError) {
+    return (
+      <div className="min-h-screen bg-zinc-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <p className="text-red-800 font-semibold mb-2">Failed to load bar queue</p>
+            <p className="text-red-600 text-sm mb-4">{ordersError.message}</p>
+            <button
+              onClick={handleManualRefresh}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+    <div className="min-h-screen bg-zinc-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-            Bar Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-            Welcome to the bar management portal
-          </p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Bar Stock Card */}
-          <Link
-            href="/bar/stock"
-            className="group block rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 transition hover:border-red-300 dark:hover:border-red-700 hover:shadow-lg"
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-zinc-900">Bar Queue</h1>
+            <p className="mt-1 text-sm text-zinc-600">Manage drink orders and preparation</p>
+          </div>
+          <button
+            onClick={handleManualRefresh}
+            className="px-4 py-2 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 flex items-center gap-2"
           >
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-2xl">
-                📦
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-red-700 dark:group-hover:text-red-400">
-                  Bar Stock
-                </h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  View inventory & record sales
-                </p>
-              </div>
-            </div>
-          </Link>
-
-          {/* Bar Sales Card - Placeholder */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
-                💰
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                  Bar Sales
-                </h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Coming soon
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Bar Reports Card - Placeholder */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
-                📊
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                  Reports
-                </h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Coming soon
-                </p>
-              </div>
-            </div>
-          </div>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
         </div>
 
-        {/* Info */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
-          <div className="flex items-start gap-3">
-            <svg
-              className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
-              <p className="font-semibold mb-2">Bartender Quick Guide</p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>View current bar stock levels and low stock alerts</li>
-                <li>Record stock deductions when serving drinks</li>
-                <li>Track transfers received from the main store</li>
-                <li>Search products by name or scan barcodes for quick access</li>
-              </ul>
+        {/* Summary Cards */}
+        {summary && !summaryLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg border border-zinc-200 p-4">
+              <p className="text-sm text-zinc-600">Pending</p>
+              <p className="text-2xl font-bold text-blue-600">{summary.pending}</p>
             </div>
+            <div className="bg-white rounded-lg border border-zinc-200 p-4">
+              <p className="text-sm text-zinc-600">Preparing</p>
+              <p className="text-2xl font-bold text-amber-600">{summary.preparing}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-zinc-200 p-4">
+              <p className="text-sm text-zinc-600">Ready</p>
+              <p className="text-2xl font-bold text-green-600">{summary.ready}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-zinc-200 p-4">
+              <p className="text-sm text-zinc-600">Total</p>
+              <p className="text-2xl font-bold text-zinc-900">{summary.total}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Queue Board - 3 columns */}
+          <div className="lg:col-span-3">
+            <BarQueueBoard orders={orders} onStatusUpdate={handleStatusUpdate} isLoading={ordersLoading} />
+          </div>
+
+          {/* Transfer Panel - 1 column */}
+          <div className="lg:col-span-1">
+            <TransferReceiptPanel transfers={transfers} isLoading={transfersLoading} />
           </div>
         </div>
       </div>

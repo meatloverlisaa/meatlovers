@@ -227,4 +227,55 @@ export class BarService {
 
     return product?.product_category || null;
   }
+
+  async getBarTransfers(params?: {
+    dateFrom?: string;
+    dateTo?: string;
+    limit?: number;
+  }) {
+    const where: any = {
+      to_location: 'BAR',
+      movement_type: 'TRANSFER',
+    };
+
+    // Apply date filters
+    if (params?.dateFrom || params?.dateTo) {
+      where.timestamp = {};
+      if (params.dateFrom) {
+        where.timestamp.gte = new Date(params.dateFrom);
+      }
+      if (params.dateTo) {
+        where.timestamp.lte = new Date(params.dateTo);
+      }
+    } else {
+      // Default to current day if no dates specified
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      where.timestamp = { gte: startOfDay };
+    }
+
+    const movements = await (this.prisma as any).stockMovement.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: params?.limit || 20,
+      include: {
+        product: {
+          select: {
+            product_name: true,
+          },
+        },
+      },
+    });
+
+    return movements.map((movement) => ({
+      id: movement.id.toString(),
+      productId: movement.product_id.toString(),
+      productName: movement.product.product_name,
+      quantity: movement.quantity,
+      fromLocation: movement.from_location,
+      toLocation: movement.to_location,
+      timestamp: movement.timestamp,
+      notes: movement.notes,
+    }));
+  }
 }

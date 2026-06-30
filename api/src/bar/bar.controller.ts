@@ -33,4 +33,17 @@ export class BarController {
   getBarSales(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     return this.barService.getBarSales(startDate, endDate);
   }
+
+  @Get('transfers')
+  getBarTransfers(
+    @Query('date_from') dateFrom?: string,
+    @Query('date_to') dateTo?: string,
+    @Query('limit') limit?: string
+  ) {
+    return this.barService.getBarTransfers({
+      dateFrom,
+      dateTo,
+      limit: limit ? parseInt(limit, 10) : undefined
+    });
+  }
 }
