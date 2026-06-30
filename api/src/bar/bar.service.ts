@@ -278,4 +278,53 @@ export class BarService {
       notes: movement.notes,
     }));
   }
+
+  async getBarStockMovements(params?: {
+    dateFrom?: string;
+    dateTo?: string;
+    limit?: number;
+  }) {
+    const where: any = {
+      location: 'BAR',
+    };
+
+    // Apply date filters
+    if (params?.dateFrom || params?.dateTo) {
+      where.timestamp = {};
+      if (params.dateFrom) {
+        where.timestamp.gte = new Date(params.dateFrom);
+      }
+      if (params.dateTo) {
+        where.timestamp.lte = new Date(params.dateTo);
+      }
+    }
+
+    const movements = await (this.prisma as any).stockMovement.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: params?.limit || 50,
+      include: {
+        product: {
+          select: {
+            product_name: true,
+            product_category: true,
+          },
+        },
+      },
+    });
+
+    return movements.map((movement) => ({
+      id: movement.id.toString(),
+      productId: movement.product_id.toString(),
+      productName: movement.product.product_name,
+      productCategory: movement.product.product_category,
+      quantity: movement.quantity,
+      movementType: movement.movement_type,
+      location: movement.location,
+      fromLocation: movement.from_location,
+      toLocation: movement.to_location,
+      timestamp: movement.timestamp,
+      notes: movement.notes,
+    }));
+  }
 }
