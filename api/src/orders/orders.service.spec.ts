@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { RecipesService } from '../recipes/recipes.service';
 
 describe('OrdersService - Order Life-cycle Tests', () => {
   let service: OrdersService;
@@ -24,6 +25,10 @@ describe('OrdersService - Order Life-cycle Tests', () => {
     },
   };
 
+  const mockRecipesService = {
+    consumeIngredients: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,6 +36,10 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         {
           provide: PrismaService,
           useValue: mockPrisma,
+        },
+        {
+          provide: RecipesService,
+          useValue: mockRecipesService,
         },
       ],
     }).compile();

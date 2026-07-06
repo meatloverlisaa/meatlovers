@@ -212,7 +212,7 @@ export class ProductionPlansService {
     const additionalQuantity = producedQuantity - productionPlan.produced_quantity;
 
     // If we're increasing production, consume ingredients
-    if (additionalQuantity > 0 && productionPlan.recipe?.ingredients) {
+    if (additionalQuantity > 0 && productionPlan.recipe?.ingredients && productionPlan.recipe.ingredients.length > 0) {
       await this.prisma.$transaction(async (tx) => {
         for (const ingredient of productionPlan.recipe!.ingredients) {
           const requiredQuantity = Number(ingredient.quantity) * additionalQuantity;

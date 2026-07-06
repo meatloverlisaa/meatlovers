@@ -243,10 +243,21 @@ export default function ManagerDashboard() {
           <QuickActionCard
             title="Bar Operations"
             description="Monitor drink service"
-            href="/bar"
+            href="/admin/bar"
             icon={
               <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>
+            }
+          />
+
+          <QuickActionCard
+            title="Production Plans"
+            description="Kitchen production planning"
+            href="/manager/production-plans"
+            icon={
+              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             }
           />
@@ -454,6 +465,12 @@ export default function ManagerDashboard() {
                   Pricing
                 </Link>
                 <Link
+                  href="/manager/production-plans"
+                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                >
+                  Production Plans
+                </Link>
+                <Link
                   href="/admin/waste"
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
@@ -470,6 +487,12 @@ export default function ManagerDashboard() {
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
                   Website CMS
+                </Link>
+                <Link
+                  href="/admin/kitchen"
+                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                >
+                  Kitchen
                 </Link>
               </div>
             </div>

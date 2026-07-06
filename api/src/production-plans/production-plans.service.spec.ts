@@ -194,12 +194,12 @@ describe('ProductionPlansService', () => {
             update: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 90 }),
           },
           stockMovement: {
-            create: jest.fn().mockImplementation((data) => {
+            create: jest.fn().mockImplementation((params: any) => {
               stockMovementCreated = true;
-              expect(data.movement_type).toBe('WASTE');
-              expect(data.quantity).toBe(-10); // 2 kg * 5 units = 10 kg
-              expect(data.reference).toContain('Production Plan #1');
-              expect(data.notes).toContain('Consumed 10 kg');
+              expect(params.data.movement_type).toBe('WASTE');
+              expect(params.data.quantity).toBe(-10); // 2 kg * 5 units = 10 kg
+              expect(params.data.reference).toContain('Production Plan #1');
+              expect(params.data.notes).toContain('Consumed 10 kg');
               return { id: BigInt(1) };
             }),
           },
