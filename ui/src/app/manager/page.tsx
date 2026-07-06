@@ -12,6 +12,12 @@ type DashboardStats = {
   readyOrders: number;
 };
 
+type ManagerOrder = {
+  status?: string;
+  total_amount?: string | number | null;
+  created_at?: string | null;
+};
+
 async function fetchManagerStats(): Promise<DashboardStats> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   
@@ -21,25 +27,25 @@ async function fetchManagerStats(): Promise<DashboardStats> {
       fetch(`${baseUrl}/stock/reorder-alerts`, { cache: "no-store" }),
     ]);
     
-    const orders = ordersRes.ok ? await ordersRes.json() : [];
-    const stockAlerts = stockRes.ok ? await stockRes.json() : [];
+    const orders: ManagerOrder[] = ordersRes.ok ? await ordersRes.json() : [];
+    const stockAlerts: unknown[] = stockRes.ok ? await stockRes.json() : [];
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayOrders = orders.filter((o: any) => new Date(o.created_at) >= todayStart);
+    const todayOrders = orders.filter((order) => new Date(order.created_at ?? 0) >= todayStart);
     
     return {
-      activeOrders: orders.filter((o: any) => ["PENDING", "PREPARING", "READY", "SERVED"].includes(o.status)).length,
+      activeOrders: orders.filter((order) => order.status && ["PENDING", "PREPARING", "READY", "SERVED"].includes(order.status)).length,
       pendingApprovals: 0, // Placeholder
       todayRevenue: todayOrders
-        .filter((o: any) => o.status === "PAID")
-        .reduce((sum: number, o: any) => sum + parseFloat(o.total_amount || "0"), 0)
+        .filter((order) => order.status === "PAID")
+        .reduce((sum, order) => sum + Number(order.total_amount ?? 0), 0)
         .toFixed(2),
       staffOnDuty: 0, // Placeholder
       lowStockItems: Array.isArray(stockAlerts) ? stockAlerts.length : 0,
-      readyOrders: orders.filter((o: any) => o.status === "READY").length,
+      readyOrders: orders.filter((order) => order.status === "READY").length,
     };
-  } catch (e) {
+  } catch {
     return {
       activeOrders: 0,
       pendingApprovals: 0,
@@ -352,7 +358,7 @@ export default function ManagerDashboard() {
                 title="Today's Revenue"
                 value={`KES ${stats.todayRevenue}`}
                 subtitle="Total collected"
-                href="/admin/payments"
+                href="/manager/payments"
                 icon={
                   <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -459,10 +465,10 @@ export default function ManagerDashboard() {
                   Suppliers
                 </Link>
                 <Link
-                  href="/admin/pricing-control"
+                  href="/manager/payments"
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
-                  Pricing
+                  Payments
                 </Link>
                 <Link
                   href="/manager/production-plans"
