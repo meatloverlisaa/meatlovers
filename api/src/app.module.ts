@@ -30,7 +30,7 @@ import { BarModule } from './bar/bar.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { ProductionPlansModule } from './production-plans/production-plans.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
-// import { WasteModule } from './waste/waste.module'; // Temporarily disabled
+import { WasteModule } from './waste/waste.module';
 import { FinanceModule } from './finance/finance.module';
 import { WebsiteModule } from './website/website.module';
 import { CmsModule } from './cms/cms.module';
@@ -56,7 +56,7 @@ import { PosModule } from './pos/pos.module';
     RecipesModule,
     ProductionPlansModule,
     DeliveriesModule,
-    // WasteModule, // Temporarily disabled due to compilation errors
+    WasteModule,
     FinanceModule,
     WebsiteModule,
     CmsModule,
