@@ -447,7 +447,7 @@ export default function ManagerDashboard() {
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Management Tools</h3>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Link
-                  href="/admin/products"
+                  href="/manager/products"
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
                   Products
