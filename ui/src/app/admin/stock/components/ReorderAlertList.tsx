@@ -21,7 +21,7 @@ export function ReorderAlertList({ balance, reorderThreshold = 10 }: Props) {
   const lowStockItems = balance.filter((item) => item.quantity < reorderThreshold && item.quantity > 0);
   const outOfStockItems = balance.filter((item) => item.quantity === 0);
 
-  const allAlerts = [...outOfStockItems, ...lowStockItems];
+  const allAlerts: StockBalance[] = [...outOfStockItems, ...lowStockItems];
 
   if (allAlerts.length === 0) {
     return (
@@ -78,7 +78,7 @@ export function ReorderAlertList({ balance, reorderThreshold = 10 }: Props) {
 
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
         {allAlerts.map((item) => {
-          const productId = typeof item.product_id === "bigint" ? item.product_id.toString() : String(item.product_id);
+          const productId = `${item.product_id}`;
           const isOutOfStock = item.quantity === 0;
           const urgency = isOutOfStock ? "critical" : item.quantity < 5 ? "high" : "medium";
 

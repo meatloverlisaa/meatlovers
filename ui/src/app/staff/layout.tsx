@@ -22,7 +22,7 @@ const navigationItems: NavItem[] = [
   { href: "/staff/attendance", label: "Attendance", icon: "📅", roles: ["HR"] },
   { href: "/staff/payroll", label: "Payroll", icon: "💵", roles: ["HR"] },
   { href: "/staff/stock", label: "Stock Control", icon: "📦", roles: ["STOREKEEPER"] },
-  { href: "/staff/suppliers", label: "Suppliers", icon: "🏭", roles: ["STOREKEEPER", "ACCOUNTANT"] },
+  { href: "/accountant/suppliers", label: "Suppliers", icon: "🏭", roles: ["STOREKEEPER", "ACCOUNTANT"] },
   { href: "/staff/receiving", label: "Receiving", icon: "📥", roles: ["STOREKEEPER"] },
   { href: "/staff/profile", label: "My Profile", icon: "👤" },
 ];

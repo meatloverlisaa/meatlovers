@@ -453,7 +453,7 @@ export default function ManagerDashboard() {
                   Products
                 </Link>
                 <Link
-                  href="/admin/suppliers"
+                  href="/manager/suppliers"
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
                   Suppliers
