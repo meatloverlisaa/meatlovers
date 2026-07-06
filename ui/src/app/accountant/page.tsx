@@ -188,6 +188,12 @@ export default function AccountantDashboard() {
       color: "bg-blue-50 dark:bg-blue-900/20",
     },
     {
+      label: "Pricing Control",
+      icon: "💰",
+      href: "/accountant/pricing",
+      color: "bg-green-50 dark:bg-green-900/20",
+    },
+    {
       label: "Check Variances",
       icon: "⚠️",
       href: "/accountant/finance",

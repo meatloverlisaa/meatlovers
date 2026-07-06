@@ -714,6 +714,17 @@ export default function SuperAdminDashboard() {
             </a>
 
             <a
+              href="/super-admin/pricing"
+              className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors border border-green-200 dark:border-green-800"
+            >
+              <span className="text-2xl">💰</span>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Pricing Control</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Rules & margins</p>
+              </div>
+            </a>
+
+            <a
               href="/admin/orders"
               className="flex items-center gap-3 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors border border-cyan-200 dark:border-cyan-800"
             >
