@@ -483,7 +483,7 @@ export default function ManagerDashboard() {
                   Deliveries
                 </Link>
                 <Link
-                  href="/admin/cms"
+                  href="/manager/cms"
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
                   Website CMS
