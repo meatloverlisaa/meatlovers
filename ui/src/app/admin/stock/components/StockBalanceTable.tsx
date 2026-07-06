@@ -3,12 +3,12 @@
 import { useState } from "react";
 
 type StockBalance = {
-  id: string | number;
-  product_id: string | number;
+  id: string | number | bigint;
+  product_id: string | number | bigint;
   quantity: number;
   location: string;
   product?: {
-    id: string | number;
+    id: string | number | bigint;
     product_name: string;
     product_category: string;
     cost_price: string | null;

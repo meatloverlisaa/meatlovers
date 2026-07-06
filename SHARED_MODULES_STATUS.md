@@ -103,16 +103,16 @@
 
 | Route | Role | Status | Notes |
 |-------|------|--------|-------|
-| `/admin/stock` | ADMIN | ⚠️ NEEDS SPLIT | Currently shared |
-| `/manager/stock` | MANAGER | ❌ MISSING | View-only oversight |
-| `/storekeeper/stock` | STOREKEEPER | ❌ MISSING | Full inventory management |
+| `/admin/stock` | ADMIN | ✅ EXISTS | Admin-only inventory control |
+| `/manager/stock` | MANAGER | ✅ EXISTS | View-only oversight |
+| `/storekeeper/stock` | STOREKEEPER | ✅ EXISTS | Full inventory management |
 | `/kitchen/stock` | CHEF | ✅ EXISTS | Kitchen stock only |
 | `/bar/stock` | BARMAN | ✅ EXISTS | Bar stock only |
 
 **Actions Required:**
 1. Keep `/admin/stock` for ADMIN only
-2. Create `/manager/stock` for MANAGER (view-only)
-3. Create `/storekeeper/stock` for STOREKEEPER (full access)
+2. Keep `/manager/stock` for MANAGER (view-only)
+3. Keep `/storekeeper/stock` for STOREKEEPER (full access)
 
 ---
 
