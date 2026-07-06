@@ -30,6 +30,7 @@ export class KitchenController {
   }
 
   @Patch('queue/:id/status')
+  @Roles(Role.CHEF, Role.ADMIN)
   updateOrderStatus(
     @Param('id') id: string,
     @Body() updateDto: UpdateOrderStatusDto,
@@ -59,6 +60,7 @@ export class KitchenController {
   }
 
   @Post('orders/:id/notes')
+  @Roles(Role.CHEF, Role.ADMIN)
   addPreparationNote(
     @Param('id') id: string,
     @Body() dto: AddPreparationNoteDto,
@@ -67,6 +69,7 @@ export class KitchenController {
   }
 
   @Post('ingredient-consumption')
+  @Roles(Role.CHEF, Role.ADMIN)
   logIngredientConsumption(@Body() dto: LogIngredientConsumptionDto) {
     return this.kitchenService.logIngredientConsumption(dto);
   }
