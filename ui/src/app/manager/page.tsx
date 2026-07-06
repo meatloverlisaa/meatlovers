@@ -198,7 +198,7 @@ export default function ManagerDashboard() {
           <QuickActionCard
             title="Order Management"
             description="View and manage all orders"
-            href="/admin/orders"
+            href="/manager/orders"
             variant="primary"
             icon={
               <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

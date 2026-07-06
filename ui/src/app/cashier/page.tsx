@@ -186,7 +186,7 @@ export default function CashierDashboard() {
           </Link>
 
           <Link
-            href="/admin/orders"
+            href="/cashier/orders"
             className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900"
           >
             <div>
