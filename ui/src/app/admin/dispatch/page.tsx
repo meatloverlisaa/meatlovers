@@ -319,12 +319,7 @@ export default function DispatchPage() {
                 </select>
               </div>
             </div>
-            <button
-              onClick={() => setShowAssignModal(true)}
-              className="bg-red-900 text-white px-4 py-2 rounded-md hover:bg-red-800 transition-colors"
-            >
-              Assign Delivery
-            </button>
+            <span className="text-sm text-gray-500 italic">Oversight only - contact dispatcher for assignments</span>
           </div>
         </div>
 
@@ -404,40 +399,7 @@ export default function DispatchPage() {
                         {new Date(delivery.assigned_at).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
-                          {delivery.status === "ASSIGNED" && (
-                            <button
-                              onClick={() => handleStatusUpdate(String(delivery.id), "PICKED_UP")}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Mark Picked Up
-                            </button>
-                          )}
-                          {delivery.status === "PICKED_UP" && (
-                            <button
-                              onClick={() => handleStatusUpdate(String(delivery.id), "IN_TRANSIT")}
-                              className="text-purple-600 hover:text-purple-900"
-                            >
-                              Mark In Transit
-                            </button>
-                          )}
-                          {delivery.status === "IN_TRANSIT" && (
-                            <button
-                              onClick={() => handleStatusUpdate(String(delivery.id), "DELIVERED")}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              Mark Delivered
-                            </button>
-                          )}
-                          {delivery.status !== "DELIVERED" && delivery.status !== "CANCELLED" && (
-                            <button
-                              onClick={() => handleStatusUpdate(String(delivery.id), "CANCELLED")}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              Cancel
-                            </button>
-                          )}
-                        </div>
+                        <span className="text-gray-400 italic">Oversight only</span>
                       </td>
                     </tr>
                   ))}
@@ -446,94 +408,6 @@ export default function DispatchPage() {
             </div>
           )}
         </div>
-
-        {/* Assign Delivery Modal */}
-        {showAssignModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Assign Delivery</h3>
-                <form onSubmit={handleAssignDelivery}>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Order ID</label>
-                      <input
-                        type="text"
-                        value={selectedOrderId}
-                        onChange={(e) => setSelectedOrderId(e.target.value)}
-                        required
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        placeholder="Enter order ID"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Select Rider</label>
-                      <select
-                        value={selectedRiderId}
-                        onChange={(e) => setSelectedRiderId(e.target.value)}
-                        required
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                      >
-                        <option value="">Select a rider</option>
-                        {availableRiders.map((rider) => (
-                          <option key={String(rider.id)} value={String(rider.id)}>
-                            {rider.user?.full_name} - {rider.phone}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Address (Optional)</label>
-                      <input
-                        type="text"
-                        value={pickupAddress}
-                        onChange={(e) => setPickupAddress(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        placeholder="Enter pickup address"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
-                      <input
-                        type="text"
-                        value={deliveryAddress}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                        required
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        placeholder="Enter delivery address"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Notes (Optional)</label>
-                      <textarea
-                        value={deliveryNotes}
-                        onChange={(e) => setDeliveryNotes(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        rows={3}
-                        placeholder="Enter delivery notes"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={() => setShowAssignModal(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 px-4 py-2 bg-red-900 text-white rounded-md hover:bg-red-800"
-                    >
-                      Assign
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
