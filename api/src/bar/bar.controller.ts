@@ -1,7 +1,9 @@
 import { Controller, Get, Patch, Param, Query, Body } from '@nestjs/common';
 import { BarService } from './bar.service';
 import { UpdateOrderStatusDto } from '../orders/dto/update-order-status.dto';
+import { Public } from '../auth/public.decorator';
 
+@Public() // Temporary for development - remove in production
 @Controller('bar')
 export class BarController {
   constructor(private readonly barService: BarService) {}

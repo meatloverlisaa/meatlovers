@@ -26,12 +26,7 @@ export class BarService {
       },
     });
 
-    // Filter orders that contain drink items (soft drinks or alcohol)
-    const drinkOrders = orders.filter((order) => {
-      return order.items.some((item: any) => {
-        return this.isDrinkItem(item.product_id);
-      });
-    });
+    const drinkOrders = await this.filterDrinkOrders(orders);
 
     return drinkOrders;
   }
@@ -116,7 +111,7 @@ export class BarService {
       },
     });
 
-    const drinkOrders = orders.filter((order) => this.orderHasDrinkItems(order));
+    const drinkOrders = await this.filterDrinkOrders(orders);
 
     const summary = {
       pending: 0,
@@ -153,7 +148,7 @@ export class BarService {
     });
 
     // Filter orders with drink items and calculate sales
-    const drinkOrders = orders.filter((order) => this.orderHasDrinkItems(order));
+    const drinkOrders = await this.filterDrinkOrders(orders);
 
     const sales = {
       totalOrders: drinkOrders.length,
@@ -215,6 +210,19 @@ export class BarService {
       }
     }
     return false;
+  }
+
+  private async filterDrinkOrders(orders: any[]): Promise<any[]> {
+    const checks = await Promise.all(
+      orders.map(async (order) => ({
+        order,
+        hasDrinkItems: await this.orderHasDrinkItems(order),
+      })),
+    );
+
+    return checks
+      .filter(({ hasDrinkItems }) => hasDrinkItems)
+      .map(({ order }) => order);
   }
 
   private async getProductCategory(productId: bigint): Promise<string | null> {
