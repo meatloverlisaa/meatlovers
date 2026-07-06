@@ -172,6 +172,94 @@ async function postAdjustment(payload: {
   return res.json();
 }
 
+export async function handleStockIn(formData: FormData) {
+  "use server";
+
+  const productId = String(formData.get("product_id") ?? "").trim();
+  const quantityRaw = String(formData.get("quantity") ?? "").trim();
+  const reference = String(formData.get("reference") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  const quantity = Number(quantityRaw);
+
+  if (!productId) throw new Error("Product is required.");
+  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+
+  await postStockIn({
+    productId,
+    quantity,
+    reference: reference.length ? reference : undefined,
+    notes: notes.length ? notes : undefined,
+  });
+
+  revalidatePath("/admin/stock");
+  revalidatePath("/manager/stock");
+  revalidatePath("/storekeeper/stock");
+}
+
+export async function handleTransfer(formData: FormData) {
+  "use server";
+
+  const productId = String(formData.get("productId") ?? "").trim();
+  const quantityRaw = String(formData.get("quantity") ?? "").trim();
+  const fromLocation = String(formData.get("fromLocation") ?? "").trim();
+  const toLocation = String(formData.get("toLocation") ?? "").trim();
+  const reference = String(formData.get("reference") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  const quantity = Number(quantityRaw);
+
+  if (!productId) throw new Error("Product is required.");
+  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+  if (!fromLocation || !toLocation) throw new Error("Both locations are required.");
+  if (fromLocation === toLocation) throw new Error("Source and destination must be different.");
+
+  await postTransfer({
+    productId,
+    quantity,
+    fromLocation,
+    toLocation,
+    reference: reference.length ? reference : undefined,
+    notes: notes.length ? notes : undefined,
+  });
+
+  revalidatePath("/admin/stock");
+  revalidatePath("/manager/stock");
+  revalidatePath("/storekeeper/stock");
+}
+
+export async function handleAdjustment(formData: FormData) {
+  "use server";
+
+  const productId = String(formData.get("productId") ?? "").trim();
+  const quantityRaw = String(formData.get("quantity") ?? "").trim();
+  const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
+  const reason = String(formData.get("reason") ?? "").trim();
+  const reference = String(formData.get("reference") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  let quantity = Number(quantityRaw);
+  if (adjustmentType === "decrease") {
+    quantity = -quantity;
+  }
+
+  if (!productId) throw new Error("Product is required.");
+  if (!Number.isFinite(quantity) || quantity === 0) throw new Error("Quantity must be non-zero.");
+  if (!reason) throw new Error("Reason is required.");
+  if (!notes) throw new Error("Notes are required for audit trail.");
+
+  await postAdjustment({
+    productId,
+    quantity,
+    reference: reference.length ? reference : undefined,
+    notes: `${reason}: ${notes}`,
+  });
+
+  revalidatePath("/admin/stock");
+  revalidatePath("/manager/stock");
+  revalidatePath("/storekeeper/stock");
+}
+
 export async function StockControlModule({ role, canManage = true }: StockControlModuleProps) {
   let products: Product[] = [];
   let balance: StockBalance[] = [];
@@ -196,94 +284,6 @@ export async function StockControlModule({ role, canManage = true }: StockContro
   } catch (e) {
     console.warn("Failed to load movements:", e);
   }
-
-  const handleStockIn = async (formData: FormData) => {
-    "use server";
-
-    const productId = String(formData.get("product_id") ?? "").trim();
-    const quantityRaw = String(formData.get("quantity") ?? "").trim();
-    const reference = String(formData.get("reference") ?? "").trim();
-    const notes = String(formData.get("notes") ?? "").trim();
-
-    const quantity = Number(quantityRaw);
-
-    if (!productId) throw new Error("Product is required.");
-    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-
-    await postStockIn({
-      productId,
-      quantity,
-      reference: reference.length ? reference : undefined,
-      notes: notes.length ? notes : undefined,
-    });
-
-    revalidatePath("/admin/stock");
-    revalidatePath("/manager/stock");
-    revalidatePath("/storekeeper/stock");
-  };
-
-  const handleTransfer = async (formData: FormData) => {
-    "use server";
-
-    const productId = String(formData.get("productId") ?? "").trim();
-    const quantityRaw = String(formData.get("quantity") ?? "").trim();
-    const fromLocation = String(formData.get("fromLocation") ?? "").trim();
-    const toLocation = String(formData.get("toLocation") ?? "").trim();
-    const reference = String(formData.get("reference") ?? "").trim();
-    const notes = String(formData.get("notes") ?? "").trim();
-
-    const quantity = Number(quantityRaw);
-
-    if (!productId) throw new Error("Product is required.");
-    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-    if (!fromLocation || !toLocation) throw new Error("Both locations are required.");
-    if (fromLocation === toLocation) throw new Error("Source and destination must be different.");
-
-    await postTransfer({
-      productId,
-      quantity,
-      fromLocation,
-      toLocation,
-      reference: reference.length ? reference : undefined,
-      notes: notes.length ? notes : undefined,
-    });
-
-    revalidatePath("/admin/stock");
-    revalidatePath("/manager/stock");
-    revalidatePath("/storekeeper/stock");
-  };
-
-  const handleAdjustment = async (formData: FormData) => {
-    "use server";
-
-    const productId = String(formData.get("productId") ?? "").trim();
-    const quantityRaw = String(formData.get("quantity") ?? "").trim();
-    const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
-    const reason = String(formData.get("reason") ?? "").trim();
-    const reference = String(formData.get("reference") ?? "").trim();
-    const notes = String(formData.get("notes") ?? "").trim();
-
-    let quantity = Number(quantityRaw);
-    if (adjustmentType === "decrease") {
-      quantity = -quantity;
-    }
-
-    if (!productId) throw new Error("Product is required.");
-    if (!Number.isFinite(quantity) || quantity === 0) throw new Error("Quantity must be non-zero.");
-    if (!reason) throw new Error("Reason is required.");
-    if (!notes) throw new Error("Notes are required for audit trail.");
-
-    await postAdjustment({
-      productId,
-      quantity,
-      reference: reference.length ? reference : undefined,
-      notes: `${reason}: ${notes}`,
-    });
-
-    revalidatePath("/admin/stock");
-    revalidatePath("/manager/stock");
-    revalidatePath("/storekeeper/stock");
-  };
 
   const roleLabel = role === "MANAGER" ? "Manager" : role === "STOREKEEPER" ? "Storekeeper" : "Admin";
   const accessText = canManage
