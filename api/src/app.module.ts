@@ -42,6 +42,7 @@ import { ManagerCmsModule } from './manager-cms/manager-cms.module';
 import { ManagerProductsModule } from './manager-products/manager-products.module';
 import { ManagerSuppliersModule } from './manager-suppliers/manager-suppliers.module';
 import { ManagerStockModule } from './manager-stock/manager-stock.module';
+import { ManagerOrdersModule } from './manager-orders/manager-orders.module';
 
 
 @Module({
@@ -72,6 +73,7 @@ import { ManagerStockModule } from './manager-stock/manager-stock.module';
     ManagerProductsModule,
     ManagerSuppliersModule,
     ManagerStockModule,
+    ManagerOrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
