@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { CategoryFilter } from "../../admin/products/components/CategoryFilter";
 
 export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -36,6 +35,217 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
   return res.json();
 }
 
+// Category Filter Component
+function CategoryFilter({
+  selected,
+  onSelect,
+}: {
+  selected: ProductCategory | "ALL";
+  onSelect: (category: ProductCategory | "ALL") => void;
+}) {
+  const categories: Array<{ id: ProductCategory | "ALL"; label: string; icon: string }> = [
+    { id: "ALL", label: "All Products", icon: "🛒" },
+    { id: "FOOD", label: "Food", icon: "🍖" },
+    { id: "SOFT_DRINK", label: "Soft Drinks", icon: "🥤" },
+    { id: "ALCOHOLIC_DRINK", label: "Alcoholic Drinks", icon: "🍺" },
+  ];
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {categories.map((cat) => (
+        <button
+          key={cat.id}
+          onClick={() => onSelect(cat.id)}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+            selected === cat.id
+              ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-black"
+              : "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-300 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          }`}
+        >
+          <span>{cat.icon}</span>
+          {cat.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Product Table Component (View-Only)
+function ProductTable({ products }: { products: Product[] }) {
+  const getCategoryBadge = (category: ProductCategory) => {
+    const badges = {
+      FOOD: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
+      SOFT_DRINK: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+      ALCOHOLIC_DRINK: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+    };
+    return badges[category];
+  };
+
+  const getCategoryLabel = (category: ProductCategory) => {
+    const labels = {
+      FOOD: "Food",
+      SOFT_DRINK: "Soft Drink",
+      ALCOHOLIC_DRINK: "Alcoholic Drink",
+    };
+    return labels[category];
+  };
+
+  if (products.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
+        <p className="text-4xl mb-3">📦</p>
+        <p className="font-semibold text-zinc-700 dark:text-zinc-300">No products found</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          Try changing the category filter
+        </p>
+      </div>
+    );
+  }
+
+  const margin = (product: Product) => {
+    const selling = parseFloat(product.selling_price);
+    const cost = parseFloat(product.cost_price);
+    if (isNaN(selling) || isNaN(cost) || selling === 0) return 0;
+    return ((selling - cost) / selling * 100);
+  };
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-zinc-50 dark:bg-zinc-900">
+            <tr className="text-zinc-600 dark:text-zinc-300">
+              <th className="px-4 py-3 font-medium">Product Name</th>
+              <th className="px-4 py-3 font-medium">Category</th>
+              <th className="px-4 py-3 font-medium">Cost Price</th>
+              <th className="px-4 py-3 font-medium">Selling Price</th>
+              <th className="px-4 py-3 font-medium">Margin</th>
+              <th className="px-4 py-3 font-medium">Barcode</th>
+              <th className="px-4 py-3 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            {products.map((product) => {
+              const productMargin = margin(product);
+              return (
+                <tr key={product.id.toString()} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-zinc-900 dark:text-zinc-50">
+                      {product.product_name}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getCategoryBadge(
+                        product.product_category
+                      )}`}
+                    >
+                      {getCategoryLabel(product.product_category)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">
+                    KSh {parseFloat(product.cost_price).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50 font-medium">
+                    KSh {parseFloat(product.selling_price).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        productMargin >= 30
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
+                          : productMargin >= 15
+                          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200"
+                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
+                      }`}
+                    >
+                      {productMargin.toFixed(1)}%
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                    {product.barcode ? (
+                      <code className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs">
+                        {product.barcode}
+                      </code>
+                    ) : (
+                      <span className="text-zinc-400">-</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                        product.is_active
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
+                          : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                      }`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${product.is_active ? "bg-emerald-500" : "bg-zinc-400"}`} />
+                      {product.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// Summary Stats Component
+function ProductStats({ products }: { products: Product[] }) {
+  const stats = {
+    total: products.length,
+    active: products.filter((p) => p.is_active).length,
+    inactive: products.filter((p) => !p.is_active).length,
+    food: products.filter((p) => p.product_category === "FOOD").length,
+    softDrinks: products.filter((p) => p.product_category === "SOFT_DRINK").length,
+    alcoholic: products.filter((p) => p.product_category === "ALCOHOLIC_DRINK").length,
+  };
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6 mb-6">
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Total Products</div>
+        <div className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+          {stats.total}
+        </div>
+      </div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Active</div>
+        <div className="mt-1 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
+          {stats.active}
+        </div>
+      </div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Inactive</div>
+        <div className="mt-1 text-2xl font-semibold text-zinc-600 dark:text-zinc-300">
+          {stats.inactive}
+        </div>
+      </div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Food Items</div>
+        <div className="mt-1 text-2xl font-semibold text-orange-600 dark:text-orange-400">
+          {stats.food}
+        </div>
+      </div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Soft Drinks</div>
+        <div className="mt-1 text-2xl font-semibold text-blue-600 dark:text-blue-400">
+          {stats.softDrinks}
+        </div>
+      </div>
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="text-xs text-zinc-600 dark:text-zinc-300">Alcoholic</div>
+        <div className="mt-1 text-2xl font-semibold text-purple-600 dark:text-purple-400">
+          {stats.alcoholic}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ManagerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,37 +267,45 @@ export default function ManagerProductsPage() {
 
   useEffect(() => {
     loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+    
+    // Auto-refresh every 60 seconds
+    const interval = setInterval(() => {
+      loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, [selectedCategory]);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Breadcrumb */}
+        <div className="mb-4 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
+          <Link href="/manager" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+            Manager Dashboard
+          </Link>
+          <span>/</span>
+          <span className="text-zinc-900 dark:text-zinc-50">Products</span>
+        </div>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/manager"
-                className="text-zinc-500 hover:text-zinc-700 transition text-sm"
-              >
-                ← Back to Dashboard
-              </Link>
-            </div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50 mt-2">
-              Product Management
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Product Catalog (View Only)
             </h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              View-only access • Contact admin to make changes
+              Monitor product catalog, pricing, and margins
             </p>
           </div>
         </div>
 
+        {/* Stats */}
+        {!loading && !error && <ProductStats products={products} />}
+
         {/* Category Filter */}
         <div className="mb-6">
-          <CategoryFilter
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
+          <CategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
         </div>
 
         {/* Loading/Error States */}
@@ -104,94 +322,7 @@ export default function ManagerProductsPage() {
         )}
 
         {/* Product Table */}
-        {!loading && !error && (
-          <div className="bg-white dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
-                  <tr>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Product Name</th>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Category</th>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Selling Price</th>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Cost Price</th>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Status</th>
-                    <th className="px-6 py-3 font-semibold text-zinc-900 dark:text-zinc-50">Updated</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                  {products.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400">
-                        No products found
-                      </td>
-                    </tr>
-                  ) : (
-                    products.map((product) => (
-                      <tr key={String(product.id)} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-zinc-900 dark:text-zinc-50">
-                            {product.product_name}
-                          </div>
-                          {product.barcode && (
-                            <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                              {product.barcode}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                            product.product_category === "FOOD"
-                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-200"
-                              : product.product_category === "SOFT_DRINK"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200"
-                              : "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-200"
-                          }`}>
-                            {product.product_category.replace(/_/g, " ")}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 font-medium text-zinc-900 dark:text-zinc-50">
-                          KSh {Number(product.selling_price).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-zinc-600 dark:text-zinc-400">
-                          KSh {Number(product.cost_price).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            product.is_active
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200"
-                              : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                          }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${
-                              product.is_active ? "bg-emerald-500" : "bg-zinc-400"
-                            }`} />
-                            {product.is_active ? "Active" : "Inactive"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-zinc-500 dark:text-zinc-400">
-                          {product.updated_at
-                            ? new Date(product.updated_at).toLocaleDateString()
-                            : "N/A"}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Summary */}
-            <div className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-6 py-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-600 dark:text-zinc-400">
-                  Showing {products.length} product{products.length !== 1 ? "s" : ""}
-                </span>
-                <span className="text-zinc-600 dark:text-zinc-400">
-                  {products.filter(p => p.is_active).length} active
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+        {!loading && !error && <ProductTable products={products} />}
       </div>
     </div>
   );
