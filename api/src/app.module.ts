@@ -39,6 +39,7 @@ import { StaffDashboardModule } from './staff-dashboard/staff-dashboard.module';
 import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 import { PosModule } from './pos/pos.module';
 import { ManagerCmsModule } from './manager-cms/manager-cms.module';
+import { ManagerProductsModule } from './manager-products/manager-products.module';
 
 
 @Module({
@@ -66,6 +67,7 @@ import { ManagerCmsModule } from './manager-cms/manager-cms.module';
     AdminDashboardModule,
     PosModule,
     ManagerCmsModule,
+    ManagerProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
