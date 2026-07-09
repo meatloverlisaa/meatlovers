@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ManagerSuppliersController } from './manager-suppliers.controller';
 import { ManagerSuppliersService } from './manager-suppliers.service';
 import { SupplierType, SupplierStatus } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 
 describe('ManagerSuppliersController', () => {
   let controller: ManagerSuppliersController;
@@ -34,6 +36,11 @@ describe('ManagerSuppliersController', () => {
     getActive: jest.fn(),
   };
 
+  const mockJwtService = {
+    sign: jest.fn(),
+    verify: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ManagerSuppliersController],
@@ -42,8 +49,16 @@ describe('ManagerSuppliersController', () => {
           provide: ManagerSuppliersService,
           useValue: mockManagerSuppliersService,
         },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        Reflector,
       ],
-    }).compile();
+    })
+      .overrideGuard(require('../auth/jwt-auth.guard').JwtAuthGuard)
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     controller = module.get<ManagerSuppliersController>(
       ManagerSuppliersController,
