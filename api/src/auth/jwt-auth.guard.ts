@@ -13,7 +13,7 @@ import { IS_PUBLIC_KEY } from './public.decorator';
 import { ROLES_KEY } from './roles.decorator';
 
 export interface JwtPayload {
-  sub: string;       // user id (BigInt as string)
+  sub: string; // user id (BigInt as string)
   email: string;
   role: Role;
   iat?: number;
@@ -40,7 +40,9 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractToken(request);
 
     if (!token) {
-      throw new UnauthorizedException('Missing or malformed Authorization header');
+      throw new UnauthorizedException(
+        'Missing or malformed Authorization header',
+      );
     }
 
     let payload: JwtPayload;
