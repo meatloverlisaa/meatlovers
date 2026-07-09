@@ -108,10 +108,7 @@ export function KitchenStockTable({ stock }: Props) {
             ) : null}
 
             {filteredStock.map((item) => {
-              const productId =
-                typeof item.product_id === "bigint"
-                  ? item.product_id.toString()
-                  : String(item.product_id);
+              const productId = String(item.product_id);
               const isLowStock = item.quantity < 10;
               const isVeryLow = item.quantity < 5;
               const isOutOfStock = item.quantity === 0;
