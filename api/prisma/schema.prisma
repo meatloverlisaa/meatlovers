@@ -32,6 +32,14 @@ model User {
   password_hash String   @db.Text
   role          Role
   is_active     Boolean  @default(true)
+  
+  // Security fields
+  failed_login_attempts Int      @default(0)
+  account_locked_until  DateTime?
+  last_login_at         DateTime?
+  last_login_ip         String?  @db.VarChar(45)
+  password_changed_at   DateTime @default(now())
+  
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
@@ -42,6 +50,8 @@ model User {
   finance_transactions FinanceTransaction[]
   approval_requests_made ApprovalRequest[] @relation("ApprovalRequester")
   approval_requests_reviewed ApprovalRequest[] @relation("ApprovalReviewer")
+  refresh_tokens RefreshToken[]
+  audit_logs AuditLog[]
 
   @@map("users")
 }
@@ -602,4 +612,83 @@ model ApprovalRequest {
   @@index([status])
   @@index([requested_by])
   @@index([reviewed_by])
+}
+
+// ==================== SECURITY MODELS ====================
+
+enum AuditAction {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
+  PASSWORD_CHANGED
+  ACCOUNT_LOCKED
+  ACCOUNT_UNLOCKED
+  TOKEN_REFRESHED
+  UNAUTHORIZED_ACCESS_ATTEMPT
+  ROLE_CHANGED
+  USER_CREATED
+  USER_DELETED
+  USER_UPDATED
+  SENSITIVE_DATA_ACCESSED
+  SECURITY_SETTING_CHANGED
+}
+
+model AuditLog {
+  id          BigInt      @id @default(autoincrement())
+  user_id     BigInt?
+  action      AuditAction
+  resource    String?     @db.VarChar(255)
+  resource_id String?     @db.VarChar(255)
+  ip_address  String?     @db.VarChar(45)
+  user_agent  String?     @db.Text
+  metadata    String?     @db.Text
+  success     Boolean     @default(true)
+  error_message String?   @db.Text
+  created_at  DateTime    @default(now())
+
+  user        User?       @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+  @@index([user_id])
+  @@index([action])
+  @@index([created_at])
+  @@index([user_id, created_at])
+}
+
+model RefreshToken {
+  id          BigInt   @id @default(autoincrement())
+  user_id     BigInt
+  token_hash  String   @unique @db.VarChar(255)
+  expires_at  DateTime
+  is_revoked  Boolean  @default(false)
+  revoked_at  DateTime?
+  ip_address  String?  @db.VarChar(45)
+  user_agent  String?  @db.Text
+  created_at  DateTime @default(now())
+
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+  @@index([user_id])
+  @@index([token_hash])
+  @@index([expires_at])
+  @@index([is_revoked])
+}
+
+model PasswordResetToken {
+  id          BigInt   @id @default(autoincrement())
+  email       String   @db.VarChar(255)
+  token_hash  String   @unique @db.VarChar(255)
+  expires_at  DateTime
+  is_used     Boolean  @default(false)
+  used_at     DateTime?
+  ip_address  String?  @db.VarChar(45)
+  created_at  DateTime @default(now())
+
+  @@map("password_reset_tokens")
+  @@index([email])
+  @@index([token_hash])
+  @@index([expires_at])
 }
