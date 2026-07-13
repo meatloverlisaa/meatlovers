@@ -14,7 +14,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 function getToken(): string {
   // In production, retrieve from secure cookie or auth context
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('access_token') || '';
+    return localStorage.getItem('auth_token') || '';
   }
   return '';
 }
@@ -23,9 +23,7 @@ export async function fetchBarOrders(status?: string): Promise<DrinkOrder[]> {
   const url = new URL(`${API_BASE}/bar/orders`);
   if (status) url.searchParams.set('status', status);
 
-  const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw new Error(`Failed to fetch bar orders: ${response.statusText}`);
@@ -35,9 +33,7 @@ export async function fetchBarOrders(status?: string): Promise<DrinkOrder[]> {
 }
 
 export async function fetchBarSummary(): Promise<BarSummary> {
-  const response = await fetch(`${API_BASE}/bar/summary`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await fetch(`${API_BASE}/bar/summary`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch bar summary: ${response.statusText}`);
@@ -56,9 +52,7 @@ export async function fetchBarTransfers(params?: {
   if (params?.dateTo) url.searchParams.set('date_to', params.dateTo);
   if (params?.limit) url.searchParams.set('limit', String(params.limit));
 
-  const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw new Error(`Failed to fetch bar transfers: ${response.statusText}`);
@@ -75,7 +69,6 @@ export async function updateOrderStatus(
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${getToken()}`,
     },
     body: JSON.stringify({ status }),
   });
@@ -97,7 +90,6 @@ export async function recordBarSale(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${getToken()}`,
     },
     body: JSON.stringify({ productId, quantity, sourceOrderId }),
   });
@@ -116,9 +108,7 @@ export async function fetchBarStock(productIds?: string[]): Promise<StockLevel[]
     productIds.forEach((id) => url.searchParams.append('productId', id));
   }
 
-  const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw new Error(`Failed to fetch bar stock: ${response.statusText}`);

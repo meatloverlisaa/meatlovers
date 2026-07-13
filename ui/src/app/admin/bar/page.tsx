@@ -11,7 +11,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 function getToken(): string {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('access_token') || '';
+    return localStorage.getItem('auth_token') || '';
   }
   return '';
 }
