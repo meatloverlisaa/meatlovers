@@ -44,6 +44,7 @@ import { ManagerSuppliersModule } from './manager-suppliers/manager-suppliers.mo
 import { ManagerStockModule } from './manager-stock/manager-stock.module';
 import { ManagerOrdersModule } from './manager-orders/manager-orders.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
+import { EnforcementModule } from './enforcement/enforcement.module';
 
 
 @Module({
@@ -76,6 +77,7 @@ import { MonitoringModule } from './monitoring/monitoring.module';
     ManagerStockModule,
     ManagerOrdersModule,
     MonitoringModule,
+    EnforcementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
