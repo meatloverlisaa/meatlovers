@@ -28,6 +28,7 @@ const navigationItems: NavItem[] = [
   { href: "/admin/reports", label: "Reports", icon: "📈", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
   { href: "/admin/users", label: "Users", icon: "👥", roles: ["SUPER_ADMIN", "HR"] },
   { href: "/admin/hrm", label: "HR Management", icon: "👤", roles: ["SUPER_ADMIN", "ADMIN"] },
+  { href: "/admin/finance", label: "Finance", icon: "💰", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
 ];
 
 // ─── Admin Layout Component ───────────────────────────────────────────────────
