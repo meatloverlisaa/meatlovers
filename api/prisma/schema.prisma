@@ -54,6 +54,7 @@ model User {
   audit_logs AuditLog[]
   risk_scores EnforcementRiskScore[]
   enforcement_actions_taken EnforcementAction[]
+  assigned_assets Asset[]
 
   @@map("users")
 }
@@ -749,4 +750,91 @@ enum ActionType {
   INVESTIGATION
   TERMINATION
   RESOLVED
+}
+
+// ==================== ASSET MANAGEMENT ====================
+
+enum AssetCategory {
+  EQUIPMENT
+  FURNITURE
+  VEHICLE
+  ELECTRONICS
+  KITCHEN_APPLIANCE
+  BAR_EQUIPMENT
+  OTHER
+}
+
+enum AssetStatus {
+  ACTIVE
+  MAINTENANCE
+  RETIRED
+  DISPOSED
+}
+
+enum AssetCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Asset {
+  id                BigInt          @id @default(autoincrement())
+  asset_name        String          @db.VarChar(255)
+  asset_code        String          @unique @db.VarChar(100)
+  category          AssetCategory
+  description       String?         @db.Text
+  purchase_date     DateTime
+  purchase_cost     Decimal         @db.Decimal(12, 2)
+  current_value     Decimal         @db.Decimal(12, 2)
+  depreciation_rate Decimal?        @db.Decimal(5, 2)
+  location          String          @db.VarChar(255)
+  assigned_to       BigInt?
+  status            AssetStatus     @default(ACTIVE)
+  condition         AssetCondition  @default(GOOD)
+  warranty_expiry   DateTime?
+  last_maintenance  DateTime?
+  next_maintenance  DateTime?
+  notes             String?         @db.Text
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+
+  assigned_user     User?           @relation(fields: [assigned_to], references: [id], onDelete: SetNull)
+  maintenance_logs  MaintenanceLog[]
+
+  @@map("assets")
+  @@index([asset_code])
+  @@index([category])
+  @@index([status])
+  @@index([assigned_to])
+}
+
+model MaintenanceLog {
+  id              BigInt            @id @default(autoincrement())
+  asset_id        BigInt
+  maintenance_type String           @db.VarChar(100)
+  description     String            @db.Text
+  cost            Decimal           @db.Decimal(12, 2)
+  status          MaintenanceStatus @default(SCHEDULED)
+  scheduled_date  DateTime
+  completed_date  DateTime?
+  performed_by    String?           @db.VarChar(255)
+  notes           String?           @db.Text
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+
+  asset           Asset             @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@map("maintenance_logs")
+  @@index([asset_id])
+  @@index([status])
+  @@index([scheduled_date])
 }

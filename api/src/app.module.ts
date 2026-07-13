@@ -46,6 +46,7 @@ import { ManagerOrdersModule } from './manager-orders/manager-orders.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { EnforcementModule } from './enforcement/enforcement.module';
 import { ApprovalsModule } from './approvals/approvals.module';
+import { AssetsModule } from './assets/assets.module';
 
 
 @Module({
@@ -80,6 +81,7 @@ import { ApprovalsModule } from './approvals/approvals.module';
     MonitoringModule,
     EnforcementModule,
     ApprovalsModule,
+    AssetsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
