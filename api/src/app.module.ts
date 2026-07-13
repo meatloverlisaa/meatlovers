@@ -43,6 +43,7 @@ import { ManagerProductsModule } from './manager-products/manager-products.modul
 import { ManagerSuppliersModule } from './manager-suppliers/manager-suppliers.module';
 import { ManagerStockModule } from './manager-stock/manager-stock.module';
 import { ManagerOrdersModule } from './manager-orders/manager-orders.module';
+import { MonitoringModule } from './monitoring/monitoring.module';
 
 
 @Module({
@@ -74,6 +75,7 @@ import { ManagerOrdersModule } from './manager-orders/manager-orders.module';
     ManagerSuppliersModule,
     ManagerStockModule,
     ManagerOrdersModule,
+    MonitoringModule,
   ],
   controllers: [AppController],
   providers: [AppService],
