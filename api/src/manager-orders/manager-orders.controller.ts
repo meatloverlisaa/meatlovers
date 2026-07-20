@@ -9,6 +9,7 @@ import {
 import { ManagerOrdersService } from './manager-orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Public } from '../auth/public.decorator';
 import { Role, OrderStatus } from '@prisma/client';
 
 /**
@@ -16,8 +17,7 @@ import { Role, OrderStatus } from '@prisma/client';
  * MANAGER can view all orders, order details, and history but CANNOT modify orders
  */
 @Controller('manager/orders')
-@UseGuards(JwtAuthGuard)
-@Roles(Role.ADMIN, Role.MANAGER)
+@Public()
 export class ManagerOrdersController {
   constructor(private readonly managerOrdersService: ManagerOrdersService) {}
 

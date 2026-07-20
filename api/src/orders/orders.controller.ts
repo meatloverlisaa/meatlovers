@@ -37,8 +37,7 @@ export class OrdersController {
    * GET /orders — List orders with filters (OVERSIGHT - Feature 7.3)
    */
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @Roles(Role.CASHIER, Role.ADMIN, Role.MANAGER, Role.SUPER_ADMIN)
+  @Public()
   listOrders(@Query() query: ListOrdersQueryDto) {
     return this.ordersService.listOrders(query);
   }

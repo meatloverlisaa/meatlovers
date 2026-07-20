@@ -2,6 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+
+function getToken(): string {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("auth_token") || "";
+  }
+  return "";
+}
+
 type WasteReason = "EXPIRED" | "SPOILED" | "OVERPRODUCTION" | "QUALITY_ISSUE" | "CUSTOMER_RETURN" | "THEFT" | "OTHER";
 
 type WasteDeclaration = {
@@ -62,15 +71,15 @@ async function getWasteDeclarations(
   startDate?: string,
   endDate?: string
 ): Promise<WasteDeclaration[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const params = new URLSearchParams();
   if (productId) params.append("productId", productId);
   if (reason) params.append("reason", reason);
   if (startDate) params.append("startDate", startDate);
   if (endDate) params.append("endDate", endDate);
 
-  const res = await fetch(`${baseUrl}/waste-declarations?${params.toString()}`, {
+  const res = await fetch(`${API_BASE}/waste-declarations?${params.toString()}`, {
     cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {
@@ -81,13 +90,13 @@ async function getWasteDeclarations(
 }
 
 async function getWasteSummary(startDate?: string, endDate?: string): Promise<WasteSummary> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const params = new URLSearchParams();
   if (startDate) params.append("startDate", startDate);
   if (endDate) params.append("endDate", endDate);
 
-  const res = await fetch(`${baseUrl}/waste-declarations/summary?${params.toString()}`, {
+  const res = await fetch(`${API_BASE}/waste-declarations/summary?${params.toString()}`, {
     cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {
@@ -98,10 +107,9 @@ async function getWasteSummary(startDate?: string, endDate?: string): Promise<Wa
 }
 
 async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/products`, {
+  const res = await fetch(`${API_BASE}/products`, {
     cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {
@@ -118,11 +126,12 @@ async function createWasteDeclaration(data: {
   notes?: string;
   declared_by: string;
 }): Promise<WasteDeclaration> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/waste-declarations`, {
+  const res = await fetch(`${API_BASE}/waste-declarations`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
     body: JSON.stringify(data),
   });
 
@@ -141,11 +150,12 @@ async function updateWasteDeclaration(
     notes?: string;
   }
 ): Promise<WasteDeclaration> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/waste-declarations/${id}`, {
+  const res = await fetch(`${API_BASE}/waste-declarations/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
     body: JSON.stringify(data),
   });
 
@@ -157,10 +167,9 @@ async function updateWasteDeclaration(
 }
 
 async function deleteWasteDeclaration(id: string): Promise<{ message: string }> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/waste-declarations/${id}`, {
+  const res = await fetch(`${API_BASE}/waste-declarations/${id}`, {
     method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {

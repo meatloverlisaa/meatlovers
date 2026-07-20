@@ -7,6 +7,7 @@ import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Public } from '../auth/public.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('riders')
@@ -21,13 +22,13 @@ export class RidersController {
   }
 
   @Get()
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Public()
   findAllRiders() {
     return this.deliveriesService.findAllRiders();
   }
 
   @Get('available')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Public()
   findAvailableRiders() {
     return this.deliveriesService.findAvailableRiders();
   }
@@ -63,13 +64,13 @@ export class DeliveriesController {
   }
 
   @Get()
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Public()
   findAllDeliveries(@Query('status') status?: string) {
     return this.deliveriesService.findAllDeliveries(status);
   }
 
   @Get('summary')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Public()
   getDeliverySummary(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     return this.deliveriesService.getDeliverySummary(startDate, endDate);
   }

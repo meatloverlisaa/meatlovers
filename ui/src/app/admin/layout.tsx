@@ -3,32 +3,59 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  ChartBarIcon,
+  ClipboardDocumentListIcon,
+  GlobeAltIcon,
+  CubeIcon,
+  CurrencyDollarIcon,
+  BuildingOfficeIcon,
+  CubeIcon as PackageIcon,
+  UserIcon as ChefIcon,
+  BeakerIcon,
+  WrenchIcon,
+  CreditCardIcon,
+  TruckIcon,
+  TrashIcon,
+  UserGroupIcon,
+  UserIcon,
+  BanknotesIcon,
+  CheckCircleIcon,
+  ShieldCheckIcon,
+  CogIcon,
+} from "@heroicons/react/24/outline";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type NavItem = {
   href: string;
   label: string;
-  icon: string;
+  icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
 };
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: "📊" },
-  { href: "/admin/cms", label: "Website CMS", icon: "🌐", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/products", label: "Products", icon: "🍖", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/pricing-control", label: "Pricing", icon: "💰", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/suppliers", label: "Suppliers", icon: "🏭", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/stock", label: "Stock Control", icon: "📦", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
-  { href: "/admin/kitchen", label: "Kitchen", icon: "👨‍🍳", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/production-plans", label: "Production", icon: "�", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/payments", label: "Payments", icon: "💳", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
-  { href: "/admin/dispatch", label: "Dispatch", icon: "🚴", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/waste", label: "Waste", icon: "♻️", roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
-  { href: "/admin/reports", label: "Reports", icon: "📈", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
-  { href: "/admin/users", label: "Users", icon: "👥", roles: ["SUPER_ADMIN", "HR"] },
-  { href: "/admin/hrm", label: "HR Management", icon: "👤", roles: ["SUPER_ADMIN", "ADMIN"] },
-  { href: "/admin/finance", label: "Finance", icon: "💰", roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
+  { href: "/admin", label: "Dashboard", icon: ChartBarIcon },
+  { href: "/admin/orders", label: "Orders", icon: ClipboardDocumentListIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/cms", label: "Website CMS", icon: GlobeAltIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/products", label: "Products", icon: CubeIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/pricing-control", label: "Pricing", icon: CurrencyDollarIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/suppliers", label: "Suppliers", icon: BuildingOfficeIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/stock", label: "Stock Control", icon: PackageIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"] },
+  { href: "/admin/kitchen", label: "Kitchen", icon: ChefIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/bar", label: "Bar", icon: BeakerIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/production-plans", label: "Production", icon: WrenchIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/payments", label: "Payments", icon: CreditCardIcon, roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
+  { href: "/admin/dispatch", label: "Dispatch", icon: TruckIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/delivery-tracking", label: "Delivery", icon: TruckIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/waste", label: "Waste", icon: TrashIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/crm", label: "CRM", icon: UserGroupIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/hrm", label: "HR Management", icon: UserIcon, roles: ["SUPER_ADMIN", "ADMIN", "HR"] },
+  { href: "/admin/finance", label: "Finance", icon: BanknotesIcon, roles: ["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"] },
+  { href: "/admin/assets", label: "Assets", icon: WrenchIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/approvals", label: "Approvals", icon: CheckCircleIcon, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"] },
+  { href: "/admin/enforcement", label: "Enforcement", icon: ShieldCheckIcon, roles: ["SUPER_ADMIN", "ADMIN"] },
+  { href: "/admin/system", label: "System", icon: CogIcon, roles: ["SUPER_ADMIN", "ADMIN"] },
 ];
 
 // ─── Admin Layout Component ───────────────────────────────────────────────────
@@ -86,7 +113,7 @@ export default function AdminLayout({
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <item.icon className="h-5 w-5" />
                 {item.label}
               </Link>
             ))}
