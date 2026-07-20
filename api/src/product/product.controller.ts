@@ -21,17 +21,18 @@ import { Public } from '../auth/public.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @Public()
   @Roles(Role.ADMIN)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
 
   @Get()
+  @Public()
   @Roles(Role.ADMIN, Role.MANAGER)
   findAll(@Query('category') category?: string, @Query('status') status?: string) {
     if (category) {
@@ -41,18 +42,21 @@ export class ProductController {
   }
 
   @Get(':id')
+  @Public()
   @Roles(Role.ADMIN, Role.MANAGER)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productService.findOne(id);
   }
 
   @Patch(':id')
+  @Public()
   @Roles(Role.ADMIN)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto, @Req() request: Request) {
     return this.productService.update(id, updateProductDto, request);
   }
 
   @Delete(':id')
+  @Public()
   @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productService.remove(id);

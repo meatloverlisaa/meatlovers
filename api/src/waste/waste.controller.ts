@@ -8,7 +8,6 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('waste-declarations')
-@UseGuards(JwtAuthGuard)
 export class WasteController {
   constructor(private readonly wasteService: WasteService) {}
 
