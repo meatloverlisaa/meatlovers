@@ -4,11 +4,15 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DiscoveryModule } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuditLogService } from './audit-log.service';
+import { AuthorizationScannerService } from './authorization-scanner.service';
+import { AuthorizationScannerController } from './authorization-scanner.controller';
+import { AuthorizationTestService } from './authorization-test.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
 /**
@@ -63,12 +67,15 @@ import { PrismaModule } from '../prisma/prisma.module';
         limit: 200, // 200 requests per hour
       },
     ]),
+    DiscoveryModule,
     PrismaModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AuthorizationScannerController],
   providers: [
     AuthService,
     AuditLogService,
+    AuthorizationScannerService,
+    AuthorizationTestService,
     JwtStrategy,
     {
       provide: APP_GUARD,
@@ -79,6 +86,6 @@ import { PrismaModule } from '../prisma/prisma.module';
       useClass: ThrottlerGuard,
     },
   ],
-  exports: [JwtModule, AuthService, AuditLogService],
+  exports: [JwtModule, AuthService, AuditLogService, AuthorizationScannerService, AuthorizationTestService],
 })
 export class AuthModule {}
