@@ -1,7 +1,2 @@
-import { SetMetadata } from '@nestjs/common';
-import { Role } from '@prisma/client';
-
-export const ROLES_KEY = 'roles';
-
-/** Restrict an endpoint to one or more roles. */
-export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+// Re-export for backward compatibility
+export * from './decorators/roles.decorator';
