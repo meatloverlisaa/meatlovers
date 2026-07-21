@@ -8,15 +8,15 @@ import {
 } from '@nestjs/common';
 import { CrmService } from './crm.service';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { CRM_ROLES } from '../auth/constants/role-groups';
 
 /**
- * CRM Lead Management — SUPER_ADMIN, ADMIN, MANAGER only.
- * All routes in this controller require a valid JWT with one of those roles.
+ * CRM Lead Management — Management roles only.
+ * All routes in this controller require a valid JWT with CRM_ROLES.
  */
 @Controller('crm')
-@Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+@Roles(...CRM_ROLES)
 export class CrmController {
   constructor(private readonly crmService: CrmService) {}
 

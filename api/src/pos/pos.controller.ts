@@ -8,19 +8,16 @@ import {
   Param,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { PosService } from './pos.service';
 import { CreatePosOrderDto } from './dto/create-order.dto';
 import { AddOrderItemDto } from './dto/add-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { POS_ROLES } from '../auth/constants/role-groups';
 
 @Controller('pos')
-@UseGuards(JwtAuthGuard)
-@Roles(Role.WAITER)
+@Roles(...POS_ROLES)
 export class PosController {
   constructor(private readonly posService: PosService) {}
 

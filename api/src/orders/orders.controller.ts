@@ -6,76 +6,66 @@ import {
   Patch,
   Query,
   Post,
-  UseGuards,
   Req,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { ListOrdersQueryDto } from './dto/list-orders-query.dto';
 import { ApplyDiscountDto } from './dto/apply-discount.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Public } from '../auth/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  APPROVER_ROLES,
+  KITCHEN_ROLES,
+  POS_ROLES,
+} from '../auth/constants/role-groups';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  /**
-   * POST /orders — Create order (legacy, kept for backward compatibility)
-   */
-  @Post()
-  @Public() // Temporary for development
-  create(@Body() createDto: CreateOrderDto) {
-    return this.ordersService.create(createDto);
-  }
-
-  /**
-   * GET /orders — List orders with filters (OVERSIGHT - Feature 7.3)
-   */
   @Get()
-  @Public()
+  @Roles(...POS_ROLES, ...KITCHEN_ROLES)
   listOrders(@Query() query: ListOrdersQueryDto) {
     return this.ordersService.listOrders(query);
   }
 
-  /**
-   * GET /orders/latest — Get latest order (legacy)
-   */
   @Get('latest')
-  @Public() // Temporary for development
+  @Roles(...POS_ROLES)
   findLatest(@Query() query: GetOrdersQueryDto) {
     return this.ordersService.findLatest(query);
   }
 
-  /**
-   * GET /orders/all — Get all orders (legacy)
-   */
   @Get('all')
-  @Public() // Temporary for development
+  @Roles(...POS_ROLES, ...KITCHEN_ROLES)
   findAll(@Query('status') status?: string) {
     return this.ordersService.findAll(status);
   }
 
-  /**
-   * GET /orders/:id — Get full order detail (OVERSIGHT - Feature 7.3)
-   */
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @Roles(Role.CASHIER, Role.ADMIN, Role.MANAGER, Role.SUPER_ADMIN, Role.WAITER)
+  @Roles(...POS_ROLES, ...KITCHEN_ROLES)
   getOrderById(@Param('id') id: string) {
     return this.ordersService.getOrderById(id);
   }
 
-  /**
-   * PATCH /orders/:id/status — Update order status (OVERSIGHT - Feature 7.3)
-   */
+  @Post()
+  @Roles(...POS_ROLES)
+  create(@Body() createDto: CreateOrderDto) {
+    return this.ordersService.create(createDto);
+  }
+
+  @Patch(':id')
+  @Roles(...POS_ROLES)
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: any,
+  ) {
+    return this.ordersService.update(id, updateDto);
+  }
+
   @Patch(':id/status')
-  @UseGuards(JwtAuthGuard)
-  @Roles(Role.CASHIER, Role.ADMIN, Role.MANAGER, Role.SUPER_ADMIN, Role.CHEF, Role.BARMAN)
+  @Roles(...POS_ROLES, ...KITCHEN_ROLES)
   updateOrderStatus(
     @Req() req: any,
     @Param('id') id: string,
@@ -85,12 +75,32 @@ export class OrdersController {
     return this.ordersService.updateOrderStatus(id, userId, updateDto);
   }
 
-  /**
-   * PATCH /orders/:id/discount — Apply discount or create approval request (OVERSIGHT - Feature 7.3)
-   */
+  @Post(':id/cancellation-request')
+  @Roles(...POS_ROLES)
+  requestCancellation(
+    @Param('id') id: string,
+    @Body() dto: any,
+  ) {
+    return this.ordersService.requestCancellation(id, dto);
+  }
+
+  @Post(':id/discount-request')
+  @Roles(...POS_ROLES)
+  requestDiscount(
+    @Param('id') id: string,
+    @Body() dto: ApplyDiscountDto,
+  ) {
+    return this.ordersService.requestDiscount(id, dto);
+  }
+
+  @Post(':id/cancel')
+  @Roles(...APPROVER_ROLES)
+  cancel(@Param('id') id: string) {
+    return this.ordersService.cancel(id);
+  }
+
   @Patch(':id/discount')
-  @UseGuards(JwtAuthGuard)
-  @Roles(Role.CASHIER, Role.ADMIN, Role.MANAGER, Role.SUPER_ADMIN)
+  @Roles(...APPROVER_ROLES)
   applyDiscount(
     @Req() req: any,
     @Param('id') id: string,

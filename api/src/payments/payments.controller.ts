@@ -1,32 +1,42 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreatePaymentDto, PaymentStatus, RefundPaymentDto, SettlementSummaryDto } from './dto/create-payment.dto';
 import { PaymentsService } from './payments.service';
-import { Public } from '../auth/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  CASHIER_ROLES,
+  FINANCE_ROLES,
+} from '../auth/constants/role-groups';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
-  @Public()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  @Get()
+  @Roles(...FINANCE_ROLES)
+  findAll(@Query() query: any) {
+    return this.paymentsService.findAll(query);
   }
 
   @Get(':id')
-  @Public()
+  @Roles(...FINANCE_ROLES, ...CASHIER_ROLES)
   findOne(@Param('id') id: string) {
     return this.paymentsService.findOne(Number(id));
   }
 
   @Get('order/:orderId')
-  @Public()
+  @Roles(...FINANCE_ROLES, ...CASHIER_ROLES)
   findByOrder(@Param('orderId') orderId: string) {
     return this.paymentsService.findByOrder(Number(orderId));
   }
 
+  @Post('settle')
+  @Roles(...CASHIER_ROLES)
+  create(@Body() createPaymentDto: CreatePaymentDto) {
+    return this.paymentsService.create(createPaymentDto);
+  }
+
   @Patch(':id/status')
-  @Public()
+  @Roles(...CASHIER_ROLES, ...FINANCE_ROLES)
   updateStatus(
     @Param('id') id: string,
     @Body('status') status: PaymentStatus,
@@ -35,20 +45,26 @@ export class PaymentsController {
   }
 
   @Post(':id/refund')
-  @Public()
+  @Roles(...FINANCE_ROLES)
   refund(@Param('id') id: string, @Body() refundPaymentDto: RefundPaymentDto) {
     return this.paymentsService.refundPayment(Number(id), refundPaymentDto);
   }
 
   @Get('settlement/summary')
-  @Public()
+  @Roles(...FINANCE_ROLES, ...CASHIER_ROLES)
   getSettlementSummary(@Query() query: SettlementSummaryDto) {
     return this.paymentsService.getSettlementSummary(query);
   }
 
   @Get(':id/receipt')
-  @Public()
+  @Roles(...CASHIER_ROLES, ...FINANCE_ROLES)
   generateReceipt(@Param('id') id: string) {
     return this.paymentsService.generateReceipt(Number(id));
+  }
+
+  @Get('reports/reconciliation')
+  @Roles(...FINANCE_ROLES)
+  reconciliation(@Query() query: any) {
+    return this.paymentsService.reconciliation(query);
   }
 }

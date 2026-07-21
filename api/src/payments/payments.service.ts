@@ -233,4 +233,119 @@ export class PaymentsService {
 
     return receipt;
   }
+
+  /**
+   * GET /payments — List all payments with filters
+   */
+  async findAll(query: any) {
+    const where: any = {};
+
+    if (query.payment_method) {
+      where.payment_method = query.payment_method;
+    }
+
+    if (query.payment_status) {
+      where.payment_status = query.payment_status;
+    }
+
+    if (query.start_date || query.end_date) {
+      where.created_at = {};
+      if (query.start_date) {
+        where.created_at.gte = new Date(query.start_date);
+      }
+      if (query.end_date) {
+        where.created_at.lte = new Date(query.end_date);
+      }
+    }
+
+    const payments = await this.prisma.payment.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+      include: {
+        order: {
+          select: {
+            id: true,
+            status: true,
+            total_amount: true,
+          },
+        },
+      },
+    });
+
+    return payments.map((payment) => ({
+      id: payment.id.toString(),
+      orderId: payment.order_id.toString(),
+      paymentMethod: payment.payment_method,
+      amount: Number(payment.amount),
+      paymentStatus: payment.payment_status,
+      transactionReference: payment.transaction_reference,
+      createdAt: payment.created_at,
+      order: payment.order ? {
+        id: payment.order.id.toString(),
+        status: payment.order.status,
+        totalAmount: Number(payment.order.total_amount),
+      } : null,
+    }));
+  }
+
+  /**
+   * GET /payments/reconciliation — Payment reconciliation report
+   */
+  async reconciliation(query: any) {
+    const where: any = {
+      payment_status: PaymentStatus.SUCCESS,
+    };
+
+    if (query.start_date || query.end_date) {
+      where.created_at = {};
+      if (query.start_date) {
+        where.created_at.gte = new Date(query.start_date);
+      }
+      if (query.end_date) {
+        where.created_at.lte = new Date(query.end_date);
+      }
+    }
+
+    const payments = await this.prisma.payment.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+    });
+
+    const summary = {
+      totalPayments: payments.length,
+      totalAmount: payments.reduce((sum, p) => sum + Number(p.amount), 0),
+      byMethod: {
+        CASH: {
+          count: 0,
+          amount: 0,
+        },
+        MPESA: {
+          count: 0,
+          amount: 0,
+        },
+        CARD: {
+          count: 0,
+          amount: 0,
+        },
+      },
+      payments: payments.map((p) => ({
+        id: p.id.toString(),
+        orderId: p.order_id.toString(),
+        method: p.payment_method,
+        amount: Number(p.amount),
+        reference: p.transaction_reference,
+        createdAt: p.created_at,
+      })),
+    };
+
+    payments.forEach((p) => {
+      const method = p.payment_method as 'CASH' | 'MPESA' | 'CARD';
+      if (summary.byMethod[method]) {
+        summary.byMethod[method].count += 1;
+        summary.byMethod[method].amount += Number(p.amount);
+      }
+    });
+
+    return summary;
+  }
 }

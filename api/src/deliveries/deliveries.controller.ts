@@ -1,112 +1,108 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DeliveriesService } from './deliveries.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
 import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Public } from '../auth/public.decorator';
-import { Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { DISPATCH_ROLES, MANAGEMENT_ROLES } from '../auth/constants/role-groups';
 
 @Controller('riders')
-@UseGuards(JwtAuthGuard)
 export class RidersController {
   constructor(private readonly deliveriesService: DeliveriesService) {}
 
   @Post()
-  @Roles(Role.DISPATCHER)
+  @Roles(...DISPATCH_ROLES)
   createRider(@Body() createRiderDto: CreateRiderDto) {
     return this.deliveriesService.createRider(createRiderDto);
   }
 
   @Get()
-  @Public()
+  @Roles(...DISPATCH_ROLES)
   findAllRiders() {
     return this.deliveriesService.findAllRiders();
   }
 
   @Get('available')
-  @Public()
+  @Roles(...DISPATCH_ROLES)
   findAvailableRiders() {
     return this.deliveriesService.findAvailableRiders();
   }
 
   @Get(':id')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Roles(...DISPATCH_ROLES)
   findOneRider(@Param('id') id: string) {
     return this.deliveriesService.findOneRider(id);
   }
 
   @Patch(':id')
-  @Roles(Role.DISPATCHER)
+  @Roles(...DISPATCH_ROLES)
   updateRider(@Param('id') id: string, @Body() updateRiderDto: UpdateRiderDto) {
     return this.deliveriesService.updateRider(id, updateRiderDto);
   }
 
   @Delete(':id')
-  @Roles(Role.DISPATCHER)
+  @Roles(...MANAGEMENT_ROLES)
   removeRider(@Param('id') id: string) {
     return this.deliveriesService.removeRider(id);
   }
 }
 
 @Controller('deliveries')
-@UseGuards(JwtAuthGuard)
 export class DeliveriesController {
   constructor(private readonly deliveriesService: DeliveriesService) {}
 
   @Post()
-  @Roles(Role.DISPATCHER)
+  @Roles(...DISPATCH_ROLES)
   createDelivery(@Body() createDeliveryDto: CreateDeliveryDto) {
     return this.deliveriesService.createDelivery(createDeliveryDto);
   }
 
   @Get()
-  @Public()
+  @Roles(...DISPATCH_ROLES)
   findAllDeliveries(@Query('status') status?: string) {
     return this.deliveriesService.findAllDeliveries(status);
   }
 
   @Get('summary')
-  @Public()
+  @Roles(...MANAGEMENT_ROLES)
   getDeliverySummary(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     return this.deliveriesService.getDeliverySummary(startDate, endDate);
   }
 
   @Get(':id')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Roles(...DISPATCH_ROLES)
   findOneDelivery(@Param('id') id: string) {
     return this.deliveriesService.findOneDelivery(id);
   }
 
   @Get('order/:orderId')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Roles(...DISPATCH_ROLES)
   findByOrderId(@Param('orderId') orderId: string) {
     return this.deliveriesService.findByOrderId(orderId);
   }
 
   @Get('rider/:riderId')
-  @Roles(Role.DISPATCHER, Role.ADMIN, Role.MANAGER)
+  @Roles(...DISPATCH_ROLES)
   findByRiderId(@Param('riderId') riderId: string) {
     return this.deliveriesService.findByRiderId(riderId);
   }
 
   @Patch(':id')
-  @Roles(Role.DISPATCHER)
+  @Roles(...DISPATCH_ROLES)
   updateDelivery(@Param('id') id: string, @Body() updateDeliveryDto: UpdateDeliveryDto) {
     return this.deliveriesService.updateDelivery(id, updateDeliveryDto);
   }
 
   @Patch(':id/status')
-  @Roles(Role.DISPATCHER)
+  @Roles(...DISPATCH_ROLES)
   updateDeliveryStatus(@Param('id') id: string, @Body() updateDeliveryStatusDto: UpdateDeliveryStatusDto) {
     return this.deliveriesService.updateDeliveryStatus(id, updateDeliveryStatusDto);
   }
 
   @Delete(':id')
-  @Roles(Role.DISPATCHER)
+  @Roles(...MANAGEMENT_ROLES)
   removeDelivery(@Param('id') id: string) {
     return this.deliveriesService.removeDelivery(id);
   }

@@ -1,72 +1,32 @@
-import { Body, Controller, Get, Param, Post, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, ValidationPipe } from '@nestjs/common';
 import { StockService } from './stock.service';
-import { Public } from '../auth/public.decorator';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  APPROVER_ROLES,
+  STOCK_OPERATION_ROLES,
+  STOCK_READ_ROLES,
+  KITCHEN_ROLES,
+  BAR_ROLES,
+} from '../auth/constants/role-groups';
 
 @Controller('stock')
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
-  /**
-   * GET /stock — Current stock balances with product and location filters
-   * Access: ADMIN, MANAGER, STOREKEEPER
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOREKEEPER)
   @Get()
+  @Roles(...STOCK_READ_ROLES)
   async getStock(
     @Query('location') location?: string,
     @Query('productId') productId?: string,
   ) {
     if (productId) {
-      // Get specific product stock across locations or at specific location
       return this.stockService.getProductStock(parseInt(productId), location);
     }
-    // Get all stock balances, optionally filtered by location
     return this.stockService.getBalance(location);
   }
 
-  /**
-   * POST /stock/purchase — Record purchase stock-in
-   * Access: ADMIN, MANAGER, STOREKEEPER
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOREKEEPER)
-  @Post('purchase')
-  async purchase(@Body(ValidationPipe) body: any) {
-    return this.stockService.createPurchase(body);
-  }
-
-  /**
-   * POST /stock/adjustment — Record stock adjustment
-   * Access: ADMIN, MANAGER, STOREKEEPER
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOREKEEPER)
-  @Post('adjustment')
-  async adjustment(@Body(ValidationPipe) body: any) {
-    return this.stockService.createAdjustment(body);
-  }
-
-  /**
-   * POST /stock/transfer — Transfer stock to kitchen or bar
-   * Access: ADMIN, MANAGER, STOREKEEPER
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOREKEEPER)
-  @Post('transfer')
-  async transfer(@Body(ValidationPipe) body: any) {
-    return this.stockService.createTransfer(body);
-  }
-
-  /**
-   * GET /stock/movements — List stock movements with date/type filters
-   * Access: ADMIN, MANAGER, STOREKEEPER
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ADMIN, Role.MANAGER, Role.STOREKEEPER)
   @Get('movements')
+  @Roles(...STOCK_READ_ROLES)
   async getMovements(
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
@@ -86,33 +46,66 @@ export class StockController {
     });
   }
 
+  @Get('low-stock')
+  @Roles(...STOCK_READ_ROLES)
+  async getReorderAlerts(@Query('location') location?: string) {
+    return this.stockService.getReorderAlerts(location);
+  }
+
+  @Post('purchases')
+  @Roles(...STOCK_OPERATION_ROLES)
+  async purchase(@Body(ValidationPipe) body: any) {
+    return this.stockService.createPurchase(body);
+  }
+
+  @Post('transfers')
+  @Roles(...STOCK_OPERATION_ROLES)
+  async transfer(@Body(ValidationPipe) body: any) {
+    return this.stockService.createTransfer(body);
+  }
+
+  @Post('adjustment-requests')
+  @Roles(...STOCK_OPERATION_ROLES)
+  async adjustment(@Body(ValidationPipe) body: any) {
+    return this.stockService.createAdjustment(body);
+  }
+
+  @Post('adjustment-requests/:id/approve')
+  @Roles(...APPROVER_ROLES)
+  async approveAdjustment(@Param('id', ParseIntPipe) id: number) {
+    // Placeholder for adjustment approval logic
+    return { message: 'Adjustment approval not implemented yet', id };
+  }
+
+  @Post('adjustment-requests/:id/reject')
+  @Roles(...APPROVER_ROLES)
+  async rejectAdjustment(@Param('id', ParseIntPipe) id: number) {
+    // Placeholder for adjustment rejection logic
+    return { message: 'Adjustment rejection not implemented yet', id };
+  }
+
   // Legacy endpoints for backward compatibility
-  @Public() // Temporary for development - remove in production
   @Get('product/:productId')
+  @Roles(...STOCK_READ_ROLES)
   async getStockItem(@Param('productId') productId: string) {
     return this.stockService.getStockItem(parseInt(productId));
   }
 
-  @Public() // Temporary for development - remove in production
   @Get('balance')
+  @Roles(...STOCK_READ_ROLES)
   async getBalance(@Query('location') location?: string) {
     return this.stockService.getBalance(location);
   }
 
-  @Public() // Temporary for development - remove in production
   @Get('movements/recent')
+  @Roles(...STOCK_READ_ROLES)
   async getRecentMovements(@Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 50;
     return this.stockService.getRecentMovements(parsedLimit);
   }
 
-  /**
-   * GET /stock/valuation — Stock value summary by category/location
-   * Access: ACCOUNTANT, ADMIN
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ACCOUNTANT, Role.ADMIN)
   @Get('valuation')
+  @Roles(...STOCK_READ_ROLES)
   async getValuation(
     @Query('category') category?: string,
     @Query('location') location?: string,
@@ -120,14 +113,9 @@ export class StockController {
     return this.stockService.getStockValuation(category, location);
   }
 
-  /**
-   * GET /stock/reorder-alerts — Items below reorder level
-   * Access: ACCOUNTANT, ADMIN
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.ACCOUNTANT, Role.ADMIN)
   @Get('reorder-alerts')
-  async getReorderAlerts(@Query('location') location?: string) {
+  @Roles(...STOCK_READ_ROLES)
+  async getReorderAlertsLegacy(@Query('location') location?: string) {
     return this.stockService.getReorderAlerts(location);
   }
 }
@@ -137,35 +125,20 @@ export class StockController {
 export class KitchenStockController {
   constructor(private readonly stockService: StockService) {}
 
-  /**
-   * GET /stock/kitchen — Kitchen-relevant stock view
-   * Access: CHEF
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.CHEF)
   @Get('kitchen')
+  @Roles(...KITCHEN_ROLES)
   async getKitchenStock() {
     return this.stockService.getKitchenStock();
   }
 
-  /**
-   * POST /stock/kitchen-usage — Record kitchen usage movement
-   * Access: CHEF
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.CHEF)
   @Post('kitchen-usage')
+  @Roles(...KITCHEN_ROLES)
   async kitchenUsage(@Body(ValidationPipe) body: any) {
     return this.stockService.createKitchenUsage(body);
   }
 
-  /**
-   * POST /stock/waste — Record kitchen wastage movement
-   * Access: CHEF
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.CHEF)
   @Post('waste')
+  @Roles(...KITCHEN_ROLES)
   async recordWaste(@Body(ValidationPipe) body: any) {
     return this.stockService.createWaste(body);
   }
@@ -176,50 +149,33 @@ export class KitchenStockController {
 export class BarStockController {
   constructor(private readonly stockService: StockService) {}
 
-  /**
-   * GET /stock/bar — Bar stock balance view
-   * Access: BARMAN
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Get('bar')
+  @Roles(...BAR_ROLES)
   async getBarStock() {
     return this.stockService.getBarStock();
   }
 
-  /**
-   * POST /stock/bar-sale — Record bar sale stock deduction
-   * Access: BARMAN
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Post('bar-sale')
+  @Roles(...BAR_ROLES)
   async barSale(@Body(ValidationPipe) body: any) {
     return this.stockService.createBarSale(body);
   }
 
-  /**
-   * POST /stock/bar-adjustment — Record bar adjustment request
-   * Access: BARMAN
-   */
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Post('bar-adjustment')
+  @Roles(...BAR_ROLES)
   async barAdjustment(@Body(ValidationPipe) body: any) {
     return this.stockService.createBarAdjustment(body);
   }
 
   // Legacy endpoints for backward compatibility
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Post('sale-deduction')
+  @Roles(...BAR_ROLES)
   async saleDeduction(@Body(ValidationPipe) body: any) {
     return this.stockService.createBarSaleDeduction(body);
   }
 
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Get('transfers')
+  @Roles(...BAR_ROLES)
   async getTransfers(@Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 50;
     return this.stockService.getBarTransfers(parsedLimit);
@@ -231,16 +187,14 @@ export class BarStockController {
 export class LegacyBarStockController {
   constructor(private readonly stockService: StockService) {}
 
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Post('sale-deduction')
+  @Roles(...BAR_ROLES)
   async saleDeduction(@Body(ValidationPipe) body: any) {
     return this.stockService.createBarSaleDeduction(body);
   }
 
-  @Public() // Temporary for development - remove in production
-  @Roles(Role.BARMAN)
   @Get('transfers')
+  @Roles(...BAR_ROLES)
   async getTransfers(@Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 50;
     return this.stockService.getBarTransfers(parsedLimit);

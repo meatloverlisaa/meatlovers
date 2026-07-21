@@ -600,6 +600,119 @@ export class OrdersService {
       updatedAt: order.updated_at,
     };
   }
+
+  /**
+   * PATCH /orders/:id — Update order details (placeholder)
+   */
+  async update(id: string, updateDto: any) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: BigInt(id) },
+      data: updateDto,
+      include: {
+        items: true,
+        waiter: { select: { id: true, full_name: true, role: true } },
+        table: { select: { id: true, table_name: true } },
+      },
+    });
+
+    return this.serializeOrder(updatedOrder);
+  }
+
+  /**
+   * POST /orders/:id/request-cancellation — Request cancellation approval
+   */
+  async requestCancellation(id: string, dto: any) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    if (order.status === 'CANCELLED' || order.status === 'PAID') {
+      throw new BadRequestException(`Cannot cancel ${order.status} order`);
+    }
+
+    const approvalRequest = await this.prisma.approvalRequest.create({
+      data: {
+        order_id: BigInt(id),
+        request_type: 'ORDER_CANCELLATION',
+        status: 'PENDING',
+        requested_by: BigInt(dto.requestedBy),
+        reason: dto.reason || 'Order cancellation requested',
+      },
+    });
+
+    return {
+      message: 'Cancellation approval request created',
+      approvalRequestId: approvalRequest.id.toString(),
+    };
+  }
+
+  /**
+   * POST /orders/:id/request-discount — Request discount approval
+   */
+  async requestDiscount(id: string, dto: any) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    const approvalRequest = await this.prisma.approvalRequest.create({
+      data: {
+        order_id: BigInt(id),
+        request_type: 'DISCOUNT',
+        status: 'PENDING',
+        requested_by: BigInt(dto.requestedBy),
+        reason: dto.reason || 'Discount requested',
+        metadata: JSON.stringify(dto.metadata || {}),
+      },
+    });
+
+    return {
+      message: 'Discount approval request created',
+      approvalRequestId: approvalRequest.id.toString(),
+    };
+  }
+
+  /**
+   * DELETE /orders/:id — Cancel order
+   */
+  async cancel(id: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    if (order.status === 'PAID') {
+      throw new BadRequestException('Cannot cancel paid order');
+    }
+
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: BigInt(id) },
+      data: { status: 'CANCELLED' },
+      include: {
+        items: true,
+        waiter: { select: { id: true, full_name: true, role: true } },
+        table: { select: { id: true, table_name: true } },
+      },
+    });
+
+    return this.serializeOrder(updatedOrder);
+  }
 }
-
-

@@ -1,30 +1,28 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AdminDashboardService } from './admin-dashboard.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { OWNER_DASHBOARD_ROLES, SYSTEM_ADMIN_ROLES } from '../auth/constants/role-groups';
 
 @Controller('admin/dashboard')
-@UseGuards(JwtAuthGuard)
 export class AdminDashboardController {
   constructor(
     private readonly adminDashboardService: AdminDashboardService,
   ) {}
 
   @Get('summary')
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  @Roles(...OWNER_DASHBOARD_ROLES)
   async getSummary() {
     return this.adminDashboardService.getDashboardSummary();
   }
 
   @Get('activity')
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  @Roles(...SYSTEM_ADMIN_ROLES)
   async getActivity() {
     return this.adminDashboardService.getRecentActivity();
   }
 
   @Get('alerts')
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  @Roles(...OWNER_DASHBOARD_ROLES)
   async getAlerts() {
     return this.adminDashboardService.getDashboardAlerts();
   }
