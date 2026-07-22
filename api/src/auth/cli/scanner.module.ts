@@ -8,7 +8,7 @@ import { AuthorizationScannerController } from '../authorization-scanner.control
 import { AppController } from '../../app.controller';
 import { ProductController } from '../../product/product.controller';
 import { SupplierController } from '../../supplier/supplier.controller';
-import { StockController, StockTransfersController, StockAdjustmentsController } from '../../stock/stock.controller';
+import { StockController, KitchenStockController, BarStockController, LegacyBarStockController } from '../../stock/stock.controller';
 import { OrdersController } from '../../orders/orders.controller';
 import { PaymentsController } from '../../payments/payments.controller';
 import { KitchenController } from '../../kitchen/kitchen.controller';
@@ -36,8 +36,9 @@ import { PosController } from '../../pos/pos.controller';
     ProductController,
     SupplierController,
     StockController,
-    StockTransfersController,
-    StockAdjustmentsController,
+    KitchenStockController,
+    BarStockController,
+    LegacyBarStockController,
     OrdersController,
     PaymentsController,
     KitchenController,

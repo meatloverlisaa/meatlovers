@@ -22,7 +22,11 @@
     "auth:test": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts",
     "auth:test:report": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts --report",
     "auth:test:security": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts --security",
-    "auth:test:validate": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts --validate"
+    "auth:test:validate": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts --validate",
+    "test:authorization": "jest --config test/jest-e2e.json authorization-coverage role-authorization --runInBand",
+    "test:unit": "jest",
+    "report:roles": "ts-node -r tsconfig-paths/register scripts/generate-role-guard-report.ts",
+    "certify:authorization": "npm run build && npm run test:unit && npm run test:authorization && npm run report:roles"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

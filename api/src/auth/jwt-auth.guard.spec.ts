@@ -3,6 +3,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { IS_PUBLIC_KEY } from './constants/auth-metadata.constants';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
@@ -67,7 +68,7 @@ describe('JwtAuthGuard', () => {
 
       expect(result).toBe(true);
       expect(mockReflector.getAllAndOverride).toHaveBeenCalledWith(
-        'isPublic',
+        IS_PUBLIC_KEY,
         expect.any(Array),
       );
     });
@@ -92,7 +93,7 @@ describe('JwtAuthGuard', () => {
       const result = await guard.canActivate(context);
 
       expect(mockReflector.getAllAndOverride).toHaveBeenCalledWith(
-        'isPublic',
+        IS_PUBLIC_KEY,
         [context.getHandler(), context.getClass()],
       );
       expect(result).toBe(true);
