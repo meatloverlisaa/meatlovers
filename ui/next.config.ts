@@ -9,6 +9,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  
+  // Font optimization
+  optimizeFonts: true,
+  
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['@heroicons/react'],
+  },
+  
+  // Compiler options
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 };
 
 export default nextConfig;
