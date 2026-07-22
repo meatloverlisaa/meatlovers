@@ -26,7 +26,12 @@
     "test:authorization": "jest --config test/jest-e2e.json authorization-coverage role-authorization --runInBand",
     "test:unit": "jest",
     "report:roles": "ts-node -r tsconfig-paths/register scripts/generate-role-guard-report.ts",
-    "certify:authorization": "npm run build && npm run test:unit && npm run test:authorization && npm run report:roles"
+    "certify:authorization": "npm run build && npm run test:unit && npm run test:authorization && npm run report:roles",
+    "coverage:report": "ts-node -r tsconfig-paths/register src/auth/cli/generate-coverage-report.ts",
+    "coverage:report:md": "REPORT_FORMAT=markdown ts-node -r tsconfig-paths/register src/auth/cli/generate-coverage-report.ts",
+    "coverage:report:json": "REPORT_FORMAT=json ts-node -r tsconfig-paths/register src/auth/cli/generate-coverage-report.ts",
+    "coverage:report:csv": "REPORT_FORMAT=csv ts-node -r tsconfig-paths/register src/auth/cli/generate-coverage-report.ts",
+    "coverage:check": "EXIT_ON_FAILURE=true VERBOSE=true ts-node -r tsconfig-paths/register src/auth/cli/generate-coverage-report.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

@@ -1,0 +1,3220 @@
+{
+  "metadata": {
+    "generatedAt": "2026-07-22T08:11:55.089Z",
+    "version": "1.0.0",
+    "generator": "Part E - Role Guard Coverage Report"
+  },
+  "summary": {
+    "totalEndpoints": 231,
+    "publicEndpoints": 81,
+    "protectedEndpoints": 148,
+    "uncoveredEndpoints": 2,
+    "coveragePercentage": 99.13,
+    "securityRiskLevel": "LOW",
+    "isPassing": false
+  },
+  "controllers": [
+    {
+      "controllerName": "AdminDashboardController",
+      "totalEndpoints": 3,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 3,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "AppController",
+      "totalEndpoints": 1,
+      "publicEndpoints": 1,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ApprovalsController",
+      "totalEndpoints": 7,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 7,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "AssetsController",
+      "totalEndpoints": 11,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 11,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "AuthController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 4,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 2,
+      "coveragePercentage": 66.67
+    },
+    {
+      "controllerName": "AuthorizationScannerController",
+      "totalEndpoints": 3,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 3,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "BarController",
+      "totalEndpoints": 8,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 8,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "BarStockController",
+      "totalEndpoints": 5,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 5,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "CmsController",
+      "totalEndpoints": 4,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 4,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "CrmController",
+      "totalEndpoints": 3,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 3,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "DeliveriesController",
+      "totalEndpoints": 9,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 9,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "EnforcementController",
+      "totalEndpoints": 9,
+      "publicEndpoints": 9,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "FinanceController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 6,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "KitchenController",
+      "totalEndpoints": 10,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 10,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "KitchenStockController",
+      "totalEndpoints": 3,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 3,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "LegacyBarStockController",
+      "totalEndpoints": 2,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 2,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ManagerCmsController",
+      "totalEndpoints": 4,
+      "publicEndpoints": 4,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ManagerOrdersController",
+      "totalEndpoints": 10,
+      "publicEndpoints": 10,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ManagerProductsController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 6,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ManagerStockController",
+      "totalEndpoints": 10,
+      "publicEndpoints": 10,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ManagerSuppliersController",
+      "totalEndpoints": 11,
+      "publicEndpoints": 11,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "MarginAlertController",
+      "totalEndpoints": 2,
+      "publicEndpoints": 1,
+      "protectedEndpoints": 1,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "MonitoringController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 6,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "OrdersController",
+      "totalEndpoints": 11,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 11,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "PaymentsController",
+      "totalEndpoints": 9,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 9,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "PosController",
+      "totalEndpoints": 7,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 7,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "PricingRuleController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 1,
+      "protectedEndpoints": 5,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ProductController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 6,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "ProductionPlansController",
+      "totalEndpoints": 8,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 8,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "RecipesController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 6,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "RidersController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 6,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "StaffDashboardController",
+      "totalEndpoints": 2,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 2,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "StockController",
+      "totalEndpoints": 13,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 13,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "SupplierController",
+      "totalEndpoints": 6,
+      "publicEndpoints": 0,
+      "protectedEndpoints": 6,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "WasteController",
+      "totalEndpoints": 8,
+      "publicEndpoints": 8,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    },
+    {
+      "controllerName": "WebsiteController",
+      "totalEndpoints": 4,
+      "publicEndpoints": 4,
+      "protectedEndpoints": 0,
+      "uncoveredEndpoints": 0,
+      "coveragePercentage": 100
+    }
+  ],
+  "roles": {
+    "SUPER_ADMIN": 161,
+    "ADMIN": 166,
+    "MANAGER": 151,
+    "ACCOUNTANT": 41,
+    "BARMAN": 24,
+    "DISPATCHER": 12,
+    "CHEF": 33,
+    "WAITER": 18,
+    "CASHIER": 24,
+    "STOREKEEPER": 18,
+    "HR": 2
+  },
+  "uncoveredEndpoints": [
+    {
+      "controller": "AuthController",
+      "method": "getProfile",
+      "path": "auth/profile"
+    },
+    {
+      "controller": "AuthController",
+      "method": "logout",
+      "path": "auth/logout"
+    }
+  ],
+  "endpoints": [
+    {
+      "controller": "AdminDashboardController",
+      "method": "getActivity",
+      "path": "admin/dashboard/activity",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AdminDashboardController",
+      "method": "getAlerts",
+      "path": "admin/dashboard/alerts",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AdminDashboardController",
+      "method": "getSummary",
+      "path": "admin/dashboard/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AppController",
+      "method": "getHello",
+      "path": "/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "approveRequest",
+      "path": "approvals/:id/approve",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "createApproval",
+      "path": "approvals/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "getApprovalById",
+      "path": "approvals/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "getApprovals",
+      "path": "approvals/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "getApprovalsSummary",
+      "path": "approvals/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "getPendingApprovals",
+      "path": "approvals/pending",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ApprovalsController",
+      "method": "rejectRequest",
+      "path": "approvals/:id/reject",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "addMaintenanceLog",
+      "path": "assets/:id/maintenance",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "createAsset",
+      "path": "assets/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "deleteAsset",
+      "path": "assets/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getAssetById",
+      "path": "assets/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getAssetMaintenance",
+      "path": "assets/:id/maintenance",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getAssets",
+      "path": "assets/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getAssetsSummary",
+      "path": "assets/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getDepreciationReport",
+      "path": "assets/depreciation",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "getMaintenanceDue",
+      "path": "assets/maintenance-due",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "updateAsset",
+      "path": "assets/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AssetsController",
+      "method": "updateMaintenanceLog",
+      "path": "assets/maintenance/:logId",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AuthController",
+      "method": "forgotPassword",
+      "path": "auth/forgot-password",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "AuthController",
+      "method": "getProfile",
+      "path": "auth/profile",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [],
+      "covered": false
+    },
+    {
+      "controller": "AuthController",
+      "method": "login",
+      "path": "auth/login",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "AuthController",
+      "method": "logout",
+      "path": "auth/logout",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [],
+      "covered": false
+    },
+    {
+      "controller": "AuthController",
+      "method": "refresh",
+      "path": "auth/refresh",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "AuthController",
+      "method": "resetPassword",
+      "path": "auth/reset-password",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "AuthorizationScannerController",
+      "method": "getCoverageReport",
+      "path": "auth/scanner/coverage",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AuthorizationScannerController",
+      "method": "getSummary",
+      "path": "auth/scanner/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "AuthorizationScannerController",
+      "method": "getUnprotectedEndpoints",
+      "path": "auth/scanner/unprotected",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarOrders",
+      "path": "bar/orders",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarQueue",
+      "path": "bar/queue",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarSales",
+      "path": "bar/sales",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarStockMovements",
+      "path": "bar/stock-movements",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarSummary",
+      "path": "bar/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getBarTransfers",
+      "path": "bar/transfers",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "getOrderById",
+      "path": "bar/orders/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarController",
+      "method": "updateOrderStatus",
+      "path": "bar/orders/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarStockController",
+      "method": "barAdjustment",
+      "path": "stock/bar-adjustment",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarStockController",
+      "method": "barSale",
+      "path": "stock/bar-sale",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarStockController",
+      "method": "getBarStock",
+      "path": "stock/bar",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarStockController",
+      "method": "getTransfers",
+      "path": "stock/transfers",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "BarStockController",
+      "method": "saleDeduction",
+      "path": "stock/sale-deduction",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CmsController",
+      "method": "createPage",
+      "path": "cms/pages",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CmsController",
+      "method": "getPages",
+      "path": "cms/pages",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CmsController",
+      "method": "togglePublish",
+      "path": "cms/pages/:id/publish",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CmsController",
+      "method": "updatePage",
+      "path": "cms/pages/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CrmController",
+      "method": "getAnalytics",
+      "path": "crm/leads/analytics",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CrmController",
+      "method": "getLeads",
+      "path": "crm/leads",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "CrmController",
+      "method": "updateLeadStatus",
+      "path": "crm/leads/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "createDelivery",
+      "path": "deliveries/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "findAllDeliveries",
+      "path": "deliveries/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "findByOrderId",
+      "path": "deliveries/order/:orderId",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "findByRiderId",
+      "path": "deliveries/rider/:riderId",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "findOneDelivery",
+      "path": "deliveries/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "getDeliverySummary",
+      "path": "deliveries/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "removeDelivery",
+      "path": "deliveries/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "updateDelivery",
+      "path": "deliveries/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "DeliveriesController",
+      "method": "updateDeliveryStatus",
+      "path": "deliveries/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "createAction",
+      "path": "enforcement/actions",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "createRiskScore",
+      "path": "enforcement/risk-scores",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "getActions",
+      "path": "enforcement/actions",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "getRecentActions",
+      "path": "enforcement/actions/recent",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "getRiskScoreById",
+      "path": "enforcement/risk-scores/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "getRiskScores",
+      "path": "enforcement/risk-scores",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "getRiskSummary",
+      "path": "enforcement/risk-scores/summary",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "resolveAction",
+      "path": "enforcement/actions/:id/resolve",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "EnforcementController",
+      "method": "updateRiskScore",
+      "path": "enforcement/risk-scores/:id",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "createFinanceTransaction",
+      "path": "finance-transactions/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "findAllFinanceTransactions",
+      "path": "finance-transactions/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "findOneFinanceTransaction",
+      "path": "finance-transactions/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "getFinanceSummary",
+      "path": "finance-transactions/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "removeFinanceTransaction",
+      "path": "finance-transactions/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "FinanceController",
+      "method": "updateFinanceTransaction",
+      "path": "finance-transactions/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "addPreparationNote",
+      "path": "kitchen/orders/:id/notes",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getDelayedOrders",
+      "path": "kitchen/delayed",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getKitchenActivity",
+      "path": "kitchen/activity",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getKitchenMetrics",
+      "path": "kitchen/metrics",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getKitchenQueue",
+      "path": "kitchen/queue",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getKitchenSummary",
+      "path": "kitchen/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getOrderById",
+      "path": "kitchen/queue/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "getOrderStatus",
+      "path": "kitchen/orders/:id/status",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "logIngredientConsumption",
+      "path": "kitchen/ingredient-consumption",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenController",
+      "method": "updateOrderStatus",
+      "path": "kitchen/queue/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenStockController",
+      "method": "getKitchenStock",
+      "path": "stock/kitchen",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenStockController",
+      "method": "kitchenUsage",
+      "path": "stock/kitchen-usage",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "KitchenStockController",
+      "method": "recordWaste",
+      "path": "stock/waste",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "LegacyBarStockController",
+      "method": "getTransfers",
+      "path": "bar/stock/transfers",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "LegacyBarStockController",
+      "method": "saleDeduction",
+      "path": "bar/stock/sale-deduction",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ManagerCmsController",
+      "method": "getCmsStats",
+      "path": "manager/cms/stats",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerCmsController",
+      "method": "getPageById",
+      "path": "manager/cms/pages/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerCmsController",
+      "method": "getPageBySlug",
+      "path": "manager/cms/pages/slug/:slug",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerCmsController",
+      "method": "getPages",
+      "path": "manager/cms/pages",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getAllOrders",
+      "path": "manager/orders/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrderById",
+      "path": "manager/orders/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrdersByCustomer",
+      "path": "manager/orders/customer/:customerId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrdersByStatus",
+      "path": "manager/orders/status/:status",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrdersByTable",
+      "path": "manager/orders/table/:tableId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrdersByWaiter",
+      "path": "manager/orders/waiter/:waiterId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getOrderStats",
+      "path": "manager/orders/stats",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getPendingApprovals",
+      "path": "manager/orders/approvals/pending",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "getRecentOrders",
+      "path": "manager/orders/recent",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerOrdersController",
+      "method": "searchOrders",
+      "path": "manager/orders/search",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "findAll",
+      "path": "manager/products/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "findOne",
+      "path": "manager/products/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "getInventory",
+      "path": "manager/products/:id/inventory",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "getLowStock",
+      "path": "manager/products/stats/low-stock",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "getPriceHistory",
+      "path": "manager/products/:id/price-history",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerProductsController",
+      "method": "getProductStats",
+      "path": "manager/products/stats/overview",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getAllStock",
+      "path": "manager/stock/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getLocations",
+      "path": "manager/stock/locations",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getLowStockAlerts",
+      "path": "manager/stock/low-stock",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getMovements",
+      "path": "manager/stock/movements",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getProductStock",
+      "path": "manager/stock/product/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getRecentMovements",
+      "path": "manager/stock/movements/recent",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getStockByLocation",
+      "path": "manager/stock/location/:location",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getStockStats",
+      "path": "manager/stock/stats",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "getStockValuation",
+      "path": "manager/stock/valuation",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerStockController",
+      "method": "searchStock",
+      "path": "manager/stock/search",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "create",
+      "path": "manager/suppliers/",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "findAll",
+      "path": "manager/suppliers/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "findOne",
+      "path": "manager/suppliers/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "getActive",
+      "path": "manager/suppliers/active",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "getByType",
+      "path": "manager/suppliers/type/:type",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "getRecent",
+      "path": "manager/suppliers/recent",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "getStats",
+      "path": "manager/suppliers/stats",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "remove",
+      "path": "manager/suppliers/:id",
+      "httpMethod": "DELETE",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "search",
+      "path": "manager/suppliers/search",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "update",
+      "path": "manager/suppliers/:id",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "ManagerSuppliersController",
+      "method": "updateStatus",
+      "path": "manager/suppliers/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MarginAlertController",
+      "method": "findAll",
+      "path": "margin-alerts/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "MarginAlertController",
+      "method": "updateStatus",
+      "path": "margin-alerts/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getActiveUsers",
+      "path": "monitoring/active-users",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getApiHealth",
+      "path": "monitoring/api-health",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getDatabaseMetrics",
+      "path": "monitoring/database",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getPerformanceMetrics",
+      "path": "monitoring/performance",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getRecentErrors",
+      "path": "monitoring/errors",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "MonitoringController",
+      "method": "getSystemSummary",
+      "path": "monitoring/summary",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "applyDiscount",
+      "path": "orders/:id/discount",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "cancel",
+      "path": "orders/:id/cancel",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "create",
+      "path": "orders/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "findAll",
+      "path": "orders/all",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "findLatest",
+      "path": "orders/latest",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "getOrderById",
+      "path": "orders/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "listOrders",
+      "path": "orders/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "requestCancellation",
+      "path": "orders/:id/cancellation-request",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "requestDiscount",
+      "path": "orders/:id/discount-request",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "update",
+      "path": "orders/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "OrdersController",
+      "method": "updateOrderStatus",
+      "path": "orders/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "create",
+      "path": "payments/settle",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "findAll",
+      "path": "payments/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "findByOrder",
+      "path": "payments/order/:orderId",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "findOne",
+      "path": "payments/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "generateReceipt",
+      "path": "payments/:id/receipt",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "getSettlementSummary",
+      "path": "payments/settlement/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "reconciliation",
+      "path": "payments/reports/reconciliation",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "refund",
+      "path": "payments/:id/refund",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PaymentsController",
+      "method": "updateStatus",
+      "path": "payments/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CASHIER",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "addOrderItem",
+      "path": "pos/orders/:id/items",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "createOrder",
+      "path": "pos/orders",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "getMenu",
+      "path": "pos/menu",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "getMyOrders",
+      "path": "pos/orders/mine",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "getTables",
+      "path": "pos/tables",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "removeOrderItem",
+      "path": "pos/orders/:id/items/:itemId",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PosController",
+      "method": "updateOrderItem",
+      "path": "pos/orders/:id/items/:itemId",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "WAITER",
+        "CASHIER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "apply",
+      "path": "pricing-rules/:id/apply",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "create",
+      "path": "pricing-rules/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "findAll",
+      "path": "pricing-rules/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "findOne",
+      "path": "pricing-rules/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "remove",
+      "path": "pricing-rules/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "PricingRuleController",
+      "method": "update",
+      "path": "pricing-rules/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "create",
+      "path": "products/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "findAll",
+      "path": "products/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "WAITER",
+        "CASHIER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "findOne",
+      "path": "products/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "WAITER",
+        "CASHIER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "remove",
+      "path": "products/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "update",
+      "path": "products/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductController",
+      "method": "updatePrice",
+      "path": "products/:id/price",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "create",
+      "path": "production-plans/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "findAll",
+      "path": "production-plans/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "findByRecipeId",
+      "path": "production-plans/recipe/:recipeId",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "findOne",
+      "path": "production-plans/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "getSummary",
+      "path": "production-plans/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF",
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "remove",
+      "path": "production-plans/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "update",
+      "path": "production-plans/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "ProductionPlansController",
+      "method": "updateProducedQuantity",
+      "path": "production-plans/:id/produced-quantity",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "CHEF"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "create",
+      "path": "recipes/",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "findAll",
+      "path": "recipes/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "findByProductId",
+      "path": "recipes/product/:productId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "findOne",
+      "path": "recipes/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "remove",
+      "path": "recipes/:id",
+      "httpMethod": "DELETE",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RecipesController",
+      "method": "update",
+      "path": "recipes/:id",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "createRider",
+      "path": "riders/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "findAllRiders",
+      "path": "riders/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "findAvailableRiders",
+      "path": "riders/available",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "findOneRider",
+      "path": "riders/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "removeRider",
+      "path": "riders/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "RidersController",
+      "method": "updateRider",
+      "path": "riders/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "DISPATCHER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StaffDashboardController",
+      "method": "getSummary",
+      "path": "staff/dashboard/summary",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "ACCOUNTANT",
+        "HR",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StaffDashboardController",
+      "method": "getTasks",
+      "path": "staff/dashboard/tasks",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "ACCOUNTANT",
+        "HR",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "adjustment",
+      "path": "stock/adjustment-requests",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "approveAdjustment",
+      "path": "stock/adjustment-requests/:id/approve",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getBalance",
+      "path": "stock/balance",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getMovements",
+      "path": "stock/movements",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getRecentMovements",
+      "path": "stock/movements/recent",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getReorderAlerts",
+      "path": "stock/low-stock",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getReorderAlertsLegacy",
+      "path": "stock/reorder-alerts",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getStock",
+      "path": "stock/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getStockItem",
+      "path": "stock/product/:productId",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "getValuation",
+      "path": "stock/valuation",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER",
+        "CHEF",
+        "BARMAN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "purchase",
+      "path": "stock/purchases",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "rejectAdjustment",
+      "path": "stock/adjustment-requests/:id/reject",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "StockController",
+      "method": "transfer",
+      "path": "stock/transfers",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "create",
+      "path": "suppliers/",
+      "httpMethod": "POST",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "findAll",
+      "path": "suppliers/",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "findOne",
+      "path": "suppliers/:id",
+      "httpMethod": "GET",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER",
+        "ACCOUNTANT",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "remove",
+      "path": "suppliers/:id",
+      "httpMethod": "DELETE",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "update",
+      "path": "suppliers/:id",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "SupplierController",
+      "method": "updateStatus",
+      "path": "suppliers/:id/status",
+      "httpMethod": "PATCH",
+      "isPublic": false,
+      "roles": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "createWasteDeclaration",
+      "path": "waste-declarations/",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "CHEF",
+        "STOREKEEPER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "findAllWasteDeclarations",
+      "path": "waste-declarations/",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "findByDeclarer",
+      "path": "waste-declarations/declarer/:declarerId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "findByProductId",
+      "path": "waste-declarations/product/:productId",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "findOneWasteDeclaration",
+      "path": "waste-declarations/:id",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "getWasteSummary",
+      "path": "waste-declarations/summary",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [
+        "ADMIN",
+        "MANAGER"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "removeWasteDeclaration",
+      "path": "waste-declarations/:id",
+      "httpMethod": "DELETE",
+      "isPublic": true,
+      "roles": [
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WasteController",
+      "method": "updateWasteDeclaration",
+      "path": "waste-declarations/:id",
+      "httpMethod": "PATCH",
+      "isPublic": true,
+      "roles": [
+        "ADMIN"
+      ],
+      "covered": true
+    },
+    {
+      "controller": "WebsiteController",
+      "method": "createLead",
+      "path": "website/leads",
+      "httpMethod": "POST",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "WebsiteController",
+      "method": "getHomepage",
+      "path": "website/home",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "WebsiteController",
+      "method": "getMenuHighlights",
+      "path": "website/menu-highlights",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    },
+    {
+      "controller": "WebsiteController",
+      "method": "getPage",
+      "path": "website/pages/:slug",
+      "httpMethod": "GET",
+      "isPublic": true,
+      "roles": [],
+      "covered": true
+    }
+  ]
+}
