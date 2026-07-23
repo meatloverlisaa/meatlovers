@@ -79,6 +79,16 @@ model User {
   leave_requests LeaveRequest[] @relation("LeaveRequests")
   leave_approvals LeaveRequest[] @relation("LeaveApprovals")
   payroll_records Payroll[]
+  performance_reviews PerformanceReview[] @relation("PerformanceReviews")
+  reviews_conducted PerformanceReview[] @relation("ReviewsConducted")
+  training_enrollments TrainingEnrollment[]
+  disciplinary_actions DisciplinaryAction[] @relation("DisciplinaryActions")
+  disciplinary_reports DisciplinaryAction[] @relation("DisciplinaryReports")
+  grievances_submitted Grievance[] @relation("GrievancesSubmitted")
+  grievances_assigned Grievance[] @relation("GrievancesAssigned")
+  employee_documents EmployeeDocument[] @relation("EmployeeDocuments")
+  documents_uploaded EmployeeDocument[] @relation("DocumentsUploaded")
+  documents_verified EmployeeDocument[] @relation("DocumentsVerified")
 
   @@map("users")
 }
@@ -1053,4 +1063,268 @@ model Payroll {
   @@index([user_id])
   @@index([period_start])
   @@index([period_end])
+}
+
+// ==================== PERFORMANCE MANAGEMENT ====================
+
+enum ReviewPeriod {
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+}
+
+enum ReviewStatus {
+  DRAFT
+  SUBMITTED
+  COMPLETED
+  ARCHIVED
+}
+
+model PerformanceReview {
+  id              BigInt       @id @default(autoincrement())
+  user_id         BigInt
+  reviewer_id     BigInt
+  review_period   ReviewPeriod
+  review_date     DateTime
+  period_start    DateTime     @db.Date
+  period_end      DateTime     @db.Date
+  overall_score   Decimal      @db.Decimal(3, 2)
+  status          ReviewStatus @default(DRAFT)
+  strengths       String?      @db.Text
+  weaknesses      String?      @db.Text
+  goals_achieved  String?      @db.Text
+  goals_next      String?      @db.Text
+  comments        String?      @db.Text
+  employee_comments String?    @db.Text
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  user            User         @relation("PerformanceReviews", fields: [user_id], references: [id], onDelete: Cascade)
+  reviewer        User         @relation("ReviewsConducted", fields: [reviewer_id], references: [id])
+  metrics         PerformanceMetric[]
+
+  @@map("performance_reviews")
+  @@index([user_id])
+  @@index([reviewer_id])
+  @@index([review_date])
+  @@index([status])
+}
+
+model PerformanceMetric {
+  id          BigInt             @id @default(autoincrement())
+  review_id   BigInt
+  metric_name String             @db.VarChar(255)
+  target      Decimal?           @db.Decimal(10, 2)
+  achieved    Decimal?           @db.Decimal(10, 2)
+  score       Decimal            @db.Decimal(3, 2)
+  weight      Decimal            @default(1) @db.Decimal(3, 2)
+  comments    String?            @db.Text
+  created_at  DateTime           @default(now())
+
+  review      PerformanceReview  @relation(fields: [review_id], references: [id], onDelete: Cascade)
+
+  @@map("performance_metrics")
+  @@index([review_id])
+}
+
+// ==================== TRAINING & DEVELOPMENT ====================
+
+enum TrainingType {
+  ONBOARDING
+  SKILLS
+  SAFETY
+  COMPLIANCE
+  LEADERSHIP
+  TECHNICAL
+  SOFT_SKILLS
+  CERTIFICATION
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+model TrainingProgram {
+  id              BigInt   @id @default(autoincrement())
+  program_name    String   @db.VarChar(255)
+  training_type   TrainingType
+  description     String?  @db.Text
+  duration_hours  Int
+  is_mandatory    Boolean  @default(false)
+  validity_months Int?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  enrollments     TrainingEnrollment[]
+
+  @@map("training_programs")
+  @@index([training_type])
+  @@index([is_mandatory])
+}
+
+model TrainingEnrollment {
+  id              BigInt         @id @default(autoincrement())
+  user_id         BigInt
+  program_id      BigInt
+  trainer_name    String?        @db.VarChar(255)
+  scheduled_date  DateTime
+  completion_date DateTime?
+  status          TrainingStatus @default(SCHEDULED)
+  score           Decimal?       @db.Decimal(5, 2)
+  certificate_url String?        @db.VarChar(500)
+  feedback        String?        @db.Text
+  notes           String?        @db.Text
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  user            User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  program         TrainingProgram @relation(fields: [program_id], references: [id])
+
+  @@map("training_enrollments")
+  @@index([user_id])
+  @@index([program_id])
+  @@index([status])
+  @@index([scheduled_date])
+}
+
+// ==================== DISCIPLINARY & GRIEVANCE ====================
+
+enum DisciplinaryType {
+  VERBAL_WARNING
+  WRITTEN_WARNING
+  FINAL_WARNING
+  SUSPENSION
+  DEMOTION
+  TERMINATION
+}
+
+enum DisciplinaryStatus {
+  REPORTED
+  UNDER_INVESTIGATION
+  ACTION_TAKEN
+  APPEALED
+  RESOLVED
+  CLOSED
+}
+
+model DisciplinaryAction {
+  id              BigInt             @id @default(autoincrement())
+  user_id         BigInt
+  reported_by     BigInt
+  incident_date   DateTime
+  report_date     DateTime           @default(now())
+  type            DisciplinaryType
+  status          DisciplinaryStatus @default(REPORTED)
+  incident_description String         @db.Text
+  action_taken    String?            @db.Text
+  resolution      String?            @db.Text
+  appeal_notes    String?            @db.Text
+  resolved_date   DateTime?
+  documents       String?            @db.Text
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+
+  user            User               @relation("DisciplinaryActions", fields: [user_id], references: [id], onDelete: Cascade)
+  reporter        User               @relation("DisciplinaryReports", fields: [reported_by], references: [id])
+
+  @@map("disciplinary_actions")
+  @@index([user_id])
+  @@index([reported_by])
+  @@index([incident_date])
+  @@index([status])
+  @@index([type])
+}
+
+enum GrievanceCategory {
+  WORKPLACE_HARASSMENT
+  DISCRIMINATION
+  UNFAIR_TREATMENT
+  WORK_CONDITIONS
+  SAFETY_CONCERNS
+  COMPENSATION
+  MANAGEMENT_ISSUES
+  OTHER
+}
+
+enum GrievanceStatus {
+  SUBMITTED
+  ACKNOWLEDGED
+  UNDER_REVIEW
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
+
+model Grievance {
+  id              BigInt            @id @default(autoincrement())
+  user_id         BigInt
+  category        GrievanceCategory
+  status          GrievanceStatus   @default(SUBMITTED)
+  subject         String            @db.VarChar(255)
+  description     String            @db.Text
+  submitted_date  DateTime          @default(now())
+  acknowledged_date DateTime?
+  resolved_date   DateTime?
+  assigned_to     BigInt?
+  resolution      String?           @db.Text
+  is_confidential Boolean           @default(true)
+  notes           String?           @db.Text
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+
+  user            User              @relation("GrievancesSubmitted", fields: [user_id], references: [id], onDelete: Cascade)
+  assigned_user   User?             @relation("GrievancesAssigned", fields: [assigned_to], references: [id])
+
+  @@map("grievances")
+  @@index([user_id])
+  @@index([assigned_to])
+  @@index([status])
+  @@index([category])
+  @@index([submitted_date])
+}
+
+// ==================== DOCUMENTS & CERTIFICATES ====================
+
+enum DocumentType {
+  CONTRACT
+  ID_COPY
+  CERTIFICATE
+  LICENSE
+  QUALIFICATION
+  REFERENCE
+  MEDICAL
+  POLICE_CLEARANCE
+  OTHER
+}
+
+model EmployeeDocument {
+  id              BigInt       @id @default(autoincrement())
+  user_id         BigInt
+  document_type   DocumentType
+  document_name   String       @db.VarChar(255)
+  document_url    String       @db.VarChar(500)
+  file_size       Int?
+  uploaded_by     BigInt
+  issue_date      DateTime?    @db.Date
+  expiry_date     DateTime?    @db.Date
+  is_verified     Boolean      @default(false)
+  verified_by     BigInt?
+  verified_at     DateTime?
+  notes           String?      @db.Text
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  user            User         @relation("EmployeeDocuments", fields: [user_id], references: [id], onDelete: Cascade)
+  uploader        User         @relation("DocumentsUploaded", fields: [uploaded_by], references: [id])
+  verifier        User?        @relation("DocumentsVerified", fields: [verified_by], references: [id])
+
+  @@map("employee_documents")
+  @@index([user_id])
+  @@index([document_type])
+  @@index([expiry_date])
+  @@index([is_verified])
 }
