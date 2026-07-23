@@ -13,6 +13,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { HrmService } from './hrm.service';
+import { PerformanceService } from './performance.service';
+import { TrainingService } from './training.service';
+import { DisciplinaryService } from './disciplinary.service';
+import { DocumentsService } from './documents.service';
 import { Public } from '../auth/public.decorator';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -29,7 +33,13 @@ import { CreatePayrollDto, UpdatePayrollDto } from './dto/payroll.dto';
 @Public()
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class HrmController {
-  constructor(private readonly hrmService: HrmService) {}
+  constructor(
+    private readonly hrmService: HrmService,
+    private readonly performanceService: PerformanceService,
+    private readonly trainingService: TrainingService,
+    private readonly disciplinaryService: DisciplinaryService,
+    private readonly documentsService: DocumentsService,
+  ) {}
 
   // Dashboard & Summary
   @Get('summary')
@@ -249,5 +259,288 @@ export class HrmController {
   @Get('payroll/:id/slip')
   generatePayslip(@Param('id') id: string) {
     return this.hrmService.generatePayslip(id);
+  }
+}
+
+
+  // ==================== PERFORMANCE MANAGEMENT ====================
+
+  @Post('performance/reviews')
+  @HttpCode(HttpStatus.CREATED)
+  createPerformanceReview(@Body() data: any) {
+    return this.performanceService.createReview(data);
+  }
+
+  @Get('performance/reviews')
+  getPerformanceReviews(
+    @Query('userId') userId?: string,
+    @Query('reviewerId') reviewerId?: string,
+    @Query('status') status?: string,
+    @Query('review_period') review_period?: string,
+  ) {
+    return this.performanceService.getReviews({
+      userId,
+      reviewerId,
+      status,
+      review_period,
+    });
+  }
+
+  @Get('performance/reviews/:id')
+  getPerformanceReviewById(@Param('id') id: string) {
+    return this.performanceService.getReviewById(id);
+  }
+
+  @Patch('performance/reviews/:id')
+  updatePerformanceReview(@Param('id') id: string, @Body() data: any) {
+    return this.performanceService.updateReview(id, data);
+  }
+
+  @Patch('performance/reviews/:id/submit')
+  submitPerformanceReview(@Param('id') id: string) {
+    return this.performanceService.submitReview(id);
+  }
+
+  @Patch('performance/reviews/:id/complete')
+  completePerformanceReview(@Param('id') id: string, @Body() body: { employee_comments?: string }) {
+    return this.performanceService.completeReview(id, body.employee_comments);
+  }
+
+  @Get('performance/users/:userId/stats')
+  getUserPerformanceStats(@Param('userId') userId: string) {
+    return this.performanceService.getUserPerformanceStats(userId);
+  }
+
+  @Get('performance/department-overview')
+  getDepartmentPerformance() {
+    return this.performanceService.getDepartmentPerformance();
+  }
+
+  // ==================== TRAINING & DEVELOPMENT ====================
+
+  @Post('training/programs')
+  @HttpCode(HttpStatus.CREATED)
+  createTrainingProgram(@Body() data: any) {
+    return this.trainingService.createProgram(data);
+  }
+
+  @Get('training/programs')
+  getTrainingPrograms(
+    @Query('training_type') training_type?: string,
+    @Query('is_mandatory') is_mandatory?: string,
+  ) {
+    return this.trainingService.getPrograms({
+      training_type,
+      is_mandatory: is_mandatory === 'true' ? true : is_mandatory === 'false' ? false : undefined,
+    });
+  }
+
+  @Get('training/programs/:id')
+  getTrainingProgramById(@Param('id') id: string) {
+    return this.trainingService.getProgramById(id);
+  }
+
+  @Patch('training/programs/:id')
+  updateTrainingProgram(@Param('id') id: string, @Body() data: any) {
+    return this.trainingService.updateProgram(id, data);
+  }
+
+  @Delete('training/programs/:id')
+  deleteTrainingProgram(@Param('id') id: string) {
+    return this.trainingService.deleteProgram(id);
+  }
+
+  @Post('training/enrollments')
+  @HttpCode(HttpStatus.CREATED)
+  enrollUserInTraining(@Body() data: any) {
+    return this.trainingService.enrollUser(data);
+  }
+
+  @Get('training/enrollments')
+  getTrainingEnrollments(
+    @Query('userId') userId?: string,
+    @Query('programId') programId?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.trainingService.getEnrollments({ userId, programId, status });
+  }
+
+  @Patch('training/enrollments/:id')
+  updateTrainingEnrollment(@Param('id') id: string, @Body() data: any) {
+    return this.trainingService.updateEnrollment(id, data);
+  }
+
+  @Patch('training/enrollments/:id/complete')
+  completeTraining(@Param('id') id: string, @Body() data: any) {
+    return this.trainingService.completeTraining(id, data);
+  }
+
+  @Get('training/compliance')
+  getTrainingComplianceReport() {
+    return this.trainingService.getComplianceReport();
+  }
+
+  @Get('training/users/:userId/history')
+  getUserTrainingHistory(@Param('userId') userId: string) {
+    return this.trainingService.getUserTrainingHistory(userId);
+  }
+
+  @Get('training/statistics')
+  getTrainingStatistics() {
+    return this.trainingService.getTrainingStats();
+  }
+
+  // ==================== DISCIPLINARY & GRIEVANCE ====================
+
+  // Disciplinary Actions
+  @Post('disciplinary/actions')
+  @HttpCode(HttpStatus.CREATED)
+  createDisciplinaryAction(@Body() data: any) {
+    return this.disciplinaryService.createDisciplinaryAction(data);
+  }
+
+  @Get('disciplinary/actions')
+  getDisciplinaryActions(
+    @Query('userId') userId?: string,
+    @Query('reportedBy') reportedBy?: string,
+    @Query('type') type?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.disciplinaryService.getDisciplinaryActions({
+      userId,
+      reportedBy,
+      type,
+      status,
+    });
+  }
+
+  @Get('disciplinary/actions/:id')
+  getDisciplinaryActionById(@Param('id') id: string) {
+    return this.disciplinaryService.getDisciplinaryActionById(id);
+  }
+
+  @Patch('disciplinary/actions/:id')
+  updateDisciplinaryAction(@Param('id') id: string, @Body() data: any) {
+    return this.disciplinaryService.updateDisciplinaryAction(id, data);
+  }
+
+  @Patch('disciplinary/actions/:id/close')
+  closeDisciplinaryAction(@Param('id') id: string, @Body() body: { resolution: string }) {
+    return this.disciplinaryService.closeDisciplinaryAction(id, body.resolution);
+  }
+
+  @Get('disciplinary/statistics')
+  getDisciplinaryStatistics() {
+    return this.disciplinaryService.getDisciplinaryStats();
+  }
+
+  @Get('disciplinary/users/:userId/history')
+  getUserDisciplinaryHistory(@Param('userId') userId: string) {
+    return this.disciplinaryService.getUserDisciplinaryHistory(userId);
+  }
+
+  // Grievances
+  @Post('grievances')
+  @HttpCode(HttpStatus.CREATED)
+  submitGrievance(@Body() data: any) {
+    return this.disciplinaryService.submitGrievance(data);
+  }
+
+  @Get('grievances')
+  getGrievances(
+    @Query('userId') userId?: string,
+    @Query('assignedTo') assignedTo?: string,
+    @Query('category') category?: string,
+    @Query('status') status?: string,
+    @Query('includeConfidential') includeConfidential?: string,
+  ) {
+    return this.disciplinaryService.getGrievances({
+      userId,
+      assignedTo,
+      category,
+      status,
+      includeConfidential: includeConfidential === 'true',
+    });
+  }
+
+  @Get('grievances/:id')
+  getGrievanceById(@Param('id') id: string) {
+    return this.disciplinaryService.getGrievanceById(id);
+  }
+
+  @Patch('grievances/:id/assign')
+  assignGrievance(@Param('id') id: string, @Body() body: { assigned_to: string }) {
+    return this.disciplinaryService.assignGrievance(id, body.assigned_to);
+  }
+
+  @Patch('grievances/:id')
+  updateGrievance(@Param('id') id: string, @Body() data: any) {
+    return this.disciplinaryService.updateGrievance(id, data);
+  }
+
+  @Patch('grievances/:id/resolve')
+  resolveGrievance(@Param('id') id: string, @Body() body: { resolution: string }) {
+    return this.disciplinaryService.resolveGrievance(id, body.resolution);
+  }
+
+  @Get('grievances/statistics/overview')
+  getGrievanceStatistics() {
+    return this.disciplinaryService.getGrievanceStats();
+  }
+
+  // ==================== DOCUMENT MANAGEMENT ====================
+
+  @Post('documents')
+  @HttpCode(HttpStatus.CREATED)
+  uploadDocument(@Body() data: any) {
+    return this.documentsService.uploadDocument(data);
+  }
+
+  @Get('documents')
+  getDocuments(
+    @Query('userId') userId?: string,
+    @Query('documentType') documentType?: string,
+    @Query('isVerified') isVerified?: string,
+  ) {
+    return this.documentsService.getDocuments({
+      userId,
+      documentType,
+      isVerified: isVerified === 'true' ? true : isVerified === 'false' ? false : undefined,
+    });
+  }
+
+  @Get('documents/:id')
+  getDocumentById(@Param('id') id: string) {
+    return this.documentsService.getDocumentById(id);
+  }
+
+  @Patch('documents/:id/verify')
+  verifyDocument(@Param('id') id: string, @Body() body: { verified_by: string; notes?: string }) {
+    return this.documentsService.verifyDocument(id, body.verified_by, body.notes);
+  }
+
+  @Patch('documents/:id')
+  updateDocument(@Param('id') id: string, @Body() data: any) {
+    return this.documentsService.updateDocument(id, data);
+  }
+
+  @Delete('documents/:id')
+  deleteDocument(@Param('id') id: string) {
+    return this.documentsService.deleteDocument(id);
+  }
+
+  @Get('documents/alerts/expiring')
+  getExpiringDocuments(@Query('days') days?: string) {
+    return this.documentsService.getExpiringDocuments(days ? parseInt(days) : 30);
+  }
+
+  @Get('documents/alerts/expired')
+  getExpiredDocuments() {
+    return this.documentsService.getExpiredDocuments();
+  }
+
+  @Get('documents/statistics/overview')
+  getDocumentStatistics() {
+    return this.documentsService.getDocumentStats();
   }
 }
