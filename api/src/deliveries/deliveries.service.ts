@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
@@ -118,11 +122,21 @@ export class DeliveriesService {
       where: { id: BigInt(id) },
       data: {
         ...(updateRiderDto.phone && { phone: updateRiderDto.phone }),
-        ...(updateRiderDto.license_number !== undefined && { license_number: updateRiderDto.license_number }),
-        ...(updateRiderDto.vehicle_type !== undefined && { vehicle_type: updateRiderDto.vehicle_type }),
-        ...(updateRiderDto.vehicle_plate !== undefined && { vehicle_plate: updateRiderDto.vehicle_plate }),
-        ...(updateRiderDto.current_location !== undefined && { current_location: updateRiderDto.current_location }),
-        ...(updateRiderDto.is_available !== undefined && { is_available: updateRiderDto.is_available }),
+        ...(updateRiderDto.license_number !== undefined && {
+          license_number: updateRiderDto.license_number,
+        }),
+        ...(updateRiderDto.vehicle_type !== undefined && {
+          vehicle_type: updateRiderDto.vehicle_type,
+        }),
+        ...(updateRiderDto.vehicle_plate !== undefined && {
+          vehicle_plate: updateRiderDto.vehicle_plate,
+        }),
+        ...(updateRiderDto.current_location !== undefined && {
+          current_location: updateRiderDto.current_location,
+        }),
+        ...(updateRiderDto.is_available !== undefined && {
+          is_available: updateRiderDto.is_available,
+        }),
       },
       include: {
         user: true,
@@ -317,9 +331,15 @@ export class DeliveriesService {
     const updatedDelivery = await this.prisma.delivery.update({
       where: { id: BigInt(id) },
       data: {
-        ...(updateDeliveryDto.pickup_address !== undefined && { pickup_address: updateDeliveryDto.pickup_address }),
-        ...(updateDeliveryDto.delivery_address !== undefined && { delivery_address: updateDeliveryDto.delivery_address }),
-        ...(updateDeliveryDto.delivery_notes !== undefined && { delivery_notes: updateDeliveryDto.delivery_notes }),
+        ...(updateDeliveryDto.pickup_address !== undefined && {
+          pickup_address: updateDeliveryDto.pickup_address,
+        }),
+        ...(updateDeliveryDto.delivery_address !== undefined && {
+          delivery_address: updateDeliveryDto.delivery_address,
+        }),
+        ...(updateDeliveryDto.delivery_notes !== undefined && {
+          delivery_notes: updateDeliveryDto.delivery_notes,
+        }),
       },
       include: {
         order: {
@@ -338,7 +358,10 @@ export class DeliveriesService {
     return updatedDelivery;
   }
 
-  async updateDeliveryStatus(id: string, updateDeliveryStatusDto: UpdateDeliveryStatusDto) {
+  async updateDeliveryStatus(
+    id: string,
+    updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+  ) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
     });
@@ -347,9 +370,17 @@ export class DeliveriesService {
       throw new NotFoundException('Delivery not found');
     }
 
-    const validStatuses = ['ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'];
+    const validStatuses = [
+      'ASSIGNED',
+      'PICKED_UP',
+      'IN_TRANSIT',
+      'DELIVERED',
+      'CANCELLED',
+    ];
     if (!validStatuses.includes(updateDeliveryStatusDto.status)) {
-      throw new BadRequestException(`Invalid status. Valid statuses are: ${validStatuses.join(', ')}`);
+      throw new BadRequestException(
+        `Invalid status. Valid statuses are: ${validStatuses.join(', ')}`,
+      );
     }
 
     const updateData: any = {
@@ -363,7 +394,8 @@ export class DeliveriesService {
       updateData.delivered_at = new Date();
     } else if (updateDeliveryStatusDto.status === 'CANCELLED') {
       updateData.cancelled_at = new Date();
-      updateData.cancellation_reason = updateDeliveryStatusDto.cancellation_reason;
+      updateData.cancellation_reason =
+        updateDeliveryStatusDto.cancellation_reason;
     }
 
     const updatedDelivery = await this.prisma.delivery.update({
@@ -434,7 +466,9 @@ export class DeliveriesService {
       inTransit: deliveries.filter((d) => d.status === 'IN_TRANSIT').length,
       delivered: deliveries.filter((d) => d.status === 'DELIVERED').length,
       cancelled: deliveries.filter((d) => d.status === 'CANCELLED').length,
-      activeRiders: deliveries.filter((d) => d.status !== 'DELIVERED' && d.status !== 'CANCELLED').length,
+      activeRiders: deliveries.filter(
+        (d) => d.status !== 'DELIVERED' && d.status !== 'CANCELLED',
+      ).length,
       deliveries,
     };
 

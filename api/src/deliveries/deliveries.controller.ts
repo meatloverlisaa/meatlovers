@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { DeliveriesService } from './deliveries.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
@@ -6,7 +15,10 @@ import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { DISPATCH_ROLES, MANAGEMENT_ROLES } from '../auth/constants/role-groups';
+import {
+  DISPATCH_ROLES,
+  MANAGEMENT_ROLES,
+} from '../auth/constants/role-groups';
 
 @Controller('riders')
 export class RidersController {
@@ -67,7 +79,10 @@ export class DeliveriesController {
 
   @Get('summary')
   @Roles(...MANAGEMENT_ROLES)
-  getDeliverySummary(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
+  getDeliverySummary(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     return this.deliveriesService.getDeliverySummary(startDate, endDate);
   }
 
@@ -91,14 +106,23 @@ export class DeliveriesController {
 
   @Patch(':id')
   @Roles(...DISPATCH_ROLES)
-  updateDelivery(@Param('id') id: string, @Body() updateDeliveryDto: UpdateDeliveryDto) {
+  updateDelivery(
+    @Param('id') id: string,
+    @Body() updateDeliveryDto: UpdateDeliveryDto,
+  ) {
     return this.deliveriesService.updateDelivery(id, updateDeliveryDto);
   }
 
   @Patch(':id/status')
   @Roles(...DISPATCH_ROLES)
-  updateDeliveryStatus(@Param('id') id: string, @Body() updateDeliveryStatusDto: UpdateDeliveryStatusDto) {
-    return this.deliveriesService.updateDeliveryStatus(id, updateDeliveryStatusDto);
+  updateDeliveryStatus(
+    @Param('id') id: string,
+    @Body() updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+  ) {
+    return this.deliveriesService.updateDeliveryStatus(
+      id,
+      updateDeliveryStatusDto,
+    );
   }
 
   @Delete(':id')

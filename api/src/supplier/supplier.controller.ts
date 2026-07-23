@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -13,15 +24,15 @@ import { Resource, Action } from '../auth/constants/role-permissions';
 
 /**
  * SupplierController
- * 
+ *
  * Manages supplier relationships with fine-grained permission control.
- * 
+ *
  * Permissions:
  * - READ: SUPER_ADMIN, ADMIN, MANAGER, STOREKEEPER, ACCOUNTANT
  * - CREATE: SUPER_ADMIN, ADMIN
  * - UPDATE: SUPER_ADMIN, ADMIN
  * - DELETE: SUPER_ADMIN, ADMIN
- * 
+ *
  * Note: Supplier data includes financial information and must be protected.
  */
 @Controller('suppliers')
@@ -53,15 +64,24 @@ export class SupplierController {
   @Patch(':id')
   @Roles(...SUPPLIER_WRITE_ROLES)
   @Permission(Resource.SUPPLIERS, Action.UPDATE)
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateSupplierDto: UpdateSupplierDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateSupplierDto: UpdateSupplierDto,
+  ) {
     return this.supplierService.update(id, updateSupplierDto);
   }
 
   @Patch(':id/status')
   @Roles(...SUPPLIER_WRITE_ROLES)
   @Permission(Resource.SUPPLIERS, Action.UPDATE)
-  updateStatus(@Param('id', ParseIntPipe) id: number, @Body() updateStatusDto: any) {
-    return this.supplierService.updateStatus(id, updateStatusDto?.status || 'ACTIVE');
+  updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStatusDto: any,
+  ) {
+    return this.supplierService.updateStatus(
+      id,
+      updateStatusDto?.status || 'ACTIVE',
+    );
   }
 
   @Delete(':id')

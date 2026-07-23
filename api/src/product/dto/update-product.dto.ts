@@ -1,6 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateProductDto } from './create-product.dto';
-import { IsBoolean, IsDecimal, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDecimal,
+  IsEnum,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ProductCategory } from '@prisma/client';
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {
@@ -28,4 +34,3 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsOptional()
   is_active?: boolean;
 }
-

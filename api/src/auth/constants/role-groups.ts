@@ -2,10 +2,7 @@ import { Role } from '@prisma/client';
 
 export const SUPER_ADMIN_ONLY = [Role.SUPER_ADMIN] as const;
 
-export const SYSTEM_ADMIN_ROLES = [
-  Role.SUPER_ADMIN,
-  Role.ADMIN,
-] as const;
+export const SYSTEM_ADMIN_ROLES = [Role.SUPER_ADMIN, Role.ADMIN] as const;
 
 export const MANAGEMENT_ROLES = [
   Role.SUPER_ADMIN,
@@ -105,11 +102,7 @@ export const DISPATCH_ROLES = [
   Role.DISPATCHER,
 ] as const;
 
-export const CRM_ROLES = [
-  Role.SUPER_ADMIN,
-  Role.ADMIN,
-  Role.MANAGER,
-] as const;
+export const CRM_ROLES = [Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER] as const;
 
 export const HR_ROLES = [
   Role.SUPER_ADMIN,

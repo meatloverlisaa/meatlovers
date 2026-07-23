@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AssetCategory, AssetStatus, AssetCondition, MaintenanceStatus } from '@prisma/client';
+import {
+  AssetCategory,
+  AssetStatus,
+  AssetCondition,
+  MaintenanceStatus,
+} from '@prisma/client';
 
 @Injectable()
 export class AssetsService {
@@ -46,23 +51,24 @@ export class AssetsService {
   }
 
   async getAssetsSummary() {
-    const [total, active, maintenance, retired, byCategory, byCondition] = await Promise.all([
-      this.prisma.asset.count(),
-      this.prisma.asset.count({ where: { status: 'ACTIVE' } }),
-      this.prisma.asset.count({ where: { status: 'MAINTENANCE' } }),
-      this.prisma.asset.count({ where: { status: 'RETIRED' } }),
-      this.prisma.asset.groupBy({
-        by: ['category'],
-        _count: true,
-        _sum: {
-          current_value: true,
-        },
-      }),
-      this.prisma.asset.groupBy({
-        by: ['condition'],
-        _count: true,
-      }),
-    ]);
+    const [total, active, maintenance, retired, byCategory, byCondition] =
+      await Promise.all([
+        this.prisma.asset.count(),
+        this.prisma.asset.count({ where: { status: 'ACTIVE' } }),
+        this.prisma.asset.count({ where: { status: 'MAINTENANCE' } }),
+        this.prisma.asset.count({ where: { status: 'RETIRED' } }),
+        this.prisma.asset.groupBy({
+          by: ['category'],
+          _count: true,
+          _sum: {
+            current_value: true,
+          },
+        }),
+        this.prisma.asset.groupBy({
+          by: ['condition'],
+          _count: true,
+        }),
+      ]);
 
     const totalValue = await this.prisma.asset.aggregate({
       _sum: {
@@ -121,7 +127,8 @@ export class AssetsService {
     });
 
     const totalDepreciation = assets.reduce((sum, asset) => {
-      const depreciation = Number(asset.purchase_cost) - Number(asset.current_value);
+      const depreciation =
+        Number(asset.purchase_cost) - Number(asset.current_value);
       return sum + depreciation;
     }, 0);
 
@@ -131,7 +138,9 @@ export class AssetsService {
         purchase_cost: Number(asset.purchase_cost),
         current_value: Number(asset.current_value),
         depreciation: Number(asset.purchase_cost) - Number(asset.current_value),
-        depreciation_rate: asset.depreciation_rate ? Number(asset.depreciation_rate) : null,
+        depreciation_rate: asset.depreciation_rate
+          ? Number(asset.depreciation_rate)
+          : null,
       })),
       totalDepreciation,
     };
@@ -230,8 +239,12 @@ export class AssetsService {
         assigned_to: data.assigned_to ? BigInt(data.assigned_to) : null,
         status: data.status || 'ACTIVE',
         condition: data.condition || 'GOOD',
-        warranty_expiry: data.warranty_expiry ? new Date(data.warranty_expiry) : null,
-        next_maintenance: data.next_maintenance ? new Date(data.next_maintenance) : null,
+        warranty_expiry: data.warranty_expiry
+          ? new Date(data.warranty_expiry)
+          : null,
+        next_maintenance: data.next_maintenance
+          ? new Date(data.next_maintenance)
+          : null,
         notes: data.notes,
       },
       include: {
@@ -286,16 +299,19 @@ export class AssetsService {
     });
   }
 
-  async addMaintenanceLog(assetId: string, data: {
-    maintenance_type: string;
-    description: string;
-    cost: number;
-    status?: MaintenanceStatus;
-    scheduled_date: string;
-    completed_date?: string;
-    performed_by?: string;
-    notes?: string;
-  }) {
+  async addMaintenanceLog(
+    assetId: string,
+    data: {
+      maintenance_type: string;
+      description: string;
+      cost: number;
+      status?: MaintenanceStatus;
+      scheduled_date: string;
+      completed_date?: string;
+      performed_by?: string;
+      notes?: string;
+    },
+  ) {
     return this.prisma.maintenanceLog.create({
       data: {
         asset_id: BigInt(assetId),
@@ -304,7 +320,9 @@ export class AssetsService {
         cost: data.cost,
         status: data.status || 'SCHEDULED',
         scheduled_date: new Date(data.scheduled_date),
-        completed_date: data.completed_date ? new Date(data.completed_date) : null,
+        completed_date: data.completed_date
+          ? new Date(data.completed_date)
+          : null,
         performed_by: data.performed_by,
         notes: data.notes,
       },

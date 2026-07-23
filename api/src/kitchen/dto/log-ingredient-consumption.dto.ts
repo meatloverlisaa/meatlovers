@@ -1,4 +1,10 @@
-import { IsNumber, IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
 
 export enum ConsumptionSource {
   PRODUCTION = 'PRODUCTION',

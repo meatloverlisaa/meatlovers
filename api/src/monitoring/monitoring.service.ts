@@ -27,7 +27,9 @@ export class MonitoringService {
     ]);
 
     // Count low stock items (quantity <= 10 as threshold)
-    const lowStockItems = stockItems.filter((item) => item.quantity <= 10).length;
+    const lowStockItems = stockItems.filter(
+      (item) => item.quantity <= 10,
+    ).length;
 
     return {
       totalOrders,

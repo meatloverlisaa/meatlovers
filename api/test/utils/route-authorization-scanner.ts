@@ -57,35 +57,31 @@ export function scanAuthorizationCoverage(
         unknown
       >;
 
-      const controllerPath =
-        Reflect.getMetadata(PATH_METADATA, metatype) ?? '';
+      const controllerPath = Reflect.getMetadata(PATH_METADATA, metatype) ?? '';
 
       const handlerNames = Object.getOwnPropertyNames(prototype).filter(
         (name) =>
-          name !== 'constructor' &&
-          typeof prototype[name] === 'function',
+          name !== 'constructor' && typeof prototype[name] === 'function',
       );
 
       for (const handlerName of handlerNames) {
         const handler = prototype[handlerName] as Function;
 
-        const handlerPath =
-          Reflect.getMetadata(PATH_METADATA, handler) ?? '';
+        const handlerPath = Reflect.getMetadata(PATH_METADATA, handler) ?? '';
 
-        const methodCode = Reflect.getMetadata(
-          METHOD_METADATA,
-          handler,
-        ) as number | undefined;
+        const methodCode = Reflect.getMetadata(METHOD_METADATA, handler) as
+          | number
+          | undefined;
 
         if (methodCode === undefined) {
           continue;
         }
 
         const isPublic =
-          reflector.getAllAndOverride<boolean>(
-            IS_PUBLIC_KEY,
-            [handler, metatype],
-          ) ?? false;
+          reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+            handler,
+            metatype,
+          ]) ?? false;
 
         const roles =
           reflector.getAllAndOverride<string[]>(ROLES_KEY, [

@@ -1,13 +1,23 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateFinanceTransactionDto, TransactionType, TransactionCategory } from './dto/create-finance-transaction.dto';
+import {
+  CreateFinanceTransactionDto,
+  TransactionType,
+  TransactionCategory,
+} from './dto/create-finance-transaction.dto';
 import { UpdateFinanceTransactionDto } from './dto/update-finance-transaction.dto';
 
 @Injectable()
 export class FinanceService {
   constructor(private prisma: PrismaService) {}
 
-  async createFinanceTransaction(createFinanceTransactionDto: CreateFinanceTransactionDto) {
+  async createFinanceTransaction(
+    createFinanceTransactionDto: CreateFinanceTransactionDto,
+  ) {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: BigInt(createFinanceTransactionDto.recorded_by) },
@@ -101,7 +111,10 @@ export class FinanceService {
     return financeTransaction;
   }
 
-  async updateFinanceTransaction(id: string, updateFinanceTransactionDto: UpdateFinanceTransactionDto) {
+  async updateFinanceTransaction(
+    id: string,
+    updateFinanceTransactionDto: UpdateFinanceTransactionDto,
+  ) {
     const financeTransaction = await this.prisma.financeTransaction.findUnique({
       where: { id: BigInt(id) },
     });
@@ -111,7 +124,10 @@ export class FinanceService {
     }
 
     // Validate amount if provided
-    if (updateFinanceTransactionDto.amount !== undefined && updateFinanceTransactionDto.amount <= 0) {
+    if (
+      updateFinanceTransactionDto.amount !== undefined &&
+      updateFinanceTransactionDto.amount <= 0
+    ) {
       throw new BadRequestException('Amount must be greater than 0');
     }
 
@@ -148,7 +164,9 @@ export class FinanceService {
           recorded_by: BigInt(updateFinanceTransactionDto.recorded_by),
         }),
         ...(updateFinanceTransactionDto.transaction_date !== undefined && {
-          transaction_date: new Date(updateFinanceTransactionDto.transaction_date),
+          transaction_date: new Date(
+            updateFinanceTransactionDto.transaction_date,
+          ),
         }),
       },
       include: {
@@ -221,7 +239,7 @@ export class FinanceService {
 
     transactions.forEach((t) => {
       const amount = Number(t.amount);
-      
+
       if (t.type === 'INCOME') {
         summary.totalIncome += amount;
       } else {
@@ -232,11 +250,13 @@ export class FinanceService {
       summary.byType[t.type] = (summary.byType[t.type] || 0) + amount;
 
       // Group by category
-      summary.byCategory[t.category] = (summary.byCategory[t.category] || 0) + amount;
+      summary.byCategory[t.category] =
+        (summary.byCategory[t.category] || 0) + amount;
 
       // Group by recorder
       const recorderName = t.recorder?.full_name || 'Unknown';
-      summary.byRecorder[recorderName] = (summary.byRecorder[recorderName] || 0) + amount;
+      summary.byRecorder[recorderName] =
+        (summary.byRecorder[recorderName] || 0) + amount;
     });
 
     summary.netProfit = summary.totalIncome - summary.totalExpenses;

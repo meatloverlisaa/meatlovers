@@ -11,9 +11,7 @@ import { SUPER_ADMIN_ONLY } from './constants/role-groups';
 @Controller('auth/scanner')
 @Roles(...SUPER_ADMIN_ONLY)
 export class AuthorizationScannerController {
-  constructor(
-    private readonly scannerService: AuthorizationScannerService,
-  ) {}
+  constructor(private readonly scannerService: AuthorizationScannerService) {}
 
   /**
    * GET /auth/scanner/coverage

@@ -44,7 +44,10 @@ export class PricingRuleController {
 
   @Patch(':id')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.ACCOUNTANT)
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdatePricingRuleDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdatePricingRuleDto,
+  ) {
     return this.pricingRuleService.update(id, updateDto);
   }
 
@@ -63,4 +66,3 @@ export class PricingRuleController {
     return this.pricingRuleService.applyToProduct(id, applyDto);
   }
 }
-

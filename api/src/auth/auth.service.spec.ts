@@ -218,7 +218,7 @@ describe('AuthService', () => {
         is_revoked: true,
       });
 
-      const result = await service.refreshToken(refreshTokenDto as any);
+      const result = await service.refreshToken(refreshTokenDto);
 
       expect(result).toHaveProperty('access_token');
       expect(result).toHaveProperty('refresh_token');
@@ -244,7 +244,7 @@ describe('AuthService', () => {
         email: forgotPasswordDto.email_or_phone,
       });
 
-      await service.forgotPassword(forgotPasswordDto as any);
+      await service.forgotPassword(forgotPasswordDto);
 
       expect(mockPrismaService.passwordResetToken.create).toHaveBeenCalled();
       expect(mockAuditLogService.logPasswordResetRequested).toHaveBeenCalled();
@@ -254,7 +254,7 @@ describe('AuthService', () => {
       const forgotPasswordDto = { email_or_phone: 'nonexistent@example.com' };
       mockPrismaService.user.findFirst.mockResolvedValue(null);
 
-      const result = await service.forgotPassword(forgotPasswordDto as any);
+      const result = await service.forgotPassword(forgotPasswordDto);
 
       expect(result).toHaveProperty('message');
       expect(mockAuditLogService.logPasswordResetRequested).toHaveBeenCalled();
@@ -287,7 +287,7 @@ describe('AuthService', () => {
         is_used: true,
       });
 
-      await service.resetPassword(resetPasswordDto as any);
+      await service.resetPassword(resetPasswordDto);
 
       expect(mockPrismaService.user.update).toHaveBeenCalled();
       expect(mockAuditLogService.logPasswordResetCompleted).toHaveBeenCalled();

@@ -13,7 +13,10 @@ import { CmsService } from './cms.service';
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { MANAGEMENT_ROLES, SYSTEM_ADMIN_ROLES } from '../auth/constants/role-groups';
+import {
+  MANAGEMENT_ROLES,
+  SYSTEM_ADMIN_ROLES,
+} from '../auth/constants/role-groups';
 
 /**
  * Website Content Management — Management roles only.

@@ -158,7 +158,6 @@ export class StaffDashboardService {
     };
   }
 
-
   // ─── HR Methods ───────────────────────────────────────────────────────────
 
   private async getHRSummary() {

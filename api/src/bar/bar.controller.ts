@@ -45,7 +45,10 @@ export class BarController {
 
   @Get('sales')
   @Roles(...MANAGEMENT_ROLES)
-  getBarSales(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
+  getBarSales(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     return this.barService.getBarSales(startDate, endDate);
   }
 
@@ -54,12 +57,12 @@ export class BarController {
   getBarTransfers(
     @Query('date_from') dateFrom?: string,
     @Query('date_to') dateTo?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
   ) {
     return this.barService.getBarTransfers({
       dateFrom,
       dateTo,
-      limit: limit ? parseInt(limit, 10) : undefined
+      limit: limit ? parseInt(limit, 10) : undefined,
     });
   }
 
@@ -68,13 +71,13 @@ export class BarController {
   getBarStockMovements(
     @Query('date_from') dateFrom?: string,
     @Query('date_to') dateTo?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
   ) {
     // Alias for stock movements at BAR location
     return this.barService.getBarStockMovements({
       dateFrom,
       dateTo,
-      limit: limit ? parseInt(limit, 10) : undefined
+      limit: limit ? parseInt(limit, 10) : undefined,
     });
   }
 }

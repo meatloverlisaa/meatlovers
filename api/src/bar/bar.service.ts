@@ -53,7 +53,10 @@ export class BarService {
     return order;
   }
 
-  async updateOrderStatus({ id, status }: { id: string } & UpdateOrderStatusDto) {
+  async updateOrderStatus({
+    id,
+    status,
+  }: { id: string } & UpdateOrderStatusDto) {
     const order = await (this.prisma as any).order.findUnique({
       where: { id: BigInt(id) },
       include: { items: true },
@@ -193,13 +196,16 @@ export class BarService {
 
   private async isDrinkItem(productId: bigint): Promise<boolean> {
     if (!productId) return false;
-    
+
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { product_category: true },
     });
 
-    return product?.product_category === 'SOFT_DRINK' || product?.product_category === 'ALCOHOLIC_DRINK';
+    return (
+      product?.product_category === 'SOFT_DRINK' ||
+      product?.product_category === 'ALCOHOLIC_DRINK'
+    );
   }
 
   private async orderHasDrinkItems(order: any): Promise<boolean> {
@@ -227,7 +233,7 @@ export class BarService {
 
   private async getProductCategory(productId: bigint): Promise<string | null> {
     if (!productId) return null;
-    
+
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { product_category: true },

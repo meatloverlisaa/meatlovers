@@ -3,7 +3,7 @@
 /**
  * Part E: Role Guard Coverage Report Generator
  * Authentication Recovery Sprint Part 3
- * 
+ *
  * Enhanced coverage report generator with:
  * - Detailed role-by-role analysis
  * - Security risk assessment
@@ -18,7 +18,10 @@ import { join } from 'node:path';
 import { NestFactory } from '@nestjs/core';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../../app.module';
-import { scanAuthorizationCoverage, AuthorizationCoverageRow } from './scanner-utils';
+import {
+  scanAuthorizationCoverage,
+  AuthorizationCoverageRow,
+} from './scanner-utils';
 
 interface CoverageStatistics {
   totalEndpoints: number;
@@ -58,10 +61,10 @@ class CoverageReportGenerator {
       logger: ['error'],
     });
     await this.app.init();
-    
+
     console.log('🔍 Scanning authorization coverage...');
     this.rows = scanAuthorizationCoverage(this.app);
-    
+
     console.log('📊 Computing statistics...');
     this.stats = this.computeStatistics();
   }
@@ -77,7 +80,7 @@ class CoverageReportGenerator {
       (row) => !row.isPublic && row.roles.length > 0,
     ).length;
     const uncoveredEndpoints = this.rows.filter((row) => !row.covered).length;
-    
+
     const coveragePercentage =
       totalEndpoints === 0
         ? 0
@@ -164,7 +167,9 @@ class CoverageReportGenerator {
     sections.push('# 🔐 Role Guard Coverage Report\n');
     sections.push(`**Generated:** ${new Date().toISOString()}\n`);
     sections.push(`**Status:** ${isPassing ? '✅ PASS' : '❌ FAIL'}\n`);
-    sections.push(`**Security Risk:** ${this.getRiskEmoji()} ${stats.securityRiskLevel}\n`);
+    sections.push(
+      `**Security Risk:** ${this.getRiskEmoji()} ${stats.securityRiskLevel}\n`,
+    );
     sections.push('---\n');
 
     // Executive Summary
@@ -187,9 +192,7 @@ class CoverageReportGenerator {
     sections.push(
       `ROLE GUARD COVERAGE: ${isPassing ? '✅ PASS - All endpoints protected' : '❌ FAIL - Unprotected endpoints detected'}`,
     );
-    sections.push(
-      `SECURITY RISK LEVEL: ${stats.securityRiskLevel}`,
-    );
+    sections.push(`SECURITY RISK LEVEL: ${stats.securityRiskLevel}`);
     if (!isPassing) {
       sections.push(
         `ACTION REQUIRED: Protect ${stats.uncoveredEndpoints} endpoint(s) before production deployment`,
@@ -199,9 +202,13 @@ class CoverageReportGenerator {
 
     // Controller Breakdown
     sections.push('## 📋 Controller Breakdown\n');
-    sections.push('| Controller | Total | Public | Protected | Uncovered | Coverage |');
-    sections.push('|------------|------:|-------:|----------:|----------:|---------:|');
-    
+    sections.push(
+      '| Controller | Total | Public | Protected | Uncovered | Coverage |',
+    );
+    sections.push(
+      '|------------|------:|-------:|----------:|----------:|---------:|',
+    );
+
     const sortedControllers = Array.from(stats.byController.values()).sort(
       (a, b) => {
         // Sort by coverage (ascending), then by uncovered count (descending)
@@ -230,11 +237,11 @@ class CoverageReportGenerator {
     sections.push('Endpoints accessible by each role:\n');
     sections.push('| Role | Endpoint Count |');
     sections.push('|------|---------------:|');
-    
+
     const sortedRoles = Array.from(stats.byRole.entries()).sort(
       (a, b) => b[1] - a[1],
     );
-    
+
     for (const [role, count] of sortedRoles) {
       sections.push(`| ${role} | ${count} |`);
     }
@@ -248,7 +255,7 @@ class CoverageReportGenerator {
       );
       sections.push('| Controller | Method | Path | Action Required |');
       sections.push('|------------|--------|------|-----------------|');
-      
+
       for (const row of uncoveredRows) {
         const path = `${row.controllerPath}/${row.handlerPath}`.replace(
           /\/+/g,
@@ -265,7 +272,7 @@ class CoverageReportGenerator {
     sections.push('## 📝 Complete Endpoint Matrix\n');
     sections.push('| Controller | Method | Path | Authorization | Status |');
     sections.push('|------------|--------|------|---------------|:------:|');
-    
+
     for (const row of rows) {
       const path = `${row.controllerPath}/${row.handlerPath}`.replace(
         /\/+/g,
@@ -282,17 +289,23 @@ class CoverageReportGenerator {
     // Recommendations
     sections.push('## 💡 Recommendations\n');
     if (isPassing) {
-      sections.push('✅ **Excellent!** All endpoints have proper authorization guards.\n');
+      sections.push(
+        '✅ **Excellent!** All endpoints have proper authorization guards.\n',
+      );
       sections.push('**Next Steps:**');
       sections.push('1. Regularly run this report in CI/CD pipeline');
       sections.push('2. Review role assignments for least privilege');
       sections.push('3. Consider implementing fine-grained permissions');
       sections.push('4. Document authorization decisions\n');
     } else {
-      sections.push('❌ **Action Required:** Fix uncovered endpoints before deployment.\n');
+      sections.push(
+        '❌ **Action Required:** Fix uncovered endpoints before deployment.\n',
+      );
       sections.push('**Immediate Actions:**');
       sections.push('1. Add `@Roles()` decorator to protected endpoints');
-      sections.push('2. Add `@Public()` decorator to intentionally public endpoints');
+      sections.push(
+        '2. Add `@Public()` decorator to intentionally public endpoints',
+      );
       sections.push('3. Review and test authorization logic');
       sections.push('4. Re-run this report to verify fixes\n');
       sections.push('**Code Example:**');
@@ -311,9 +324,7 @@ class CoverageReportGenerator {
 
     // Footer
     sections.push('---');
-    sections.push(
-      `**Report Generated:** ${new Date().toISOString()}  `,
-    );
+    sections.push(`**Report Generated:** ${new Date().toISOString()}  `);
     sections.push(
       '**Generator:** Authentication Recovery Sprint Part 3 - Part E  ',
     );
@@ -324,7 +335,7 @@ class CoverageReportGenerator {
 
   generateJsonReport(): string {
     const { stats, rows } = this;
-    
+
     const report = {
       metadata: {
         generatedAt: new Date().toISOString(),
@@ -365,21 +376,24 @@ class CoverageReportGenerator {
 
   generateCsvReport(): string {
     const lines: string[] = [];
-    
+
     // Header
     lines.push('Controller,Method,Path,HTTP Method,Is Public,Roles,Covered');
-    
+
     // Data rows
     for (const row of this.rows) {
-      const path = `${row.controllerPath}/${row.handlerPath}`.replace(/\/+/g, '/');
+      const path = `${row.controllerPath}/${row.handlerPath}`.replace(
+        /\/+/g,
+        '/',
+      );
       const httpMethod = this.getHttpMethod(row.methodCode);
       const roles = row.roles.join(';');
-      
+
       lines.push(
         `"${row.controller}","${row.handler}","${path}","${httpMethod}",${row.isPublic},"${roles}",${row.covered}`,
       );
     }
-    
+
     return lines.join('\n');
   }
 
@@ -394,7 +408,9 @@ class CoverageReportGenerator {
       6: 'OPTIONS',
       7: 'HEAD',
     };
-    return methodCode !== undefined ? methods[methodCode] || 'UNKNOWN' : 'UNKNOWN';
+    return methodCode !== undefined
+      ? methods[methodCode] || 'UNKNOWN'
+      : 'UNKNOWN';
   }
 
   private getRiskEmoji(): string {
@@ -450,7 +466,9 @@ class CoverageReportGenerator {
     console.log(`Protected Endpoints:  ${stats.protectedEndpoints}`);
     console.log(`Uncovered Endpoints:  ${stats.uncoveredEndpoints}`);
     console.log(`Coverage:             ${stats.coveragePercentage}%`);
-    console.log(`Security Risk:        ${this.getRiskEmoji()} ${stats.securityRiskLevel}`);
+    console.log(
+      `Security Risk:        ${this.getRiskEmoji()} ${stats.securityRiskLevel}`,
+    );
     console.log(`Status:               ${isPassing ? '✅ PASS' : '❌ FAIL'}`);
     console.log('='.repeat(80) + '\n');
 
@@ -474,18 +492,20 @@ async function main(): Promise<void> {
 
   try {
     await generator.initialize();
-    
+
     if (options.verbose) {
       generator.printSummary();
     }
-    
+
     await generator.saveReports(options);
-    
+
     console.log('\n✅ Coverage report generation complete!\n');
-    
+
     // Exit with error code if coverage check fails
     if (options.exitOnFailure && generator['stats'].uncoveredEndpoints > 0) {
-      console.error('❌ Coverage check failed. Fix uncovered endpoints before deployment.\n');
+      console.error(
+        '❌ Coverage check failed. Fix uncovered endpoints before deployment.\n',
+      );
       process.exit(1);
     }
   } catch (error) {

@@ -2,7 +2,6 @@ import { ProductController } from './product.controller';
 import { describe, beforeEach, it, expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 
-
 describe('ProductController', () => {
   let controller: ProductController;
 
@@ -20,4 +19,3 @@ describe('ProductController', () => {
     expect(controller).toBeDefined();
   });
 });
-

@@ -12,4 +12,3 @@ export class ApplyPricingRuleDto {
   @IsString()
   note?: string;
 }
-

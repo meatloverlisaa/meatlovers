@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
@@ -33,7 +37,9 @@ export class OrdersService {
       throw new NotFoundException(`Waiter with ID ${waiterId} not found`);
     }
     if (waiter.role !== 'WAITER') {
-      throw new BadRequestException('waiterId must belong to a user with role WAITER');
+      throw new BadRequestException(
+        'waiterId must belong to a user with role WAITER',
+      );
     }
 
     // Validate products exist/active
@@ -63,7 +69,9 @@ export class OrdersService {
 
       const product = byId.get(item.productId.toString());
       if (!product) {
-        throw new NotFoundException(`Product with ID ${item.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${item.productId} not found`,
+        );
       }
 
       // Prisma Decimal supports numeric operations via JS number conversion.
@@ -84,7 +92,10 @@ export class OrdersService {
       };
     });
 
-    const orderTotal = computedItems.reduce((sum, it) => sum + it.line_total, 0);
+    const orderTotal = computedItems.reduce(
+      (sum, it) => sum + it.line_total,
+      0,
+    );
 
     return this.prisma.$transaction(async (tx) => {
       const order = await (tx as any).order.create({
@@ -172,7 +183,9 @@ export class OrdersService {
     const expectedNext = allowed[order.status as string];
     if (status !== expectedNext && status !== order.status) {
       // allow no-op, but otherwise enforce sequential progression
-      throw new BadRequestException(`Invalid status transition from ${order.status} to ${status}`);
+      throw new BadRequestException(
+        `Invalid status transition from ${order.status} to ${status}`,
+      );
     }
 
     // Consume ingredients when status changes to PREPARING
@@ -367,7 +380,11 @@ export class OrdersService {
   /**
    * PATCH /orders/:id/status — Update order status with authorization (OVERSIGHT)
    */
-  async updateOrderStatus(id: string, userId: bigint, updateDto: UpdateOrderStatusDto) {
+  async updateOrderStatus(
+    id: string,
+    userId: bigint,
+    updateDto: UpdateOrderStatusDto,
+  ) {
     const order = await this.prisma.order.findUnique({
       where: { id: BigInt(id) },
       include: { items: true },
@@ -488,7 +505,10 @@ export class OrdersService {
     const discountPercentActual = (discountValue / originalTotal) * 100;
     const needsApproval = discountPercentActual > 10;
 
-    if (needsApproval && !['ADMIN', 'SUPER_ADMIN', 'MANAGER'].includes(userRole)) {
+    if (
+      needsApproval &&
+      !['ADMIN', 'SUPER_ADMIN', 'MANAGER'].includes(userRole)
+    ) {
       // Create approval request
       const approvalRequest = await this.prisma.approvalRequest.create({
         data: {

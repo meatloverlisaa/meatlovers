@@ -121,7 +121,7 @@ describe('ManagerSuppliersController', () => {
         ...updateDto,
       });
 
-      const result = await controller.update(1, updateDto as any);
+      const result = await controller.update(1, updateDto);
       expect(result.supplier_name).toBe('Updated Name');
       expect(service.update).toHaveBeenCalledWith(1, updateDto);
     });
@@ -135,7 +135,7 @@ describe('ManagerSuppliersController', () => {
         status: SupplierStatus.SUSPENDED,
       });
 
-      await controller.updateStatus(1, statusDto as any);
+      await controller.updateStatus(1, statusDto);
       expect(service.updateStatus).toHaveBeenCalledWith(
         1,
         SupplierStatus.SUSPENDED,

@@ -25,12 +25,15 @@ export class CrmService {
     });
   }
 
-  async updateLeadStatus(id: string,_updateLeadStatusDto: UpdateLeadStatusDto) {
+  async updateLeadStatus(
+    id: string,
+    _updateLeadStatusDto: UpdateLeadStatusDto,
+  ) {
     await this.findLead(id);
 
     return this.prisma.websiteLead.update({
       where: { id: BigInt(id) },
-      data: { status: _updateLeadStatusDto.status as LeadStatus },
+      data: { status: _updateLeadStatusDto.status },
     });
   }
 
@@ -50,7 +53,8 @@ export class CrmService {
       where: { status: 'CONVERTED' },
     });
 
-    const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
+    const conversionRate =
+      totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
 
     return {
       total_leads: totalLeads,

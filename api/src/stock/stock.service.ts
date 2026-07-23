@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MovementType } from '@prisma/client';
 
@@ -36,7 +40,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {
@@ -98,7 +104,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       let stockItem = await tx.stockItem.findFirst({
@@ -110,7 +118,9 @@ export class StockService {
 
       if (!stockItem) {
         if (dto.quantity < 0) {
-          throw new BadRequestException('Cannot adjust negative quantity for non-existent stock item');
+          throw new BadRequestException(
+            'Cannot adjust negative quantity for non-existent stock item',
+          );
         }
         stockItem = await tx.stockItem.create({
           data: {
@@ -122,7 +132,9 @@ export class StockService {
       } else {
         const newQuantity = stockItem.quantity + dto.quantity;
         if (newQuantity < 0) {
-          throw new BadRequestException('Resulting quantity cannot be negative');
+          throw new BadRequestException(
+            'Resulting quantity cannot be negative',
+          );
         }
         stockItem = await tx.stockItem.update({
           where: { id: stockItem.id },
@@ -163,7 +175,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {
@@ -264,7 +278,9 @@ export class StockService {
     });
 
     if (!stockItem) {
-      throw new NotFoundException(`Stock item for product ${productId} not found`);
+      throw new NotFoundException(
+        `Stock item for product ${productId} not found`,
+      );
     }
 
     return stockItem;
@@ -280,7 +296,7 @@ export class StockService {
 
   async getBalance(location?: string) {
     const whereClause = location ? { location } : {};
-    
+
     return this.prisma.stockItem.findMany({
       where: whereClause,
       include: {
@@ -350,10 +366,16 @@ export class StockService {
     // Calculate total value and group by category and location
     let totalValue = 0;
     let totalQuantity = 0;
-    const byCategory: Record<string, { value: number; quantity: number; itemCount: number }> = {};
-    const byLocation: Record<string, { value: number; quantity: number; itemCount: number }> = {};
+    const byCategory: Record<
+      string,
+      { value: number; quantity: number; itemCount: number }
+    > = {};
+    const byLocation: Record<
+      string,
+      { value: number; quantity: number; itemCount: number }
+    > = {};
 
-    const items = stockItems.map(item => {
+    const items = stockItems.map((item) => {
       const itemValue = Number(item.product.cost_price) * item.quantity;
       const cat = item.product.product_category;
       const loc = item.location;
@@ -435,12 +457,14 @@ export class StockService {
 
     // Filter items below reorder level
     const alerts = stockItems
-      .filter(item => {
-        const reorderLevel = REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
+      .filter((item) => {
+        const reorderLevel =
+          REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
         return item.quantity <= reorderLevel;
       })
-      .map(item => {
-        const reorderLevel = REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
+      .map((item) => {
+        const reorderLevel =
+          REORDER_LEVELS[item.location as keyof typeof REORDER_LEVELS] || 10;
         return {
           productId: item.product_id,
           productName: item.product.product_name,
@@ -452,14 +476,19 @@ export class StockService {
           costPrice: item.product.cost_price,
           barcode: item.product.barcode,
           lastUpdated: item.updated_at,
-          status: item.quantity === 0 ? 'OUT_OF_STOCK' : item.quantity <= reorderLevel / 2 ? 'CRITICAL' : 'LOW',
+          status:
+            item.quantity === 0
+              ? 'OUT_OF_STOCK'
+              : item.quantity <= reorderLevel / 2
+                ? 'CRITICAL'
+                : 'LOW',
         };
       });
 
     return {
       alertCount: alerts.length,
-      criticalCount: alerts.filter(a => a.status === 'CRITICAL').length,
-      outOfStockCount: alerts.filter(a => a.status === 'OUT_OF_STOCK').length,
+      criticalCount: alerts.filter((a) => a.status === 'CRITICAL').length,
+      outOfStockCount: alerts.filter((a) => a.status === 'OUT_OF_STOCK').length,
       alerts,
     };
   }
@@ -587,7 +616,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {
@@ -651,7 +682,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {
@@ -739,7 +772,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {
@@ -803,7 +838,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity === 0) {
@@ -819,7 +856,9 @@ export class StockService {
 
       if (!stockItem) {
         if (dto.quantity < 0) {
-          throw new BadRequestException('Cannot adjust negative quantity for non-existent stock item');
+          throw new BadRequestException(
+            'Cannot adjust negative quantity for non-existent stock item',
+          );
         }
         stockItem = await tx.stockItem.create({
           data: {
@@ -831,7 +870,9 @@ export class StockService {
       } else {
         const newQuantity = stockItem.quantity + dto.quantity;
         if (newQuantity < 0) {
-          throw new BadRequestException('Resulting quantity cannot be negative');
+          throw new BadRequestException(
+            'Resulting quantity cannot be negative',
+          );
         }
         stockItem = await tx.stockItem.update({
           where: { id: stockItem.id },
@@ -872,7 +913,9 @@ export class StockService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${dto.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
       }
 
       if (dto.quantity <= 0) {

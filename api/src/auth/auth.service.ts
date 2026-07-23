@@ -444,7 +444,12 @@ export class AuthService {
    * Stores refresh token in database with metadata
    */
   private async generateTokens(
-    user: { id: bigint; email: string | null; phone: string | null; role: string },
+    user: {
+      id: bigint;
+      email: string | null;
+      phone: string | null;
+      role: string;
+    },
     ipAddress?: string,
     userAgent?: string,
   ) {

@@ -4,7 +4,7 @@
  * Authorization Test CLI
  * Command-line tool to test and validate authorization configuration
  * Part C: Authentication Recovery Sprint Part 3
- * 
+ *
  * Usage:
  *   npm run auth:test              # Run all authorization tests
  *   npm run auth:test -- --role WAITER  # Test specific role
@@ -66,7 +66,9 @@ async function bootstrap() {
       console.log(`Total Tests: ${results.length}`);
       console.log(`✓ Passed: ${passed}`);
       console.log(`✗ Failed: ${failed}`);
-      console.log(`Pass Rate: ${((passed / results.length) * 100).toFixed(1)}%\n`);
+      console.log(
+        `Pass Rate: ${((passed / results.length) * 100).toFixed(1)}%\n`,
+      );
 
       if (failed > 0) {
         console.log('Failed Tests:');
@@ -81,7 +83,9 @@ async function bootstrap() {
 
       const coverage = authTestService.generateRoleCoverageReport(flags.role);
       console.log(`\nResource Coverage: ${coverage.coverage.toFixed(1)}%`);
-      console.log(`Accessible Resources: ${coverage.accessibleResources}/${coverage.totalResources}\n`);
+      console.log(
+        `Accessible Resources: ${coverage.accessibleResources}/${coverage.totalResources}\n`,
+      );
     }
 
     // Security scenarios

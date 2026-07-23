@@ -1,4 +1,14 @@
-import { IsArray, IsEnum, IsNumber, IsOptional, IsString, Min, ArrayMinSize, ValidateNested, IsDateString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  ArrayMinSize,
+  ValidateNested,
+  IsDateString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum PaymentMethod {

@@ -50,7 +50,7 @@ import { MonitoringModule } from './monitoring/monitoring.module';
 import { EnforcementModule } from './enforcement/enforcement.module';
 import { ApprovalsModule } from './approvals/approvals.module';
 import { AssetsModule } from './assets/assets.module';
-
+import { HrmModule } from './hrm/hrm.module';
 
 @Module({
   imports: [
@@ -85,6 +85,7 @@ import { AssetsModule } from './assets/assets.module';
     EnforcementModule,
     ApprovalsModule,
     AssetsModule,
+    HrmModule,
   ],
   controllers: [AppController],
   providers: [
@@ -100,5 +101,3 @@ import { AssetsModule } from './assets/assets.module';
   ],
 })
 export class AppModule {}
-
-

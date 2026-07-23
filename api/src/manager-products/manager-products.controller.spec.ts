@@ -39,7 +39,9 @@ describe('ManagerProductsController', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get<ManagerProductsController>(ManagerProductsController);
+    controller = module.get<ManagerProductsController>(
+      ManagerProductsController,
+    );
     service = module.get<ManagerProductsService>(ManagerProductsService);
   });
 
@@ -60,14 +62,12 @@ describe('ManagerProductsController', () => {
           product_name: 'Ribeye Steak',
           product_category: 'MEAT',
           selling_price: 25.99,
-          cost_price: 15.50,
+          cost_price: 15.5,
           barcode: '1234567890',
           is_active: true,
           created_at: new Date(),
           updated_at: new Date(),
-          stock_items: [
-            { location: 'MAIN_STORE', quantity: 45 },
-          ],
+          stock_items: [{ location: 'MAIN_STORE', quantity: 45 }],
         },
       ];
 
@@ -89,7 +89,7 @@ describe('ManagerProductsController', () => {
           product_name: 'Ribeye Steak',
           product_category: 'MEAT',
           selling_price: 25.99,
-          cost_price: 15.50,
+          cost_price: 15.5,
           is_active: true,
           stock_items: [],
         },
@@ -124,7 +124,7 @@ describe('ManagerProductsController', () => {
         product_name: 'Ribeye Steak',
         product_category: 'MEAT',
         selling_price: 25.99,
-        cost_price: 15.50,
+        cost_price: 15.5,
         is_active: true,
         stock_items: [],
         recipe: null,
@@ -139,7 +139,9 @@ describe('ManagerProductsController', () => {
     it('should throw NotFoundException when product not found', async () => {
       mockPrismaService.product.findUnique.mockResolvedValue(null);
 
-      await expect(controller.findOne(999)).rejects.toThrow('Product with ID 999 not found');
+      await expect(controller.findOne(999)).rejects.toThrow(
+        'Product with ID 999 not found',
+      );
     });
   });
 
@@ -194,7 +196,7 @@ describe('ManagerProductsController', () => {
       ]);
 
       mockPrismaService.$queryRaw.mockResolvedValue([
-        { total_value: 125430.50 },
+        { total_value: 125430.5 },
       ]);
 
       const result = await controller.getProductStats();
@@ -207,7 +209,7 @@ describe('ManagerProductsController', () => {
           MEAT: 45,
           POULTRY: 32,
         },
-        total_stock_value: 125430.50,
+        total_stock_value: 125430.5,
       });
     });
   });
@@ -220,7 +222,7 @@ describe('ManagerProductsController', () => {
           product_name: 'Salmon Fillet',
           product_category: 'SEAFOOD',
           selling_price: 18.99,
-          cost_price: 12.00,
+          cost_price: 12.0,
           stock_items: [{ location: 'MAIN_STORE', quantity: 3 }],
         },
       ];
@@ -258,7 +260,9 @@ describe('ManagerProductsController', () => {
       ];
 
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-      mockPrismaService.priceChangeAuditTrail.findMany.mockResolvedValue(mockPriceHistory);
+      mockPrismaService.priceChangeAuditTrail.findMany.mockResolvedValue(
+        mockPriceHistory,
+      );
 
       const result = await controller.getPriceHistory(1, '20');
 

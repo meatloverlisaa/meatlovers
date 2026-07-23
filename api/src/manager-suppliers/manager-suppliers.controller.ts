@@ -130,7 +130,10 @@ export class ManagerSuppliersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStatusDto: UpdateSupplierStatusDto,
   ) {
-    return this.managerSuppliersService.updateStatus(id, updateStatusDto.status);
+    return this.managerSuppliersService.updateStatus(
+      id,
+      updateStatusDto.status,
+    );
   }
 
   /**

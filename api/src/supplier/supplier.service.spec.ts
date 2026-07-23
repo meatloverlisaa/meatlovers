@@ -2,7 +2,6 @@ import { SupplierService } from './supplier.service';
 import { describe, beforeEach, it, expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 
-
 describe('SupplierService', () => {
   let service: SupplierService;
 

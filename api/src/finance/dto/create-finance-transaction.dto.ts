@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 
 export enum TransactionType {
   INCOME = 'INCOME',

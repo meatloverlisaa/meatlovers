@@ -86,39 +86,38 @@ export class ManagerCmsService {
    * Get CMS statistics for oversight
    */
   async getCmsStats() {
-    const [
-      totalPages,
-      publishedPages,
-      draftPages,
-      pagesByType,
-    ] = await Promise.all([
-      // Total pages
-      this.prisma.contentPage.count(),
-      
-      // Published pages
-      this.prisma.contentPage.count({
-        where: { is_published: true },
-      }),
-      
-      // Draft pages
-      this.prisma.contentPage.count({
-        where: { is_published: false },
-      }),
-      
-      // Pages grouped by type
-      this.prisma.contentPage.groupBy({
-        by: ['page_type'],
-        _count: {
-          id: true,
-        },
-      }),
-    ]);
+    const [totalPages, publishedPages, draftPages, pagesByType] =
+      await Promise.all([
+        // Total pages
+        this.prisma.contentPage.count(),
+
+        // Published pages
+        this.prisma.contentPage.count({
+          where: { is_published: true },
+        }),
+
+        // Draft pages
+        this.prisma.contentPage.count({
+          where: { is_published: false },
+        }),
+
+        // Pages grouped by type
+        this.prisma.contentPage.groupBy({
+          by: ['page_type'],
+          _count: {
+            id: true,
+          },
+        }),
+      ]);
 
     // Transform page type stats to a more readable format
-    const pageTypeStats = pagesByType.reduce((acc, item) => {
-      acc[item.page_type] = item._count.id;
-      return acc;
-    }, {} as Record<PageType, number>);
+    const pageTypeStats = pagesByType.reduce(
+      (acc, item) => {
+        acc[item.page_type] = item._count.id;
+        return acc;
+      },
+      {} as Record<PageType, number>,
+    );
 
     return {
       total: totalPages,

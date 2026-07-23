@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -51,14 +55,24 @@ export class ProductService {
     });
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto, request?: Request) {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    request?: Request,
+  ) {
     const existingProduct = await this.findOne(id);
     const currentUserId = this.getCurrentUserId(request);
 
     // Check if selling_price is being changed
-    if (updateProductDto.selling_price && existingProduct.selling_price.toString() !== updateProductDto.selling_price) {
+    if (
+      updateProductDto.selling_price &&
+      existingProduct.selling_price.toString() !==
+        updateProductDto.selling_price
+    ) {
       if (!currentUserId) {
-        throw new BadRequestException('User authentication required for price changes');
+        throw new BadRequestException(
+          'User authentication required for price changes',
+        );
       }
 
       // Create price change audit record
@@ -89,4 +103,3 @@ export class ProductService {
     });
   }
 }
-

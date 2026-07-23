@@ -27,15 +27,15 @@ import { Resource, Action } from '../auth/constants/role-permissions';
 
 /**
  * ProductController
- * 
+ *
  * Manages product catalog operations with fine-grained permission control.
- * 
+ *
  * Permissions:
  * - READ: SUPER_ADMIN, ADMIN, MANAGER, STOREKEEPER, WAITER, CHEF, BARMAN
  * - CREATE: SUPER_ADMIN, ADMIN
  * - UPDATE: SUPER_ADMIN, ADMIN
  * - DELETE: SUPER_ADMIN, ADMIN
- * 
+ *
  * Special:
  * - Price updates require PRICING permission (SUPER_ADMIN, ADMIN only)
  */
@@ -47,7 +47,10 @@ export class ProductController {
   @Get()
   @Roles(...PRODUCT_READ_ROLES)
   @Permission(Resource.PRODUCTS, Action.READ)
-  findAll(@Query('category') category?: string, @Query('status') status?: string) {
+  findAll(
+    @Query('category') category?: string,
+    @Query('status') status?: string,
+  ) {
     if (category) {
       return this.productService.findByCategory(category, status);
     }
@@ -71,14 +74,22 @@ export class ProductController {
   @Patch(':id')
   @Roles(...PRODUCT_WRITE_ROLES)
   @Permission(Resource.PRODUCTS, Action.UPDATE)
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto, @Req() request: Request) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+    @Req() request: Request,
+  ) {
     return this.productService.update(id, updateProductDto, request);
   }
 
   @Patch(':id/price')
   @Roles(...FINANCE_ROLES)
   @Permission(Resource.PRICING, Action.UPDATE)
-  updatePrice(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto, @Req() request?: Request) {
+  updatePrice(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+    @Req() request?: Request,
+  ) {
     return this.productService.update(id, updateProductDto, request);
   }
 
@@ -89,4 +100,3 @@ export class ProductController {
     return this.productService.remove(id);
   }
 }
-

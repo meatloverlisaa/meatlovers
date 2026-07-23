@@ -20,7 +20,9 @@ describe('Payments Settlement (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -45,13 +47,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should create a single payment for an order', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -72,7 +74,7 @@ describe('Payments Settlement (e2e)', () => {
         payments: [
           {
             payment_method: 'CASH',
-            amount: 30.00,
+            amount: 30.0,
             transaction_reference: 'CASH-001',
           },
         ],
@@ -92,13 +94,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should create multi-pay payments for an order', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -119,12 +121,12 @@ describe('Payments Settlement (e2e)', () => {
         payments: [
           {
             payment_method: 'MPESA',
-            amount: 20.00,
+            amount: 20.0,
             transaction_reference: 'MPESA-001',
           },
           {
             payment_method: 'CASH',
-            amount: 10.00,
+            amount: 10.0,
             transaction_reference: 'CASH-001',
           },
         ],
@@ -146,7 +148,7 @@ describe('Payments Settlement (e2e)', () => {
         payments: [
           {
             payment_method: 'CASH',
-            amount: 30.00,
+            amount: 30.0,
           },
         ],
       };
@@ -160,13 +162,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should reject payment with amount mismatch', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -187,7 +189,7 @@ describe('Payments Settlement (e2e)', () => {
         payments: [
           {
             payment_method: 'CASH',
-            amount: 25.00, // Should be 30.00
+            amount: 25.0, // Should be 30.00
           },
         ],
       };
@@ -201,13 +203,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should update order status to PAID after successful payment', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -228,7 +230,7 @@ describe('Payments Settlement (e2e)', () => {
         payments: [
           {
             payment_method: 'CASH',
-            amount: 30.00,
+            amount: 30.0,
           },
         ],
       };
@@ -239,8 +241,9 @@ describe('Payments Settlement (e2e)', () => {
         .expect(201);
 
       // Verify order status is PAID
-      const orderCheck = await request(app.getHttpServer())
-        .get(`/orders/${orderId}/status`);
+      const orderCheck = await request(app.getHttpServer()).get(
+        `/orders/${orderId}/status`,
+      );
 
       expect(orderCheck.body.status).toBe('PAID');
     });
@@ -250,13 +253,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should find payment by ID', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -276,7 +279,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -294,13 +297,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should find payments by order ID', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -320,7 +323,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -334,9 +337,7 @@ describe('Payments Settlement (e2e)', () => {
     });
 
     it('should return 404 for non-existent payment', async () => {
-      await request(app.getHttpServer())
-        .get('/payments/999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/payments/999').expect(404);
     });
   });
 
@@ -344,13 +345,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should update payment status', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -370,7 +371,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -390,13 +391,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should refund a payment', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -416,7 +417,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -424,7 +425,7 @@ describe('Payments Settlement (e2e)', () => {
 
       // Refund payment
       const refundDto = {
-        refund_amount: 30.00,
+        refund_amount: 30.0,
         reason: 'Customer complaint',
         refund_reference: 'REF-001',
       };
@@ -440,13 +441,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should reject refund for non-SUCCESS payment', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -466,7 +467,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -479,7 +480,7 @@ describe('Payments Settlement (e2e)', () => {
 
       // Try to refund failed payment
       const refundDto = {
-        refund_amount: 30.00,
+        refund_amount: 30.0,
         reason: 'Customer complaint',
       };
 
@@ -492,13 +493,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should reject refund amount exceeding payment amount', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -518,7 +519,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -526,7 +527,7 @@ describe('Payments Settlement (e2e)', () => {
 
       // Try to refund more than payment amount
       const refundDto = {
-        refund_amount: 50.00,
+        refund_amount: 50.0,
         reason: 'Customer complaint',
       };
 
@@ -541,13 +542,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should get settlement summary', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -568,8 +569,8 @@ describe('Payments Settlement (e2e)', () => {
         .send({
           order_id: orderId,
           payments: [
-            { payment_method: 'CASH', amount: 20.00 },
-            { payment_method: 'MPESA', amount: 10.00 },
+            { payment_method: 'CASH', amount: 20.0 },
+            { payment_method: 'MPESA', amount: 10.0 },
           ],
         })
         .expect(201);
@@ -580,21 +581,21 @@ describe('Payments Settlement (e2e)', () => {
         .expect(200);
 
       expect(response.body.total_payments).toBe(2);
-      expect(response.body.total_amount).toBe(30.00);
-      expect(response.body.by_method.CASH).toBe(20.00);
-      expect(response.body.by_method.MPESA).toBe(10.00);
+      expect(response.body.total_amount).toBe(30.0);
+      expect(response.body.by_method.CASH).toBe(20.0);
+      expect(response.body.by_method.MPESA).toBe(10.0);
     });
 
     it('should filter settlement summary by payment method', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -615,8 +616,8 @@ describe('Payments Settlement (e2e)', () => {
         .send({
           order_id: orderId,
           payments: [
-            { payment_method: 'CASH', amount: 20.00 },
-            { payment_method: 'MPESA', amount: 10.00 },
+            { payment_method: 'CASH', amount: 20.0 },
+            { payment_method: 'MPESA', amount: 10.0 },
           ],
         })
         .expect(201);
@@ -628,7 +629,7 @@ describe('Payments Settlement (e2e)', () => {
         .expect(200);
 
       expect(response.body.total_payments).toBe(1);
-      expect(response.body.total_amount).toBe(20.00);
+      expect(response.body.total_amount).toBe(20.0);
     });
   });
 
@@ -636,13 +637,13 @@ describe('Payments Settlement (e2e)', () => {
     it('should generate receipt for payment', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -662,7 +663,7 @@ describe('Payments Settlement (e2e)', () => {
         .post('/payments')
         .send({
           order_id: orderId,
-          payments: [{ payment_method: 'CASH', amount: 30.00 }],
+          payments: [{ payment_method: 'CASH', amount: 30.0 }],
         })
         .expect(201);
 
@@ -677,7 +678,7 @@ describe('Payments Settlement (e2e)', () => {
       expect(response.body.payment_id).toBe(paymentId);
       expect(response.body.order_id).toBe(orderId);
       expect(response.body.payment_method).toBe('CASH');
-      expect(response.body.amount_paid).toBe(30.00);
+      expect(response.body.amount_paid).toBe(30.0);
       expect(response.body.order_details).toBeDefined();
       expect(response.body.order_details.items).toHaveLength(1);
     });

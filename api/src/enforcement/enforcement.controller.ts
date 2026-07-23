@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { EnforcementService } from './enforcement.service';
 import { Public } from '../auth/public.decorator';
 
@@ -39,7 +47,9 @@ export class EnforcementController {
 
   @Get('actions/recent')
   getRecentActions(@Query('limit') limit?: string) {
-    return this.enforcementService.getRecentActions(limit ? parseInt(limit) : 10);
+    return this.enforcementService.getRecentActions(
+      limit ? parseInt(limit) : 10,
+    );
   }
 
   @Post('actions')

@@ -1,11 +1,21 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { CreatePaymentDto, PaymentStatus, RefundPaymentDto, SettlementSummaryDto } from './dto/create-payment.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import {
+  CreatePaymentDto,
+  PaymentStatus,
+  RefundPaymentDto,
+  SettlementSummaryDto,
+} from './dto/create-payment.dto';
 import { PaymentsService } from './payments.service';
 import { Roles } from '../auth/decorators/roles.decorator';
-import {
-  CASHIER_ROLES,
-  FINANCE_ROLES,
-} from '../auth/constants/role-groups';
+import { CASHIER_ROLES, FINANCE_ROLES } from '../auth/constants/role-groups';
 
 @Controller('payments')
 export class PaymentsController {
@@ -37,10 +47,7 @@ export class PaymentsController {
 
   @Patch(':id/status')
   @Roles(...CASHIER_ROLES, ...FINANCE_ROLES)
-  updateStatus(
-    @Param('id') id: string,
-    @Body('status') status: PaymentStatus,
-  ) {
+  updateStatus(@Param('id') id: string, @Body('status') status: PaymentStatus) {
     return this.paymentsService.updatePaymentStatus(id, status);
   }
 

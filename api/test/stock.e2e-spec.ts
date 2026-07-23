@@ -20,7 +20,9 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -42,7 +44,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should create stock item and increase quantity on purchase', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       const purchaseDto = {
@@ -68,17 +70,15 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should increase existing stock quantity on subsequent purchase', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       // First purchase
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 50,
-          reference: 'PO-001',
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 50,
+        reference: 'PO-001',
+      });
 
       // Second purchase - should increase quantity
       const response = await request(app.getHttpServer())
@@ -109,7 +109,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject purchase with zero or negative quantity', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       await request(app.getHttpServer())
@@ -134,7 +134,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should create stock item with positive adjustment', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       const adjustmentDto = {
@@ -157,15 +157,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should decrease stock quantity with negative adjustment', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 50,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 50,
+      });
 
       // Negative adjustment
       const response = await request(app.getHttpServer())
@@ -184,15 +182,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject adjustment that results in negative quantity', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 10,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 10,
+      });
 
       // Try to adjust by more than available
       await request(app.getHttpServer())
@@ -207,7 +203,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject negative adjustment for non-existent stock item', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       await request(app.getHttpServer())
@@ -224,15 +220,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should transfer stock between locations and update quantities correctly', async () => {
       // Setup: Create a product and initial stock in MAIN_STORE
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 100,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 100,
+      });
 
       const transferDto = {
         productId: 1,
@@ -259,15 +253,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should create new stock item in destination location if it does not exist', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 100,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 100,
+      });
 
       const response = await request(app.getHttpServer())
         .post('/stock/transfer')
@@ -286,25 +278,21 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should accumulate quantity in destination location on multiple transfers', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 100,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 100,
+      });
 
       // First transfer
-      await request(app.getHttpServer())
-        .post('/stock/transfer')
-        .send({
-          productId: 1,
-          quantity: 20,
-          fromLocation: 'MAIN_STORE',
-          toLocation: 'KITCHEN',
-        });
+      await request(app.getHttpServer()).post('/stock/transfer').send({
+        productId: 1,
+        quantity: 20,
+        fromLocation: 'MAIN_STORE',
+        toLocation: 'KITCHEN',
+      });
 
       // Second transfer to same location
       const response = await request(app.getHttpServer())
@@ -324,15 +312,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject transfer with insufficient quantity in source location', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 20,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 20,
+      });
 
       // Try to transfer more than available
       await request(app.getHttpServer())
@@ -349,7 +335,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject transfer from non-existent source location', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       await request(app.getHttpServer())
@@ -366,15 +352,13 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should reject transfer with zero or negative quantity', async () => {
       // Setup: Create a product and initial stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 50,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 50,
+      });
 
       await request(app.getHttpServer())
         .post('/stock/transfer')
@@ -402,22 +386,18 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should retrieve stock item with movement history', async () => {
       // Setup: Create a product and stock movements
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 100,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 100,
+      });
 
-      await request(app.getHttpServer())
-        .post('/stock/adjustment')
-        .send({
-          productId: 1,
-          quantity: -10,
-        });
+      await request(app.getHttpServer()).post('/stock/adjustment').send({
+        productId: 1,
+        quantity: -10,
+      });
 
       const response = await request(app.getHttpServer())
         .get('/stock/product/1')
@@ -430,30 +410,24 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     });
 
     it('should return 404 for non-existent stock item', async () => {
-      await request(app.getHttpServer())
-        .get('/stock/product/999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/stock/product/999').expect(404);
     });
 
     it('should retrieve all stock items', async () => {
       // Setup: Create multiple products and stock
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW()), (2, "Chicken", "FOOD", 18.00, 12.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW()), (2, "Chicken", "FOOD", 18.00, 12.00, 1, NOW(), NOW())',
       );
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 50,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 50,
+      });
 
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 2,
-          quantity: 30,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 2,
+        quantity: 30,
+      });
 
       const response = await request(app.getHttpServer())
         .get('/stock')
@@ -468,43 +442,35 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should handle multiple movement types and verify final quantity', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       // Initial purchase: 100 units
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 100,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 100,
+      });
 
       // Transfer 30 to kitchen
-      await request(app.getHttpServer())
-        .post('/stock/transfer')
-        .send({
-          productId: 1,
-          quantity: 30,
-          fromLocation: 'MAIN_STORE',
-          toLocation: 'KITCHEN',
-        });
+      await request(app.getHttpServer()).post('/stock/transfer').send({
+        productId: 1,
+        quantity: 30,
+        fromLocation: 'MAIN_STORE',
+        toLocation: 'KITCHEN',
+      });
 
       // Adjustment in main store: -5 (waste)
-      await request(app.getHttpServer())
-        .post('/stock/adjustment')
-        .send({
-          productId: 1,
-          quantity: -5,
-          notes: 'Spoilage',
-        });
+      await request(app.getHttpServer()).post('/stock/adjustment').send({
+        productId: 1,
+        quantity: -5,
+        notes: 'Spoilage',
+      });
 
       // Additional purchase: 20 units
-      await request(app.getHttpServer())
-        .post('/stock/purchase')
-        .send({
-          productId: 1,
-          quantity: 20,
-        });
+      await request(app.getHttpServer()).post('/stock/purchase').send({
+        productId: 1,
+        quantity: 20,
+      });
 
       // Verify final quantities
       const mainStoreResponse = await request(app.getHttpServer())
@@ -518,7 +484,7 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
     it('should maintain data integrity across concurrent operations', async () => {
       // Setup: Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Beef", "FOOD", 20.00, 15.00, 1, NOW(), NOW())',
       );
 
       // Sequential operations to verify consistency
@@ -552,8 +518,9 @@ describe('Stock Movement Quantity Updates (e2e)', () => {
       expect(adjustment.body.stockItem.quantity).toBe(55);
 
       // Final verification
-      const finalStock = await request(app.getHttpServer())
-        .get('/stock/product/1');
+      const finalStock = await request(app.getHttpServer()).get(
+        '/stock/product/1',
+      );
 
       expect(finalStock.body.quantity).toBe(55);
       expect(finalStock.body.movements).toHaveLength(4);

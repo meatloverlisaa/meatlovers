@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { WebsiteService } from './website.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { Public } from '../auth/public.decorator';

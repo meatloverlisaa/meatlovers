@@ -1,7 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-export function createControllerTestModule<T>(opts: { controllers: any[]; providers?: any[] }) {
+export function createControllerTestModule<T>(opts: {
+  controllers: any[];
+  providers?: any[];
+}) {
   return Test.createTestingModule({
     controllers: opts.controllers,
     providers: opts.providers ?? [],
@@ -10,7 +13,9 @@ export function createControllerTestModule<T>(opts: { controllers: any[]; provid
     .compile();
 }
 
-export async function createAppForE2E(appModule: any): Promise<INestApplication> {
+export async function createAppForE2E(
+  appModule: any,
+): Promise<INestApplication> {
   const moduleFixture = await Test.createTestingModule({
     imports: [appModule],
   }).compile();
@@ -19,4 +24,3 @@ export async function createAppForE2E(appModule: any): Promise<INestApplication>
   await app.init();
   return app;
 }
-

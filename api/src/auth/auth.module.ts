@@ -86,6 +86,12 @@ import { PrismaModule } from '../prisma/prisma.module';
       useClass: ThrottlerGuard,
     },
   ],
-  exports: [JwtModule, AuthService, AuditLogService, AuthorizationScannerService, AuthorizationTestService],
+  exports: [
+    JwtModule,
+    AuthService,
+    AuditLogService,
+    AuthorizationScannerService,
+    AuthorizationTestService,
+  ],
 })
 export class AuthModule {}

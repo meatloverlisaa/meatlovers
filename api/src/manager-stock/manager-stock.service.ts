@@ -38,10 +38,7 @@ export class ManagerStockService {
           },
         },
       },
-      orderBy: [
-        { location: 'asc' },
-        { updated_at: 'desc' },
-      ],
+      orderBy: [{ location: 'asc' }, { updated_at: 'desc' }],
     });
   }
 
@@ -281,11 +278,7 @@ export class ManagerStockService {
       whereClause.location = location;
     }
 
-    const [
-      totalItems,
-      stockItems,
-      recentMovements,
-    ] = await Promise.all([
+    const [totalItems, stockItems, recentMovements] = await Promise.all([
       // Total stock items count
       this.prisma.stockItem.count({ where: whereClause }),
 
@@ -402,11 +395,21 @@ export class ManagerStockService {
     let totalQuantity = 0;
     const byCategory: Record<
       string,
-      { costValue: number; sellingValue: number; quantity: number; itemCount: number }
+      {
+        costValue: number;
+        sellingValue: number;
+        quantity: number;
+        itemCount: number;
+      }
     > = {};
     const byLocation: Record<
       string,
-      { costValue: number; sellingValue: number; quantity: number; itemCount: number }
+      {
+        costValue: number;
+        sellingValue: number;
+        quantity: number;
+        itemCount: number;
+      }
     > = {};
 
     const items = stockItems.map((item) => {
@@ -417,10 +420,20 @@ export class ManagerStockService {
 
       // Initialize if not exists
       if (!byCategory[cat]) {
-        byCategory[cat] = { costValue: 0, sellingValue: 0, quantity: 0, itemCount: 0 };
+        byCategory[cat] = {
+          costValue: 0,
+          sellingValue: 0,
+          quantity: 0,
+          itemCount: 0,
+        };
       }
       if (!byLocation[loc]) {
-        byLocation[loc] = { costValue: 0, sellingValue: 0, quantity: 0, itemCount: 0 };
+        byLocation[loc] = {
+          costValue: 0,
+          sellingValue: 0,
+          quantity: 0,
+          itemCount: 0,
+        };
       }
 
       // Accumulate totals

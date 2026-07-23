@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductionPlanDto } from './dto/create-production-plan.dto';
 import { UpdateProductionPlanDto } from './dto/update-production-plan.dto';
@@ -8,7 +12,8 @@ export class ProductionPlansService {
   constructor(private prisma: PrismaService) {}
 
   async create(createProductionPlanDto: CreateProductionPlanDto) {
-    const { recipe_id, planned_quantity, planned_date, notes } = createProductionPlanDto;
+    const { recipe_id, planned_quantity, planned_date, notes } =
+      createProductionPlanDto;
 
     // Check if recipe exists
     const recipe = await this.prisma.recipe.findUnique({
@@ -121,8 +126,14 @@ export class ProductionPlansService {
   }
 
   async update(id: string, updateProductionPlanDto: UpdateProductionPlanDto) {
-    const { recipe_id, planned_quantity, produced_quantity, planned_date, notes, status } =
-      updateProductionPlanDto;
+    const {
+      recipe_id,
+      planned_quantity,
+      produced_quantity,
+      planned_date,
+      notes,
+      status,
+    } = updateProductionPlanDto;
 
     // Check if production plan exists
     const existingPlan = await this.prisma.productionPlan.findUnique({
@@ -147,15 +158,19 @@ export class ProductionPlansService {
     // If updating produced_quantity, validate it doesn't exceed planned_quantity
     if (produced_quantity !== undefined && planned_quantity !== undefined) {
       if (produced_quantity > planned_quantity) {
-        throw new BadRequestException('Produced quantity cannot exceed planned quantity');
+        throw new BadRequestException(
+          'Produced quantity cannot exceed planned quantity',
+        );
       }
     }
 
     // If status is being updated to COMPLETED, set completed_date
     const updateData: any = {};
     if (recipe_id) updateData.recipe_id = BigInt(recipe_id);
-    if (planned_quantity !== undefined) updateData.planned_quantity = planned_quantity;
-    if (produced_quantity !== undefined) updateData.produced_quantity = produced_quantity;
+    if (planned_quantity !== undefined)
+      updateData.planned_quantity = planned_quantity;
+    if (produced_quantity !== undefined)
+      updateData.produced_quantity = produced_quantity;
     if (planned_date) updateData.planned_date = new Date(planned_date);
     if (notes !== undefined) updateData.notes = notes;
     if (status) {
@@ -205,17 +220,25 @@ export class ProductionPlansService {
     }
 
     if (producedQuantity > productionPlan.planned_quantity) {
-      throw new BadRequestException('Produced quantity cannot exceed planned quantity');
+      throw new BadRequestException(
+        'Produced quantity cannot exceed planned quantity',
+      );
     }
 
     // Calculate the additional quantity being produced
-    const additionalQuantity = producedQuantity - productionPlan.produced_quantity;
+    const additionalQuantity =
+      producedQuantity - productionPlan.produced_quantity;
 
     // If we're increasing production, consume ingredients
-    if (additionalQuantity > 0 && productionPlan.recipe?.ingredients && productionPlan.recipe.ingredients.length > 0) {
+    if (
+      additionalQuantity > 0 &&
+      productionPlan.recipe?.ingredients &&
+      productionPlan.recipe.ingredients.length > 0
+    ) {
       await this.prisma.$transaction(async (tx) => {
-        for (const ingredient of productionPlan.recipe!.ingredients) {
-          const requiredQuantity = Number(ingredient.quantity) * additionalQuantity;
+        for (const ingredient of productionPlan.recipe.ingredients) {
+          const requiredQuantity =
+            Number(ingredient.quantity) * additionalQuantity;
           const stockItem = ingredient.stock_item;
 
           // Check if sufficient stock exists
@@ -224,12 +247,14 @@ export class ProductionPlansService {
           });
 
           if (!currentStockItem) {
-            throw new NotFoundException(`Stock item not found for ${stockItem.product?.product_name}`);
+            throw new NotFoundException(
+              `Stock item not found for ${stockItem.product?.product_name}`,
+            );
           }
 
           if (currentStockItem.quantity < requiredQuantity) {
             throw new BadRequestException(
-              `Insufficient stock for ${stockItem.product?.product_name}. Required: ${requiredQuantity}, Available: ${currentStockItem.quantity}`
+              `Insufficient stock for ${stockItem.product?.product_name}. Required: ${requiredQuantity}, Available: ${currentStockItem.quantity}`,
             );
           }
 
@@ -259,8 +284,14 @@ export class ProductionPlansService {
       where: { id: BigInt(id) },
       data: {
         produced_quantity: producedQuantity,
-        status: producedQuantity >= productionPlan.planned_quantity ? 'COMPLETED' : 'IN_PROGRESS',
-        completed_date: producedQuantity >= productionPlan.planned_quantity ? new Date() : null,
+        status:
+          producedQuantity >= productionPlan.planned_quantity
+            ? 'COMPLETED'
+            : 'IN_PROGRESS',
+        completed_date:
+          producedQuantity >= productionPlan.planned_quantity
+            ? new Date()
+            : null,
       },
       include: {
         recipe: {
@@ -320,8 +351,14 @@ export class ProductionPlansService {
       inProgress: plans.filter((p) => p.status === 'IN_PROGRESS').length,
       completed: plans.filter((p) => p.status === 'COMPLETED').length,
       cancelled: plans.filter((p) => p.status === 'CANCELLED').length,
-      totalPlannedQuantity: plans.reduce((sum, p) => sum + p.planned_quantity, 0),
-      totalProducedQuantity: plans.reduce((sum, p) => sum + p.produced_quantity, 0),
+      totalPlannedQuantity: plans.reduce(
+        (sum, p) => sum + p.planned_quantity,
+        0,
+      ),
+      totalProducedQuantity: plans.reduce(
+        (sum, p) => sum + p.produced_quantity,
+        0,
+      ),
       completionRate:
         plans.reduce((sum, p) => sum + p.planned_quantity, 0) > 0
           ? (plans.reduce((sum, p) => sum + p.produced_quantity, 0) /

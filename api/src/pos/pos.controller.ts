@@ -70,7 +70,12 @@ export class PosController {
     @Body() updateDto: UpdateOrderItemDto,
   ) {
     const waiterId = BigInt(req.user.sub);
-    return this.posService.updateOrderItem(waiterId, orderId, itemId, updateDto);
+    return this.posService.updateOrderItem(
+      waiterId,
+      orderId,
+      itemId,
+      updateDto,
+    );
   }
 
   /**

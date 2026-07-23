@@ -1,4 +1,11 @@
-import { IsString, IsEmail, IsOptional, IsEnum, IsInt, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsDateString,
+} from 'class-validator';
 import { LeadSource } from '@prisma/client';
 
 export class CreateLeadDto {

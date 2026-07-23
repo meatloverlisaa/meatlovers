@@ -57,10 +57,7 @@ export class OrdersController {
 
   @Patch(':id')
   @Roles(...POS_ROLES)
-  update(
-    @Param('id') id: string,
-    @Body() updateDto: any,
-  ) {
+  update(@Param('id') id: string, @Body() updateDto: any) {
     return this.ordersService.update(id, updateDto);
   }
 
@@ -77,19 +74,13 @@ export class OrdersController {
 
   @Post(':id/cancellation-request')
   @Roles(...POS_ROLES)
-  requestCancellation(
-    @Param('id') id: string,
-    @Body() dto: any,
-  ) {
+  requestCancellation(@Param('id') id: string, @Body() dto: any) {
     return this.ordersService.requestCancellation(id, dto);
   }
 
   @Post(':id/discount-request')
   @Roles(...POS_ROLES)
-  requestDiscount(
-    @Param('id') id: string,
-    @Body() dto: ApplyDiscountDto,
-  ) {
+  requestDiscount(@Param('id') id: string, @Body() dto: ApplyDiscountDto) {
     return this.ordersService.requestDiscount(id, dto);
   }
 
@@ -111,5 +102,3 @@ export class OrdersController {
     return this.ordersService.applyDiscount(id, userId, userRole, applyDto);
   }
 }
-
-

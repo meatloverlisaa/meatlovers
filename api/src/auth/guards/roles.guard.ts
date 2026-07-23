@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
-import {
-  IS_PUBLIC_KEY,
-  ROLES_KEY,
-} from '../constants/auth-metadata.constants';
+import { IS_PUBLIC_KEY, ROLES_KEY } from '../constants/auth-metadata.constants';
 import { AuthenticatedRequest } from '../types/authenticated-request.type';
 
 @Injectable()
@@ -26,10 +23,10 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     /*
      * Fail closed.
@@ -44,8 +41,7 @@ export class RolesGuard implements CanActivate {
       );
     }
 
-    const request =
-      context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
     if (!user) {

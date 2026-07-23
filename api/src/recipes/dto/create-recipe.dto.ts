@@ -1,4 +1,11 @@
-import { IsString, IsBoolean, IsOptional, IsArray, ValidateNested, IsDecimal } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  IsDecimal,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateRecipeIngredientDto {

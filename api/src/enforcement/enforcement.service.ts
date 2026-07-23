@@ -25,28 +25,34 @@ export class EnforcementService {
           take: 5,
         },
       },
-      orderBy: [
-        { risk_level: 'desc' },
-        { risk_score: 'desc' },
-      ],
+      orderBy: [{ risk_level: 'desc' }, { risk_score: 'desc' }],
     });
   }
 
   async getRiskSummary() {
-    const [total, low, medium, high, critical, recentViolations] = await Promise.all([
-      this.prisma.enforcementRiskScore.count(),
-      this.prisma.enforcementRiskScore.count({ where: { risk_level: 'LOW' } }),
-      this.prisma.enforcementRiskScore.count({ where: { risk_level: 'MEDIUM' } }),
-      this.prisma.enforcementRiskScore.count({ where: { risk_level: 'HIGH' } }),
-      this.prisma.enforcementRiskScore.count({ where: { risk_level: 'CRITICAL' } }),
-      this.prisma.enforcementRiskScore.count({
-        where: {
-          last_violation_at: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+    const [total, low, medium, high, critical, recentViolations] =
+      await Promise.all([
+        this.prisma.enforcementRiskScore.count(),
+        this.prisma.enforcementRiskScore.count({
+          where: { risk_level: 'LOW' },
+        }),
+        this.prisma.enforcementRiskScore.count({
+          where: { risk_level: 'MEDIUM' },
+        }),
+        this.prisma.enforcementRiskScore.count({
+          where: { risk_level: 'HIGH' },
+        }),
+        this.prisma.enforcementRiskScore.count({
+          where: { risk_level: 'CRITICAL' },
+        }),
+        this.prisma.enforcementRiskScore.count({
+          where: {
+            last_violation_at: {
+              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+            },
           },
-        },
-      }),
-    ]);
+        }),
+      ]);
 
     return {
       total,
@@ -116,7 +122,9 @@ export class EnforcementService {
       data: {
         ...(data.risk_level && { risk_level: data.risk_level }),
         ...(data.risk_score !== undefined && { risk_score: data.risk_score }),
-        ...(data.violation_count !== undefined && { violation_count: data.violation_count }),
+        ...(data.violation_count !== undefined && {
+          violation_count: data.violation_count,
+        }),
         ...(data.notes !== undefined && { notes: data.notes }),
         updated_at: new Date(),
       },

@@ -35,4 +35,3 @@ export class MarginAlertController {
     return this.marginAlertService.updateStatus(id, updateDto);
   }
 }
-

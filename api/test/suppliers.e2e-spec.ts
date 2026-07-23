@@ -20,7 +20,9 @@ describe('Suppliers (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -55,7 +57,9 @@ describe('Suppliers (e2e)', () => {
       expect(response.body.contact_person).toBe('John Doe');
       expect(response.body.phone).toBe('+254712345678');
       expect(response.body.email).toBe('john@freshfoods.com');
-      expect(response.body.physical_address).toBe('123 Industrial Area, Nairobi');
+      expect(response.body.physical_address).toBe(
+        '123 Industrial Area, Nairobi',
+      );
       expect(response.body.supplier_type).toBe('FOOD');
       expect(response.body.status).toBe('ACTIVE'); // Default status
     });
@@ -249,7 +253,7 @@ describe('Suppliers (e2e)', () => {
         },
       });
 
-      await new Promise(resolve => setTimeout(resolve, 10)); // Small delay
+      await new Promise((resolve) => setTimeout(resolve, 10)); // Small delay
 
       await prisma.supplier.create({
         data: {
@@ -287,9 +291,7 @@ describe('Suppliers (e2e)', () => {
     });
 
     it('should return 404 for non-existent supplier', async () => {
-      await request(app.getHttpServer())
-        .get('/suppliers/99999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/suppliers/99999').expect(404);
     });
   });
 
@@ -313,9 +315,7 @@ describe('Suppliers (e2e)', () => {
     });
 
     it('should return 404 when deleting non-existent supplier', async () => {
-      await request(app.getHttpServer())
-        .delete('/suppliers/99999')
-        .expect(404);
+      await request(app.getHttpServer()).delete('/suppliers/99999').expect(404);
     });
   });
 

@@ -211,15 +211,19 @@ export class ManagerProductsService {
     ]);
 
     // Transform category stats
-    const categoryStats = productsByCategory.reduce((acc, item) => {
-      acc[item.product_category] = item._count.id;
-      return acc;
-    }, {} as Record<ProductCategory, number>);
+    const categoryStats = productsByCategory.reduce(
+      (acc, item) => {
+        acc[item.product_category] = item._count.id;
+        return acc;
+      },
+      {} as Record<ProductCategory, number>,
+    );
 
     // Extract total value from query result
-    const stockValue = Array.isArray(totalStockValue) && totalStockValue.length > 0 
-      ? (totalStockValue[0] as any).total_value || 0 
-      : 0;
+    const stockValue =
+      Array.isArray(totalStockValue) && totalStockValue.length > 0
+        ? totalStockValue[0].total_value || 0
+        : 0;
 
     return {
       total: totalProducts,

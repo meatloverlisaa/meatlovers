@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProductionPlansService } from './production-plans.service';
 import { CreateProductionPlanDto } from './dto/create-production-plan.dto';
 import { UpdateProductionPlanDto } from './dto/update-production-plan.dto';
@@ -7,7 +16,9 @@ import { KITCHEN_ROLES, MANAGEMENT_ROLES } from '../auth/constants/role-groups';
 
 @Controller('production-plans')
 export class ProductionPlansController {
-  constructor(private readonly productionPlansService: ProductionPlansService) {}
+  constructor(
+    private readonly productionPlansService: ProductionPlansService,
+  ) {}
 
   @Post()
   @Roles(...KITCHEN_ROLES)
@@ -48,14 +59,23 @@ export class ProductionPlansController {
 
   @Patch(':id')
   @Roles(...KITCHEN_ROLES)
-  update(@Param('id') id: string, @Body() updateProductionPlanDto: UpdateProductionPlanDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProductionPlanDto: UpdateProductionPlanDto,
+  ) {
     return this.productionPlansService.update(id, updateProductionPlanDto);
   }
 
   @Patch(':id/produced-quantity')
   @Roles(...KITCHEN_ROLES)
-  updateProducedQuantity(@Param('id') id: string, @Body('producedQuantity') producedQuantity: number) {
-    return this.productionPlansService.updateProducedQuantity(id, producedQuantity);
+  updateProducedQuantity(
+    @Param('id') id: string,
+    @Body('producedQuantity') producedQuantity: number,
+  ) {
+    return this.productionPlansService.updateProducedQuantity(
+      id,
+      producedQuantity,
+    );
   }
 
   @Delete(':id')

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
@@ -35,7 +39,9 @@ export class RecipesService {
       });
 
       if (!stockItem) {
-        throw new NotFoundException(`Stock item with ID ${ingredient.stock_item_id} not found`);
+        throw new NotFoundException(
+          `Stock item with ID ${ingredient.stock_item_id} not found`,
+        );
       }
     }
 
@@ -168,7 +174,9 @@ export class RecipesService {
           });
 
           if (!stockItem) {
-            throw new NotFoundException(`Stock item with ID ${ingredient.stock_item_id} not found`);
+            throw new NotFoundException(
+              `Stock item with ID ${ingredient.stock_item_id} not found`,
+            );
           }
         }
       }
@@ -178,10 +186,16 @@ export class RecipesService {
     const updatedRecipe = await this.prisma.recipe.update({
       where: { id: BigInt(id) },
       data: {
-        ...(recipeData.product_id && { product_id: BigInt(recipeData.product_id) }),
+        ...(recipeData.product_id && {
+          product_id: BigInt(recipeData.product_id),
+        }),
         ...(recipeData.name && { name: recipeData.name }),
-        ...(recipeData.instructions !== undefined && { instructions: recipeData.instructions }),
-        ...(recipeData.is_active !== undefined && { is_active: recipeData.is_active }),
+        ...(recipeData.instructions !== undefined && {
+          instructions: recipeData.instructions,
+        }),
+        ...(recipeData.is_active !== undefined && {
+          is_active: recipeData.is_active,
+        }),
         ...(ingredients && {
           ingredients: {
             deleteMany: {},
@@ -256,7 +270,7 @@ export class RecipesService {
 
       if (stockItem.quantity < requiredQuantity) {
         throw new BadRequestException(
-          `Insufficient stock for ${stockItem.product.product_name}. Required: ${requiredQuantity}, Available: ${stockItem.quantity}`
+          `Insufficient stock for ${stockItem.product.product_name}. Required: ${requiredQuantity}, Available: ${stockItem.quantity}`,
         );
       }
 

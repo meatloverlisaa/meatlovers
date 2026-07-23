@@ -3,7 +3,7 @@
 /**
  * Authorization Coverage Scanner CLI
  * Run with: npm run scan:auth
- * 
+ *
  * This script scans all controllers and endpoints to verify that every endpoint
  * is either protected with @Roles() decorator or explicitly marked as @Public().
  */

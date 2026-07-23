@@ -2,7 +2,6 @@ import { SupplierController } from './supplier.controller';
 import { describe, beforeEach, it, expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 
-
 describe('SupplierController', () => {
   let controller: SupplierController;
 

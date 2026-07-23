@@ -126,7 +126,7 @@ describe('ManagerSuppliersService', () => {
         ...updateDto,
       });
 
-      const result = await service.update(1, updateDto as any);
+      const result = await service.update(1, updateDto);
       expect(result.supplier_name).toBe('Updated Name');
       expect(prisma.supplier.update).toHaveBeenCalledWith({
         where: { id: BigInt(1) },

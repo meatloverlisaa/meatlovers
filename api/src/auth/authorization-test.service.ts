@@ -199,11 +199,7 @@ export class AuthorizationTestService {
     // Scenario 2: WAITER cannot access financial data
     scenarios.push({
       scenario: 'WAITER cannot access financial reports',
-      passed: !hasPermission(
-        'WAITER',
-        Resource.FINANCIAL_REPORTS,
-        Action.READ,
-      ),
+      passed: !hasPermission('WAITER', Resource.FINANCIAL_REPORTS, Action.READ),
       message: 'WAITER should not have access to financial reports',
     });
 
@@ -233,11 +229,7 @@ export class AuthorizationTestService {
       scenario: 'ACCOUNTANT can read but not modify financial reports',
       passed:
         hasPermission('ACCOUNTANT', Resource.FINANCIAL_REPORTS, Action.READ) &&
-        !hasPermission(
-          'ACCOUNTANT',
-          Resource.FINANCIAL_REPORTS,
-          Action.DELETE,
-        ),
+        !hasPermission('ACCOUNTANT', Resource.FINANCIAL_REPORTS, Action.DELETE),
       message: 'ACCOUNTANT should have read-only access to financial data',
     });
 

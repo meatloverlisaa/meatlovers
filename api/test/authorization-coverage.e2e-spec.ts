@@ -63,13 +63,10 @@ describe('Authorization metadata coverage', () => {
     ];
 
     const violations = rows.filter((row) => {
-      const fullPath =
-        `${row.controllerPath}/${row.handlerPath}`.toLowerCase();
+      const fullPath = `${row.controllerPath}/${row.handlerPath}`.toLowerCase();
       return (
         row.isPublic &&
-        prohibitedPublicPrefixes.some((prefix) =>
-          fullPath.includes(prefix),
-        )
+        prohibitedPublicPrefixes.some((prefix) => fullPath.includes(prefix))
       );
     });
 

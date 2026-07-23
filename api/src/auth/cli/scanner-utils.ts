@@ -7,10 +7,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PATH_METADATA, METHOD_METADATA } from '@nestjs/common/constants';
-import {
-  IS_PUBLIC_KEY,
-  ROLES_KEY,
-} from '../constants/auth-metadata.constants';
+import { IS_PUBLIC_KEY, ROLES_KEY } from '../constants/auth-metadata.constants';
 
 export interface AuthorizationCoverageRow {
   controller: string;
@@ -67,28 +64,24 @@ export function scanAuthorizationCoverage(
       >;
 
       // Get controller base path
-      const controllerPath =
-        Reflect.getMetadata(PATH_METADATA, metatype) ?? '';
+      const controllerPath = Reflect.getMetadata(PATH_METADATA, metatype) ?? '';
 
       // Get all handler methods
       const handlerNames = Object.getOwnPropertyNames(prototype).filter(
         (name) =>
-          name !== 'constructor' &&
-          typeof prototype[name] === 'function',
+          name !== 'constructor' && typeof prototype[name] === 'function',
       );
 
       for (const handlerName of handlerNames) {
         const handler = prototype[handlerName] as Function;
 
         // Get handler path
-        const handlerPath =
-          Reflect.getMetadata(PATH_METADATA, handler) ?? '';
+        const handlerPath = Reflect.getMetadata(PATH_METADATA, handler) ?? '';
 
         // Get HTTP method code
-        const methodCode = Reflect.getMetadata(
-          METHOD_METADATA,
-          handler,
-        ) as number | undefined;
+        const methodCode = Reflect.getMetadata(METHOD_METADATA, handler) as
+          | number
+          | undefined;
 
         // Skip if not an HTTP handler
         if (methodCode === undefined) {
@@ -97,10 +90,10 @@ export function scanAuthorizationCoverage(
 
         // Check if endpoint is marked as public
         const isPublic =
-          reflector.getAllAndOverride<boolean>(
-            IS_PUBLIC_KEY,
-            [handler, metatype],
-          ) ?? false;
+          reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+            handler,
+            metatype,
+          ]) ?? false;
 
         // Get required roles
         const roles =
@@ -198,9 +191,7 @@ export function getUniqueControllers(
 /**
  * Get all unique roles
  */
-export function getUniqueRoles(
-  rows: AuthorizationCoverageRow[],
-): string[] {
+export function getUniqueRoles(rows: AuthorizationCoverageRow[]): string[] {
   const roles = new Set<string>();
   for (const row of rows) {
     for (const role of row.roles) {
@@ -217,7 +208,7 @@ export function calculateCoveragePercentage(
   rows: AuthorizationCoverageRow[],
 ): number {
   if (rows.length === 0) return 0;
-  
+
   const coveredCount = rows.filter((row) => row.covered).length;
   return Number(((coveredCount / rows.length) * 100).toFixed(2));
 }

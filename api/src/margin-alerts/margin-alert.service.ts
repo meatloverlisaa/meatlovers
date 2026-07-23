@@ -1,5 +1,9 @@
 // @ts-nocheck — Module disabled in AppModule, Prisma model not yet in schema
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateMarginAlertDto } from './dto/update-margin-alert.dto';
 
@@ -36,4 +40,3 @@ export class MarginAlertService {
     });
   }
 }
-

@@ -1,6 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { FinanceService } from './finance.service';
-import { CreateFinanceTransactionDto, TransactionType, TransactionCategory } from './dto/create-finance-transaction.dto';
+import {
+  CreateFinanceTransactionDto,
+  TransactionType,
+  TransactionCategory,
+} from './dto/create-finance-transaction.dto';
 import { UpdateFinanceTransactionDto } from './dto/update-finance-transaction.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { FINANCE_ROLES } from '../auth/constants/role-groups';
@@ -11,8 +24,12 @@ export class FinanceController {
 
   @Post()
   @Roles(...FINANCE_ROLES)
-  createFinanceTransaction(@Body() createFinanceTransactionDto: CreateFinanceTransactionDto) {
-    return this.financeService.createFinanceTransaction(createFinanceTransactionDto);
+  createFinanceTransaction(
+    @Body() createFinanceTransactionDto: CreateFinanceTransactionDto,
+  ) {
+    return this.financeService.createFinanceTransaction(
+      createFinanceTransactionDto,
+    );
   }
 
   @Get()
@@ -57,8 +74,14 @@ export class FinanceController {
 
   @Patch(':id')
   @Roles(...FINANCE_ROLES)
-  updateFinanceTransaction(@Param('id') id: string, @Body() updateFinanceTransactionDto: UpdateFinanceTransactionDto) {
-    return this.financeService.updateFinanceTransaction(id, updateFinanceTransactionDto);
+  updateFinanceTransaction(
+    @Param('id') id: string,
+    @Body() updateFinanceTransactionDto: UpdateFinanceTransactionDto,
+  ) {
+    return this.financeService.updateFinanceTransaction(
+      id,
+      updateFinanceTransactionDto,
+    );
   }
 
   @Delete(':id')

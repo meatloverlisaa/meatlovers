@@ -1,4 +1,11 @@
-import { IsNumber, IsPositive, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+  IsNumber,
+  IsPositive,
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class ApplyDiscountDto {
   @IsNumber()

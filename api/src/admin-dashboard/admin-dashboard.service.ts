@@ -17,7 +17,11 @@ export class AdminDashboardService {
    */
   async getDashboardSummary() {
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -65,7 +69,7 @@ export class AdminDashboardService {
     ordersByStatus.forEach((group) => {
       const count = group._count.id;
       orderCounts.total += count;
-      
+
       switch (group.status) {
         case OrderStatus.PENDING:
           orderCounts.pending = count;
@@ -126,7 +130,10 @@ export class AdminDashboardService {
         total: totalLeads,
         new: newLeads,
         converted: convertedLeads,
-        conversionRate: totalLeads > 0 ? ((convertedLeads / totalLeads) * 100).toFixed(2) : '0.00',
+        conversionRate:
+          totalLeads > 0
+            ? ((convertedLeads / totalLeads) * 100).toFixed(2)
+            : '0.00',
       },
       approvals: {
         marginAlerts: openMarginAlerts,
@@ -205,23 +212,25 @@ export class AdminDashboardService {
     });
 
     // Recent price changes
-    const recentPriceChanges = await this.prisma.priceChangeAuditTrail.findMany({
-      take: limit,
-      orderBy: { created_at: 'desc' },
-      select: {
-        id: true,
-        old_selling_price: true,
-        new_selling_price: true,
-        note: true,
-        created_at: true,
-        product: {
-          select: { id: true, product_name: true },
-        },
-        actor: {
-          select: { id: true, full_name: true, role: true },
+    const recentPriceChanges = await this.prisma.priceChangeAuditTrail.findMany(
+      {
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        select: {
+          id: true,
+          old_selling_price: true,
+          new_selling_price: true,
+          note: true,
+          created_at: true,
+          product: {
+            select: { id: true, product_name: true },
+          },
+          actor: {
+            select: { id: true, full_name: true, role: true },
+          },
         },
       },
-    });
+    );
 
     // Format as unified activity timeline
     const activities: any[] = [];
@@ -375,7 +384,7 @@ export class AdminDashboardService {
 
     const now = new Date();
     const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-    
+
     const pendingPayments = await this.prisma.payment.findMany({
       where: {
         payment_status: PaymentStatus.PENDING,
@@ -457,7 +466,9 @@ export class AdminDashboardService {
           method: payment.payment_method,
           amount: payment.amount,
           createdAt: payment.created_at,
-          minutesStuck: Math.floor((now.getTime() - payment.created_at.getTime()) / 60000),
+          minutesStuck: Math.floor(
+            (now.getTime() - payment.created_at.getTime()) / 60000,
+          ),
         })),
       },
       operational: {
@@ -467,7 +478,9 @@ export class AdminDashboardService {
           table: order.table.table_name || `Table ${order.table}`,
           waiter: order.waiter.full_name,
           createdAt: order.created_at,
-          hoursStuck: Math.floor((now.getTime() - order.created_at.getTime()) / 3600000),
+          hoursStuck: Math.floor(
+            (now.getTime() - order.created_at.getTime()) / 3600000,
+          ),
         })),
       },
       summary: {
@@ -478,8 +491,10 @@ export class AdminDashboardService {
           failedPayments.length +
           pendingPayments.length +
           stuckOrders.length,
-        criticalCount: criticalStock.length + failedPayments.length + stuckOrders.length,
-        warningCount: lowStock.length + marginAlerts.length + pendingPayments.length,
+        criticalCount:
+          criticalStock.length + failedPayments.length + stuckOrders.length,
+        warningCount:
+          lowStock.length + marginAlerts.length + pendingPayments.length,
       },
     };
   }

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Body,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param, Query } from '@nestjs/common';
 import { CrmService } from './crm.service';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
 import { Roles } from '../auth/decorators/roles.decorator';

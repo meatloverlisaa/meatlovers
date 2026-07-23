@@ -23,7 +23,9 @@ describe('Waste Declarations (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -57,8 +59,8 @@ describe('Waste Declarations (e2e)', () => {
         id: 200n,
         product_name: 'Cooked Ribs',
         product_category: 'FOOD',
-        selling_price: 35.50,
-        cost_price: 20.00,
+        selling_price: 35.5,
+        cost_price: 20.0,
       },
     });
 
@@ -94,7 +96,7 @@ describe('Waste Declarations (e2e)', () => {
       expect(response.body.reason).toBe(WasteReason.THEFT);
       expect(response.body.notes).toBe('Disappeared from kitchen');
       expect(response.body.declared_by).toBe(String(testUser.id));
-      expect(Number(response.body.cost_value)).toBe(200.00); // 10 * cost_price (20.00)
+      expect(Number(response.body.cost_value)).toBe(200.0); // 10 * cost_price (20.00)
 
       // Verify stock was updated
       const updatedStock = await prisma.stockItem.findUnique({
@@ -150,7 +152,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 5,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 100.00,
+          cost_value: 100.0,
           declared_at: new Date(now.getTime() - 60000), // 1 minute ago
         },
       });
@@ -161,7 +163,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.THEFT,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
           declared_at: now, // now (most recent)
         },
       });
@@ -197,14 +199,14 @@ describe('Waste Declarations (e2e)', () => {
             quantity: 5,
             reason: WasteReason.SPOILED,
             declared_by: testUser.id,
-            cost_value: 100.00,
+            cost_value: 100.0,
           },
           {
             product_id: testProduct.id,
             quantity: 10,
             reason: WasteReason.THEFT,
             declared_by: testUser.id,
-            cost_value: 200.00,
+            cost_value: 200.0,
           },
         ],
       });
@@ -217,7 +219,7 @@ describe('Waste Declarations (e2e)', () => {
 
       expect(response.body.totalDeclarations).toBe(2);
       expect(response.body.totalQuantity).toBe(15);
-      expect(response.body.totalCostValue).toBe(300.00);
+      expect(response.body.totalCostValue).toBe(300.0);
       expect(response.body.byReason[WasteReason.SPOILED]).toBe(5);
       expect(response.body.byReason[WasteReason.THEFT]).toBe(10);
       expect(response.body.byProduct[testProduct.product_name]).toBe(15);
@@ -235,7 +237,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
         },
       });
       declarationId = String(declaration.id);
@@ -260,8 +262,10 @@ describe('Waste Declarations (e2e)', () => {
         .expect(200);
 
       expect(response.body.quantity).toBe(15);
-      expect(response.body.notes).toBe('More was spoiled than initially counted');
-      expect(Number(response.body.cost_value)).toBe(300.00);
+      expect(response.body.notes).toBe(
+        'More was spoiled than initially counted',
+      );
+      expect(Number(response.body.cost_value)).toBe(300.0);
 
       // Stock should go from 40 to 35
       const updatedStock = await prisma.stockItem.findUnique({
@@ -281,7 +285,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
         },
       });
       declarationId = String(declaration.id);
@@ -373,7 +377,9 @@ describe('Waste Declarations (e2e)', () => {
       // Second movement: adjustment for quantity change
       expect(movements[1].movement_type).toBe('ADJUSTMENT');
       expect(movements[1].quantity).toBe(-5); // Additional 5 deducted
-      expect(movements[1].reference).toContain(`Waste Declaration Adjustment #${wasteId}`);
+      expect(movements[1].reference).toContain(
+        `Waste Declaration Adjustment #${wasteId}`,
+      );
       expect(movements[1].notes).toContain('10 to 15');
     });
 
@@ -411,8 +417,12 @@ describe('Waste Declarations (e2e)', () => {
       // Second movement: reversal/restoration
       expect(movements[1].movement_type).toBe('ADJUSTMENT');
       expect(movements[1].quantity).toBe(10); // Stock restored
-      expect(movements[1].reference).toContain(`Waste Declaration Reversal #${wasteId}`);
-      expect(movements[1].notes).toContain(`Reversed waste declaration #${wasteId}`);
+      expect(movements[1].reference).toContain(
+        `Waste Declaration Reversal #${wasteId}`,
+      );
+      expect(movements[1].notes).toContain(
+        `Reversed waste declaration #${wasteId}`,
+      );
     });
 
     it('should support date-range filtering for audit purposes', async () => {
@@ -427,7 +437,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 5,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 100.00,
+          cost_value: 100.0,
           declared_at: twoDaysAgo,
         },
       });
@@ -438,7 +448,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.THEFT,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
           declared_at: yesterday,
         },
       });
@@ -449,7 +459,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 15,
           reason: WasteReason.EXPIRED,
           declared_by: testUser.id,
-          cost_value: 300.00,
+          cost_value: 300.0,
           declared_at: now,
         },
       });
@@ -464,9 +474,13 @@ describe('Waste Declarations (e2e)', () => {
         .expect(200);
 
       expect(response.body).toHaveLength(2);
-      expect(response.body.every((w: any) => 
-        new Date(w.declared_at) >= yesterday && new Date(w.declared_at) <= now
-      )).toBe(true);
+      expect(
+        response.body.every(
+          (w: any) =>
+            new Date(w.declared_at) >= yesterday &&
+            new Date(w.declared_at) <= now,
+        ),
+      ).toBe(true);
     });
   });
 
@@ -485,7 +499,7 @@ describe('Waste Declarations (e2e)', () => {
         .expect(201);
 
       // Cost value should be quantity * cost_price (10 * 20.00 = 200.00)
-      expect(Number(response.body.cost_value)).toBe(200.00);
+      expect(Number(response.body.cost_value)).toBe(200.0);
     });
 
     it('should aggregate waste costs correctly for P&L reporting', async () => {
@@ -497,21 +511,21 @@ describe('Waste Declarations (e2e)', () => {
             quantity: 5,
             reason: WasteReason.SPOILED,
             declared_by: testUser.id,
-            cost_value: 100.00,
+            cost_value: 100.0,
           },
           {
             product_id: testProduct.id,
             quantity: 10,
             reason: WasteReason.THEFT,
             declared_by: testUser.id,
-            cost_value: 200.00,
+            cost_value: 200.0,
           },
           {
             product_id: testProduct.id,
             quantity: 15,
             reason: WasteReason.EXPIRED,
             declared_by: testUser.id,
-            cost_value: 300.00,
+            cost_value: 300.0,
           },
         ],
       });
@@ -521,7 +535,7 @@ describe('Waste Declarations (e2e)', () => {
         .expect(200);
 
       // Total cost value should be 100 + 200 + 300 = 600
-      expect(summaryResponse.body.totalCostValue).toBe(600.00);
+      expect(summaryResponse.body.totalCostValue).toBe(600.0);
       expect(summaryResponse.body.totalQuantity).toBe(30);
       expect(summaryResponse.body.totalDeclarations).toBe(3);
     });
@@ -537,7 +551,7 @@ describe('Waste Declarations (e2e)', () => {
         })
         .expect(201);
 
-      expect(Number(createResponse.body.cost_value)).toBe(200.00);
+      expect(Number(createResponse.body.cost_value)).toBe(200.0);
 
       // Update quantity to 15
       const updateResponse = await request(app.getHttpServer())
@@ -546,7 +560,7 @@ describe('Waste Declarations (e2e)', () => {
         .expect(200);
 
       // New cost value should be 15 * 20.00 = 300.00
-      expect(Number(updateResponse.body.cost_value)).toBe(300.00);
+      expect(Number(updateResponse.body.cost_value)).toBe(300.0);
     });
 
     it('should provide waste breakdown by reason for P&L analysis', async () => {
@@ -557,21 +571,21 @@ describe('Waste Declarations (e2e)', () => {
             quantity: 5,
             reason: WasteReason.SPOILED,
             declared_by: testUser.id,
-            cost_value: 100.00,
+            cost_value: 100.0,
           },
           {
             product_id: testProduct.id,
             quantity: 5,
             reason: WasteReason.SPOILED,
             declared_by: testUser.id,
-            cost_value: 100.00,
+            cost_value: 100.0,
           },
           {
             product_id: testProduct.id,
             quantity: 10,
             reason: WasteReason.THEFT,
             declared_by: testUser.id,
-            cost_value: 200.00,
+            cost_value: 200.0,
           },
         ],
       });
@@ -592,8 +606,8 @@ describe('Waste Declarations (e2e)', () => {
           id: 201n,
           product_name: 'Grilled Chicken',
           product_category: 'FOOD',
-          selling_price: 25.00,
-          cost_price: 15.00,
+          selling_price: 25.0,
+          cost_price: 15.0,
         },
       });
 
@@ -613,7 +627,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
         },
       });
 
@@ -623,7 +637,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 5,
           reason: WasteReason.THEFT,
           declared_by: testUser.id,
-          cost_value: 75.00,
+          cost_value: 75.0,
         },
       });
 
@@ -647,7 +661,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 10,
           reason: WasteReason.SPOILED,
           declared_by: testUser.id,
-          cost_value: 200.00,
+          cost_value: 200.0,
           declared_at: oneWeekAgo,
         },
       });
@@ -658,7 +672,7 @@ describe('Waste Declarations (e2e)', () => {
           quantity: 15,
           reason: WasteReason.THEFT,
           declared_by: testUser.id,
-          cost_value: 300.00,
+          cost_value: 300.0,
           declared_at: now,
         },
       });
@@ -668,7 +682,7 @@ describe('Waste Declarations (e2e)', () => {
         .get('/waste-declarations/summary')
         .expect(200);
 
-      expect(fullSummary.body.totalCostValue).toBe(500.00);
+      expect(fullSummary.body.totalCostValue).toBe(500.0);
 
       // Get summary for just this week
       const weeklySummary = await request(app.getHttpServer())
@@ -676,7 +690,7 @@ describe('Waste Declarations (e2e)', () => {
         .query({ startDate: oneWeekAgo.toISOString() })
         .expect(200);
 
-      expect(weeklySummary.body.totalCostValue).toBe(500.00);
+      expect(weeklySummary.body.totalCostValue).toBe(500.0);
     });
   });
 });

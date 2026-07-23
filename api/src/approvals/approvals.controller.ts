@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ApprovalsService } from './approvals.service';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { APPROVER_ROLES, MANAGEMENT_ROLES } from '../auth/constants/role-groups';
+import {
+  APPROVER_ROLES,
+  MANAGEMENT_ROLES,
+} from '../auth/constants/role-groups';
 
 @Controller('approvals')
 export class ApprovalsController {
@@ -50,6 +61,10 @@ export class ApprovalsController {
   @Patch(':id/reject')
   @Roles(...APPROVER_ROLES)
   rejectRequest(@Param('id') id: string, @Body() data: any) {
-    return this.approvalsService.rejectRequest(id, data.reviewed_by, data.reason);
+    return this.approvalsService.rejectRequest(
+      id,
+      data.reviewed_by,
+      data.reason,
+    );
   }
 }

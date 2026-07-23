@@ -63,15 +63,23 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         ],
       };
 
-      mockPrisma.table.findUnique.mockResolvedValue({ id: 1n, table_name: 'Table 1' });
+      mockPrisma.table.findUnique.mockResolvedValue({
+        id: 1n,
+        table_name: 'Table 1',
+      });
       mockPrisma.user.findUnique.mockResolvedValue({
         id: 1n,
         full_name: 'John Waiter',
         role: 'WAITER',
       });
       mockPrisma.product.findMany.mockResolvedValue([
-        { id: 1n, product_name: 'Burger', selling_price: 15.00, is_active: true },
-        { id: 2n, product_name: 'Fries', selling_price: 5.00, is_active: true },
+        {
+          id: 1n,
+          product_name: 'Burger',
+          selling_price: 15.0,
+          is_active: true,
+        },
+        { id: 2n, product_name: 'Fries', selling_price: 5.0, is_active: true },
       ]);
 
       const mockOrder = {
@@ -79,10 +87,22 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         table_id: 1n,
         waiter_id: 1n,
         status: 'PENDING',
-        total_amount: 35.00,
+        total_amount: 35.0,
         items: [
-          { product_id: 1n, product_name: 'Burger', quantity: 2, unit_price: 15.00, line_total: 30.00 },
-          { product_id: 2n, product_name: 'Fries', quantity: 1, unit_price: 5.00, line_total: 5.00 },
+          {
+            product_id: 1n,
+            product_name: 'Burger',
+            quantity: 2,
+            unit_price: 15.0,
+            line_total: 30.0,
+          },
+          {
+            product_id: 2n,
+            product_name: 'Fries',
+            quantity: 1,
+            unit_price: 5.0,
+            line_total: 5.0,
+          },
         ],
         waiter: { id: 1n, full_name: 'John Waiter' },
         table: { id: 1n, table_name: 'Table 1' },
@@ -96,10 +116,14 @@ describe('OrdersService - Order Life-cycle Tests', () => {
       const result = await service.create(createOrderDto);
 
       expect(result.status).toBe('PENDING');
-      expect(result.total_amount).toBe(35.00);
+      expect(result.total_amount).toBe(35.0);
       expect(result.items).toHaveLength(2);
-      expect(mockPrisma.table.findUnique).toHaveBeenCalledWith({ where: { id: 1n } });
-      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 1n } });
+      expect(mockPrisma.table.findUnique).toHaveBeenCalledWith({
+        where: { id: 1n },
+      });
+      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 1n },
+      });
     });
 
     it('should reject order with non-existent table', async () => {
@@ -111,8 +135,12 @@ describe('OrdersService - Order Life-cycle Tests', () => {
 
       mockPrisma.table.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(createOrderDto)).rejects.toThrow(NotFoundException);
-      await expect(service.create(createOrderDto)).rejects.toThrow('Table with ID 999 not found');
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        'Table with ID 999 not found',
+      );
     });
 
     it('should reject order with non-waiter user', async () => {
@@ -122,15 +150,22 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [{ productId: 1, quantity: 1 }],
       };
 
-      mockPrisma.table.findUnique.mockResolvedValue({ id: 1n, table_name: 'Table 1' });
+      mockPrisma.table.findUnique.mockResolvedValue({
+        id: 1n,
+        table_name: 'Table 1',
+      });
       mockPrisma.user.findUnique.mockResolvedValue({
         id: 1n,
         full_name: 'John Chef',
         role: 'CHEF',
       });
 
-      await expect(service.create(createOrderDto)).rejects.toThrow(BadRequestException);
-      await expect(service.create(createOrderDto)).rejects.toThrow('waiterId must belong to a user with role WAITER');
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        'waiterId must belong to a user with role WAITER',
+      );
     });
 
     it('should reject order with inactive product', async () => {
@@ -140,7 +175,10 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [{ productId: 1, quantity: 1 }],
       };
 
-      mockPrisma.table.findUnique.mockResolvedValue({ id: 1n, table_name: 'Table 1' });
+      mockPrisma.table.findUnique.mockResolvedValue({
+        id: 1n,
+        table_name: 'Table 1',
+      });
       mockPrisma.user.findUnique.mockResolvedValue({
         id: 1n,
         full_name: 'John Waiter',
@@ -149,8 +187,12 @@ describe('OrdersService - Order Life-cycle Tests', () => {
       // Simulate that the product is not returned because is_active: false filter excludes it
       mockPrisma.product.findMany.mockResolvedValue([]);
 
-      await expect(service.create(createOrderDto)).rejects.toThrow(NotFoundException);
-      await expect(service.create(createOrderDto)).rejects.toThrow('Products not found or inactive: 1');
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        'Products not found or inactive: 1',
+      );
     });
 
     it('should reject order with zero or negative quantity', async () => {
@@ -160,18 +202,30 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [{ productId: 1, quantity: 0 }],
       };
 
-      mockPrisma.table.findUnique.mockResolvedValue({ id: 1n, table_name: 'Table 1' });
+      mockPrisma.table.findUnique.mockResolvedValue({
+        id: 1n,
+        table_name: 'Table 1',
+      });
       mockPrisma.user.findUnique.mockResolvedValue({
         id: 1n,
         full_name: 'John Waiter',
         role: 'WAITER',
       });
       mockPrisma.product.findMany.mockResolvedValue([
-        { id: 1n, product_name: 'Burger', selling_price: 15.00, is_active: true },
+        {
+          id: 1n,
+          product_name: 'Burger',
+          selling_price: 15.0,
+          is_active: true,
+        },
       ]);
 
-      await expect(service.create(createOrderDto)).rejects.toThrow(BadRequestException);
-      await expect(service.create(createOrderDto)).rejects.toThrow('quantity must be > 0');
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.create(createOrderDto)).rejects.toThrow(
+        'quantity must be > 0',
+      );
     });
   });
 
@@ -187,9 +241,14 @@ describe('OrdersService - Order Life-cycle Tests', () => {
       (mockPrisma as any).order.findUnique = mockPrisma.order.findUnique;
 
       const updatedOrder = { ...mockOrder, status: 'PREPARING' };
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue(updatedOrder);
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue(updatedOrder);
 
-      const result = await service.updateStatus({ id: '1', status: 'PREPARING' });
+      const result = await service.updateStatus({
+        id: '1',
+        status: 'PREPARING',
+      });
 
       expect(result.status).toBe('PREPARING');
       expect((mockPrisma as any).order.update).toHaveBeenCalledWith({
@@ -206,10 +265,14 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [],
       };
 
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
       const updatedOrder = { ...mockOrder, status: 'READY' };
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue(updatedOrder);
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue(updatedOrder);
 
       const result = await service.updateStatus({ id: '1', status: 'READY' });
 
@@ -223,10 +286,14 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [],
       };
 
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
       const updatedOrder = { ...mockOrder, status: 'SERVED' };
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue(updatedOrder);
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue(updatedOrder);
 
       const result = await service.updateStatus({ id: '1', status: 'SERVED' });
 
@@ -240,12 +307,16 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [],
       };
 
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
-      await expect(service.updateStatus({ id: '1', status: 'READY' })).rejects.toThrow(BadRequestException);
-      await expect(service.updateStatus({ id: '1', status: 'READY' })).rejects.toThrow(
-        'Invalid status transition from PENDING to READY'
-      );
+      await expect(
+        service.updateStatus({ id: '1', status: 'READY' }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.updateStatus({ id: '1', status: 'READY' }),
+      ).rejects.toThrow('Invalid status transition from PENDING to READY');
     });
 
     it('should reject invalid status transition (PREPARING to SERVED)', async () => {
@@ -255,12 +326,16 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [],
       };
 
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
-      await expect(service.updateStatus({ id: '1', status: 'SERVED' })).rejects.toThrow(BadRequestException);
-      await expect(service.updateStatus({ id: '1', status: 'SERVED' })).rejects.toThrow(
-        'Invalid status transition from PREPARING to SERVED'
-      );
+      await expect(
+        service.updateStatus({ id: '1', status: 'SERVED' }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.updateStatus({ id: '1', status: 'SERVED' }),
+      ).rejects.toThrow('Invalid status transition from PREPARING to SERVED');
     });
 
     it('should allow no-op status update (same status)', async () => {
@@ -270,10 +345,14 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         items: [],
       };
 
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
       const updatedOrder = { ...mockOrder, status: 'PENDING' };
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue(updatedOrder);
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue(updatedOrder);
 
       const result = await service.updateStatus({ id: '1', status: 'PENDING' });
 
@@ -283,10 +362,12 @@ describe('OrdersService - Order Life-cycle Tests', () => {
     it('should reject status update for non-existent order', async () => {
       (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue(null);
 
-      await expect(service.updateStatus({ id: '999', status: 'PREPARING' })).rejects.toThrow(NotFoundException);
-      await expect(service.updateStatus({ id: '999', status: 'PREPARING' })).rejects.toThrow(
-        'Order with ID 999 not found'
-      );
+      await expect(
+        service.updateStatus({ id: '999', status: 'PREPARING' }),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.updateStatus({ id: '999', status: 'PREPARING' }),
+      ).rejects.toThrow('Order with ID 999 not found');
     });
   });
 
@@ -302,15 +383,23 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         ],
       };
 
-      mockPrisma.table.findUnique.mockResolvedValue({ id: 1n, table_name: 'Table 1' });
+      mockPrisma.table.findUnique.mockResolvedValue({
+        id: 1n,
+        table_name: 'Table 1',
+      });
       mockPrisma.user.findUnique.mockResolvedValue({
         id: 1n,
         full_name: 'John Waiter',
         role: 'WAITER',
       });
       mockPrisma.product.findMany.mockResolvedValue([
-        { id: 1n, product_name: 'Burger', selling_price: 15.00, is_active: true },
-        { id: 2n, product_name: 'Fries', selling_price: 5.00, is_active: true },
+        {
+          id: 1n,
+          product_name: 'Burger',
+          selling_price: 15.0,
+          is_active: true,
+        },
+        { id: 2n, product_name: 'Fries', selling_price: 5.0, is_active: true },
       ]);
 
       const mockOrder = {
@@ -318,10 +407,22 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         table_id: 1n,
         waiter_id: 1n,
         status: 'PENDING',
-        total_amount: 35.00,
+        total_amount: 35.0,
         items: [
-          { product_id: 1n, product_name: 'Burger', quantity: 2, unit_price: 15.00, line_total: 30.00 },
-          { product_id: 2n, product_name: 'Fries', quantity: 1, unit_price: 5.00, line_total: 5.00 },
+          {
+            product_id: 1n,
+            product_name: 'Burger',
+            quantity: 2,
+            unit_price: 15.0,
+            line_total: 30.0,
+          },
+          {
+            product_id: 2n,
+            product_name: 'Fries',
+            quantity: 1,
+            unit_price: 5.0,
+            line_total: 5.0,
+          },
         ],
         waiter: { id: 1n, full_name: 'John Waiter' },
         table: { id: 1n, table_name: 'Table 1' },
@@ -336,24 +437,45 @@ describe('OrdersService - Order Life-cycle Tests', () => {
       expect(createdOrder.status).toBe('PENDING');
 
       // Step 2: Kitchen starts preparing (PREPARING)
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue({ ...mockOrder, status: 'PENDING' });
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue({ ...mockOrder, status: 'PREPARING' });
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'PENDING' });
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'PREPARING' });
 
-      const preparingOrder = await service.updateStatus({ id: '1', status: 'PREPARING' });
+      const preparingOrder = await service.updateStatus({
+        id: '1',
+        status: 'PREPARING',
+      });
       expect(preparingOrder.status).toBe('PREPARING');
 
       // Step 3: Order is ready for serving (READY)
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue({ ...mockOrder, status: 'PREPARING' });
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue({ ...mockOrder, status: 'READY' });
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'PREPARING' });
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'READY' });
 
-      const readyOrder = await service.updateStatus({ id: '1', status: 'READY' });
+      const readyOrder = await service.updateStatus({
+        id: '1',
+        status: 'READY',
+      });
       expect(readyOrder.status).toBe('READY');
 
       // Step 4: Order has been served (SERVED)
-      (mockPrisma as any).order.findUnique = jest.fn().mockResolvedValue({ ...mockOrder, status: 'READY' });
-      (mockPrisma as any).order.update = jest.fn().mockResolvedValue({ ...mockOrder, status: 'SERVED' });
+      (mockPrisma as any).order.findUnique = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'READY' });
+      (mockPrisma as any).order.update = jest
+        .fn()
+        .mockResolvedValue({ ...mockOrder, status: 'SERVED' });
 
-      const servedOrder = await service.updateStatus({ id: '1', status: 'SERVED' });
+      const servedOrder = await service.updateStatus({
+        id: '1',
+        status: 'SERVED',
+      });
       expect(servedOrder.status).toBe('SERVED');
 
       // Verify the complete life-cycle
@@ -377,7 +499,9 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         table: { id: 1n, table_name: 'Table 1' },
       };
 
-      (mockPrisma as any).order.findFirst = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findFirst = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
       const result = await service.findLatest(query);
 
@@ -401,7 +525,9 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         table: { id: 1n, table_name: 'Table 1' },
       };
 
-      (mockPrisma as any).order.findFirst = jest.fn().mockResolvedValue(mockOrder);
+      (mockPrisma as any).order.findFirst = jest
+        .fn()
+        .mockResolvedValue(mockOrder);
 
       const result = await service.findLatest(query);
 
@@ -416,8 +542,12 @@ describe('OrdersService - Order Life-cycle Tests', () => {
     it('should reject order retrieval without tableId or waiterId', async () => {
       const query = {};
 
-      await expect(service.findLatest(query)).rejects.toThrow(BadRequestException);
-      await expect(service.findLatest(query)).rejects.toThrow('Provide either tableId or waiterId');
+      await expect(service.findLatest(query)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.findLatest(query)).rejects.toThrow(
+        'Provide either tableId or waiterId',
+      );
     });
   });
 });

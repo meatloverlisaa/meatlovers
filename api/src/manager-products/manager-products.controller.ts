@@ -19,7 +19,9 @@ import { Role } from '@prisma/client';
 @Controller('manager/products')
 @Public()
 export class ManagerProductsController {
-  constructor(private readonly managerProductsService: ManagerProductsService) {}
+  constructor(
+    private readonly managerProductsService: ManagerProductsService,
+  ) {}
 
   /**
    * GET /manager/products

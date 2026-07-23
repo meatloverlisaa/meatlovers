@@ -24,6 +24,22 @@ enum Role {
   HR
 }
 
+enum EmploymentType {
+  PERMANENT
+  CONTRACT
+  PART_TIME
+  CASUAL
+  PROBATION
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  SUSPENDED
+  TERMINATED
+}
+
 model User {
   id            BigInt   @id @default(autoincrement())
   full_name     String   @db.VarChar(255)
@@ -39,6 +55,9 @@ model User {
   last_login_at         DateTime?
   last_login_ip         String?  @db.VarChar(45)
   password_changed_at   DateTime @default(now())
+  
+  // HR/Employee fields
+  employee_profile EmployeeProfile?
   
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
@@ -62,6 +81,74 @@ model User {
   payroll_records Payroll[]
 
   @@map("users")
+}
+
+model EmployeeProfile {
+  id                    BigInt           @id @default(autoincrement())
+  user_id               BigInt           @unique
+  
+  // Personal Details
+  date_of_birth         DateTime?        @db.Date
+  gender                String?          @db.VarChar(20)
+  nationality           String?          @db.VarChar(100)
+  
+  // Identification Documents
+  national_id           String?          @db.VarChar(50)
+  tax_id                String?          @db.VarChar(50)
+  passport_number       String?          @db.VarChar(50)
+  
+  // Contact Information
+  alternative_phone     String?          @db.VarChar(50)
+  personal_email        String?          @db.VarChar(255)
+  physical_address      String?          @db.Text
+  postal_address        String?          @db.VarChar(255)
+  city                  String?          @db.VarChar(100)
+  country               String?          @db.VarChar(100)
+  
+  // Emergency Contact
+  emergency_contact_name  String?        @db.VarChar(255)
+  emergency_contact_phone String?        @db.VarChar(50)
+  emergency_contact_relationship String? @db.VarChar(100)
+  
+  // Employment Details
+  employment_start_date DateTime         @db.Date
+  employment_end_date   DateTime?        @db.Date
+  employment_type       EmploymentType   @default(PERMANENT)
+  employment_status     EmploymentStatus @default(ACTIVE)
+  probation_end_date    DateTime?        @db.Date
+  contract_end_date     DateTime?        @db.Date
+  
+  // Department & Position
+  department            String?          @db.VarChar(100)
+  position_title        String?          @db.VarChar(255)
+  reports_to_user_id    BigInt?
+  
+  // Banking Details
+  bank_name             String?          @db.VarChar(255)
+  bank_account_number   String?          @db.VarChar(100)
+  bank_account_name     String?          @db.VarChar(255)
+  bank_branch           String?          @db.VarChar(255)
+  bank_swift_code       String?          @db.VarChar(50)
+  
+  // Qualifications
+  education_level       String?          @db.VarChar(100)
+  certifications        String?          @db.Text
+  skills                String?          @db.Text
+  
+  // Additional Information
+  notes                 String?          @db.Text
+  profile_photo_url     String?          @db.VarChar(500)
+  
+  created_at            DateTime         @default(now())
+  updated_at            DateTime         @updatedAt
+  
+  user                  User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@map("employee_profiles")
+  @@index([user_id])
+  @@index([employment_status])
+  @@index([employment_type])
+  @@index([department])
 }
 
 enum SupplierType {

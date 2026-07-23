@@ -24,18 +24,9 @@ describe('Role authorization', () => {
     cashierToken = await loginRole(app, 'cashier@test.local');
     chefToken = await loginRole(app, 'chef@test.local');
     barmanToken = await loginRole(app, 'barman@test.local');
-    storekeeperToken = await loginRole(
-      app,
-      'storekeeper@test.local',
-    );
-    accountantToken = await loginRole(
-      app,
-      'accountant@test.local',
-    );
-    dispatcherToken = await loginRole(
-      app,
-      'dispatcher@test.local',
-    );
+    storekeeperToken = await loginRole(app, 'storekeeper@test.local');
+    accountantToken = await loginRole(app, 'accountant@test.local');
+    dispatcherToken = await loginRole(app, 'dispatcher@test.local');
   });
 
   afterAll(async () => {

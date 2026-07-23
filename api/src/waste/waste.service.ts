@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateWasteDeclarationDto, WasteReason } from './dto/create-waste-declaration.dto';
+import {
+  CreateWasteDeclarationDto,
+  WasteReason,
+} from './dto/create-waste-declaration.dto';
 import { UpdateWasteDeclarationDto } from './dto/update-waste-declaration.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -8,7 +15,9 @@ import { Decimal } from '@prisma/client/runtime/library';
 export class WasteService {
   constructor(private prisma: PrismaService) {}
 
-  async createWasteDeclaration(createWasteDeclarationDto: CreateWasteDeclarationDto) {
+  async createWasteDeclaration(
+    createWasteDeclarationDto: CreateWasteDeclarationDto,
+  ) {
     // Check if product exists
     const product = await this.prisma.product.findUnique({
       where: { id: BigInt(createWasteDeclarationDto.product_id) },
@@ -36,12 +45,13 @@ export class WasteService {
     const stockItem = product.stock_items[0];
     if (stockItem.quantity < createWasteDeclarationDto.quantity) {
       throw new BadRequestException(
-        `Insufficient stock. Available: ${stockItem.quantity}, Requested: ${createWasteDeclarationDto.quantity}`
+        `Insufficient stock. Available: ${stockItem.quantity}, Requested: ${createWasteDeclarationDto.quantity}`,
       );
     }
 
     // Calculate cost value based on product cost price
-    const costValue = Number(product.cost_price) * createWasteDeclarationDto.quantity;
+    const costValue =
+      Number(product.cost_price) * createWasteDeclarationDto.quantity;
 
     // Create waste declaration and update stock in transaction
     const result = await this.prisma.$transaction(async (tx) => {
@@ -94,7 +104,7 @@ export class WasteService {
     productId?: string,
     reason?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ) {
     const where: any = {};
 
@@ -155,7 +165,10 @@ export class WasteService {
 
     const totalDeclarations = declarations.length;
     const totalQuantity = declarations.reduce((sum, d) => sum + d.quantity, 0);
-    const totalCostValue = declarations.reduce((sum, d) => sum + Number(d.cost_value), 0);
+    const totalCostValue = declarations.reduce(
+      (sum, d) => sum + Number(d.cost_value),
+      0,
+    );
 
     const byReason: Record<string, number> = {};
     const byProduct: Record<string, number> = {};
@@ -163,8 +176,10 @@ export class WasteService {
 
     declarations.forEach((d) => {
       byReason[d.reason] = (byReason[d.reason] || 0) + Number(d.cost_value);
-      byProduct[d.product.product_name] = (byProduct[d.product.product_name] || 0) + Number(d.cost_value);
-      byDeclarer[d.declarer.full_name] = (byDeclarer[d.declarer.full_name] || 0) + Number(d.cost_value);
+      byProduct[d.product.product_name] =
+        (byProduct[d.product.product_name] || 0) + Number(d.cost_value);
+      byDeclarer[d.declarer.full_name] =
+        (byDeclarer[d.declarer.full_name] || 0) + Number(d.cost_value);
     });
 
     return {
@@ -232,7 +247,10 @@ export class WasteService {
     return wasteDeclaration;
   }
 
-  async updateWasteDeclaration(id: string, updateWasteDeclarationDto: UpdateWasteDeclarationDto) {
+  async updateWasteDeclaration(
+    id: string,
+    updateWasteDeclarationDto: UpdateWasteDeclarationDto,
+  ) {
     const wasteDeclaration = await this.prisma.wasteDeclaration.findUnique({
       where: { id: BigInt(id) },
       include: {

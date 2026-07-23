@@ -85,7 +85,7 @@ describe('DeliveriesService', () => {
           created_at: new Date(),
           updated_at: new Date(),
           user: {
-           id: BigInt(1),
+            id: BigInt(1),
             full_name: 'John Doe',
             email: 'john@example.com',
             role: 'DISPATCHER',
@@ -116,7 +116,7 @@ describe('DeliveriesService', () => {
         mockPrismaService.user.findUnique.mockResolvedValue(null);
 
         await expect(service.createRider(createRiderDto)).rejects.toThrow(
-          NotFoundException
+          NotFoundException,
         );
       });
 
@@ -147,7 +147,7 @@ describe('DeliveriesService', () => {
         });
 
         await expect(service.createRider(createRiderDto)).rejects.toThrow(
-          BadRequestException
+          BadRequestException,
         );
       });
     });
@@ -260,9 +260,9 @@ describe('DeliveriesService', () => {
       it('should throw NotFoundException if rider does not exist', async () => {
         mockPrismaService.rider.findUnique.mockResolvedValue(null);
 
-        await expect(service.updateRider('999', { phone: '+254798765432' })).rejects.toThrow(
-          NotFoundException
-        );
+        await expect(
+          service.updateRider('999', { phone: '+254798765432' }),
+        ).rejects.toThrow(NotFoundException);
       });
     });
 
@@ -289,7 +289,9 @@ describe('DeliveriesService', () => {
       it('should throw NotFoundException if rider does not exist', async () => {
         mockPrismaService.rider.findUnique.mockResolvedValue(null);
 
-        await expect(service.removeRider('999')).rejects.toThrow(NotFoundException);
+        await expect(service.removeRider('999')).rejects.toThrow(
+          NotFoundException,
+        );
       });
     });
   });
@@ -377,7 +379,7 @@ describe('DeliveriesService', () => {
         mockPrismaService.order.findUnique.mockResolvedValue(null);
 
         await expect(service.createDelivery(createDeliveryDto)).rejects.toThrow(
-          NotFoundException
+          NotFoundException,
         );
       });
 
@@ -404,7 +406,7 @@ describe('DeliveriesService', () => {
         });
 
         await expect(service.createDelivery(createDeliveryDto)).rejects.toThrow(
-          BadRequestException
+          BadRequestException,
         );
       });
 
@@ -432,7 +434,7 @@ describe('DeliveriesService', () => {
         });
 
         await expect(service.createDelivery(createDeliveryDto)).rejects.toThrow(
-          BadRequestException
+          BadRequestException,
         );
       });
     });
@@ -456,7 +458,9 @@ describe('DeliveriesService', () => {
         mockPrismaService.delivery.findUnique.mockResolvedValue(mockDelivery);
         mockPrismaService.delivery.update.mockResolvedValue(updatedDelivery);
 
-        const result = await service.updateDeliveryStatus('1', { status: 'PICKED_UP' });
+        const result = await service.updateDeliveryStatus('1', {
+          status: 'PICKED_UP',
+        });
 
         expect(result).toEqual(updatedDelivery);
         expect(mockPrismaService.delivery.update).toHaveBeenCalledWith({
@@ -488,7 +492,9 @@ describe('DeliveriesService', () => {
         mockPrismaService.delivery.findUnique.mockResolvedValue(mockDelivery);
         mockPrismaService.delivery.update.mockResolvedValue(updatedDelivery);
 
-        const result = await service.updateDeliveryStatus('1', { status: 'DELIVERED' });
+        const result = await service.updateDeliveryStatus('1', {
+          status: 'DELIVERED',
+        });
 
         expect(result).toEqual(updatedDelivery);
         expect(mockPrismaService.delivery.update).toHaveBeenCalledWith({
@@ -549,7 +555,7 @@ describe('DeliveriesService', () => {
         mockPrismaService.delivery.findUnique.mockResolvedValue(mockDelivery);
 
         await expect(
-          service.updateDeliveryStatus('1', { status: 'INVALID_STATUS' })
+          service.updateDeliveryStatus('1', { status: 'INVALID_STATUS' }),
         ).rejects.toThrow(BadRequestException);
       });
 
@@ -557,7 +563,7 @@ describe('DeliveriesService', () => {
         mockPrismaService.delivery.findUnique.mockResolvedValue(null);
 
         await expect(
-          service.updateDeliveryStatus('999', { status: 'PICKED_UP' })
+          service.updateDeliveryStatus('999', { status: 'PICKED_UP' }),
         ).rejects.toThrow(NotFoundException);
       });
     });
@@ -599,23 +605,35 @@ describe('DeliveriesService', () => {
           },
         ];
 
-        mockPrismaService.delivery.findUnique.mockResolvedValue(deliveryFlow[0]);
+        mockPrismaService.delivery.findUnique.mockResolvedValue(
+          deliveryFlow[0],
+        );
         mockPrismaService.delivery.update.mockResolvedValue(deliveryFlow[1]);
 
-        let result = await service.updateDeliveryStatus('1', { status: 'PICKED_UP' });
+        let result = await service.updateDeliveryStatus('1', {
+          status: 'PICKED_UP',
+        });
         expect(result.status).toBe('PICKED_UP');
         expect(result.picked_up_at).toBeDefined();
 
-        mockPrismaService.delivery.findUnique.mockResolvedValue(deliveryFlow[1]);
+        mockPrismaService.delivery.findUnique.mockResolvedValue(
+          deliveryFlow[1],
+        );
         mockPrismaService.delivery.update.mockResolvedValue(deliveryFlow[2]);
 
-        result = await service.updateDeliveryStatus('1', { status: 'IN_TRANSIT' });
+        result = await service.updateDeliveryStatus('1', {
+          status: 'IN_TRANSIT',
+        });
         expect(result.status).toBe('IN_TRANSIT');
 
-        mockPrismaService.delivery.findUnique.mockResolvedValue(deliveryFlow[2]);
+        mockPrismaService.delivery.findUnique.mockResolvedValue(
+          deliveryFlow[2],
+        );
         mockPrismaService.delivery.update.mockResolvedValue(deliveryFlow[3]);
 
-        result = await service.updateDeliveryStatus('1', { status: 'DELIVERED' });
+        result = await service.updateDeliveryStatus('1', {
+          status: 'DELIVERED',
+        });
         expect(result.status).toBe('DELIVERED');
         expect(result.delivered_at).toBeDefined();
       });
@@ -646,7 +664,9 @@ describe('DeliveriesService', () => {
       it('should throw NotFoundException if delivery not found for order', async () => {
         mockPrismaService.delivery.findUnique.mockResolvedValue(null);
 
-        await expect(service.findByOrderId('999')).rejects.toThrow(NotFoundException);
+        await expect(service.findByOrderId('999')).rejects.toThrow(
+          NotFoundException,
+        );
       });
     });
 

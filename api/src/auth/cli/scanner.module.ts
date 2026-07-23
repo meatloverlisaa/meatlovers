@@ -8,12 +8,20 @@ import { AuthorizationScannerController } from '../authorization-scanner.control
 import { AppController } from '../../app.controller';
 import { ProductController } from '../../product/product.controller';
 import { SupplierController } from '../../supplier/supplier.controller';
-import { StockController, KitchenStockController, BarStockController, LegacyBarStockController } from '../../stock/stock.controller';
+import {
+  StockController,
+  KitchenStockController,
+  BarStockController,
+  LegacyBarStockController,
+} from '../../stock/stock.controller';
 import { OrdersController } from '../../orders/orders.controller';
 import { PaymentsController } from '../../payments/payments.controller';
 import { KitchenController } from '../../kitchen/kitchen.controller';
 import { BarController } from '../../bar/bar.controller';
-import { DeliveriesController, RidersController } from '../../deliveries/deliveries.controller';
+import {
+  DeliveriesController,
+  RidersController,
+} from '../../deliveries/deliveries.controller';
 import { FinanceController } from '../../finance/finance.controller';
 import { CrmController } from '../../crm/crm.controller';
 import { WebsiteController } from '../../website/website.controller';

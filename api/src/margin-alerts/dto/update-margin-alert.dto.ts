@@ -11,4 +11,3 @@ export class UpdateMarginAlertDto {
   @IsNotEmpty()
   notes?: string;
 }
-

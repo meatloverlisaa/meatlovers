@@ -150,7 +150,13 @@ export class ManagerOrdersService {
           select: { id: true, table_name: true },
         },
         customer: {
-          select: { id: true, name: true, phone: true, email: true, notes: true },
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            notes: true,
+          },
         },
         payments: {
           select: {
@@ -240,12 +246,24 @@ export class ManagerOrdersService {
       orders,
     ] = await Promise.all([
       this.prisma.order.count({ where }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.PENDING } }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.PREPARING } }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.READY } }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.SERVED } }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.PAID } }),
-      this.prisma.order.count({ where: { ...where, status: OrderStatus.CANCELLED } }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.PENDING },
+      }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.PREPARING },
+      }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.READY },
+      }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.SERVED },
+      }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.PAID },
+      }),
+      this.prisma.order.count({
+        where: { ...where, status: OrderStatus.CANCELLED },
+      }),
       this.prisma.order.findMany({
         where,
         select: {
@@ -261,7 +279,10 @@ export class ManagerOrdersService {
       .reduce((sum, o) => sum + o.total_amount, 0);
 
     const pendingRevenue = orders
-      .filter((o) => o.status !== OrderStatus.PAID && o.status !== OrderStatus.CANCELLED)
+      .filter(
+        (o) =>
+          o.status !== OrderStatus.PAID && o.status !== OrderStatus.CANCELLED,
+      )
       .reduce((sum, o) => sum + o.total_amount, 0);
 
     return {
@@ -377,7 +398,11 @@ export class ManagerOrdersService {
   /**
    * Get orders by waiter
    */
-  async getOrdersByWaiter(waiterId: number, dateFrom?: string, dateTo?: string) {
+  async getOrdersByWaiter(
+    waiterId: number,
+    dateFrom?: string,
+    dateTo?: string,
+  ) {
     const where: any = { waiter_id: BigInt(waiterId) };
 
     if (dateFrom || dateTo) {
@@ -521,7 +546,7 @@ export class ManagerOrdersService {
       requestType: approval.request_type,
       status: approval.status,
       reason: approval.reason,
-      metadata: approval.metadata ? JSON.parse(approval.metadata as string) : null,
+      metadata: approval.metadata ? JSON.parse(approval.metadata) : null,
       requestedBy: approval.requested_by?.toString(),
       requesterName: approval.requester?.full_name,
       requesterRole: approval.requester?.role,

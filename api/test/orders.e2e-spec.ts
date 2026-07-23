@@ -20,7 +20,9 @@ describe('Orders Life-cycle (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -44,17 +46,17 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should create an order with valid data', async () => {
       // Setup: Create a table
       const table = await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
 
       // Setup: Create a waiter user
       const waiter = await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
 
       // Setup: Create products
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW()), (2, "Fries", "FOOD", 5.00, 2.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW()), (2, "Fries", "FOOD", 5.00, 2.00, 1, NOW(), NOW())',
       );
 
       const createOrderDto = {
@@ -75,19 +77,19 @@ describe('Orders Life-cycle (e2e)', () => {
       expect(response.body.status).toBe('PENDING');
       expect(response.body.table_id).toBe(1);
       expect(response.body.waiter_id).toBe(1);
-      expect(response.body.total_amount).toBe(35.00); // 2*15 + 1*5
+      expect(response.body.total_amount).toBe(35.0); // 2*15 + 1*5
       expect(response.body.items).toHaveLength(2);
     });
 
     it('should reject order with non-existent table', async () => {
       // Setup: Create a waiter user
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
 
       // Setup: Create products
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       const createOrderDto = {
@@ -105,17 +107,17 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should reject order with non-waiter user', async () => {
       // Setup: Create a table
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
 
       // Setup: Create a non-waiter user (CHEF)
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Chef", "john@test.com", "1234567890", "hashed_password", "CHEF", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Chef", "john@test.com", "1234567890", "hashed_password", "CHEF", 1, NOW(), NOW())',
       );
 
       // Setup: Create products
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       const createOrderDto = {
@@ -133,17 +135,17 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should reject order with inactive product', async () => {
       // Setup: Create a table
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
 
       // Setup: Create a waiter user
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
 
       // Setup: Create inactive product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 0, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 0, NOW(), NOW())',
       );
 
       const createOrderDto = {
@@ -165,13 +167,13 @@ describe('Orders Life-cycle (e2e)', () => {
     beforeEach(async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create an order
@@ -262,13 +264,13 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should complete full order life-cycle from creation to serving', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW()), (2, "Fries", "FOOD", 5.00, 2.00, 1, NOW(), NOW()), (3, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW()), (2, "Fries", "FOOD", 5.00, 2.00, 1, NOW(), NOW()), (3, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW())',
       );
 
       // Step 1: Create order (PENDING)
@@ -287,7 +289,7 @@ describe('Orders Life-cycle (e2e)', () => {
 
       const orderId = createResponse.body.id;
       expect(createResponse.body.status).toBe('PENDING');
-      expect(createResponse.body.total_amount).toBe(41.00); // 2*15 + 1*5 + 2*3
+      expect(createResponse.body.total_amount).toBe(41.0); // 2*15 + 1*5 + 2*3
       expect(createResponse.body.items).toHaveLength(3);
 
       // Step 2: Kitchen starts preparing (PREPARING)
@@ -329,13 +331,13 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should find latest order by tableId', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW()), (2, "Table 2", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW()), (2, "Table 2", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create first order for table 1
@@ -370,13 +372,13 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should find latest order by waiterId', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       // Create first order
@@ -409,9 +411,7 @@ describe('Orders Life-cycle (e2e)', () => {
     });
 
     it('should reject order retrieval without tableId or waiterId', async () => {
-      await request(app.getHttpServer())
-        .get('/orders')
-        .expect(400);
+      await request(app.getHttpServer()).get('/orders').expect(400);
     });
   });
 
@@ -419,10 +419,10 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should reject order with empty items array', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
 
       const createOrderDto = {
@@ -440,13 +440,13 @@ describe('Orders Life-cycle (e2e)', () => {
     it('should reject order with zero or negative quantity', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())'
+        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
       );
 
       const createOrderDto = {

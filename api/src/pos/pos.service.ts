@@ -76,10 +76,7 @@ export class PosService {
     return tables.map((table) => ({
       id: table.id.toString(),
       name: table.table_name,
-      status:
-        table.orders.length > 0
-          ? 'OCCUPIED'
-          : 'AVAILABLE',
+      status: table.orders.length > 0 ? 'OCCUPIED' : 'AVAILABLE',
       currentOrder: table.orders[0]
         ? {
             id: table.orders[0].id.toString(),
@@ -140,7 +137,9 @@ export class PosService {
 
       const product = byId.get(item.productId.toString());
       if (!product) {
-        throw new NotFoundException(`Product with ID ${item.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${item.productId} not found`,
+        );
       }
 
       const unitPrice = Number(product.selling_price);
@@ -155,7 +154,10 @@ export class PosService {
       };
     });
 
-    const orderTotal = computedItems.reduce((sum, it) => sum + it.line_total, 0);
+    const orderTotal = computedItems.reduce(
+      (sum, it) => sum + it.line_total,
+      0,
+    );
 
     // Create order with items
     const order = await this.prisma.order.create({
@@ -385,10 +387,15 @@ export class PosService {
           where: { id: BigInt(orderId) },
           data: { status: 'CANCELLED', total_amount: 0 },
         });
-        return { message: 'Item removed and order cancelled (no items remaining)' };
+        return {
+          message: 'Item removed and order cancelled (no items remaining)',
+        };
       }
 
-      const newTotal = remainingItems.reduce((sum, it) => sum + it.line_total, 0);
+      const newTotal = remainingItems.reduce(
+        (sum, it) => sum + it.line_total,
+        0,
+      );
       await this.prisma.order.update({
         where: { id: BigInt(orderId) },
         data: { total_amount: newTotal },

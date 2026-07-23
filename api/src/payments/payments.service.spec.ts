@@ -47,7 +47,7 @@ describe('PaymentsService', () => {
         payments: [
           {
             payment_method: 'CASH' as any,
-            amount: 35.00,
+            amount: 35.0,
             transaction_reference: 'REF123',
           },
         ],
@@ -55,7 +55,7 @@ describe('PaymentsService', () => {
 
       mockPrisma.order.findUnique.mockResolvedValue({
         id: 1n,
-        total_amount: 35.00,
+        total_amount: 35.0,
         payments: [],
       });
 
@@ -63,7 +63,7 @@ describe('PaymentsService', () => {
         id: 1n,
         order_id: 1n,
         payment_method: 'CASH',
-        amount: 35.00,
+        amount: 35.0,
         transaction_reference: 'REF123',
         payment_status: PaymentStatus.SUCCESS,
       };
@@ -71,7 +71,9 @@ describe('PaymentsService', () => {
       mockPrisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockPrisma);
       });
-      (mockPrisma as any).payment.create = jest.fn().mockResolvedValue(mockPayment);
+      (mockPrisma as any).payment.create = jest
+        .fn()
+        .mockResolvedValue(mockPayment);
 
       const result = await service.create(createPaymentDto);
 
@@ -88,15 +90,19 @@ describe('PaymentsService', () => {
         payments: [
           {
             payment_method: 'CASH' as any,
-            amount: 35.00,
+            amount: 35.0,
           },
         ],
       };
 
       mockPrisma.order.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(createPaymentDto)).rejects.toThrow(NotFoundException);
-      await expect(service.create(createPaymentDto)).rejects.toThrow('Order with ID 999 not found');
+      await expect(service.create(createPaymentDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.create(createPaymentDto)).rejects.toThrow(
+        'Order with ID 999 not found',
+      );
     });
 
     it('should throw BadRequestException if payment amount does not match order total', async () => {
@@ -105,20 +111,22 @@ describe('PaymentsService', () => {
         payments: [
           {
             payment_method: 'CASH' as any,
-            amount: 30.00,
+            amount: 30.0,
           },
         ],
       };
 
       mockPrisma.order.findUnique.mockResolvedValue({
         id: 1n,
-        total_amount: 35.00,
+        total_amount: 35.0,
         payments: [],
       });
 
-      await expect(service.create(createPaymentDto)).rejects.toThrow(BadRequestException);
       await expect(service.create(createPaymentDto)).rejects.toThrow(
-        'Payment amount (30) does not match order total (35)'
+        BadRequestException,
+      );
+      await expect(service.create(createPaymentDto)).rejects.toThrow(
+        'Payment amount (30) does not match order total (35)',
       );
     });
 
@@ -128,19 +136,23 @@ describe('PaymentsService', () => {
         payments: [
           {
             payment_method: 'INVALID' as any,
-            amount: 35.00,
+            amount: 35.0,
           },
         ],
       };
 
       mockPrisma.order.findUnique.mockResolvedValue({
         id: 1n,
-        total_amount: 35.00,
+        total_amount: 35.0,
         payments: [],
       });
 
-      await expect(service.create(createPaymentDto)).rejects.toThrow(BadRequestException);
-      await expect(service.create(createPaymentDto)).rejects.toThrow('Invalid payment method: INVALID');
+      await expect(service.create(createPaymentDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.create(createPaymentDto)).rejects.toThrow(
+        'Invalid payment method: INVALID',
+      );
     });
   });
 
@@ -152,13 +164,15 @@ describe('PaymentsService', () => {
           id: 1n,
           order_id: 1n,
           payment_method: 'CASH',
-          amount: 35.00,
+          amount: 35.0,
           payment_status: PaymentStatus.SUCCESS,
         },
       ];
 
       mockPrisma.order.findUnique.mockResolvedValue({ id: 1n });
-      (mockPrisma as any).payment.findMany = jest.fn().mockResolvedValue(mockPayments);
+      (mockPrisma as any).payment.findMany = jest
+        .fn()
+        .mockResolvedValue(mockPayments);
 
       const result = await service.findByOrder(orderId);
 
@@ -173,8 +187,12 @@ describe('PaymentsService', () => {
       const orderId = 999;
       mockPrisma.order.findUnique.mockResolvedValue(null);
 
-      await expect(service.findByOrder(orderId)).rejects.toThrow(NotFoundException);
-      await expect(service.findByOrder(orderId)).rejects.toThrow('Order with ID 999 not found');
+      await expect(service.findByOrder(orderId)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.findByOrder(orderId)).rejects.toThrow(
+        'Order with ID 999 not found',
+      );
     });
   });
 
@@ -188,7 +206,9 @@ describe('PaymentsService', () => {
         payment_status: PaymentStatus.PENDING,
       };
 
-      (mockPrisma as any).payment.findUnique = jest.fn().mockResolvedValue(mockPayment);
+      (mockPrisma as any).payment.findUnique = jest
+        .fn()
+        .mockResolvedValue(mockPayment);
       (mockPrisma as any).payment.update = jest.fn().mockResolvedValue({
         ...mockPayment,
         payment_status: status,
@@ -207,10 +227,16 @@ describe('PaymentsService', () => {
       const paymentId = '999';
       const status = PaymentStatus.SUCCESS;
 
-      (mockPrisma as any).payment.findUnique = jest.fn().mockResolvedValue(null);
+      (mockPrisma as any).payment.findUnique = jest
+        .fn()
+        .mockResolvedValue(null);
 
-      await expect(service.updatePaymentStatus(paymentId, status)).rejects.toThrow(NotFoundException);
-      await expect(service.updatePaymentStatus(paymentId, status)).rejects.toThrow('Payment with ID 999 not found');
+      await expect(
+        service.updatePaymentStatus(paymentId, status),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.updatePaymentStatus(paymentId, status),
+      ).rejects.toThrow('Payment with ID 999 not found');
     });
   });
 });

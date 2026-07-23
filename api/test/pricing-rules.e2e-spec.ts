@@ -20,7 +20,9 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -82,21 +84,17 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
 
     it('should retrieve all pricing rules', async () => {
       // Create multiple rules
-      await request(app.getHttpServer())
-        .post('/pricing-rules')
-        .send({
-          name: 'Rule 1',
-          rule_type: 'PERCENT_INCREASE',
-          value: '10.00',
-        });
+      await request(app.getHttpServer()).post('/pricing-rules').send({
+        name: 'Rule 1',
+        rule_type: 'PERCENT_INCREASE',
+        value: '10.00',
+      });
 
-      await request(app.getHttpServer())
-        .post('/pricing-rules')
-        .send({
-          name: 'Rule 2',
-          rule_type: 'PERCENT_DECREASE',
-          value: '15.00',
-        });
+      await request(app.getHttpServer()).post('/pricing-rules').send({
+        name: 'Rule 2',
+        rule_type: 'PERCENT_DECREASE',
+        value: '15.00',
+      });
 
       const response = await request(app.getHttpServer())
         .get('/pricing-rules')
@@ -182,13 +180,13 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     beforeEach(async () => {
       // Create a user for audit logging
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())',
       );
       userId = 1;
 
       // Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 20.00, 10.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 20.00, 10.00, 1, NOW(), NOW())',
       );
       productId = 1;
     });
@@ -398,7 +396,7 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     it('should allow category-matching rule application', async () => {
       // Create an ALCOHOLIC_DRINK product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (2, "Beer", "ALCOHOLIC_DRINK", 10.00, 5.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (2, "Beer", "ALCOHOLIC_DRINK", 10.00, 5.00, 1, NOW(), NOW())',
       );
 
       // Create a rule for ALCOHOLIC_DRINK category
@@ -459,13 +457,13 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     beforeEach(async () => {
       // Create a user
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())',
       );
       userId = 1;
 
       // Create a product
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 20.00, 10.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 20.00, 10.00, 1, NOW(), NOW())',
       );
       productId = 1;
 
@@ -592,7 +590,9 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
 
       expect(updatedProduct).not.toBeNull();
       expect(initialProduct).not.toBeNull();
-      expect(updatedProduct!.selling_price).not.toEqual(initialProduct!.selling_price);
+      expect(updatedProduct!.selling_price).not.toEqual(
+        initialProduct!.selling_price,
+      );
       expect(response.body.product.selling_price).toBe('22.00');
 
       // Verify audit was created
@@ -602,7 +602,7 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
     it('should link audit to correct user', async () => {
       // Create another user
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (2, "Manager User", "manager@test.com", "0987654321", "hashed_password", "MANAGER", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (2, "Manager User", "manager@test.com", "0987654321", "hashed_password", "MANAGER", 1, NOW(), NOW())',
       );
 
       const response = await request(app.getHttpServer())
@@ -642,7 +642,9 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
         })
         .expect(201);
 
-      expect(response.body.audit.pricing_rule_id).toBe(secondRuleResponse.body.id);
+      expect(response.body.audit.pricing_rule_id).toBe(
+        secondRuleResponse.body.id,
+      );
       expect(response.body.audit.pricing_rule_id).not.toBe(ruleId);
     });
 
@@ -680,7 +682,9 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
       `;
 
       expect(audits).toHaveLength(2);
-      expect(Number(audits[0].old_selling_price).toFixed(2)).toBe(Number(originalPrice).toFixed(2));
+      expect(Number(audits[0].old_selling_price).toFixed(2)).toBe(
+        Number(originalPrice).toFixed(2),
+      );
       expect(Number(audits[0].new_selling_price).toFixed(2)).toBe('22.00');
       expect(Number(audits[1].old_selling_price).toFixed(2)).toBe('22.00');
       expect(Number(audits[1].new_selling_price).toFixed(2)).toBe('19.80');
@@ -693,12 +697,12 @@ describe('Pricing Rules and Audit Logging (e2e)', () => {
 
     beforeEach(async () => {
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())'
+        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "Admin User", "admin@test.com", "1234567890", "hashed_password", "ADMIN", 1, NOW(), NOW())',
       );
       userId = 1;
 
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 10.00, 5.00, 1, NOW(), NOW())'
+        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Test Product", "FOOD", 10.00, 5.00, 1, NOW(), NOW())',
       );
       productId = 1;
     });

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { StockService } from './stock.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import {

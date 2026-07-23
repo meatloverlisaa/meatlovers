@@ -103,14 +103,20 @@ describe('ProductionPlansService', () => {
         status: 'IN_PROGRESS',
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
-      
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
+
       // Mock transaction to execute callback
       mockPrismaService.$transaction.mockImplementation(async (callback) => {
         const tx = {
           stockItem: {
-            findUnique: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 100 }),
-            update: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 80 }),
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 100 }),
+            update: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 80 }),
           },
           stockMovement: {
             create: jest.fn().mockResolvedValue({ id: BigInt(1) }),
@@ -119,9 +125,14 @@ describe('ProductionPlansService', () => {
         await callback(tx);
       });
 
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      const result = await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      const result = await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       expect(mockPrismaService.$transaction).toHaveBeenCalled();
       expect(mockPrismaService.productionPlan.update).toHaveBeenCalledWith({
@@ -184,14 +195,20 @@ describe('ProductionPlansService', () => {
         status: 'IN_PROGRESS',
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
 
       let stockMovementCreated = false;
       mockPrismaService.$transaction.mockImplementation(async (callback) => {
         const tx = {
           stockItem: {
-            findUnique: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 100 }),
-            update: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 90 }),
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 100 }),
+            update: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 90 }),
           },
           stockMovement: {
             create: jest.fn().mockImplementation((params: any) => {
@@ -207,9 +224,14 @@ describe('ProductionPlansService', () => {
         await callback(tx);
       });
 
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       expect(stockMovementCreated).toBe(true);
     });
@@ -249,12 +271,16 @@ describe('ProductionPlansService', () => {
         },
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
 
       mockPrismaService.$transaction.mockImplementation(async (callback) => {
         const tx = {
           stockItem: {
-            findUnique: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 10 }),
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 10 }),
             update: jest.fn(),
           },
           stockMovement: {
@@ -265,10 +291,10 @@ describe('ProductionPlansService', () => {
       });
 
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow('Insufficient stock for Beef');
     });
 
@@ -313,10 +339,17 @@ describe('ProductionPlansService', () => {
         status: 'IN_PROGRESS',
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      const result = await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      const result = await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       // Transaction should not be called when decreasing quantity
       expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
@@ -386,7 +419,9 @@ describe('ProductionPlansService', () => {
         status: 'IN_PROGRESS',
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
 
       let ingredientCount = 0;
       mockPrismaService.$transaction.mockImplementation(async (callback) => {
@@ -396,7 +431,9 @@ describe('ProductionPlansService', () => {
               id: BigInt(ingredientCount + 1),
               quantity: 50,
             })),
-            update: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 45 }),
+            update: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 45 }),
           },
           stockMovement: {
             create: jest.fn().mockImplementation(() => {
@@ -408,9 +445,14 @@ describe('ProductionPlansService', () => {
         await callback(tx);
       });
 
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       expect(ingredientCount).toBe(3); // All 3 ingredients should be processed
     });
@@ -457,13 +499,19 @@ describe('ProductionPlansService', () => {
         completed_date: expect.any(Date),
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
 
       mockPrismaService.$transaction.mockImplementation(async (callback) => {
         const tx = {
           stockItem: {
-            findUnique: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 100 }),
-            update: jest.fn().mockResolvedValue({ id: BigInt(1), quantity: 90 }),
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 100 }),
+            update: jest
+              .fn()
+              .mockResolvedValue({ id: BigInt(1), quantity: 90 }),
           },
           stockMovement: {
             create: jest.fn().mockResolvedValue({ id: BigInt(1) }),
@@ -472,9 +520,14 @@ describe('ProductionPlansService', () => {
         await callback(tx);
       });
 
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      const result = await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      const result = await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       expect(mockPrismaService.productionPlan.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -482,7 +535,7 @@ describe('ProductionPlansService', () => {
             status: 'COMPLETED',
             completed_date: expect.any(Date),
           }),
-        })
+        }),
       );
       expect(result.status).toBe('COMPLETED');
     });
@@ -516,10 +569,17 @@ describe('ProductionPlansService', () => {
         status: 'IN_PROGRESS',
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
-      mockPrismaService.productionPlan.update.mockResolvedValue(mockUpdatedPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
+      mockPrismaService.productionPlan.update.mockResolvedValue(
+        mockUpdatedPlan,
+      );
 
-      const result = await service.updateProducedQuantity(productionPlanId, newProducedQuantity);
+      const result = await service.updateProducedQuantity(
+        productionPlanId,
+        newProducedQuantity,
+      );
 
       // Transaction should not be called when there are no ingredients
       expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
@@ -533,10 +593,10 @@ describe('ProductionPlansService', () => {
       mockPrismaService.productionPlan.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow(NotFoundException);
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow('Production plan not found');
     });
 
@@ -562,13 +622,15 @@ describe('ProductionPlansService', () => {
         },
       };
 
-      mockPrismaService.productionPlan.findUnique.mockResolvedValue(mockProductionPlan);
+      mockPrismaService.productionPlan.findUnique.mockResolvedValue(
+        mockProductionPlan,
+      );
 
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.updateProducedQuantity(productionPlanId, newProducedQuantity)
+        service.updateProducedQuantity(productionPlanId, newProducedQuantity),
       ).rejects.toThrow('Produced quantity cannot exceed planned quantity');
     });
   });

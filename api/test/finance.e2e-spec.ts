@@ -4,7 +4,10 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { TransactionType, TransactionCategory } from '../src/finance/dto/create-finance-transaction.dto';
+import {
+  TransactionType,
+  TransactionCategory,
+} from '../src/finance/dto/create-finance-transaction.dto';
 
 describe('Finance Transactions (e2e)', () => {
   let app: INestApplication<App>;
@@ -21,7 +24,9 @@ describe('Finance Transactions (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -53,7 +58,7 @@ describe('Finance Transactions (e2e)', () => {
       const createDto = {
         type: TransactionType.INCOME,
         category: TransactionCategory.SALES,
-        amount: 5000.00,
+        amount: 5000.0,
         description: 'Daily sales revenue',
         reference: 'SALES-2024-001',
         recorded_by: String(testUser.id),
@@ -67,7 +72,7 @@ describe('Finance Transactions (e2e)', () => {
       expect(response.body).toHaveProperty('id');
       expect(response.body.type).toBe(TransactionType.INCOME);
       expect(response.body.category).toBe(TransactionCategory.SALES);
-      expect(Number(response.body.amount)).toBe(5000.00);
+      expect(Number(response.body.amount)).toBe(5000.0);
       expect(response.body.description).toBe('Daily sales revenue');
       expect(response.body.reference).toBe('SALES-2024-001');
       expect(response.body.recorded_by).toBe(String(testUser.id));
@@ -77,7 +82,7 @@ describe('Finance Transactions (e2e)', () => {
       const createDto = {
         type: TransactionType.EXPENSE,
         category: TransactionCategory.SUPPLIER_PAYMENT,
-        amount: 2500.00,
+        amount: 2500.0,
         description: 'Supplier payment for meat',
         reference: 'SUPP-2024-001',
         recorded_by: String(testUser.id),
@@ -91,14 +96,14 @@ describe('Finance Transactions (e2e)', () => {
       expect(response.body).toHaveProperty('id');
       expect(response.body.type).toBe(TransactionType.EXPENSE);
       expect(response.body.category).toBe(TransactionCategory.SUPPLIER_PAYMENT);
-      expect(Number(response.body.amount)).toBe(2500.00);
+      expect(Number(response.body.amount)).toBe(2500.0);
     });
 
     it('should reject transaction with zero or negative amount', async () => {
       const createDto = {
         type: TransactionType.INCOME,
         category: TransactionCategory.SALES,
-        amount: -100.00,
+        amount: -100.0,
         recorded_by: String(testUser.id),
       };
 
@@ -112,7 +117,7 @@ describe('Finance Transactions (e2e)', () => {
       const createDto = {
         type: TransactionType.INCOME,
         category: TransactionCategory.SALES,
-        amount: 5000.00,
+        amount: 5000.0,
         recorded_by: '999',
       };
 
@@ -127,7 +132,7 @@ describe('Finance Transactions (e2e)', () => {
       const createDto = {
         type: TransactionType.INCOME,
         category: TransactionCategory.SALES,
-        amount: 5000.00,
+        amount: 5000.0,
         recorded_by: String(testUser.id),
         transaction_date: customDate,
       };
@@ -137,7 +142,9 @@ describe('Finance Transactions (e2e)', () => {
         .send(createDto)
         .expect(201);
 
-      expect(new Date(response.body.transaction_date).toISOString()).toBe(new Date(customDate).toISOString());
+      expect(new Date(response.body.transaction_date).toISOString()).toBe(
+        new Date(customDate).toISOString(),
+      );
     });
   });
 
@@ -149,7 +156,7 @@ describe('Finance Transactions (e2e)', () => {
         data: {
           type: TransactionType.INCOME,
           category: TransactionCategory.SALES,
-          amount: 5000.00,
+          amount: 5000.0,
           recorded_by: testUser.id,
           transaction_date: new Date(now.getTime() - 60000), // 1 minute ago
         },
@@ -159,7 +166,7 @@ describe('Finance Transactions (e2e)', () => {
         data: {
           type: TransactionType.EXPENSE,
           category: TransactionCategory.SUPPLIER_PAYMENT,
-          amount: 2500.00,
+          amount: 2500.0,
           recorded_by: testUser.id,
           transaction_date: now, // now (most recent)
         },
@@ -228,25 +235,25 @@ describe('Finance Transactions (e2e)', () => {
           {
             type: TransactionType.INCOME,
             category: TransactionCategory.SALES,
-            amount: 5000.00,
+            amount: 5000.0,
             recorded_by: testUser.id,
           },
           {
             type: TransactionType.INCOME,
             category: TransactionCategory.SALES,
-            amount: 3000.00,
+            amount: 3000.0,
             recorded_by: testUser.id,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.SUPPLIER_PAYMENT,
-            amount: 2500.00,
+            amount: 2500.0,
             recorded_by: testUser.id,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.SALARY,
-            amount: 1500.00,
+            amount: 1500.0,
             recorded_by: testUser.id,
           },
         ],
@@ -259,9 +266,9 @@ describe('Finance Transactions (e2e)', () => {
         .expect(200);
 
       expect(response.body.totalTransactions).toBe(4);
-      expect(response.body.totalIncome).toBe(8000.00); // 5000 + 3000
-      expect(response.body.totalExpenses).toBe(4000.00); // 2500 + 1500
-      expect(response.body.netProfit).toBe(4000.00); // 8000 - 4000
+      expect(response.body.totalIncome).toBe(8000.0); // 5000 + 3000
+      expect(response.body.totalExpenses).toBe(4000.0); // 2500 + 1500
+      expect(response.body.netProfit).toBe(4000.0); // 8000 - 4000
     });
 
     it('should provide breakdown by type', async () => {
@@ -269,8 +276,8 @@ describe('Finance Transactions (e2e)', () => {
         .get('/finance-transactions/summary')
         .expect(200);
 
-      expect(response.body.byType[TransactionType.INCOME]).toBe(8000.00);
-      expect(response.body.byType[TransactionType.EXPENSE]).toBe(4000.00);
+      expect(response.body.byType[TransactionType.INCOME]).toBe(8000.0);
+      expect(response.body.byType[TransactionType.EXPENSE]).toBe(4000.0);
     });
 
     it('should provide breakdown by category', async () => {
@@ -278,9 +285,11 @@ describe('Finance Transactions (e2e)', () => {
         .get('/finance-transactions/summary')
         .expect(200);
 
-      expect(response.body.byCategory[TransactionCategory.SALES]).toBe(8000.00);
-      expect(response.body.byCategory[TransactionCategory.SUPPLIER_PAYMENT]).toBe(2500.00);
-      expect(response.body.byCategory[TransactionCategory.SALARY]).toBe(1500.00);
+      expect(response.body.byCategory[TransactionCategory.SALES]).toBe(8000.0);
+      expect(
+        response.body.byCategory[TransactionCategory.SUPPLIER_PAYMENT],
+      ).toBe(2500.0);
+      expect(response.body.byCategory[TransactionCategory.SALARY]).toBe(1500.0);
     });
 
     it('should provide breakdown by recorder', async () => {
@@ -288,7 +297,7 @@ describe('Finance Transactions (e2e)', () => {
         .get('/finance-transactions/summary')
         .expect(200);
 
-      expect(response.body.byRecorder[testUser.full_name]).toBe(12000.00);
+      expect(response.body.byRecorder[testUser.full_name]).toBe(12000.0);
     });
 
     it('should filter summary by type', async () => {
@@ -297,9 +306,9 @@ describe('Finance Transactions (e2e)', () => {
         .query({ type: TransactionType.INCOME })
         .expect(200);
 
-      expect(response.body.totalIncome).toBe(8000.00);
+      expect(response.body.totalIncome).toBe(8000.0);
       expect(response.body.totalExpenses).toBe(0);
-      expect(response.body.netProfit).toBe(8000.00);
+      expect(response.body.netProfit).toBe(8000.0);
     });
 
     it('should filter summary by category', async () => {
@@ -308,7 +317,7 @@ describe('Finance Transactions (e2e)', () => {
         .query({ category: TransactionCategory.SALES })
         .expect(200);
 
-      expect(response.body.totalIncome).toBe(8000.00);
+      expect(response.body.totalIncome).toBe(8000.0);
       expect(response.body.totalExpenses).toBe(0);
     });
 
@@ -325,49 +334,49 @@ describe('Finance Transactions (e2e)', () => {
           {
             type: TransactionType.INCOME,
             category: TransactionCategory.SALES,
-            amount: 12000.00,
+            amount: 12000.0,
             recorded_by: testUser.id,
             transaction_date: reportDate,
           },
           {
             type: TransactionType.INCOME,
             category: TransactionCategory.SALES,
-            amount: 3500.00,
+            amount: 3500.0,
             recorded_by: testUser.id,
             transaction_date: reportDate,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.SUPPLIER_PAYMENT,
-            amount: 4200.00,
+            amount: 4200.0,
             recorded_by: testUser.id,
             transaction_date: reportDate,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.SALARY,
-            amount: 1800.00,
+            amount: 1800.0,
             recorded_by: testUser.id,
             transaction_date: reportDate,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.UTILITIES,
-            amount: 650.00,
+            amount: 650.0,
             recorded_by: testUser.id,
             transaction_date: reportDate,
           },
           {
             type: TransactionType.INCOME,
             category: TransactionCategory.SALES,
-            amount: 9999.00,
+            amount: 9999.0,
             recorded_by: testUser.id,
             transaction_date: outsideReportDate,
           },
           {
             type: TransactionType.EXPENSE,
             category: TransactionCategory.RENT,
-            amount: 9999.00,
+            amount: 9999.0,
             recorded_by: testUser.id,
             transaction_date: outsideReportDate,
           },
@@ -380,16 +389,22 @@ describe('Finance Transactions (e2e)', () => {
         .expect(200);
 
       expect(response.body.totalTransactions).toBe(5);
-      expect(response.body.totalIncome).toBe(15500.00);
-      expect(response.body.totalExpenses).toBe(6650.00);
-      expect(response.body.netProfit).toBe(8850.00);
-      expect(response.body.byType[TransactionType.INCOME]).toBe(15500.00);
-      expect(response.body.byType[TransactionType.EXPENSE]).toBe(6650.00);
-      expect(response.body.byCategory[TransactionCategory.SALES]).toBe(15500.00);
-      expect(response.body.byCategory[TransactionCategory.SUPPLIER_PAYMENT]).toBe(4200.00);
-      expect(response.body.byCategory[TransactionCategory.SALARY]).toBe(1800.00);
-      expect(response.body.byCategory[TransactionCategory.UTILITIES]).toBe(650.00);
-      expect(response.body.byCategory[TransactionCategory.RENT]).toBeUndefined();
+      expect(response.body.totalIncome).toBe(15500.0);
+      expect(response.body.totalExpenses).toBe(6650.0);
+      expect(response.body.netProfit).toBe(8850.0);
+      expect(response.body.byType[TransactionType.INCOME]).toBe(15500.0);
+      expect(response.body.byType[TransactionType.EXPENSE]).toBe(6650.0);
+      expect(response.body.byCategory[TransactionCategory.SALES]).toBe(15500.0);
+      expect(
+        response.body.byCategory[TransactionCategory.SUPPLIER_PAYMENT],
+      ).toBe(4200.0);
+      expect(response.body.byCategory[TransactionCategory.SALARY]).toBe(1800.0);
+      expect(response.body.byCategory[TransactionCategory.UTILITIES]).toBe(
+        650.0,
+      );
+      expect(
+        response.body.byCategory[TransactionCategory.RENT],
+      ).toBeUndefined();
     });
   });
 
@@ -399,7 +414,7 @@ describe('Finance Transactions (e2e)', () => {
         data: {
           type: TransactionType.INCOME,
           category: TransactionCategory.SALES,
-          amount: 5000.00,
+          amount: 5000.0,
           recorded_by: testUser.id,
         },
       });
@@ -427,7 +442,7 @@ describe('Finance Transactions (e2e)', () => {
         data: {
           type: TransactionType.INCOME,
           category: TransactionCategory.SALES,
-          amount: 5000.00,
+          amount: 5000.0,
           recorded_by: testUser.id,
         },
       });
@@ -436,7 +451,7 @@ describe('Finance Transactions (e2e)', () => {
 
     it('should update finance transaction', async () => {
       const updateDto = {
-        amount: 6000.00,
+        amount: 6000.0,
         description: 'Updated sales revenue',
       };
 
@@ -445,13 +460,13 @@ describe('Finance Transactions (e2e)', () => {
         .send(updateDto)
         .expect(200);
 
-      expect(Number(response.body.amount)).toBe(6000.00);
+      expect(Number(response.body.amount)).toBe(6000.0);
       expect(response.body.description).toBe('Updated sales revenue');
     });
 
     it('should reject update with negative amount', async () => {
       const updateDto = {
-        amount: -100.00,
+        amount: -100.0,
       };
 
       await request(app.getHttpServer())
@@ -495,7 +510,7 @@ describe('Finance Transactions (e2e)', () => {
         data: {
           type: TransactionType.INCOME,
           category: TransactionCategory.SALES,
-          amount: 5000.00,
+          amount: 5000.0,
           recorded_by: testUser.id,
         },
       });
@@ -507,7 +522,9 @@ describe('Finance Transactions (e2e)', () => {
         .delete(`/finance-transactions/${transactionId}`)
         .expect(200);
 
-      expect(response.body.message).toBe('Finance transaction deleted successfully');
+      expect(response.body.message).toBe(
+        'Finance transaction deleted successfully',
+      );
 
       const deletedTransaction = await prisma.financeTransaction.findUnique({
         where: { id: BigInt(transactionId) },

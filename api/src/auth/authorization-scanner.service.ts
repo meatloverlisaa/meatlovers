@@ -24,12 +24,15 @@ export interface AuthorizationReport {
   endpoints: EndpointAuthInfo[];
   unprotectedEndpointsList: string[];
   summary: {
-    byController: Record<string, {
-      total: number;
-      protected: number;
-      public: number;
-      unprotected: number;
-    }>;
+    byController: Record<
+      string,
+      {
+        total: number;
+        protected: number;
+        public: number;
+        unprotected: number;
+      }
+    >;
   };
 }
 
@@ -204,7 +207,15 @@ export class AuthorizationScannerService {
    * Get HTTP method from route decorator
    */
   private getHttpMethod(methodRef: any): string | null {
-    const methods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
+    const methods = [
+      'get',
+      'post',
+      'put',
+      'patch',
+      'delete',
+      'options',
+      'head',
+    ];
     for (const method of methods) {
       if (Reflect.getMetadata(method, methodRef)) {
         return method.toUpperCase();
@@ -217,7 +228,15 @@ export class AuthorizationScannerService {
    * Get method path from route decorator
    */
   private getMethodPath(methodRef: any): string {
-    const methods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
+    const methods = [
+      'get',
+      'post',
+      'put',
+      'patch',
+      'delete',
+      'options',
+      'head',
+    ];
     for (const method of methods) {
       const path = Reflect.getMetadata(method, methodRef);
       if (path !== undefined) {
@@ -276,8 +295,8 @@ export class AuthorizationScannerService {
         stats.unprotected === 0
           ? '✓'
           : stats.unprotected > 0 && stats.unprotected < stats.total
-          ? '⚠️'
-          : '✗';
+            ? '⚠️'
+            : '✗';
 
       this.logger.log(
         `  ${status} ${controller}: ${Math.round(coverage)}% (${stats.total} endpoints: ${stats.protected} protected, ${stats.public} public, ${stats.unprotected} unprotected)`,

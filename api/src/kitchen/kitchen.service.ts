@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateOrderStatusDto } from '../orders/dto/update-order-status.dto';
 import { AddPreparationNoteDto } from './dto/add-preparation-note.dto';
@@ -66,7 +70,10 @@ export class KitchenService {
     return order;
   }
 
-  async updateOrderStatus({ id, status }: { id: string } & UpdateOrderStatusDto) {
+  async updateOrderStatus({
+    id,
+    status,
+  }: { id: string } & UpdateOrderStatusDto) {
     const order = await (this.prisma as any).order.findUnique({
       where: { id: BigInt(id) },
       include: { items: true },
@@ -144,7 +151,7 @@ export class KitchenService {
 
   private async isFoodItem(productId: bigint): Promise<boolean> {
     if (!productId) return false;
-    
+
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { product_category: true },
@@ -175,13 +182,15 @@ export class KitchenService {
     // Validate that this order contains food items
     const hasFoodItems = await this.orderHasFoodItems(order);
     if (!hasFoodItems) {
-      throw new BadRequestException(`Order ${orderId} does not contain food items`);
+      throw new BadRequestException(
+        `Order ${orderId} does not contain food items`,
+      );
     }
 
     // Store the note - for now we'll add it to the order's metadata or create a separate notes table
     // Since there's no dedicated notes table, we'll use a simple approach by storing in a JSON field if available
     // or we could create a kitchen_notes table. For now, let's return success with the note data.
-    
+
     return {
       order_id: orderId,
       note: dto.note,
@@ -197,7 +206,9 @@ export class KitchenService {
     });
 
     if (!stockItem) {
-      throw new NotFoundException(`Stock item with ID ${dto.stock_item_id} not found`);
+      throw new NotFoundException(
+        `Stock item with ID ${dto.stock_item_id} not found`,
+      );
     }
 
     // Check if sufficient stock exists

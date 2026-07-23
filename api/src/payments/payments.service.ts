@@ -1,6 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePaymentDto, PaymentStatus, RefundPaymentDto, SettlementSummaryDto } from './dto/create-payment.dto';
+import {
+  CreatePaymentDto,
+  PaymentStatus,
+  RefundPaymentDto,
+  SettlementSummaryDto,
+} from './dto/create-payment.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -20,12 +29,15 @@ export class PaymentsService {
     }
 
     // Calculate total payment amount
-    const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const totalPaymentAmount = payments.reduce(
+      (sum, payment) => sum + payment.amount,
+      0,
+    );
 
     // Validate payment amount matches order total
     if (Math.abs(totalPaymentAmount - Number(order.total_amount)) > 0.01) {
       throw new BadRequestException(
-        `Payment amount (${totalPaymentAmount}) does not match order total (${order.total_amount})`
+        `Payment amount (${totalPaymentAmount}) does not match order total (${order.total_amount})`,
       );
     }
 
@@ -33,7 +45,9 @@ export class PaymentsService {
     const validPaymentMethods = ['CASH', 'MPESA', 'CARD'];
     for (const payment of payments) {
       if (!validPaymentMethods.includes(payment.payment_method)) {
-        throw new BadRequestException(`Invalid payment method: ${payment.payment_method}`);
+        throw new BadRequestException(
+          `Invalid payment method: ${payment.payment_method}`,
+        );
       }
     }
 
@@ -117,11 +131,15 @@ export class PaymentsService {
     }
 
     if (payment.payment_status !== PaymentStatus.SUCCESS) {
-      throw new BadRequestException(`Cannot refund payment with status ${payment.payment_status}`);
+      throw new BadRequestException(
+        `Cannot refund payment with status ${payment.payment_status}`,
+      );
     }
 
     if (refundPaymentDto.refund_amount > Number(payment.amount)) {
-      throw new BadRequestException(`Refund amount cannot exceed payment amount`);
+      throw new BadRequestException(
+        `Refund amount cannot exceed payment amount`,
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -130,7 +148,8 @@ export class PaymentsService {
         where: { id: BigInt(id) },
         data: {
           payment_status: PaymentStatus.REFUNDED,
-          transaction_reference: refundPaymentDto.refund_reference || payment.transaction_reference,
+          transaction_reference:
+            refundPaymentDto.refund_reference || payment.transaction_reference,
         },
       });
 
@@ -172,7 +191,10 @@ export class PaymentsService {
 
     const summary = {
       total_payments: payments.length,
-      total_amount: payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0),
+      total_amount: payments.reduce(
+        (sum: number, p: any) => sum + Number(p.amount),
+        0,
+      ),
       by_method: {
         CASH: 0,
         MPESA: 0,
@@ -227,7 +249,10 @@ export class PaymentsService {
           unit_price: item.unit_price,
           line_total: item.line_total,
         })),
-        subtotal: payment.order.items.reduce((sum: number, item: any) => sum + item.line_total, 0),
+        subtotal: payment.order.items.reduce(
+          (sum: number, item: any) => sum + item.line_total,
+          0,
+        ),
       },
     };
 
@@ -280,11 +305,13 @@ export class PaymentsService {
       paymentStatus: payment.payment_status,
       transactionReference: payment.transaction_reference,
       createdAt: payment.created_at,
-      order: payment.order ? {
-        id: payment.order.id.toString(),
-        status: payment.order.status,
-        totalAmount: Number(payment.order.total_amount),
-      } : null,
+      order: payment.order
+        ? {
+            id: payment.order.id.toString(),
+            status: payment.order.status,
+            totalAmount: Number(payment.order.total_amount),
+          }
+        : null,
     }));
   }
 
@@ -339,7 +366,7 @@ export class PaymentsService {
     };
 
     payments.forEach((p) => {
-      const method = p.payment_method as 'CASH' | 'MPESA' | 'CARD';
+      const method = p.payment_method;
       if (summary.byMethod[method]) {
         summary.byMethod[method].count += 1;
         summary.byMethod[method].amount += Number(p.amount);

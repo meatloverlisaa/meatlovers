@@ -5,8 +5,6 @@ import { UpdatePricingRuleDto } from './dto/update-pricing-rule.dto';
 import { ApplyPricingRuleDto } from './dto/apply-pricing-rule.dto';
 import { PricingRuleType, ProductCategory } from '@prisma/client';
 
-
-
 @Injectable()
 export class PricingRuleService {
   constructor(private readonly prisma: PrismaService) {}
@@ -62,11 +60,16 @@ export class PricingRuleService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Product with ID ${applyDto.productId} not found`);
+      throw new NotFoundException(
+        `Product with ID ${applyDto.productId} not found`,
+      );
     }
 
     // If rule is scoped by category, enforce it.
-    if (rule.product_category && rule.product_category !== (product.product_category as ProductCategory)) {
+    if (
+      rule.product_category &&
+      rule.product_category !== product.product_category
+    ) {
       // treat as no-op audit entry? For now, reject.
       throw new NotFoundException(
         `Pricing rule does not apply to product category ${product.product_category}`,
@@ -75,7 +78,7 @@ export class PricingRuleService {
 
     const currentSelling = Number(product.selling_price);
     const newSelling = this.calculateNewPrice({
-      ruleType: rule.rule_type as PricingRuleType,
+      ruleType: rule.rule_type,
       value: rule.value.toString(),
       currentSelling,
       minSellingPrice: rule.min_selling_price?.toString() ?? null,
@@ -139,4 +142,3 @@ export class PricingRuleService {
     return Math.round(next * 100) / 100;
   }
 }
-

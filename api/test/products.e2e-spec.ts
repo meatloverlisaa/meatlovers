@@ -20,7 +20,9 @@ describe('Products (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -118,7 +120,7 @@ describe('Products (e2e)', () => {
         },
       });
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       await prisma.product.create({
         data: {
@@ -171,7 +173,9 @@ describe('Products (e2e)', () => {
         .expect(200);
 
       expect(response.body).toHaveLength(2);
-      expect(response.body.every((p: any) => p.product_category === 'FOOD')).toBe(true);
+      expect(
+        response.body.every((p: any) => p.product_category === 'FOOD'),
+      ).toBe(true);
     });
 
     it('should retrieve products filtered by status', async () => {
@@ -224,9 +228,7 @@ describe('Products (e2e)', () => {
     });
 
     it('should return 404 for non-existent product', async () => {
-      await request(app.getHttpServer())
-        .get('/products/99999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/products/99999').expect(404);
     });
 
     it('should update product details', async () => {
@@ -497,7 +499,7 @@ describe('Products (e2e)', () => {
       // before allowing a discount. The actual enforcement would be in the service layer.
       const originalPrice = 1000;
       const maxDiscount = 0.15; // 15%
-      const attemptedDiscount = 0.20; // 20% - should be blocked
+      const attemptedDiscount = 0.2; // 20% - should be blocked
 
       const maxAllowedPrice = originalPrice * (1 - maxDiscount);
       const attemptedPrice = originalPrice * (1 - attemptedDiscount);

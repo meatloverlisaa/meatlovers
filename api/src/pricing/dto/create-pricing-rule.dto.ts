@@ -1,4 +1,11 @@
-import { IsBoolean, IsDecimal, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDecimal,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { PricingRuleType, ProductCategory } from '@prisma/client';
 
 export class CreatePricingRuleDto {
@@ -29,4 +36,3 @@ export class CreatePricingRuleDto {
   @IsOptional()
   is_active?: boolean;
 }
-

@@ -14,4 +14,3 @@ export class GetOrdersQueryDto {
   @IsPositive()
   waiterId?: number;
 }
-
