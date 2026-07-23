@@ -1,5 +1,7 @@
+"use client";
+
+import { useState } from "react";
 import { revalidatePath } from "next/cache";
-import React from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type HrmSummary = {
@@ -21,6 +23,12 @@ type Staff = {
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;
+  employee_profile?: {
+    department: string | null;
+    position_title: string | null;
+    employment_type: string;
+    employment_status: string;
+  };
 };
 
 type Attendance = {
@@ -99,6 +107,86 @@ type Payroll = {
   };
 };
 
+type PerformanceReview = {
+  id: string | number;
+  user_id: string | number;
+  reviewer_id: string | number;
+  review_period: string;
+  review_date: string;
+  overall_score: number;
+  status: string;
+  strengths: string | null;
+  weaknesses: string | null;
+  user: {
+    id: string | number;
+    full_name: string;
+    role: string;
+    employee_profile?: {
+      department: string | null;
+      position_title: string | null;
+    };
+  };
+  reviewer: {
+    id: string | number;
+    full_name: string;
+    role: string;
+  };
+};
+
+type TrainingProgram = {
+  id: string | number;
+  program_name: string;
+  training_type: string;
+  description: string | null;
+  duration_hours: number;
+  is_mandatory: boolean;
+  validity_months: number | null;
+  enrollments: Array<{
+    user: {
+      id: string | number;
+      full_name: string;
+    };
+    status: string;
+    completion_date: string | null;
+  }>;
+};
+
+type DisciplinaryAction = {
+  id: string | number;
+  user_id: string | number;
+  incident_date: string;
+  type: string;
+  status: string;
+  incident_description: string;
+  action_taken: string | null;
+  resolution: string | null;
+  user: {
+    id: string | number;
+    full_name: string;
+    role: string;
+    employee_profile?: {
+      department: string | null;
+      position_title: string | null;
+    };
+  };
+};
+
+type EmployeeDocument = {
+  id: string | number;
+  user_id: string | number;
+  document_type: string;
+  document_name: string;
+  document_url: string;
+  issue_date: string | null;
+  expiry_date: string | null;
+  is_verified: boolean;
+  user: {
+    id: string | number;
+    full_name: string;
+    role: string;
+  };
+};
+
 // ─── API Functions ─────────────────────────────────────────────────────────────
 async function getHrmSummary(): Promise<HrmSummary> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
@@ -113,7 +201,7 @@ async function getHrmSummary(): Promise<HrmSummary> {
 
 async function getAllStaff(): Promise<Staff[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/staff`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/employees`, { cache: "no-store" });
 
   if (!res.ok) {
     throw new Error(`Failed to load staff: ${res.status}`);
@@ -148,7 +236,7 @@ async function getDutyRoster(): Promise<DutyRoster[]> {
 
 async function getLeaveRequests(): Promise<LeaveRequest[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/leave?status=PENDING`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/leave`, { cache: "no-store" });
 
   if (!res.ok) {
     throw new Error(`Failed to load leave requests: ${res.status}`);
@@ -168,10 +256,52 @@ async function getPayroll(): Promise<Payroll[]> {
   return res.json();
 }
 
-// ─── Server Actions ─────────────────────────────────────────────────────────────
-async function approveLeaveRequest(leaveId: string, approvedBy: string) {
-  "use server";
+async function getPerformanceReviews(): Promise<PerformanceReview[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/performance/reviews`, { cache: "no-store" });
 
+  if (!res.ok) {
+    throw new Error(`Failed to load performance reviews: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function getTrainingPrograms(): Promise<TrainingProgram[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/training/programs`, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load training programs: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function getDisciplinaryActions(): Promise<DisciplinaryAction[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/disciplinary/actions`, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load disciplinary actions: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function getEmployeeDocuments(): Promise<EmployeeDocument[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/documents`, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load employee documents: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+// ─── Client Actions ─────────────────────────────────────────────────────────────
+async function approveLeaveRequest(leaveId: string, approvedBy: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/leave/${leaveId}/approve`, {
     method: "PATCH",
@@ -183,13 +313,10 @@ async function approveLeaveRequest(leaveId: string, approvedBy: string) {
     throw new Error(`Failed to approve leave: ${res.status}`);
   }
 
-  revalidatePath("/admin/hrm");
   return res.json();
 }
 
 async function rejectLeaveRequest(leaveId: string, approvedBy: string, notes: string) {
-  "use server";
-
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/leave/${leaveId}/reject`, {
     method: "PATCH",
@@ -201,39 +328,6 @@ async function rejectLeaveRequest(leaveId: string, approvedBy: string, notes: st
     throw new Error(`Failed to reject leave: ${res.status}`);
   }
 
-  revalidatePath("/admin/hrm");
-  return res.json();
-}
-
-async function markAttendance(formData: FormData) {
-  "use server";
-
-  const userId = String(formData.get("user_id") ?? "").trim();
-  const date = String(formData.get("date") ?? "").trim();
-  const checkIn = String(formData.get("check_in") ?? "").trim();
-  const checkOut = String(formData.get("check_out") ?? "").trim();
-  const status = String(formData.get("status") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
-
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/attendance`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id: userId,
-      date,
-      check_in: checkIn || undefined,
-      check_out: checkOut || undefined,
-      status,
-      notes: notes || undefined,
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to mark attendance: ${res.status}`);
-  }
-
-  revalidatePath("/admin/hrm");
   return res.json();
 }
 
@@ -706,51 +800,273 @@ function PayrollTable({ payroll }: { payroll: Payroll[] }) {
   );
 }
 
+// ─── Tab Components ───────────────────────────────────────────────────────────────
+function PerformanceTable({ reviews }: { reviews: PerformanceReview[] }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="border-b border-zinc-200 px-6 py-4">
+        <h3 className="font-black text-zinc-950">Performance Reviews</h3>
+        <p className="mt-1 text-xs text-zinc-500">Employee performance evaluations</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-zinc-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Employee</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Reviewer</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Period</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Score</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-200">
+            {reviews.length === 0 ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-sm text-zinc-400">No performance reviews found</td></tr>
+            ) : (
+              reviews.map((review) => (
+                <tr key={String(review.id)} className="hover:bg-zinc-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{review.user.full_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{review.reviewer.full_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{review.review_period}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      review.overall_score >= 4 ? "bg-green-100 text-green-800" :
+                      review.overall_score >= 3 ? "bg-yellow-100 text-yellow-800" :
+                      "bg-red-100 text-red-800"
+                    }`}>
+                      {review.overall_score.toFixed(1)}/5.0
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      review.status === "COMPLETED" ? "bg-green-100 text-green-800" :
+                      review.status === "SUBMITTED" ? "bg-blue-100 text-blue-800" :
+                      "bg-gray-100 text-gray-800"
+                    }`}>{review.status}</span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function TrainingTable({ programs }: { programs: TrainingProgram[] }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="border-b border-zinc-200 px-6 py-4">
+        <h3 className="font-black text-zinc-950">Training Programs</h3>
+        <p className="mt-1 text-xs text-zinc-500">Employee training and development</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-zinc-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Program</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Duration</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Enrolled</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Mandatory</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-200">
+            {programs.length === 0 ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-sm text-zinc-400">No training programs found</td></tr>
+            ) : (
+              programs.map((program) => (
+                <tr key={String(program.id)} className="hover:bg-zinc-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{program.program_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex rounded-full bg-purple-100 px-2 py-1 text-xs font-semibold text-purple-800">{program.training_type}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{program.duration_hours}h</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{program.enrollments.length}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {program.is_mandatory ? (
+                      <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">Required</span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800">Optional</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function DisciplinaryTable({ actions }: { actions: DisciplinaryAction[] }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="border-b border-zinc-200 px-6 py-4">
+        <h3 className="font-black text-zinc-950">Disciplinary Actions</h3>
+        <p className="mt-1 text-xs text-zinc-500">Disciplinary records and actions</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-zinc-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Employee</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Incident Date</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Action Taken</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-200">
+            {actions.length === 0 ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-sm text-zinc-400">No disciplinary actions found</td></tr>
+            ) : (
+              actions.map((action) => (
+                <tr key={String(action.id)} className="hover:bg-zinc-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{action.user.full_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      action.type === "TERMINATION" ? "bg-red-100 text-red-800" :
+                      action.type === "SUSPENSION" ? "bg-orange-100 text-orange-800" :
+                      "bg-yellow-100 text-yellow-800"
+                    }`}>{action.type}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{new Date(action.incident_date).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      action.status === "RESOLVED" ? "bg-green-100 text-green-800" :
+                      action.status === "CLOSED" ? "bg-gray-100 text-gray-800" :
+                      "bg-blue-100 text-blue-800"
+                    }`}>{action.status}</span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-zinc-600 max-w-xs truncate">{action.action_taken || "-"}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function DocumentsTable({ documents }: { documents: EmployeeDocument[] }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="border-b border-zinc-200 px-6 py-4">
+        <h3 className="font-black text-zinc-950">Employee Documents</h3>
+        <p className="mt-1 text-xs text-zinc-500">Employee documentation and certificates</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-zinc-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Employee</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Document</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Expiry Date</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Verified</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-200">
+            {documents.length === 0 ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-sm text-zinc-400">No documents found</td></tr>
+            ) : (
+              documents.map((doc) => (
+                <tr key={String(doc.id)} className="hover:bg-zinc-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{doc.user.full_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{doc.document_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">{doc.document_type}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
+                    {doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {doc.is_verified ? (
+                      <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">Verified</span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">Pending</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page Component ───────────────────────────────────────────────────────
-export default async function HrmDashboard() {
-  let summary: HrmSummary | null = null;
-  let staff: Staff[] = [];
-  let attendance: Attendance[] = [];
-  let roster: DutyRoster[] = [];
-  let leaveRequests: LeaveRequest[] = [];
-  let payroll: Payroll[] = [];
-  let error: string | null = null;
+export default function HrmDashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [summary, setSummary] = useState<HrmSummary | null>(null);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [attendance, setAttendance] = useState<Attendance[]>([]);
+  const [roster, setRoster] = useState<DutyRoster[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+  const [payroll, setPayroll] = useState<Payroll[]>([]);
+  const [performance, setPerformance] = useState<PerformanceReview[]>([]);
+  const [training, setTraining] = useState<TrainingProgram[]>([]);
+  const [disciplinary, setDisciplinary] = useState<DisciplinaryAction[]>([]);
+  const [documents, setDocuments] = useState<EmployeeDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  try {
-    summary = await getHrmSummary();
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to load HRM summary";
-  }
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [summaryData, staffData, attendanceData, rosterData, leaveData, payrollData, performanceData, trainingData, disciplinaryData, documentsData] = await Promise.all([
+        getHrmSummary().catch(() => null),
+        getAllStaff().catch(() => []),
+        getAttendance().catch(() => []),
+        getDutyRoster().catch(() => []),
+        getLeaveRequests().catch(() => []),
+        getPayroll().catch(() => []),
+        getPerformanceReviews().catch(() => []),
+        getTrainingPrograms().catch(() => []),
+        getDisciplinaryActions().catch(() => []),
+        getEmployeeDocuments().catch(() => []),
+      ]);
+      
+      setSummary(summaryData);
+      setStaff(staffData);
+      setAttendance(attendanceData);
+      setRoster(rosterData);
+      setLeaveRequests(leaveData);
+      setPayroll(payrollData);
+      setPerformance(performanceData);
+      setTraining(trainingData);
+      setDisciplinary(disciplinaryData);
+      setDocuments(documentsData);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  try {
-    staff = await getAllStaff();
-  } catch (e) {
-    console.warn("Failed to load staff:", e);
-  }
+  React.useEffect(() => {
+    loadData();
+  }, [activeTab]);
 
-  try {
-    attendance = await getAttendance();
-  } catch (e) {
-    console.warn("Failed to load attendance:", e);
-  }
-
-  try {
-    roster = await getDutyRoster();
-  } catch (e) {
-    console.warn("Failed to load duty roster:", e);
-  }
-
-  try {
-    leaveRequests = await getLeaveRequests();
-  } catch (e) {
-    console.warn("Failed to load leave requests:", e);
-  }
-
-  try {
-    payroll = await getPayroll();
-  } catch (e) {
-    console.warn("Failed to load payroll:", e);
-  }
+  const tabs = [
+    { id: "overview", label: "Overview", icon: "📊" },
+    { id: "staff", label: "Staff", icon: "👥" },
+    { id: "attendance", label: "Attendance", icon: "📋" },
+    { id: "leave", label: "Leave", icon: "🏖️" },
+    { id: "roster", label: "Roster", icon: "📅" },
+    { id: "payroll", label: "Payroll", icon: "💰" },
+    { id: "performance", label: "Performance", icon: "⭐" },
+    { id: "training", label: "Training", icon: "🎓" },
+    { id: "disciplinary", label: "Disciplinary", icon: "⚠️" },
+    { id: "documents", label: "Documents", icon: "📄" },
+  ];
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
@@ -762,13 +1078,16 @@ export default async function HrmDashboard() {
               HR Management
             </h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-              Manage staff, attendance, leave requests, and payroll
+              Complete HR system for staff management
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-zinc-600 dark:text-zinc-400">
-              Access: <span className="font-medium text-zinc-900 dark:text-zinc-50">ADMIN, SUPER_ADMIN</span>
-            </span>
+            <button
+              onClick={loadData}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700"
+            >
+              Refresh
+            </button>
           </div>
         </div>
 
@@ -779,30 +1098,68 @@ export default async function HrmDashboard() {
           </div>
         )}
 
-        {/* Summary Cards */}
-        {summary && <SummaryCards summary={summary} />}
-
-        {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Staff Directory */}
-          <StaffTable staff={staff} />
-          
-          {/* Today's Attendance */}
-          <AttendanceTable attendance={attendance} />
+        {/* Tabs */}
+        <div className="border-b border-zinc-200 dark:border-zinc-800">
+          <nav className="flex gap-1 overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                }`}
+              >
+                <span>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* Leave Requests */}
-        <LeaveRequestsTable 
-          leaveRequests={leaveRequests}
-          onApprove={approveLeaveRequest}
-          onReject={rejectLeaveRequest}
-        />
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-sm text-zinc-500">Loading...</div>
+          </div>
+        )}
 
-        {/* Duty Roster */}
-        <DutyRosterTable roster={roster} />
+        {/* Tab Content */}
+        {!loading && (
+          <>
+            {activeTab === "overview" && (
+              <div className="space-y-6">
+                {summary && <SummaryCards summary={summary} />}
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <StaffTable staff={staff} />
+                  <AttendanceTable attendance={attendance} />
+                </div>
+                <LeaveRequestsTable 
+                  leaveRequests={leaveRequests.filter(l => l.status === "PENDING")}
+                  onApprove={async (id, by) => { await approveLeaveRequest(id, by); loadData(); }}
+                  onReject={async (id, by, notes) => { await rejectLeaveRequest(id, by, notes); loadData(); }}
+                />
+              </div>
+            )}
 
-        {/* Payroll */}
-        <PayrollTable payroll={payroll} />
+            {activeTab === "staff" && <StaffTable staff={staff} />}
+            {activeTab === "attendance" && <AttendanceTable attendance={attendance} />}
+            {activeTab === "leave" && (
+              <LeaveRequestsTable 
+                leaveRequests={leaveRequests}
+                onApprove={async (id, by) => { await approveLeaveRequest(id, by); loadData(); }}
+                onReject={async (id, by, notes) => { await rejectLeaveRequest(id, by, notes); loadData(); }}
+              />
+            )}
+            {activeTab === "roster" && <DutyRosterTable roster={roster} />}
+            {activeTab === "payroll" && <PayrollTable payroll={payroll} />}
+            {activeTab === "performance" && <PerformanceTable reviews={performance} />}
+            {activeTab === "training" && <TrainingTable programs={training} />}
+            {activeTab === "disciplinary" && <DisciplinaryTable actions={disciplinary} />}
+            {activeTab === "documents" && <DocumentsTable documents={documents} />}
+          </>
+        )}
 
         {/* Info Footer */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
@@ -811,11 +1168,15 @@ export default async function HrmDashboard() {
             <div className="text-sm text-zinc-700 dark:text-zinc-300">
               <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">HR Management Features</p>
               <ul className="space-y-1 list-disc list-inside">
-                <li><strong>Staff Directory:</strong> View all staff members and their details</li>
-                <li><strong>Attendance Tracking:</strong> Monitor daily attendance and check-in/check-out times</li>
-                <li><strong>Leave Management:</strong> Approve or reject leave requests</li>
-                <li><strong>Duty Roster:</strong> View scheduled shifts and assignments</li>
-                <li><strong>Payroll:</strong> Access payroll records and payment status</li>
+                <li><strong>Staff Management:</strong> Complete employee directory with profiles</li>
+                <li><strong>Attendance Tracking:</strong> Daily attendance with check-in/check-out</li>
+                <li><strong>Leave Management:</strong> Leave requests and approval workflow</li>
+                <li><strong>Duty Roster:</strong> Shift scheduling and assignments</li>
+                <li><strong>Payroll:</strong> Salary processing and payment tracking</li>
+                <li><strong>Performance:</strong> Employee reviews and evaluations</li>
+                <li><strong>Training:</strong> Training programs and compliance</li>
+                <li><strong>Disciplinary:</strong> Disciplinary actions and grievances</li>
+                <li><strong>Documents:</strong> Employee document management</li>
               </ul>
             </div>
           </div>
