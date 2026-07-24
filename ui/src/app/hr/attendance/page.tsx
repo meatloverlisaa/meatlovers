@@ -1,3 +1,3 @@
-import { AttendanceManagement } from "@/components/hr/AttendanceManagement";
+import { AttendanceManagementHub } from "@/components/hr/AttendanceManagementHub";
 
-export default function AttendancePage() { return <AttendanceManagement />; }
+export default function AttendancePage() { return <AttendanceManagementHub />; }
