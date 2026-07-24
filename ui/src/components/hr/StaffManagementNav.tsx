@@ -7,6 +7,8 @@ const links = [
   { href: "/hr", label: "Overview" },
   { href: "/hr/staff", label: "Staff management" },
   { href: "/hr/attendance", label: "Attendance" },
+  { href: "/hr/roster", label: "Duty roster" },
+  { href: "/hr/leave", label: "Leave" },
 ];
 
 export function StaffManagementNav() {

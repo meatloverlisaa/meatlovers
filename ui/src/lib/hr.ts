@@ -144,3 +144,10 @@ export function markAttendance(data: Record<string, string | number>) {
 export function updateAttendance(id: string, data: Record<string, string | number>) {
   return request<AttendanceRecord>(`/hrm/attendance/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 }
+
+export type DutyRoster = { id: string | number; shift_date: string; shift_type: string; start_time: string; end_time: string; notes?: string | null; user: Pick<Employee, "id" | "full_name" | "role" | "phone"> };
+export function getRoster(date: string) { return request<DutyRoster[]>(`/hrm/roster?date=${date}`); }
+export function createRoster(data: Record<string, string>) { return request<DutyRoster>("/hrm/roster", { method: "POST", body: JSON.stringify(data) }); }
+
+export type LeaveSummary = { total: number; pending: number; approved: number; rejected: number; byType: Array<{ type: string; count: number }> };
+export function getLeaveSummary() { return request<LeaveSummary>("/hrm/leave/summary"); }

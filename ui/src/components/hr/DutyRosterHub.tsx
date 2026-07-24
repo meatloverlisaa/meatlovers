@@ -1,0 +1,7 @@
+import Link from "next/link";
+const actions = [
+  { title: "Shift planning", detail: "Plan coverage for morning, afternoon, night, full-day, and split shifts.", href: "/hr/roster/planning" },
+  { title: "Roster creation & management", detail: "Create daily roster entries and review staff assignments by date.", href: "/hr/roster/management" },
+  { title: "Roster notifications", detail: "Review the upcoming roster and prepare staff shift notifications.", href: "/hr/roster/notifications" },
+];
+export function DutyRosterHub() { return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8"><div className="rounded-2xl bg-blue-700 px-6 py-8 text-white shadow-sm sm:px-8"><p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-100">Core HR feature</p><h1 className="mt-2 text-3xl font-black">Duty Roster & Shift Management</h1><p className="mt-2 max-w-2xl text-sm text-blue-100">Plan coverage, create duty rosters, and prepare staff shift notifications.</p></div><section className="mt-6 grid gap-4 sm:grid-cols-3">{actions.map((action) => <Link key={action.title} href={action.href} className="rounded-xl border border-blue-200 bg-white p-6 shadow-sm transition hover:border-blue-400"><h2 className="text-lg font-black text-blue-950">{action.title}</h2><p className="mt-2 text-sm leading-6 text-zinc-600">{action.detail}</p><span className="mt-5 inline-flex text-sm font-bold text-blue-700">Open page →</span></Link>)}</section></main>; }
