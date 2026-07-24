@@ -167,7 +167,7 @@ export default function HRDashboard() {
     {
       label: "Add Employee",
       icon: "➕",
-      href: "/hr/employees/new",
+      href: "/hr/staff/new",
       color: "bg-emerald-50 dark:bg-emerald-900/20",
     },
     {

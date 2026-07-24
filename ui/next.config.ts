@@ -9,10 +9,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
-  // Font optimization
-  optimizeFonts: true,
-  
+
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['@heroicons/react'],

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { revalidatePath } from "next/cache";
+import React, { useState, useEffect } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type HrmSummary = {
@@ -1051,9 +1050,9 @@ export default function HrmDashboard() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadData();
-  }, [activeTab]);
+  }, []);
 
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },

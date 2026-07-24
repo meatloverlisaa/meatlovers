@@ -260,8 +260,6 @@ export class HrmController {
   generatePayslip(@Param('id') id: string) {
     return this.hrmService.generatePayslip(id);
   }
-}
-
 
   // ==================== PERFORMANCE MANAGEMENT ====================
 
