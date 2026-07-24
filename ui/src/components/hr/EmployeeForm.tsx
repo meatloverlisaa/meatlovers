@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createEmployee, EMPLOYMENT_TYPES, Employee, updateEmployee, readable, STAFF_ROLES } from "@/lib/hr";
 
 type Props = { employee?: Employee };
-const fieldClass = "mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100";
+const fieldClass = "mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
 const labelClass = "block text-sm font-semibold text-zinc-700";
 const empty = "";
 
@@ -42,7 +42,7 @@ export function EmployeeForm({ employee }: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      {error && <div role="alert" className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
+      {error && <div role="alert" className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">{error}</div>}
       <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-black text-zinc-950">Identity and access</h2><p className="mt-1 text-sm text-zinc-600">These details create the staff record and role-based system access.</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -80,7 +80,7 @@ export function EmployeeForm({ employee }: Props) {
         </div>
         <label className={`${labelClass} mt-4`}>HR notes<textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} className={fieldClass} /></label>
       </section>
-      <div className="flex justify-end gap-3"><button type="button" onClick={() => router.back()} className="rounded-md border border-zinc-300 px-4 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-100">Cancel</button><button disabled={submitting} className="rounded-md bg-red-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-red-900 disabled:opacity-60">{submitting ? "Saving…" : employee ? "Save changes" : "Create employee"}</button></div>
+      <div className="flex justify-end gap-3"><button type="button" onClick={() => router.back()} className="rounded-md border border-zinc-300 px-4 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-100">Cancel</button><button disabled={submitting} className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-60">{submitting ? "Saving…" : employee ? "Save changes" : "Create employee"}</button></div>
     </form>
   );
 }

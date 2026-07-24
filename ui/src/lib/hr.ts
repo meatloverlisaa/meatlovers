@@ -82,6 +82,14 @@ export function getEmployees(filters: Record<string, string> = {}) {
   return request<Employee[]>(`/hrm/employees${query.size ? `?${query}` : ""}`);
 }
 
+// The legacy directory is intentionally profile-independent. It keeps attendance
+// available while HR profile records are being completed in the database.
+export function getStaffDirectory(status = "active") {
+  const query = new URLSearchParams();
+  if (status) query.set("status", status);
+  return request<Employee[]>(`/hrm/staff${query.size ? `?${query}` : ""}`);
+}
+
 export function getEmployee(id: string) {
   return request<Employee>(`/hrm/employees/${id}`);
 }
@@ -104,4 +112,35 @@ export function deactivateEmployee(id: string, reason?: string) {
 
 export function reactivateEmployee(id: string) {
   return request(`/hrm/employees/${id}/reactivate`, { method: "PATCH" });
+}
+
+export type AttendanceRecord = {
+  id: string | number;
+  date: string;
+  check_in?: string | null;
+  check_out?: string | null;
+  status: string;
+  hours_worked?: number | null;
+  notes?: string | null;
+  user: Pick<Employee, "id" | "full_name" | "role" | "email">;
+};
+
+export type AttendanceSummary = { totalStaff: number; markedAttendance: number; unmarked: number; breakdown: Array<{ status: string; count: number }> };
+
+export function getAttendance(date: string, status = "") {
+  const query = new URLSearchParams({ date });
+  if (status) query.set("status", status);
+  return request<AttendanceRecord[]>(`/hrm/attendance?${query}`);
+}
+
+export function getAttendanceSummary(date: string) {
+  return request<AttendanceSummary>(`/hrm/attendance/summary?date=${date}`);
+}
+
+export function markAttendance(data: Record<string, string | number>) {
+  return request<AttendanceRecord>("/hrm/attendance", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function updateAttendance(id: string, data: Record<string, string | number>) {
+  return request<AttendanceRecord>(`/hrm/attendance/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 }

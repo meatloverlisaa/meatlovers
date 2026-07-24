@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Employee, EmployeeStatistics, getEmployees, getEmployeeStatistics, readable, STAFF_ROLES } from "@/lib/hr";
 
-const inputClass = "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100";
+const inputClass = "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
 
 export function StaffDirectory() {
+  const searchParams = useSearchParams();
+  const offboardingMode = searchParams.get("mode") === "offboarding";
   const [staff, setStaff] = useState<Employee[]>([]);
   const [statistics, setStatistics] = useState<EmployeeStatistics | null>(null);
-  const [filters, setFilters] = useState({ search: "", role: "", status: "active", department: "" });
+  const [filters, setFilters] = useState({ search: "", role: "", status: searchParams.get("status") ?? "active", department: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -36,11 +39,11 @@ export function StaffDirectory() {
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-red-800">Core HR · Staff management</p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-950">Staff directory</h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-600">Maintain employee records, employment details, contacts, and access status from one place.</p>
+          <p className="text-sm font-semibold text-blue-700">Core HR · Staff management</p>
+          <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-950">{offboardingMode ? "Offboard an employee" : "Staff directory"}</h1>
+          <p className="mt-2 max-w-2xl text-sm text-zinc-600">{offboardingMode ? "Open an active employee profile to deactivate access and complete their offboarding." : "Maintain employee records, employment details, contacts, and access status from one place."}</p>
         </div>
-        <Link href="/hr/staff/new" className="rounded-md bg-red-800 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-red-900">Add employee</Link>
+        <Link href="/hr/staff/new" className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-700">Add employee</Link>
       </div>
 
       <section className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -74,7 +77,7 @@ export function StaffDirectory() {
           </div>
         </form>
 
-        {error && <div className="m-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
+        {error && <div className="m-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">{error}</div>}
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500"><tr><th className="px-5 py-3">Employee</th><th className="px-5 py-3">Role & department</th><th className="px-5 py-3">Employment</th><th className="px-5 py-3">Status</th><th className="px-5 py-3"><span className="sr-only">Open profile</span></th></tr></thead>
@@ -85,7 +88,7 @@ export function StaffDirectory() {
                   <td className="px-5 py-4"><p className="font-medium text-zinc-800">{readable(employee.role)}</p><p className="mt-0.5 text-xs text-zinc-500">{employee.employee_profile?.department || "No department"}</p></td>
                   <td className="px-5 py-4"><p className="text-zinc-800">{readable(employee.employee_profile?.employment_type)}</p><p className="mt-0.5 text-xs text-zinc-500">{employee.employee_profile?.position_title || "No position title"}</p></td>
                   <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${employee.is_active ? "bg-emerald-100 text-emerald-800" : "bg-zinc-200 text-zinc-700"}`}>{employee.is_active ? "Active" : "Inactive"}</span></td>
-                  <td className="px-5 py-4 text-right"><Link href={`/hr/staff/${employee.id}`} className="text-sm font-bold text-red-800 hover:text-red-950">View profile</Link></td>
+                  <td className="px-5 py-4 text-right"><Link href={`/hr/staff/${employee.id}`} className="text-sm font-bold text-blue-700 hover:text-blue-900">View profile</Link></td>
                 </tr>
               ))}
             </tbody>
