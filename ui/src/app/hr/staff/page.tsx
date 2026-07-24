@@ -1,5 +1,5 @@
-import { StaffDirectory } from "@/components/hr/StaffDirectory";
+import { StaffManagementHub } from "@/components/hr/StaffManagementHub";
 
 export default function StaffManagementPage() {
-  return <StaffDirectory />;
+  return <StaffManagementHub />;
 }
