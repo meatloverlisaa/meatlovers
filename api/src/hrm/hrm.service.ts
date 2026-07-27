@@ -1008,7 +1008,8 @@ export class HrmService {
     days_count: number;
     reason: string;
   }) {
-    return this.prisma.leaveRequest.create({
+    const requiredSteps = data.days_count > 3 ? 2 : 1;
+    const request = await this.prisma.leaveRequest.create({
       data: {
         user_id: BigInt(data.user_id),
         leave_type: data.leave_type,
@@ -1016,16 +1017,23 @@ export class HrmService {
         end_date: new Date(data.end_date),
         days_count: data.days_count,
         reason: data.reason,
+        required_approval_steps: requiredSteps,
       },
       include: { user: true },
     });
+    return request;
   }
 
   async approveLeave(id: string, approvedBy: string) {
-    return this.prisma.leaveRequest.update({
+    const request = await this.prisma.leaveRequest.findUnique({ where: { id: BigInt(id) } });
+    if (!request || request.status !== LeaveStatus.PENDING) throw new BadRequestException('Leave request cannot be approved');
+    const finalStep = request.current_approval_step >= request.required_approval_steps;
+    await this.prisma.leaveApproval.create({ data: { leave_request_id: BigInt(id), approver_id: BigInt(approvedBy), sequence: request.current_approval_step, status: 'APPROVED', acted_at: new Date() } });
+    const updated = await this.prisma.leaveRequest.update({
       where: { id: BigInt(id) },
       data: {
-        status: 'APPROVED',
+        status: finalStep ? 'APPROVED' : 'PENDING',
+        current_approval_step: finalStep ? request.current_approval_step : request.current_approval_step + 1,
         approved_by: BigInt(approvedBy),
         approved_at: new Date(),
       },
@@ -1034,6 +1042,8 @@ export class HrmService {
         approver: true,
       },
     });
+    if (finalStep) await this.prisma.leaveCalendarEvent.create({ data: { leave_request_id: BigInt(id), user_id: request.user_id, start_date: request.start_date, end_date: request.end_date } });
+    return updated;
   }
 
   async rejectLeave(id: string, approvedBy: string, notes?: string) {
@@ -1224,6 +1234,20 @@ export class HrmService {
       Number(payroll.allowances) +
       Number(payroll.overtime_pay);
 
+    // Calculate estimated Kenya statutory breakdown for display on payslip
+    const nssf = Math.min(Math.max(grossSalary * 0.06, 1080), 2160);
+    const shif = Math.max(grossSalary * 0.0275, 300);
+    const taxablePay = Math.max(grossSalary - nssf, 0);
+    let tax = 0;
+    if (taxablePay <= 24000) {
+      tax = taxablePay * 0.10;
+    } else if (taxablePay <= 32333) {
+      tax = (24000 * 0.10) + ((taxablePay - 24000) * 0.25);
+    } else {
+      tax = (24000 * 0.10) + (8333 * 0.25) + ((taxablePay - 32333) * 0.30);
+    }
+    const paye = Math.max(tax - 2400, 0);
+
     // Prepare payslip data
     const payslip = {
       payroll_id: payroll.id.toString(),
@@ -1252,6 +1276,10 @@ export class HrmService {
       },
       deductions: {
         total: Number(payroll.deductions),
+        paye: Math.round(paye * 100) / 100,
+        nssf: Math.round(nssf * 100) / 100,
+        shif: Math.round(shif * 100) / 100,
+        other_deductions: Math.max(0, Math.round((Number(payroll.deductions) - paye - nssf - shif) * 100) / 100),
       },
       net_salary: Number(payroll.net_salary),
       payment: {
@@ -1265,4 +1293,316 @@ export class HrmService {
 
     return payslip;
   }
+
+  async markPayrollPaid(
+    id: string,
+    data: {
+      payment_date?: string;
+      payment_method: string;
+      payment_reference?: string;
+    },
+  ) {
+    const payroll = await this.prisma.payroll.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!payroll) {
+      throw new NotFoundException('Payroll record not found');
+    }
+
+    return this.prisma.payroll.update({
+      where: { id: BigInt(id) },
+      data: {
+        payment_date: data.payment_date ? new Date(data.payment_date) : new Date(),
+        payment_method: data.payment_method,
+        payment_reference: data.payment_reference || `PAY-${Date.now()}`,
+      },
+      include: { user: true },
+    });
+  }
+
+  async bulkPayPayroll(data: {
+    payroll_ids: string[];
+    payment_date?: string;
+    payment_method: string;
+    payment_reference?: string;
+  }) {
+    const paymentDate = data.payment_date ? new Date(data.payment_date) : new Date();
+    const ref = data.payment_reference || `BULK-PAY-${Date.now()}`;
+
+    const updateResults = await Promise.all(
+      data.payroll_ids.map((id) =>
+        this.prisma.payroll.update({
+          where: { id: BigInt(id) },
+          data: {
+            payment_date: paymentDate,
+            payment_method: data.payment_method,
+            payment_reference: ref,
+          },
+          include: { user: true },
+        }),
+      ),
+    );
+
+    return {
+      message: `Successfully processed payment for ${updateResults.length} payroll records`,
+      count: updateResults.length,
+      records: updateResults,
+    };
+  }
+
+  async processBulkPayroll(data: {
+    period_start: string;
+    period_end: string;
+    department?: string;
+    calculate_overtime_from_attendance?: boolean;
+    overtime_hourly_rate?: number;
+    housing_allowance_percent?: number;
+    transport_allowance_flat?: number;
+    apply_statutory_deductions?: boolean;
+  }) {
+    const periodStart = new Date(data.period_start);
+    const periodEnd = new Date(data.period_end);
+
+    const whereUser: any = { is_active: true };
+    if (data.department) {
+      whereUser.employee_profile = {
+        department: { contains: data.department, mode: 'insensitive' },
+      };
+    }
+
+    const employees = await this.prisma.user.findMany({
+      where: whereUser,
+      include: {
+        employee_profile: true,
+      },
+    });
+
+    const defaultRoleSalaries: Record<string, number> = {
+      ADMIN: 95000,
+      MANAGER: 85000,
+      ACCOUNTANT: 75000,
+      CHEF: 65000,
+      STOREKEEPER: 50000,
+      BARMAN: 45000,
+      CASHIER: 40000,
+      WAITER: 35000,
+      DISPATCHER: 35000,
+    };
+
+    const results: any[] = [];
+
+
+    for (const emp of employees) {
+      const basicSalary = defaultRoleSalaries[emp.role] || 40000;
+
+      let overtimePay = 0;
+      if (data.calculate_overtime_from_attendance) {
+        const attendance = await this.prisma.staffAttendance.findMany({
+          where: {
+            user_id: emp.id,
+            date: {
+              gte: periodStart,
+              lte: periodEnd,
+            },
+          },
+        });
+
+        const totalHours = attendance.reduce(
+          (sum, att) => sum + (att.hours_worked ? Number(att.hours_worked) : 8),
+          0,
+        );
+        const standardHours = 160;
+        const extraHours = Math.max(0, totalHours - standardHours);
+        const hourlyRate = data.overtime_hourly_rate || (basicSalary / 160) * 1.5;
+        overtimePay = Math.round(extraHours * hourlyRate * 100) / 100;
+      }
+
+      const housingAllowancePct = data.housing_allowance_percent ?? 15;
+      const housingAllowance = (basicSalary * housingAllowancePct) / 100;
+      const transportAllowance = data.transport_allowance_flat ?? 3000;
+      const allowances = Math.round((housingAllowance + transportAllowance) * 100) / 100;
+
+      const grossSalary = basicSalary + allowances + overtimePay;
+
+      let totalDeductions = 0;
+      if (data.apply_statutory_deductions !== false) {
+        const nssf = Math.min(Math.max(grossSalary * 0.06, 1080), 2160);
+        const shif = Math.max(grossSalary * 0.0275, 300);
+        const taxablePay = Math.max(grossSalary - nssf, 0);
+        let tax = 0;
+        if (taxablePay <= 24000) {
+          tax = taxablePay * 0.10;
+        } else if (taxablePay <= 32333) {
+          tax = (24000 * 0.10) + ((taxablePay - 24000) * 0.25);
+        } else {
+          tax = (24000 * 0.10) + (8333 * 0.25) + ((taxablePay - 32333) * 0.30);
+        }
+        const paye = Math.max(tax - 2400, 0);
+        totalDeductions = Math.round((paye + nssf + shif) * 100) / 100;
+      }
+
+      const netSalary = Math.round((grossSalary - totalDeductions) * 100) / 100;
+
+      const existingRecord = await this.prisma.payroll.findFirst({
+        where: {
+          user_id: emp.id,
+          period_start: periodStart,
+        },
+      });
+
+      if (existingRecord) {
+        const updated = await this.prisma.payroll.update({
+          where: { id: existingRecord.id },
+          data: {
+            period_end: periodEnd,
+            basic_salary: basicSalary,
+            allowances,
+            overtime_pay: overtimePay,
+            deductions: totalDeductions,
+            net_salary: netSalary,
+            notes: `Updated by Bulk Payroll Processing on ${new Date().toISOString().split('T')[0]}`,
+          },
+          include: { user: true },
+        });
+        results.push(updated);
+      } else {
+        const created = await this.prisma.payroll.create({
+          data: {
+            user_id: emp.id,
+            period_start: periodStart,
+            period_end: periodEnd,
+            basic_salary: basicSalary,
+            allowances,
+            overtime_pay: overtimePay,
+            deductions: totalDeductions,
+            net_salary: netSalary,
+            notes: `Generated by Bulk Payroll Processing on ${new Date().toISOString().split('T')[0]}`,
+          },
+          include: { user: true },
+        });
+        results.push(created);
+      }
+    }
+
+    return {
+      message: `Payroll processed successfully for ${results.length} active employees`,
+      count: results.length,
+      records: results,
+    };
+  }
+
+  async getDepartmentPayrollSummary(period?: string) {
+    const where: any = {};
+    if (period) {
+      where.period_start = new Date(period);
+    }
+
+    const records = await this.prisma.payroll.findMany({
+      where,
+      include: {
+        user: {
+          include: {
+            employee_profile: true,
+          },
+        },
+      },
+    });
+
+    const deptMap: Record<string, {
+      department: string;
+      staff_count: number;
+      total_basic: number;
+      total_allowances: number;
+      total_overtime: number;
+      total_deductions: number;
+      total_net: number;
+    }> = {};
+
+    for (const record of records) {
+      const dept = record.user.employee_profile?.department || record.user.role || 'General Staff';
+      if (!deptMap[dept]) {
+        deptMap[dept] = {
+          department: dept,
+          staff_count: 0,
+          total_basic: 0,
+          total_allowances: 0,
+          total_overtime: 0,
+          total_deductions: 0,
+          total_net: 0,
+        };
+      }
+
+      deptMap[dept].staff_count += 1;
+      deptMap[dept].total_basic += Number(record.basic_salary);
+      deptMap[dept].total_allowances += Number(record.allowances);
+      deptMap[dept].total_overtime += Number(record.overtime_pay);
+      deptMap[dept].total_deductions += Number(record.deductions);
+      deptMap[dept].total_net += Number(record.net_salary);
+    }
+
+    return Object.values(deptMap);
+  }
+
+  async exportBankPaymentFile(periodStart?: string) {
+    const where: any = {};
+    if (periodStart) {
+      where.period_start = new Date(periodStart);
+    }
+
+    const records = await this.prisma.payroll.findMany({
+      where,
+      include: {
+        user: {
+          include: {
+            employee_profile: true,
+          },
+        },
+      },
+      orderBy: { user: { full_name: 'asc' } },
+    });
+
+    const headers = [
+      'Employee ID',
+      'Full Name',
+      'Email',
+      'Role',
+      'Department',
+      'Bank Name',
+      'Account Number',
+      'Account Name',
+      'Basic Salary',
+      'Allowances',
+      'Deductions',
+      'Net Salary (KSh)',
+      'Payment Status',
+      'Payment Reference',
+    ];
+
+    const rows = records.map((r) => [
+      r.user.id.toString(),
+      `"${r.user.full_name}"`,
+      r.user.email,
+      r.user.role,
+      `"${r.user.employee_profile?.department || 'Operations'}"`,
+      `"${r.user.employee_profile?.bank_name || 'KCB Bank'}"`,
+      `"${r.user.employee_profile?.bank_account_number || '1234567890'}"`,
+      `"${r.user.employee_profile?.bank_account_name || r.user.full_name}"`,
+      Number(r.basic_salary),
+      Number(r.allowances),
+      Number(r.deductions),
+      Number(r.net_salary),
+      r.payment_date ? 'PAID' : 'PENDING',
+      r.payment_reference || 'N/A',
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+
+    return {
+      filename: `MeatLovers_Payroll_BankFile_${new Date().toISOString().split('T')[0]}.csv`,
+      contentType: 'text/csv',
+      content: csvContent,
+    };
+  }
 }
+

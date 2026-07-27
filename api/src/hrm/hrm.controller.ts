@@ -27,7 +27,14 @@ import {
   ApproveLeaveDto,
   RejectLeaveDto,
 } from './dto/leave.dto';
-import { CreatePayrollDto, UpdatePayrollDto } from './dto/payroll.dto';
+import {
+  CreatePayrollDto,
+  UpdatePayrollDto,
+  ProcessBulkPayrollDto,
+  MarkPayrollPaidDto,
+  BulkPayPayrollDto,
+} from './dto/payroll.dto';
+
 
 @Controller('hrm')
 @Public()
@@ -242,10 +249,31 @@ export class HrmController {
     return this.hrmService.getPayrollSummary(period);
   }
 
+  @Get('payroll/department-summary')
+  getDepartmentPayrollSummary(@Query('period') period?: string) {
+    return this.hrmService.getDepartmentPayrollSummary(period);
+  }
+
+  @Get('payroll/bank-export')
+  exportBankPaymentFile(@Query('periodStart') periodStart?: string) {
+    return this.hrmService.exportBankPaymentFile(periodStart);
+  }
+
   @Post('payroll')
   @HttpCode(HttpStatus.CREATED)
   createPayroll(@Body() createPayrollDto: CreatePayrollDto) {
     return this.hrmService.createPayroll(createPayrollDto);
+  }
+
+  @Post('payroll/process-bulk')
+  @HttpCode(HttpStatus.CREATED)
+  processBulkPayroll(@Body() processBulkDto: ProcessBulkPayrollDto) {
+    return this.hrmService.processBulkPayroll(processBulkDto);
+  }
+
+  @Post('payroll/bulk-pay')
+  bulkPayPayroll(@Body() bulkPayDto: BulkPayPayrollDto) {
+    return this.hrmService.bulkPayPayroll(bulkPayDto);
   }
 
   @Patch('payroll/:id')
@@ -256,10 +284,19 @@ export class HrmController {
     return this.hrmService.updatePayroll(id, updatePayrollDto);
   }
 
+  @Patch('payroll/:id/pay')
+  markPayrollPaid(
+    @Param('id') id: string,
+    @Body() markPaidDto: MarkPayrollPaidDto,
+  ) {
+    return this.hrmService.markPayrollPaid(id, markPaidDto);
+  }
+
   @Get('payroll/:id/slip')
   generatePayslip(@Param('id') id: string) {
     return this.hrmService.generatePayslip(id);
   }
+
 
   // ==================== PERFORMANCE MANAGEMENT ====================
 

@@ -98,3 +98,66 @@ export class UpdatePayrollDto {
   @IsOptional()
   notes?: string;
 }
+
+export class ProcessBulkPayrollDto {
+  @IsDateString()
+  period_start: string;
+
+  @IsDateString()
+  period_end: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsOptional()
+  calculate_overtime_from_attendance?: boolean;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  overtime_hourly_rate?: number;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  housing_allowance_percent?: number;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  transport_allowance_flat?: number;
+
+  @IsOptional()
+  apply_statutory_deductions?: boolean;
+}
+
+export class MarkPayrollPaidDto {
+  @IsDateString()
+  @IsOptional()
+  payment_date?: string;
+
+  @IsString()
+  payment_method: string;
+
+  @IsString()
+  @IsOptional()
+  payment_reference?: string;
+}
+
+export class BulkPayPayrollDto {
+  @IsString({ each: true })
+  payroll_ids: string[];
+
+  @IsDateString()
+  @IsOptional()
+  payment_date?: string;
+
+  @IsString()
+  payment_method: string;
+
+  @IsString()
+  @IsOptional()
+  payment_reference?: string;
+}
+

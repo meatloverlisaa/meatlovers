@@ -330,6 +330,98 @@ async function rejectLeaveRequest(leaveId: string, approvedBy: string, notes: st
   return res.json();
 }
 
+async function processBulkPayrollApi(payload: any) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/process-bulk`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
+    throw new Error(err.message || `Failed to process payroll: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function markPayrollPaidApi(
+  id: string | number,
+  payload: { payment_date?: string; payment_method: string; payment_reference?: string }
+) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/${id}/pay`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to mark payroll as paid: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function bulkPayPayrollApi(payload: {
+  payroll_ids: string[];
+  payment_date?: string;
+  payment_method: string;
+  payment_reference?: string;
+}) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/bulk-pay`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to bulk pay payroll: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function updatePayrollRecordApi(id: string | number, payload: any) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to update payroll record: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function fetchPayslipApi(id: string | number) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/${id}/slip`, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load payslip: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+async function fetchBankExportApi() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const res = await fetch(`${baseUrl}/hrm/payroll/bank-export`, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to export bank file: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+
 // ─── Components ───────────────────────────────────────────────────────────────
 function SummaryCards({ summary }: { summary: HrmSummary }) {
   const cards = [
@@ -716,88 +808,1037 @@ function DutyRosterTable({ roster }: { roster: DutyRoster[] }) {
   );
 }
 
-function PayrollTable({ payroll }: { payroll: Payroll[] }) {
+// ─── Payroll Management Component & Modals ───────────────────────────────────────
+function PayslipModal({ payslip, onClose }: { payslip: any; onClose: () => void }) {
+  if (!payslip) return null;
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
-      <div className="border-b border-zinc-200 px-6 py-4">
-        <h3 className="font-black text-zinc-950">Recent Payroll</h3>
-        <p className="mt-1 text-xs text-zinc-500">Recent payroll records</p>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-zinc-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Staff Member
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Period
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Basic Salary
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Allowances
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Deductions
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Net Salary
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-200">
-            {payroll.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-sm text-zinc-400">
-                  No payroll records found
-                </td>
-              </tr>
-            ) : (
-              payroll.map((record) => (
-                <tr key={String(record.id)} className="hover:bg-zinc-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">
-                    {record.user.full_name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
-                    {new Date(record.period_start).toLocaleDateString()} - {new Date(record.period_end).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
-                    KSh {Number(record.basic_salary).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
-                    KSh {Number(record.allowances).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
-                    KSh {Number(record.deductions).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-zinc-900">
-                    KSh {Number(record.net_salary).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        record.payment_date
-                          ? "bg-green-100 text-green-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {record.payment_date ? "Paid" : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-xl font-black text-white">
+              ML
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-zinc-950 dark:text-white">MEAT LOVERS CIMS</h2>
+              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Official Employee Payslip</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700"
+            >
+              🖨️ Print Payslip
+            </button>
+            <button
+              onClick={onClose}
+              className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <div className="rounded-xl bg-zinc-50 p-4 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Employee Details</p>
+            <h3 className="mt-1 text-base font-black text-zinc-900 dark:text-white">{payslip.employee.name}</h3>
+            <p className="text-xs text-zinc-500">{payslip.employee.email}</p>
+            <div className="mt-3 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+              <p><strong>Role:</strong> {payslip.employee.role}</p>
+              <p><strong>Department:</strong> {payslip.employee.department || "Operations"}</p>
+              <p><strong>Position:</strong> {payslip.employee.position || "Staff Member"}</p>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-zinc-50 p-4 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Payment & Bank Details</p>
+            <div className="mt-3 space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+              <p><strong>Bank:</strong> {payslip.employee.bank_account?.bank_name || "KCB Bank"}</p>
+              <p><strong>Account No:</strong> {payslip.employee.bank_account?.account_number || "••••••••"}</p>
+              <p><strong>Account Name:</strong> {payslip.employee.bank_account?.account_name || payslip.employee.name}</p>
+              <p><strong>Pay Period:</strong> {new Date(payslip.period.start).toLocaleDateString()} - {new Date(payslip.period.end).toLocaleDateString()}</p>
+              <p><strong>Payment Status:</strong> <span className={payslip.payment.date ? "text-green-600 font-bold" : "text-amber-600 font-bold"}>{payslip.payment.date ? "PAID" : "PENDING"}</span></p>
+              {payslip.payment.reference && <p><strong>Ref Code:</strong> {payslip.payment.reference}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Breakdown Tables */}
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          {/* Earnings */}
+          <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+            <h4 className="font-bold text-sm text-green-700 dark:text-green-400 border-b border-zinc-200 pb-2 dark:border-zinc-800 flex items-center justify-between">
+              <span>💵 Earnings & Allowances</span>
+            </h4>
+            <div className="mt-3 space-y-2 text-xs">
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>Basic Salary</span>
+                <span className="font-semibold">KSh {Number(payslip.earnings.basic_salary).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>Housing & Transport Allowances</span>
+                <span className="font-semibold">KSh {Number(payslip.earnings.allowances).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>Overtime Earnings</span>
+                <span className="font-semibold">KSh {Number(payslip.earnings.overtime_pay).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between border-t border-zinc-200 pt-2 font-bold text-zinc-900 dark:border-zinc-800 dark:text-white">
+                <span>Gross Earnings</span>
+                <span className="text-green-600">KSh {Number(payslip.earnings.gross_salary).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Deductions */}
+          <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+            <h4 className="font-bold text-sm text-red-700 dark:text-red-400 border-b border-zinc-200 pb-2 dark:border-zinc-800">
+              🏛️ Deductions & Taxes
+            </h4>
+            <div className="mt-3 space-y-2 text-xs">
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>PAYE Income Tax</span>
+                <span className="font-semibold">KSh {Number(payslip.deductions?.paye || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>NSSF Pension Contribution</span>
+                <span className="font-semibold">KSh {Number(payslip.deductions?.nssf || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                <span>SHIF Health Insurance</span>
+                <span className="font-semibold">KSh {Number(payslip.deductions?.shif || 0).toLocaleString()}</span>
+              </div>
+              {Number(payslip.deductions?.other_deductions) > 0 && (
+                <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
+                  <span>Voluntary / Other Deductions</span>
+                  <span className="font-semibold">KSh {Number(payslip.deductions.other_deductions).toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-zinc-200 pt-2 font-bold text-zinc-900 dark:border-zinc-800 dark:text-white">
+                <span>Total Deductions</span>
+                <span className="text-red-600">KSh {Number(payslip.deductions.total).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Net Salary Highlight */}
+        <div className="mt-6 flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white shadow-lg">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-200">Net Payable Amount</p>
+            <p className="mt-1 text-3xl font-black">KSh {Number(payslip.net_salary).toLocaleString()}</p>
+          </div>
+          <div className="text-right text-xs text-blue-100">
+            <p>Generated: {new Date(payslip.generated_at).toLocaleDateString()}</p>
+            <p className="font-medium mt-1">Authorized by HR Department</p>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+function ProcessPayrollModal({
+  onClose,
+  onProcessed,
+}: {
+  onClose: () => void;
+  onProcessed: () => void;
+}) {
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split("T")[0];
+
+  const [periodStart, setPeriodStart] = useState(firstDay);
+  const [periodEnd, setPeriodEnd] = useState(lastDay);
+  const [department, setDepartment] = useState("");
+  const [calcOvertime, setCalcOvertime] = useState(true);
+  const [applyStatutory, setApplyStatutory] = useState(true);
+  const [housingPct, setHousingPct] = useState(15);
+  const [transportFlat, setTransportFlat] = useState(3000);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await processBulkPayrollApi({
+        period_start: periodStart,
+        period_end: periodEnd,
+        department: department || undefined,
+        calculate_overtime_from_attendance: calcOvertime,
+        housing_allowance_percent: housingPct,
+        transport_allowance_flat: transportFlat,
+        apply_statutory_deductions: applyStatutory,
+      });
+      onProcessed();
+      onClose();
+    } catch (err: any) {
+      setError(err.message || "Failed to process payroll");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+          <h3 className="text-lg font-black">⚡ Process Monthly Payroll Batch</h3>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Period Start Date</label>
+              <input
+                type="date"
+                required
+                value={periodStart}
+                onChange={(e) => setPeriodStart(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Period End Date</label>
+              <input
+                type="date"
+                required
+                value={periodEnd}
+                onChange={(e) => setPeriodEnd(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Department (Optional Filter)</label>
+            <select
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            >
+              <option value="">All Departments</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Service">Service / Front of House</option>
+              <option value="Bar">Bar</option>
+              <option value="Management">Management</option>
+              <option value="Logistics">Logistics / Delivery</option>
+            </select>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Housing Allowance (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="50"
+                value={housingPct}
+                onChange={(e) => setHousingPct(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Transport Allowance (KSh)</label>
+              <input
+                type="number"
+                min="0"
+                value={transportFlat}
+                onChange={(e) => setTransportFlat(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <label className="flex items-center gap-2 font-medium text-zinc-800 dark:text-zinc-200">
+              <input
+                type="checkbox"
+                checked={calcOvertime}
+                onChange={(e) => setCalcOvertime(e.target.checked)}
+                className="rounded text-blue-600"
+              />
+              Calculate Overtime from Staff Attendance records
+            </label>
+
+            <label className="flex items-center gap-2 font-medium text-zinc-800 dark:text-zinc-200">
+              <input
+                type="checkbox"
+                checked={applyStatutory}
+                onChange={(e) => setApplyStatutory(e.target.checked)}
+                className="rounded text-blue-600"
+              />
+              Auto-calculate Kenya Statutory Taxes (PAYE, NSSF, SHIF)
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-zinc-300 px-4 py-2 font-bold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-lg bg-blue-600 px-5 py-2 font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Calculating..." : "Run Payroll Batch"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function MarkPaidModal({
+  record,
+  onClose,
+  onSuccess,
+}: {
+  record: Payroll;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [method, setMethod] = useState("Bank Transfer");
+  const [reference, setReference] = useState(`PAY-${Date.now().toString().slice(-6)}`);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await markPayrollPaidApi(record.id, {
+        payment_date: paymentDate,
+        payment_method: method,
+        payment_reference: reference,
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      alert("Failed to mark as paid");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+          <h3 className="text-base font-black">💳 Confirm Salary Disbursement</h3>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+        </div>
+
+        <div className="mt-4 rounded-xl bg-green-50 p-4 border border-green-200 dark:bg-green-950/30 dark:border-green-800 text-xs">
+          <p className="text-zinc-500 font-bold uppercase">Staff Member</p>
+          <p className="text-base font-black text-zinc-900 dark:text-white mt-0.5">{record.user.full_name}</p>
+          <div className="mt-2 flex justify-between font-bold text-zinc-700 dark:text-zinc-300">
+            <span>Net Payable Amount:</span>
+            <span className="text-green-600 dark:text-green-400 text-sm">KSh {Number(record.net_salary).toLocaleString()}</span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Disbursement Date</label>
+            <input
+              type="date"
+              required
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Payment Method</label>
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            >
+              <option value="Bank Transfer">Bank Transfer (EFT/RTGS)</option>
+              <option value="M-Pesa">M-Pesa Bulk Disbursement</option>
+              <option value="Cheque">Bank Cheque</option>
+              <option value="Cash">Cash Payment</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Transaction Ref / Cheque No.</label>
+            <input
+              type="text"
+              required
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-zinc-300 px-4 py-2 font-bold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-lg bg-green-600 px-5 py-2 font-bold text-white transition hover:bg-green-700 disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Confirm Payment"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function BulkPayModal({
+  selectedIds,
+  payroll,
+  onClose,
+  onSuccess,
+}: {
+  selectedIds: string[];
+  payroll: Payroll[];
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [method, setMethod] = useState("Bank Transfer");
+  const [reference, setReference] = useState(`BULK-${Date.now().toString().slice(-6)}`);
+  const [loading, setLoading] = useState(false);
+
+  const selectedRecords = payroll.filter((r) => selectedIds.includes(String(r.id)));
+  const totalAmount = selectedRecords.reduce((sum, r) => sum + Number(r.net_salary), 0);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await bulkPayPayrollApi({
+        payroll_ids: selectedIds,
+        payment_date: paymentDate,
+        payment_method: method,
+        payment_reference: reference,
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      alert("Failed bulk payment execution");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+          <h3 className="text-base font-black">💳 Bulk Salary Disbursement</h3>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+        </div>
+
+        <div className="mt-4 rounded-xl bg-blue-50 p-4 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-800 text-xs">
+          <p className="text-zinc-500 font-bold uppercase">Selected Employees</p>
+          <p className="text-base font-black text-zinc-900 dark:text-white mt-0.5">{selectedIds.length} Staff Members</p>
+          <div className="mt-2 flex justify-between font-bold text-zinc-700 dark:text-zinc-300">
+            <span>Total Payout:</span>
+            <span className="text-blue-600 dark:text-blue-400 text-sm">KSh {totalAmount.toLocaleString()}</span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Disbursement Date</label>
+            <input
+              type="date"
+              required
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Payment Channel</label>
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            >
+              <option value="Bank Transfer">Bank Transfer (EFT Batch)</option>
+              <option value="M-Pesa">M-Pesa B2C Bulk</option>
+              <option value="Cheque">Bank Cheques</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Batch Reference / Code</label>
+            <input
+              type="text"
+              required
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-zinc-300 px-4 py-2 font-bold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-lg bg-green-600 px-5 py-2 font-bold text-white transition hover:bg-green-700 disabled:opacity-50"
+            >
+              {loading ? "Processing Batch..." : "Disburse All Selected"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function EditPayrollModal({
+  record,
+  onClose,
+  onSuccess,
+}: {
+  record: Payroll;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [basicSalary, setBasicSalary] = useState(record.basic_salary);
+  const [allowances, setAllowances] = useState(record.allowances);
+  const [overtimePay, setOvertimePay] = useState(record.overtime_pay || 0);
+  const [deductions, setDeductions] = useState(record.deductions);
+  const [netSalary, setNetSalary] = useState(record.net_salary);
+  const [notes, setNotes] = useState(record.notes || "");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const calcNet = Number(basicSalary) + Number(allowances) + Number(overtimePay) - Number(deductions);
+    setNetSalary(Math.max(0, calcNet));
+  }, [basicSalary, allowances, overtimePay, deductions]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updatePayrollRecordApi(record.id, {
+        basic_salary: Number(basicSalary),
+        allowances: Number(allowances),
+        overtime_pay: Number(overtimePay),
+        deductions: Number(deductions),
+        net_salary: Number(netSalary),
+        notes,
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      alert("Failed to update payroll record");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+          <h3 className="text-base font-black">✏️ Edit Payroll Statement</h3>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+        </div>
+
+        <p className="mt-2 text-xs text-zinc-500">Employee: <strong>{record.user.full_name}</strong></p>
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Basic Salary (KSh)</label>
+              <input
+                type="number"
+                required
+                value={basicSalary}
+                onChange={(e) => setBasicSalary(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Allowances (KSh)</label>
+              <input
+                type="number"
+                value={allowances}
+                onChange={(e) => setAllowances(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Overtime Pay (KSh)</label>
+              <input
+                type="number"
+                value={overtimePay}
+                onChange={(e) => setOvertimePay(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-zinc-700 dark:text-zinc-300">Deductions (KSh)</label>
+              <input
+                type="number"
+                value={deductions}
+                onChange={(e) => setDeductions(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Calculated Net Salary (KSh)</label>
+            <input
+              type="number"
+              required
+              value={netSalary}
+              onChange={(e) => setNetSalary(Number(e.target.value))}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 font-bold text-green-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-green-400 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-zinc-700 dark:text-zinc-300">Notes / Reason</label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-zinc-300 px-4 py-2 font-bold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-lg bg-blue-600 px-5 py-2 font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PayrollManagementSection({
+  payroll,
+  onRefresh,
+}: {
+  payroll: Payroll[];
+  onRefresh: () => void;
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "PAID" | "PENDING">("ALL");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  
+  // Modals state
+  const [activePayslip, setActivePayslip] = useState<any | null>(null);
+  const [showProcessModal, setShowProcessModal] = useState(false);
+  const [markPaidRecord, setMarkPaidRecord] = useState<Payroll | null>(null);
+  const [showBulkPayModal, setShowBulkPayModal] = useState(false);
+  const [editRecord, setEditRecord] = useState<Payroll | null>(null);
+
+  // Summary Metrics
+  const totalGross = payroll.reduce(
+    (sum, r) => sum + Number(r.basic_salary) + Number(r.allowances) + Number(r.overtime_pay || 0),
+    0
+  );
+  const totalPaid = payroll
+    .filter((r) => r.payment_date)
+    .reduce((sum, r) => sum + Number(r.net_salary), 0);
+  const totalPending = payroll
+    .filter((r) => !r.payment_date)
+    .reduce((sum, r) => sum + Number(r.net_salary), 0);
+  const totalDeductions = payroll.reduce((sum, r) => sum + Number(r.deductions), 0);
+
+  // Filtered Payroll Records
+  const filteredPayroll = payroll.filter((r) => {
+    const matchesSearch =
+      r.user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (r.payment_reference && r.payment_reference.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesStatus =
+      statusFilter === "ALL"
+        ? true
+        : statusFilter === "PAID"
+        ? Boolean(r.payment_date)
+        : !r.payment_date;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      const pendingIds = filteredPayroll.filter((r) => !r.payment_date).map((r) => String(r.id));
+      setSelectedIds(pendingIds);
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleViewPayslip = async (id: string | number) => {
+    try {
+      const slip = await fetchPayslipApi(id);
+      setActivePayslip(slip);
+    } catch (err) {
+      alert("Failed to load payslip data");
+    }
+  };
+
+  const handleExportBankFile = async () => {
+    try {
+      const fileData = await fetchBankExportApi();
+      const blob = new Blob([fileData.content], { type: fileData.contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileData.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to export bank file");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* ─── Metric Cards ──────────────────────────────────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Total Monthly Payroll</p>
+              <p className="mt-2 text-2xl font-black text-zinc-950 dark:text-white">KSh {totalGross.toLocaleString()}</p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-2xl text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+              💼
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Disbursed (Paid)</p>
+              <p className="mt-2 text-2xl font-black text-green-600 dark:text-green-400">KSh {totalPaid.toLocaleString()}</p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-2xl text-green-600 dark:bg-green-900/40 dark:text-green-400">
+              ✅
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Pending Disbursement</p>
+              <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">KSh {totalPending.toLocaleString()}</p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-2xl text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
+              ⏳
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Statutory & Tax Deductions</p>
+              <p className="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">KSh {totalDeductions.toLocaleString()}</p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-2xl text-purple-600 dark:bg-purple-900/40 dark:text-purple-400">
+              🏛️
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Toolbar & Filters ────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-64">
+            <input
+              type="text"
+              placeholder="Search staff, email, ref..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-blue-600 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
+            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-blue-600 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="PAID">Paid Only</option>
+            <option value="PENDING">Pending Only</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={() => setShowBulkPayModal(true)}
+              className="flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-green-700"
+            >
+              <span>💳</span> Pay Selected ({selectedIds.length})
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowProcessModal(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
+          >
+            <span>⚡</span> Process Monthly Payroll
+          </button>
+
+          <button
+            onClick={handleExportBankFile}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-xs font-bold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+          >
+            <span>📥</span> Bank CSV File
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Payroll Table ─────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
+          <h3 className="font-black text-zinc-950 dark:text-white">Payroll Directory & Salary Statements</h3>
+          <p className="mt-1 text-xs text-zinc-500">Manage employee earnings, deductions, and disbursements</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-zinc-50 dark:bg-zinc-800/50">
+              <tr>
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAll}
+                    checked={
+                      filteredPayroll.filter((r) => !r.payment_date).length > 0 &&
+                      selectedIds.length === filteredPayroll.filter((r) => !r.payment_date).length
+                    }
+                    className="rounded text-blue-600 focus:ring-blue-500"
+                  />
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Staff Member</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Pay Period</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Basic Salary</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Allowances / OT</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Deductions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Net Salary</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Status</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-zinc-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              {filteredPayroll.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-6 py-12 text-center text-sm text-zinc-400">
+                    No payroll records found matching criteria
+                  </td>
+                </tr>
+              ) : (
+                filteredPayroll.map((record) => {
+                  const isPending = !record.payment_date;
+                  const isSelected = selectedIds.includes(String(record.id));
+                  return (
+                    <tr key={String(record.id)} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
+                      <td className="px-4 py-4">
+                        {isPending && (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleSelectOne(String(record.id))}
+                            className="rounded text-blue-600 focus:ring-blue-500"
+                          />
+                        )}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                            {record.user.full_name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-zinc-900 dark:text-white">{record.user.full_name}</div>
+                            <div className="text-xs text-zinc-500">{record.user.email} • <span className="font-medium text-blue-600">{record.user.role}</span></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-xs text-zinc-600 dark:text-zinc-300">
+                        {new Date(record.period_start).toLocaleDateString()} - {new Date(record.period_end).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-zinc-700 dark:text-zinc-300 font-medium">
+                        KSh {Number(record.basic_salary).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-zinc-700 dark:text-zinc-300">
+                        <div>KSh {(Number(record.allowances) + Number(record.overtime_pay || 0)).toLocaleString()}</div>
+                        {Number(record.overtime_pay) > 0 && (
+                          <div className="text-[10px] text-amber-600 font-medium">+KSh {Number(record.overtime_pay).toLocaleString()} OT</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                        -KSh {Number(record.deductions).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-black text-green-600 dark:text-green-400">
+                        KSh {Number(record.net_salary).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {record.payment_date ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                              <span>✅</span> Paid
+                            </span>
+                            <div className="mt-1 text-[10px] text-zinc-500">
+                              {record.payment_method || "Bank"} • {record.payment_reference || "N/A"}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                            <span>⏳</span> Pending
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-right text-xs">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleViewPayslip(record.id)}
+                            className="rounded-md bg-zinc-100 px-2.5 py-1.5 font-bold text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                            title="View Payslip"
+                          >
+                            📄 Slip
+                          </button>
+
+                          {isPending && (
+                            <button
+                              onClick={() => setMarkPaidRecord(record)}
+                              className="rounded-md bg-green-600 px-2.5 py-1.5 font-bold text-white transition hover:bg-green-700"
+                            >
+                              ✅ Pay
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setEditRecord(record)}
+                            className="rounded-md bg-blue-50 px-2.5 py-1.5 font-bold text-blue-700 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
+                          >
+                            ✏️ Edit
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Render Modals */}
+      {activePayslip && (
+        <PayslipModal payslip={activePayslip} onClose={() => setActivePayslip(null)} />
+      )}
+
+      {showProcessModal && (
+        <ProcessPayrollModal
+          onClose={() => setShowProcessModal(false)}
+          onProcessed={onRefresh}
+        />
+      )}
+
+      {markPaidRecord && (
+        <MarkPaidModal
+          record={markPaidRecord}
+          onClose={() => setMarkPaidRecord(null)}
+          onSuccess={onRefresh}
+        />
+      )}
+
+      {showBulkPayModal && (
+        <BulkPayModal
+          selectedIds={selectedIds}
+          payroll={payroll}
+          onClose={() => setShowBulkPayModal(false)}
+          onSuccess={() => {
+            setSelectedIds([]);
+            onRefresh();
+          }}
+        />
+      )}
+
+      {editRecord && (
+        <EditPayrollModal
+          record={editRecord}
+          onClose={() => setEditRecord(null)}
+          onSuccess={onRefresh}
+        />
+      )}
+    </div>
+  );
+}
+
 
 // ─── Tab Components ───────────────────────────────────────────────────────────────
 function PerformanceTable({ reviews }: { reviews: PerformanceReview[] }) {
@@ -1152,7 +2193,10 @@ export default function HrmDashboard() {
               />
             )}
             {activeTab === "roster" && <DutyRosterTable roster={roster} />}
-            {activeTab === "payroll" && <PayrollTable payroll={payroll} />}
+            {activeTab === "payroll" && (
+              <PayrollManagementSection payroll={payroll} onRefresh={loadData} />
+            )}
+
             {activeTab === "performance" && <PerformanceTable reviews={performance} />}
             {activeTab === "training" && <TrainingTable programs={training} />}
             {activeTab === "disciplinary" && <DisciplinaryTable actions={disciplinary} />}

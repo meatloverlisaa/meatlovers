@@ -42,39 +42,69 @@ export default function HRDashboard() {
   }, []);
 
   const cards = [
-    { label: "Total staff", value: summary?.totalStaff ?? "—", detail: "Employee records", icon: "👥", color: "bg-blue-100" },
-    { label: "Active staff", value: summary?.activeStaff ?? "—", detail: "Currently employed", icon: "✓", color: "bg-emerald-100" },
-    { label: "Attendance today", value: summary?.todayAttendance ?? "—", detail: "Recorded check-ins", icon: "◷", color: "bg-amber-100" },
-    { label: "Pending leave", value: summary?.pendingLeaves ?? "—", detail: "Requests awaiting review", icon: "◫", color: "bg-sky-100" },
+    { label: "Total staff", value: summary?.totalStaff ?? "—", detail: "Employee records", icon: "👥", color: "bg-blue-900" },
+    { label: "Active staff", value: summary?.activeStaff ?? "—", detail: "Currently employed", icon: "✓", color: "bg-emerald-900" },
+    { label: "Attendance today", value: summary?.todayAttendance ?? "—", detail: "Recorded check-ins", icon: "◷", color: "bg-amber-900" },
+    { label: "Pending leave", value: summary?.pendingLeaves ?? "—", detail: "Requests awaiting review", icon: "◫", color: "bg-sky-900" },
+    { label: "Payroll", value: "Manage", detail: "Salary & payments", icon: "💰", color: "bg-purple-900", link: "/hr/payroll" },
   ];
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-2xl bg-blue-700 px-6 py-8 text-white shadow-sm sm:px-8">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-100">Human resources</p>
+      <section className="rounded-2xl bg-zinc-950 px-6 py-8 text-white shadow-sm sm:px-8">
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-400">Human resources</p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div><h1 className="text-3xl font-black tracking-tight sm:text-4xl">HR Management Dashboard</h1><p className="mt-2 max-w-2xl text-sm text-blue-100 sm:text-base">Manage your workforce from employee onboarding and personnel records to active staff visibility.</p></div>
-          <button onClick={load} className="rounded-md border border-blue-300 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-800">Refresh dashboard</button>
+          <div><h1 className="text-3xl font-black tracking-tight sm:text-4xl">HR Management Dashboard</h1><p className="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">Manage your workforce from employee onboarding and personnel records to active staff visibility.</p></div>
+          <button onClick={load} className="rounded-md border border-zinc-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-zinc-800">Refresh dashboard</button>
         </div>
       </section>
 
-      {error && <div role="alert" className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">{error}</div>}
+      {error && <div role="alert" className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm text-blue-400">{error}</div>}
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => <div key={card.label} className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between"><div><p className="text-sm font-semibold text-zinc-600">{card.label}</p><p className="mt-2 text-3xl font-black text-zinc-950">{loading ? "…" : card.value}</p><p className="mt-1 text-xs text-zinc-500">{card.detail}</p></div><span className={`flex h-11 w-11 items-center justify-center rounded-lg text-xl font-black text-zinc-800 ${card.color}`}>{card.icon}</span></div></div>)}
+        {cards.map((card) => {
+          const CardContent = (
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-semibold text-zinc-400">{card.label}</p>
+                <p className="mt-2 text-3xl font-black text-white">{loading ? "…" : card.value}</p>
+                <p className="mt-1 text-xs text-zinc-500">{card.detail}</p>
+              </div>
+              <span className={`flex h-11 w-11 items-center justify-center rounded-lg text-xl font-black text-white ${card.color}`}>{card.icon}</span>
+            </div>
+          );
+          
+          const link = 'link' in card ? card.link : undefined;
+          
+          if (link) {
+            return (
+              <Link key={card.label} href={link} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition hover:border-blue-600 hover:shadow-md">
+                {CardContent}
+              </Link>
+            );
+          }
+          
+          return (
+            <div key={card.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
+              {CardContent}
+            </div>
+          );
+        })}
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4"><div><p className="text-sm font-bold text-blue-700">Quick actions</p><h2 className="mt-1 text-2xl font-black text-zinc-950">HR core features</h2><p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600">Open a core HR workflow to manage your workforce and daily operations.</p></div><span className="rounded-xl bg-blue-100 p-3 text-2xl">⚡</span></div>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <Link href="/hr/staff" className="rounded-lg border border-blue-300 bg-blue-600 p-5 transition hover:bg-blue-700"><span className="block text-base font-black text-white">Staff management</span><span className="mt-1 block text-sm text-blue-100">Employee records, staff directory, onboarding, and offboarding.</span></Link>
-            <Link href="/hr/attendance" className="rounded-lg border border-blue-300 bg-blue-600 p-5 transition hover:bg-blue-700"><span className="block text-base font-black text-white">Attendance management</span><span className="mt-1 block text-sm text-blue-100">Mark, review, and update daily attendance records.</span></Link>
-            <Link href="/hr/roster" className="rounded-lg border border-blue-300 bg-blue-600 p-5 transition hover:bg-blue-700"><span className="block text-base font-black text-white">Duty roster & shifts</span><span className="mt-1 block text-sm text-blue-100">Plan staff coverage and assign daily shifts.</span></Link>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4"><div><p className="text-sm font-bold text-blue-400">Quick actions</p><h2 className="mt-1 text-2xl font-black text-white">HR core features</h2><p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">Open a core HR workflow to manage your workforce and daily operations.</p></div><span className="rounded-xl bg-blue-900 p-3 text-2xl">⚡</span></div>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Link href="/hr/staff" className="rounded-lg border border-zinc-700 bg-zinc-800 p-5 transition hover:border-blue-600 hover:bg-zinc-700"><span className="block text-base font-black text-white">Staff management</span><span className="mt-1 block text-sm text-zinc-400">Employee records, staff directory, onboarding, and offboarding.</span></Link>
+            <Link href="/hr/attendance" className="rounded-lg border border-zinc-700 bg-zinc-800 p-5 transition hover:border-blue-600 hover:bg-zinc-700"><span className="block text-base font-black text-white">Attendance management</span><span className="mt-1 block text-sm text-zinc-400">Mark, review, and update daily attendance records.</span></Link>
+            <Link href="/hr/roster" className="rounded-lg border border-zinc-700 bg-zinc-800 p-5 transition hover:border-blue-600 hover:bg-zinc-700"><span className="block text-base font-black text-white">Duty roster & shifts</span><span className="mt-1 block text-sm text-zinc-400">Plan staff coverage and assign daily shifts.</span></Link>
+            <Link href="/hr/payroll" className="rounded-lg border border-zinc-700 bg-zinc-800 p-5 transition hover:border-blue-600 hover:bg-zinc-700"><span className="block text-base font-black text-white">Payroll management</span><span className="mt-1 block text-sm text-zinc-400">Salary components, payroll processing, and payment records.</span></Link>
+            <Link href="/hr/performance" className="rounded-lg border border-zinc-700 bg-zinc-800 p-5 transition hover:border-blue-600 hover:bg-zinc-700"><span className="block text-base font-black text-white">Performance management</span><span className="mt-1 block text-sm text-zinc-400">Performance reviews, metrics, and rewards & recognition.</span></Link>
           </div>
-          <div className="mt-6 grid gap-3 border-t border-zinc-100 pt-5 sm:grid-cols-3"><div><p className="text-2xl font-black text-zinc-950">{loading ? "…" : summary?.totalStaff ?? 0}</p><p className="text-xs font-medium text-zinc-500">Total records</p></div><div><p className="text-2xl font-black text-emerald-700">{loading ? "…" : summary?.activeStaff ?? 0}</p><p className="text-xs font-medium text-zinc-500">Active employees</p></div><div><p className="text-2xl font-black text-zinc-700">{loading ? "…" : Math.max(0, (summary?.totalStaff ?? 0) - (summary?.activeStaff ?? 0))}</p><p className="text-xs font-medium text-zinc-500">Inactive employees</p></div></div>
+          <div className="mt-6 grid gap-3 border-t border-zinc-800 pt-5 sm:grid-cols-3"><div><p className="text-2xl font-black text-white">{loading ? "…" : summary?.totalStaff ?? 0}</p><p className="text-xs font-medium text-zinc-500">Total records</p></div><div><p className="text-2xl font-black text-emerald-400">{loading ? "…" : summary?.activeStaff ?? 0}</p><p className="text-xs font-medium text-zinc-500">Active employees</p></div><div><p className="text-2xl font-black text-zinc-400">{loading ? "…" : Math.max(0, (summary?.totalStaff ?? 0) - (summary?.activeStaff ?? 0))}</p><p className="text-xs font-medium text-zinc-500">Inactive employees</p></div></div>
         </div>
-        <aside className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"><p className="text-sm font-bold text-blue-700">Staff overview</p><h2 className="mt-1 text-xl font-black text-zinc-950">Teams by role</h2><div className="mt-5 space-y-4">{loading ? <p className="text-sm text-zinc-500">Loading workforce data…</p> : summary?.staffByRole?.length ? summary.staffByRole.slice(0, 5).map((role) => <div key={role.role} className="flex items-center justify-between"><span className="text-sm font-medium text-zinc-700">{role.role.replaceAll("_", " ")}</span><span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">{role.count}</span></div>) : <p className="text-sm text-zinc-500">Role information will appear as staff records are completed.</p>}</div><Link href="/hr/staff" className="mt-6 inline-flex text-sm font-bold text-blue-700 hover:text-blue-900">View all staff →</Link></aside>
+        <aside className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm"><p className="text-sm font-bold text-blue-400">Staff overview</p><h2 className="mt-1 text-xl font-black text-white">Teams by role</h2><div className="mt-5 space-y-4">{loading ? <p className="text-sm text-zinc-500">Loading workforce data…</p> : summary?.staffByRole?.length ? summary.staffByRole.slice(0, 5).map((role) => <div key={role.role} className="flex items-center justify-between"><span className="text-sm font-medium text-zinc-300">{role.role.replaceAll("_", " ")}</span><span className="rounded-full bg-blue-900 px-2.5 py-1 text-xs font-bold text-blue-400">{role.count}</span></div>) : <p className="text-sm text-zinc-500">Role information will appear as staff records are completed.</p>}</div><Link href="/hr/staff" className="mt-6 inline-flex text-sm font-bold text-blue-400 hover:text-blue-300">View all staff →</Link></aside>
       </section>
     </main>
   );
