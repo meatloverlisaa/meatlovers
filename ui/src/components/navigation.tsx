@@ -62,6 +62,7 @@ export function Navigation() {
 
   const adminItems = [
     { href: "/admin", label: "Dashboard" },
+    { href: "/admin/hrm", label: "HR Management" },
     { href: "/admin/cms", label: "Website CMS" },
     { href: "/admin/products", label: "Products" },
     { href: "/admin/products/new", label: "Add Product" },

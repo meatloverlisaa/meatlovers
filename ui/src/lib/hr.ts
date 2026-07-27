@@ -151,3 +151,123 @@ export function createRoster(data: Record<string, string>) { return request<Duty
 
 export type LeaveSummary = { total: number; pending: number; approved: number; rejected: number; byType: Array<{ type: string; count: number }> };
 export function getLeaveSummary() { return request<LeaveSummary>("/hrm/leave/summary"); }
+export type LeaveRequest = { id: string | number; leave_type: string; start_date: string; end_date: string; days_count: number; reason: string; status: string; user: Pick<Employee, "id" | "full_name" | "role"> };
+export function getLeaveRequests() { return request<LeaveRequest[]>("/hrm/leave"); }
+export function createLeaveRequest(data: Record<string, string | number>) { return request<LeaveRequest>("/hrm/leave", { method: "POST", body: JSON.stringify(data) }); }
+
+export type PayrollRecord = {
+  id: string | number;
+  user_id: string | number;
+  period_start: string;
+  period_end: string;
+  basic_salary: number | string;
+  allowances: number | string;
+  overtime_pay?: number | string;
+  deductions: number | string;
+  net_salary: number | string;
+  payment_date?: string | null;
+  payment_method?: string | null;
+  payment_reference?: string | null;
+  notes?: string | null;
+  user: Pick<Employee, "id" | "full_name" | "role" | "email">;
+};
+
+export type PayrollSummary = {
+  count: number;
+  totals: {
+    basic_salary: number;
+    allowances: number;
+    deductions: number;
+    overtime_pay: number;
+    net_salary: number;
+  };
+};
+
+export type PayslipData = {
+  payroll_id: string | number;
+  employee: {
+    id: string | number;
+    name: string;
+    email?: string;
+    role: string;
+    department?: string;
+    position?: string;
+    bank_account?: {
+      bank_name?: string;
+      account_number?: string;
+      account_name?: string;
+    };
+  };
+  period: { start: string; end: string };
+  earnings: {
+    basic_salary: number;
+    allowances: number;
+    overtime_pay: number;
+    gross_salary: number;
+  };
+  deductions: {
+    total: number;
+    paye?: number;
+    nssf?: number;
+    shif?: number;
+    other_deductions?: number;
+  };
+  net_salary: number;
+  payment: {
+    date?: string | null;
+    method?: string | null;
+    reference?: string | null;
+  };
+  notes?: string;
+  generated_at: string;
+};
+
+export function getPayrollRecords(filters: Record<string, string> = {}) {
+  const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
+  return request<PayrollRecord[]>(`/hrm/payroll${query.size ? `?${query}` : ""}`);
+}
+
+export function getPayrollSummary() {
+  return request<PayrollSummary>("/hrm/payroll/summary");
+}
+
+export function getDepartmentPayrollSummary() {
+  return request<Array<{ department: string; staff_count: number; basic_total: number; allowances_total: number; deductions_total: number; net_total: number }>>("/hrm/payroll/department-summary");
+}
+
+export function processBulkPayroll(data: Record<string, any>) {
+  return request<{ message: string; count: number; records: PayrollRecord[] }>("/hrm/payroll/process-bulk", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function markPayrollPaid(id: string | number, data: Record<string, any>) {
+  return request<PayrollRecord>(`/hrm/payroll/${id}/pay`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function bulkPayPayroll(data: Record<string, any>) {
+  return request<{ message: string; count: number }>("/hrm/payroll/bulk-pay", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updatePayrollRecord(id: string | number, data: Record<string, any>) {
+  return request<PayrollRecord>(`/hrm/payroll/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getPayslip(id: string | number) {
+  return request<PayslipData>(`/hrm/payroll/${id}/slip`);
+}
+
+export function exportBankPaymentFile() {
+  return request<{ filename: string; contentType: string; content: string }>("/hrm/payroll/bank-export");
+}
+
