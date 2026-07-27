@@ -1,11 +1,15 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { revalidatePath } from "next/cache";
-import React from "react";
 import { StockBalanceTable } from "./components/StockBalanceTable";
 import { StockInForm } from "./components/StockInForm";
 import { TransferForm } from "./components/TransferForm";
 import { AdjustmentForm } from "./components/AdjustmentForm";
 import { ReorderAlertList } from "./components/ReorderAlertList";
 import { MovementTimeline } from "./components/MovementTimeline";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -41,7 +45,10 @@ type StockMovement = {
 
 async function getProducts(): Promise<Product[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/products`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load products: ${res.status}`);
@@ -52,7 +59,10 @@ async function getProducts(): Promise<Product[]> {
 
 async function getStockBalance(): Promise<StockBalance[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/stock/balance`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/stock/balance`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -77,7 +87,10 @@ async function getRecentMovements(): Promise<StockMovement[]> {
   
   try {
     // Try to fetch recent movements - this endpoint might not exist yet
-    const allStockItems = await fetch(`${baseUrl}/stock`, { cache: "no-store" });
+    const allStockItems = await fetch(`${baseUrl}/stock`, { 
+      cache: "no-store",
+      headers: getAuthHeader(),
+    });
     
     if (!allStockItems.ok) {
       return [];
@@ -113,7 +126,10 @@ async function postStockIn(payload: {
 
   const res = await fetch(`${baseUrl}/stock/purchase`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -137,7 +153,10 @@ async function postTransfer(payload: {
 
   const res = await fetch(`${baseUrl}/stock/transfer`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -159,7 +178,10 @@ async function postAdjustment(payload: {
 
   const res = await fetch(`${baseUrl}/stock/adjustment`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -171,34 +193,44 @@ async function postAdjustment(payload: {
   return res.json();
 }
 
-export default async function StockControlPage() {
-  let products: Product[] = [];
-  let balance: StockBalance[] = [];
-  let movements: StockMovement[] = [];
-  let productsError: string | null = null;
-  let balanceError: string | null = null;
+export default function StockControlPage() {
+  useRequireAuth(["SUPER_ADMIN", "ADMIN", "MANAGER", "STOREKEEPER"]);
+  
+  const [products, setProducts] = useState<Product[]>([]);
+  const [balance, setBalance] = useState<StockBalance[]>([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    products = await getProducts();
-  } catch (e) {
-    productsError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    balance = await getStockBalance();
-  } catch (e) {
-    balanceError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    movements = await getRecentMovements();
-  } catch (e) {
-    console.warn("Failed to load movements:", e);
-  }
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [productsData, balanceData, movementsData] = await Promise.all([
+          getProducts().catch(e => {
+            setProductsError(e instanceof Error ? e.message : "Unknown error");
+            return [];
+          }),
+          getStockBalance().catch(e => {
+            setBalanceError(e instanceof Error ? e.message : "Unknown error");
+            return [];
+          }),
+          getRecentMovements().catch(e => {
+            console.warn("Failed to load movements:", e);
+            return [];
+          }),
+        ]);
+        setProducts(productsData);
+        setBalance(balanceData);
+        setMovements(movementsData);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const handleStockIn = async (formData: FormData) => {
-    "use server";
-
     const productId = String(formData.get("product_id") ?? "").trim();
     const quantityRaw = String(formData.get("quantity") ?? "").trim();
     const reference = String(formData.get("reference") ?? "").trim();
@@ -216,12 +248,18 @@ export default async function StockControlPage() {
       notes: notes.length ? notes : undefined,
     });
 
-    revalidatePath("/admin/stock");
+    // Reload data
+    const [productsData, balanceData, movementsData] = await Promise.all([
+      getProducts(),
+      getStockBalance(),
+      getRecentMovements(),
+    ]);
+    setProducts(productsData);
+    setBalance(balanceData);
+    setMovements(movementsData);
   };
 
   const handleTransfer = async (formData: FormData) => {
-    "use server";
-
     const productId = String(formData.get("productId") ?? "").trim();
     const quantityRaw = String(formData.get("quantity") ?? "").trim();
     const fromLocation = String(formData.get("fromLocation") ?? "").trim();
@@ -245,12 +283,18 @@ export default async function StockControlPage() {
       notes: notes.length ? notes : undefined,
     });
 
-    revalidatePath("/admin/stock");
+    // Reload data
+    const [productsData, balanceData, movementsData] = await Promise.all([
+      getProducts(),
+      getStockBalance(),
+      getRecentMovements(),
+    ]);
+    setProducts(productsData);
+    setBalance(balanceData);
+    setMovements(movementsData);
   };
 
   const handleAdjustment = async (formData: FormData) => {
-    "use server";
-
     const productId = String(formData.get("productId") ?? "").trim();
     const quantityRaw = String(formData.get("quantity") ?? "").trim();
     const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
@@ -275,8 +319,27 @@ export default async function StockControlPage() {
       notes: `${reason}: ${notes}`,
     });
 
-    revalidatePath("/admin/stock");
+    // Reload data
+    const [productsData, balanceData, movementsData] = await Promise.all([
+      getProducts(),
+      getStockBalance(),
+      getRecentMovements(),
+    ]);
+    setProducts(productsData);
+    setBalance(balanceData);
+    setMovements(movementsData);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Stock Control</h1>
+          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">

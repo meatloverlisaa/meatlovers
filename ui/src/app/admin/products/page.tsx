@@ -5,6 +5,8 @@ import { ProductTable } from "./components/ProductTable";
 import { ProductCreateForm } from "./components/ProductCreateForm";
 import { ProductEditDrawer } from "./components/ProductEditDrawer";
 import { CategoryFilter } from "./components/CategoryFilter";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -29,6 +31,7 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
   
   const res = await fetch(url, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -41,7 +44,10 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
 async function toggleProductActive(id: string, current: boolean): Promise<Product> {
   const res = await fetch(`${API_BASE_URL}/products/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ is_active: !current }),
   });
 
@@ -55,6 +61,7 @@ async function toggleProductActive(id: string, current: boolean): Promise<Produc
 async function deleteProduct(id: string): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/products/${id}`, {
     method: "DELETE",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -63,6 +70,8 @@ async function deleteProduct(id: string): Promise<void> {
 }
 
 export default function AdminProductsPage() {
+  useRequireAuth(["SUPER_ADMIN", "ADMIN", "MANAGER"]);
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

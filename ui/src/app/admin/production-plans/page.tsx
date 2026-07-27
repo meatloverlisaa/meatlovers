@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { revalidatePath } from "next/cache";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
@@ -76,6 +78,7 @@ async function getProductionPlans(
 
   const res = await fetch(`${baseUrl}/production-plans?${params.toString()}`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -95,6 +98,7 @@ async function getProductionSummary(
 
   const res = await fetch(`${baseUrl}/production-plans/summary?${params.toString()}`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -107,6 +111,7 @@ async function getProductionSummary(
 async function getRecipes(): Promise<Recipe[]> {
   const res = await fetch(`${baseUrl}/recipes`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -124,7 +129,10 @@ async function createProductionPlan(data: {
 }): Promise<ProductionPlan> {
   const res = await fetch(`${baseUrl}/production-plans`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(data),
   });
 
@@ -141,7 +149,10 @@ async function updateProducedQuantity(
 ): Promise<ProductionPlan> {
   const res = await fetch(`${baseUrl}/production-plans/${id}/produced-quantity`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ producedQuantity }),
   });
 
@@ -155,6 +166,7 @@ async function updateProducedQuantity(
 async function deleteProductionPlan(id: string): Promise<void> {
   const res = await fetch(`${baseUrl}/production-plans/${id}`, {
     method: "DELETE",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -165,6 +177,7 @@ async function deleteProductionPlan(id: string): Promise<void> {
 async function getProductionPlanDetails(id: string): Promise<ProductionPlan> {
   const res = await fetch(`${baseUrl}/production-plans/${id}`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -175,6 +188,8 @@ async function getProductionPlanDetails(id: string): Promise<ProductionPlan> {
 }
 
 export default function ProductionPlansPage() {
+  useRequireAuth(["SUPER_ADMIN", "ADMIN", "MANAGER"]);
+  
   const [plans, setPlans] = useState<ProductionPlan[]>([]);
   const [summary, setSummary] = useState<ProductionSummary | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);

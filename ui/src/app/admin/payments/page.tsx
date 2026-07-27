@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
@@ -36,6 +38,7 @@ async function getPayments(): Promise<Payment[]> {
 
   const res = await fetch(`${baseUrl}/payments/settlement/summary`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -51,6 +54,7 @@ async function getOrders(): Promise<Order[]> {
 
   const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -65,7 +69,10 @@ async function createPayment(payload: any): Promise<Payment[]> {
 
   const res = await fetch(`${baseUrl}/payments`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -82,6 +89,7 @@ async function generateReceipt(paymentId: string): Promise<any> {
 
   const res = await fetch(`${baseUrl}/payments/${paymentId}/receipt`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -92,6 +100,8 @@ async function generateReceipt(paymentId: string): Promise<any> {
 }
 
 export default function AdminPaymentsPage() {
+  useRequireAuth(["SUPER_ADMIN", "ADMIN", "ACCOUNTANT"]);
+  
   const [payments, setPayments] = useState<Payment[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);

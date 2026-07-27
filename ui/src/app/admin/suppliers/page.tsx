@@ -6,6 +6,8 @@ import { SupplierTypeFilter } from "@/components/suppliers/SupplierTypeFilter";
 import { SupplierCreateForm } from "@/components/suppliers/SupplierCreateForm";
 import { SupplierEditForm } from "@/components/suppliers/SupplierEditForm";
 import Link from "next/link";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type SupplierStatus = "ACTIVE" | "SUSPENDED";
 type SupplierType = "FOOD" | "SOFT_DRINKS" | "ALCOHOL" | "GENERAL";
@@ -28,6 +30,7 @@ async function getSuppliers(): Promise<Supplier[]> {
 
   const res = await fetch(`${baseUrl}/suppliers`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -44,7 +47,10 @@ async function toggleSupplierStatus(id: string, current: SupplierStatus): Promis
 
   const res = await fetch(`${baseUrl}/suppliers/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ status: next }),
   });
 
@@ -56,6 +62,8 @@ async function toggleSupplierStatus(id: string, current: SupplierStatus): Promis
 }
 
 export default function AdminSuppliersPage() {
+  useRequireAuth(["SUPER_ADMIN", "ADMIN", "MANAGER"]);
+  
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

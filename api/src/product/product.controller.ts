@@ -22,6 +22,7 @@ import {
   PRODUCT_WRITE_ROLES,
 } from '../auth/constants/role-groups';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { PermissionGuard, Permission } from '../auth/guards/permission.guard';
 import { Resource, Action } from '../auth/constants/role-permissions';
 
@@ -40,7 +41,7 @@ import { Resource, Action } from '../auth/constants/role-permissions';
  * - Price updates require PRICING permission (SUPER_ADMIN, ADMIN only)
  */
 @Controller('products')
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 

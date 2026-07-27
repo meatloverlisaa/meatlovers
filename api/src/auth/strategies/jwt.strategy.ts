@@ -38,10 +38,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       userId: user.id.toString(),
+      sub: user.id.toString(),
       email: user.email,
       phone: user.phone,
       role: user.role,
       full_name: user.full_name,
+      isActive: user.is_active,
     };
   }
 }
