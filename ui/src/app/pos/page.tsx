@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -158,6 +159,8 @@ function StatCard({ title, value, subtitle, icon }: {
 }
 
 export default function WaiterDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'WAITER', 'CASHIER']);
+  
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<WaiterStats>({
     activeOrders: 0,

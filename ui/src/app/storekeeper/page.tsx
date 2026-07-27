@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface SummaryCard {
   label: string;
@@ -43,6 +44,8 @@ interface StockMovement {
 }
 
 export default function StorekeeperDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
+  
   const [summary, setSummary] = useState({
     stockItems: 0,
     lowStock: 0,

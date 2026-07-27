@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type RecipeIngredient = {
   id: bigint | number;
@@ -140,6 +141,8 @@ async function deleteRecipe(id: string): Promise<void> {
 }
 
 export default function RecipesPage() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+  
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);

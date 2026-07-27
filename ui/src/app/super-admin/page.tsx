@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface MonitoringSummary {
   currentSales: number;
@@ -68,6 +69,8 @@ interface DeliveryStatus {
 }
 
 export default function SuperAdminDashboard() {
+  useRequireAuth(['SUPER_ADMIN']);
+  
   const [summary, setSummary] = useState<MonitoringSummary>({
     currentSales: 0,
     openOrders: 0,

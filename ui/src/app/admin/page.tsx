@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type SummaryCard = {
@@ -319,6 +320,8 @@ const adminModules = [
 
 // ─── Main Dashboard Component ─────────────────────────────────────────────────
 export default function AdminDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  
   const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([
     { label: "Today's Revenue", value: "KSh 0", icon: "💰", color: "bg-emerald-100", trend: "neutral" },
     { label: "Open Orders", value: "0", icon: "📋", color: "bg-blue-100", trend: "neutral" },

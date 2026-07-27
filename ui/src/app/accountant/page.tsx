@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface SummaryCard {
   label: string;
@@ -44,6 +45,8 @@ interface FinanceTransaction {
 }
 
 export default function AccountantDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT']);
+  
   const [summary, setSummary] = useState({
     pendingPayments: 0,
     todayRevenue: 0,

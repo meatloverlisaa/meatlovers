@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type HrmSummary = {
   totalStaff: number;
@@ -15,6 +16,8 @@ type HrmSummary = {
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 export default function HRDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR']);
+  
   const [summary, setSummary] = useState<HrmSummary | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);

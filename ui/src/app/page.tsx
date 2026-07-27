@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { getDashboardRoute } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type LeadSource =
@@ -242,9 +245,19 @@ function ContactForm({ initialSource }: { initialSource: LeadSource }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const contactRef = useRef<HTMLElement>(null);
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
   // Source state — drives ContactForm when CTAs pre-fill it
   const [contactSource, setContactSource] = useState<LeadSource>("LANDING_PAGE");
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (!isLoading && user) {
+      const dashboardRoute = getDashboardRoute(user.role);
+      router.push(dashboardRoute);
+    }
+  }, [user, isLoading, router]);
 
   const scrollToContact = useCallback((source: LeadSource) => {
     setContactSource(source);
@@ -253,6 +266,18 @@ export default function Home() {
       contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
   }, []);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-700 mx-auto"></div>
+          <p className="mt-4 text-zinc-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="bg-stone-50 text-zinc-950">

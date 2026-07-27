@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type OrderStatus = "SERVED" | "PAID";
 
@@ -110,6 +111,8 @@ function StatCard({
 }
 
 export default function CashierDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CASHIER']);
+  
   const [stats, setStats] = useState<CashierStats>({
     pendingSettlement: 0,
     settledToday: 0,

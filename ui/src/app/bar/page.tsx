@@ -7,8 +7,10 @@ import { BarQueueBoard } from '@/components/bar/BarQueueBoard';
 import { TransferReceiptPanel } from '@/components/bar/TransferReceiptPanel';
 import { updateOrderStatus } from '@/lib/api/bar';
 import type { OrderStatus } from '@/types/bar';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 export default function BarQueuePage() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);
   const { orders, isLoading: ordersLoading, error: ordersError, refresh: refreshOrders } = useBarOrders();
   const { summary, isLoading: summaryLoading } = useBarSummary();
   const { transfers, isLoading: transfersLoading } = useBarTransfers();

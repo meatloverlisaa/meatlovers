@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface Rider {
   id: string;
@@ -46,6 +47,8 @@ interface DeliverySummary {
 }
 
 export default function DispatcherDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'DISPATCHER']);
+  
   const [riders, setRiders] = useState<Rider[]>([]);
   const [availableRiders, setAvailableRiders] = useState<Rider[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
