@@ -31,6 +31,7 @@ export default function ManagerLogin() {
         throw new Error(data.message || "Login failed");
       }
 
+      localStorage.setItem("token", data.access_token);
       localStorage.setItem("auth_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
       localStorage.setItem("user_data", JSON.stringify(data.user));

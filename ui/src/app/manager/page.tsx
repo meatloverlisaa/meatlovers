@@ -22,10 +22,30 @@ async function fetchManagerStats(): Promise<DashboardStats> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   
   try {
-    const [ordersRes, stockRes] = await Promise.all([
-      fetch(`${baseUrl}/orders`, { cache: "no-store" }),
-      fetch(`${baseUrl}/stock/reorder-alerts`, { cache: "no-store" }),
-    ]);
+    // Get auth token from localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // Make requests sequentially to avoid rate limiting
+    const ordersRes = await fetch(`${baseUrl}/orders`, { 
+      cache: "no-store",
+      headers 
+    });
+    
+    // Add a small delay between requests to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    const stockRes = await fetch(`${baseUrl}/stock/reorder-alerts`, { 
+      cache: "no-store",
+      headers 
+    });
     
     const orders: ManagerOrder[] = ordersRes.ok ? await ordersRes.json() : [];
     const stockAlerts: unknown[] = stockRes.ok ? await stockRes.json() : [];
@@ -45,7 +65,8 @@ async function fetchManagerStats(): Promise<DashboardStats> {
       lowStockItems: Array.isArray(stockAlerts) ? stockAlerts.length : 0,
       readyOrders: orders.filter((order) => order.status === "READY").length,
     };
-  } catch {
+  } catch (error) {
+    console.error('Error fetching manager stats:', error);
     return {
       activeOrders: 0,
       pendingApprovals: 0,
@@ -164,8 +185,15 @@ export default function ManagerDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    
     let cancelled = false;
 
     async function loadStats() {
@@ -187,14 +215,14 @@ export default function ManagerDashboard() {
 
     loadStats();
     
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(loadStats, 30000);
+    // Auto-refresh every 60 seconds (increased from 30 to reduce rate limiting)
+    const interval = setInterval(loadStats, 60000);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [isMounted]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17]">
@@ -235,7 +263,7 @@ export default function ManagerDashboard() {
           <QuickActionCard
             title="Staff Management"
             description="View staff and schedules"
-            href="/admin/staff"
+            href="/manager/staff"
             icon={
               <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -246,7 +274,7 @@ export default function ManagerDashboard() {
           <QuickActionCard
             title="Kitchen Operations"
             description="Monitor food preparation"
-            href="/kitchen"
+            href="/manager/kitchen"
             icon={
               <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -290,8 +318,20 @@ export default function ManagerDashboard() {
 
         {/* Error State */}
         {error && (
-          <div className="mb-6 rounded-2xl border border-[#EA580C]/20 bg-[#EA580C]/10 px-4 py-3 text-sm text-[#EA580C] dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10 dark:text-[#FB923C]">
-            {error}
+          <div className="mb-6 rounded-2xl border border-[#EA580C]/20 bg-[#EA580C]/10 px-4 py-3 text-sm dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10">
+            <div className="flex items-start gap-3">
+              <svg className="h-5 w-5 shrink-0 text-[#EA580C] dark:text-[#FB923C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div className="flex-1">
+                <p className="font-medium text-[#EA580C] dark:text-[#FB923C]">{error}</p>
+                {error.includes('429') && (
+                  <p className="mt-1 text-xs text-[#EA580C]/80 dark:text-[#FB923C]/80">
+                    Too many requests. The dashboard will automatically retry in 60 seconds.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -379,7 +419,7 @@ export default function ManagerDashboard() {
                 title="Staff On Duty"
                 value={stats.staffOnDuty}
                 subtitle="Active now"
-                href="/admin/staff"
+                href="/manager/staff"
                 icon={
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -504,7 +544,7 @@ export default function ManagerDashboard() {
                   Website CMS
                 </Link>
                 <Link
-                  href="/admin/kitchen"
+                  href="/manager/kitchen"
                   className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Kitchen

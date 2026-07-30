@@ -54,17 +54,17 @@ import { PrismaModule } from '../prisma/prisma.module';
       {
         name: 'short',
         ttl: 60000, // 1 minute
-        limit: 10, // 10 requests per minute for general endpoints
+        limit: 100, // Increased from 10 to 100 for development
       },
       {
         name: 'medium',
         ttl: 600000, // 10 minutes
-        limit: 50, // 50 requests per 10 minutes
+        limit: 500, // Increased from 50 to 500 for development
       },
       {
         name: 'long',
         ttl: 3600000, // 1 hour
-        limit: 200, // 200 requests per hour
+        limit: 2000, // Increased from 200 to 2000 for development
       },
     ]),
     DiscoveryModule,

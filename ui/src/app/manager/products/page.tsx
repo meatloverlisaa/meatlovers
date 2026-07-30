@@ -24,8 +24,20 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
     ? `${API_BASE_URL}/products?category=${category}`
     : `${API_BASE_URL}/products`;
   
+  // Get auth token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(url, {
     cache: "no-store",
+    headers,
   });
 
   if (!res.ok) {
@@ -58,8 +70,8 @@ function CategoryFilter({
           onClick={() => onSelect(cat.id)}
           className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
             selected === cat.id
-              ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-black"
-              : "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-300 dark:border-zinc-800 dark:hover:bg-zinc-900"
+              ? "bg-[#0F172A] text-white border border-[#0284C7]/30 dark:bg-[#0A0E1A] dark:text-white"
+              : "bg-white text-[#0F172A] border border-[#0284C7]/10 hover:bg-[#0284C7]/5 hover:border-[#0284C7]/30 dark:bg-[#151F32] dark:text-white dark:border-[#38BDF8]/10 dark:hover:bg-[#0A0E1A]"
           }`}
         >
           <span>{cat.icon}</span>
@@ -92,10 +104,10 @@ function ProductTable({ products }: { products: Product[] }) {
 
   if (products.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
+      <div className="rounded-xl border border-dashed border-[#0284C7]/30 bg-white p-16 text-center dark:border-[#38BDF8]/30 dark:bg-[#151F32]">
         <p className="text-4xl mb-3">📦</p>
-        <p className="font-semibold text-zinc-700 dark:text-zinc-300">No products found</p>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+        <p className="font-semibold text-[#0F172A] dark:text-white">No products found</p>
+        <p className="text-sm text-[#0F172A]/60 dark:text-white/60 mt-1">
           Try changing the category filter
         </p>
       </div>
@@ -110,27 +122,27 @@ function ProductTable({ products }: { products: Product[] }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+    <div className="overflow-hidden rounded-xl border border-[#0284C7]/10 dark:border-[#38BDF8]/10 bg-white dark:bg-[#151F32]">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-zinc-50 dark:bg-zinc-900">
-            <tr className="text-zinc-600 dark:text-zinc-300">
-              <th className="px-4 py-3 font-medium">Product Name</th>
-              <th className="px-4 py-3 font-medium">Category</th>
-              <th className="px-4 py-3 font-medium">Cost Price</th>
-              <th className="px-4 py-3 font-medium">Selling Price</th>
-              <th className="px-4 py-3 font-medium">Margin</th>
-              <th className="px-4 py-3 font-medium">Barcode</th>
-              <th className="px-4 py-3 font-medium">Status</th>
+          <thead className="bg-[#F8FAFC] dark:bg-[#0A0E1A]">
+            <tr className="text-[#0F172A]/70 dark:text-white/70">
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Product Name</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Category</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Cost Price</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Selling Price</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Margin</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Barcode</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <tbody className="divide-y divide-[#0284C7]/10 dark:divide-[#38BDF8]/10">
             {products.map((product) => {
               const productMargin = margin(product);
               return (
-                <tr key={product.id.toString()} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
+                <tr key={product.id.toString()} className="hover:bg-[#0284C7]/5 dark:hover:bg-[#0A0E1A]/60">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-900 dark:text-zinc-50">
+                    <div className="font-medium text-[#0F172A] dark:text-white">
                       {product.product_name}
                     </div>
                   </td>
@@ -143,43 +155,43 @@ function ProductTable({ products }: { products: Product[] }) {
                       {getCategoryLabel(product.product_category)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">
+                  <td className="px-4 py-3 text-[#0F172A]/70 dark:text-white/70">
                     KSh {parseFloat(product.cost_price).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50 font-medium">
+                  <td className="px-4 py-3 text-[#0F172A] dark:text-white font-medium">
                     KSh {parseFloat(product.selling_price).toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
                         productMargin >= 30
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
+                          ? "bg-[#16A34A]/10 text-[#16A34A] dark:bg-[#4ADE80]/10 dark:text-[#4ADE80]"
                           : productMargin >= 15
-                          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
+                          ? "bg-[#EA580C]/10 text-[#EA580C] dark:bg-[#FB923C]/10 dark:text-[#FB923C]"
+                          : "bg-[#EA580C]/10 text-[#EA580C] dark:bg-[#FB923C]/10 dark:text-[#FB923C]"
                       }`}
                     >
                       {productMargin.toFixed(1)}%
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                  <td className="px-4 py-3 text-[#0F172A]/60 dark:text-white/60">
                     {product.barcode ? (
-                      <code className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs">
+                      <code className="rounded bg-[#0284C7]/10 dark:bg-[#38BDF8]/10 px-2 py-0.5 text-xs text-[#0284C7] dark:text-[#38BDF8]">
                         {product.barcode}
                       </code>
                     ) : (
-                      <span className="text-zinc-400">-</span>
+                      <span className="text-[#0F172A]/30 dark:text-white/30">-</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                         product.is_active
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200"
-                          : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                          ? "bg-[#16A34A]/10 text-[#16A34A] dark:bg-[#4ADE80]/10 dark:text-[#4ADE80]"
+                          : "bg-[#0F172A]/10 text-[#0F172A]/60 dark:bg-white/10 dark:text-white/60"
                       }`}
                     >
-                      <span className={`h-1.5 w-1.5 rounded-full ${product.is_active ? "bg-emerald-500" : "bg-zinc-400"}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${product.is_active ? "bg-[#16A34A] dark:bg-[#4ADE80]" : "bg-[#0F172A]/40 dark:bg-white/40"}`} />
                       {product.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
@@ -206,39 +218,39 @@ function ProductStats({ products }: { products: Product[] }) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6 mb-6">
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Total Products</div>
-        <div className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Total Products</div>
+        <div className="mt-1 text-2xl font-semibold text-[#0F172A] dark:text-white">
           {stats.total}
         </div>
       </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Active</div>
-        <div className="mt-1 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Active</div>
+        <div className="mt-1 text-2xl font-semibold text-[#16A34A] dark:text-[#4ADE80]">
           {stats.active}
         </div>
       </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Inactive</div>
-        <div className="mt-1 text-2xl font-semibold text-zinc-600 dark:text-zinc-300">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Inactive</div>
+        <div className="mt-1 text-2xl font-semibold text-[#0F172A]/60 dark:text-white/60">
           {stats.inactive}
         </div>
       </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Food Items</div>
-        <div className="mt-1 text-2xl font-semibold text-orange-600 dark:text-orange-400">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Food Items</div>
+        <div className="mt-1 text-2xl font-semibold text-[#EA580C] dark:text-[#FB923C]">
           {stats.food}
         </div>
       </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Soft Drinks</div>
-        <div className="mt-1 text-2xl font-semibold text-blue-600 dark:text-blue-400">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Soft Drinks</div>
+        <div className="mt-1 text-2xl font-semibold text-[#0284C7] dark:text-[#38BDF8]">
           {stats.softDrinks}
         </div>
       </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="text-xs text-zinc-600 dark:text-zinc-300">Alcoholic</div>
-        <div className="mt-1 text-2xl font-semibold text-purple-600 dark:text-purple-400">
+      <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+        <div className="text-xs text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Alcoholic</div>
+        <div className="mt-1 text-2xl font-semibold text-[#0284C7] dark:text-[#38BDF8]">
           {stats.alcoholic}
         </div>
       </div>
@@ -251,11 +263,26 @@ export default function ManagerProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "ALL">("ALL");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const loadProducts = async (category?: ProductCategory) => {
+    if (!isMounted) return;
+    
     setLoading(true);
     setError(null);
     try {
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to view products');
+        setLoading(false);
+        return;
+      }
+      
       const data = await getProducts(category);
       setProducts(data);
     } catch (e) {
@@ -266,6 +293,8 @@ export default function ManagerProductsPage() {
   };
 
   useEffect(() => {
+    if (!isMounted) return;
+    
     loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
     
     // Auto-refresh every 60 seconds
@@ -274,27 +303,27 @@ export default function ManagerProductsPage() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [selectedCategory]);
+  }, [selectedCategory, isMounted]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumb */}
-        <div className="mb-4 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-          <Link href="/manager" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+        <div className="mb-4 flex items-center gap-2 text-sm text-[#0F172A]/60 dark:text-white/60">
+          <Link href="/manager" className="hover:text-[#0F172A] dark:hover:text-white">
             Manager Dashboard
           </Link>
           <span>/</span>
-          <span className="text-zinc-900 dark:text-zinc-50">Products</span>
+          <span className="text-[#0F172A] dark:text-white">Products</span>
         </div>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-2xl font-semibold text-[#0F172A] dark:text-white">
               Product Catalog (View Only)
             </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-[#0F172A]/60 dark:text-white/60">
               Monitor product catalog, pricing, and margins
             </p>
           </div>
@@ -311,13 +340,21 @@ export default function ManagerProductsPage() {
         {/* Loading/Error States */}
         {loading && (
           <div className="text-center py-12">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Loading products...</p>
+            <p className="text-sm text-[#0F172A]/60 dark:text-white/60">Loading products...</p>
           </div>
         )}
 
         {error && (
-          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="rounded-lg bg-[#EA580C]/10 dark:bg-[#FB923C]/10 border border-[#EA580C]/20 dark:border-[#FB923C]/20 p-4">
+            <p className="text-sm text-[#EA580C] dark:text-[#FB923C] mb-2">{error}</p>
+            {error.includes('login') && (
+              <Link 
+                href="/manager/login" 
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#0284C7] hover:text-[#0284C7]/80 dark:text-[#38BDF8] dark:hover:text-[#38BDF8]/80"
+              >
+                Go to Login →
+              </Link>
+            )}
           </div>
         )}
 

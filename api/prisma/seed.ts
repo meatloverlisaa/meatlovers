@@ -33,6 +33,33 @@ async function main() {
     console.log('  ↳ Super Admin user already exists');
   }
 
+  // ─── seed_manager_user ───────────────────────────────────────────────────
+  const existingManager = await prisma.user.findFirst({
+    where: { role: 'MANAGER' }
+  });
+
+  if (!existingManager) {
+    const hashedPassword = await bcrypt.hash('Manager@1234', 10);
+    
+    const manager = await prisma.user.create({
+      data: {
+        full_name: 'Restaurant Manager',
+        email: 'manager@meatlovers.com',
+        phone: '+254788888888',
+        role: 'MANAGER',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Manager user created');
+    console.log('    Email: manager@meatlovers.com');
+    console.log('    Phone: +254788888888');
+    console.log('    Password: Manager@1234');
+  } else {
+    console.log('  ↳ Manager user already exists');
+  }
+
   // ─── seed_homepage_content ───────────────────────────────────────────────
   const contentPages = [
     {

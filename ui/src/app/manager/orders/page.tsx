@@ -37,8 +37,26 @@ async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
   
-  const res = await fetch(url, { cache: "no-store" });
+  // Get auth token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  const res = await fetch(url, { 
+    cache: "no-store",
+    headers 
+  });
+  
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error(`Failed to fetch orders: 429 - Rate limit exceeded. Please wait before refreshing.`);
+    }
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
   
@@ -162,10 +180,26 @@ export default function ManagerOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "ALL">("ALL");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   async function loadOrders() {
+    if (!isMounted) return;
+    
     try {
       setLoading(true);
+      
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to view orders');
+        setLoading(false);
+        return;
+      }
+      
       const filter = statusFilter === "ALL" ? undefined : statusFilter;
       const data = await fetchOrders(filter);
       
@@ -183,12 +217,14 @@ export default function ManagerOrdersPage() {
   }
 
   useEffect(() => {
+    if (!isMounted) return;
+    
     loadOrders();
     
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(loadOrders, 30000);
+    // Auto-refresh every 60 seconds (increased to reduce rate limiting)
+    const interval = setInterval(loadOrders, 60000);
     return () => clearInterval(interval);
-  }, [statusFilter]);
+  }, [statusFilter, isMounted]);
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
@@ -208,31 +244,31 @@ export default function ManagerOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] p-6">
       <div className="mx-auto max-w-7xl">
         {/* Breadcrumb */}
-        <div className="mb-4 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-          <Link href="/manager" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+        <div className="mb-4 flex items-center gap-2 text-sm text-[#0F172A]/60 dark:text-white/60">
+          <Link href="/manager" className="hover:text-[#0F172A] dark:hover:text-white">
             Manager Dashboard
           </Link>
           <span>/</span>
-          <span className="text-zinc-900 dark:text-zinc-50">Orders</span>
+          <span className="text-[#0F172A] dark:text-white">Orders</span>
         </div>
 
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+              <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">
                 Order Management (View Only)
               </h1>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+              <p className="mt-1 text-sm text-[#0F172A]/60 dark:text-white/60">
                 Monitor all restaurant orders and track status
               </p>
             </div>
             <button
               onClick={() => loadOrders()}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+              className="rounded-xl border border-[#0284C7]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0F172A] hover:bg-[#0284C7]/5 hover:border-[#0284C7]/30 dark:border-[#38BDF8]/20 dark:bg-[#151F32] dark:text-white dark:hover:bg-[#0A0E1A]"
             >
               Refresh
             </button>
@@ -241,28 +277,28 @@ export default function ManagerOrdersPage() {
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Orders</div>
-            <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-50">{stats.total}</div>
+          <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+            <div className="text-xs font-medium text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Total Orders</div>
+            <div className="mt-2 text-2xl font-bold text-[#0F172A] dark:text-white">{stats.total}</div>
           </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
-            <div className="text-xs font-medium text-amber-800 dark:text-amber-200">Pending</div>
-            <div className="mt-2 text-2xl font-bold text-amber-900 dark:text-amber-100">{stats.pending}</div>
+          <div className="rounded-xl border border-[#EA580C]/20 bg-[#EA580C]/10 p-4 dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10">
+            <div className="text-xs font-medium text-[#EA580C] dark:text-[#FB923C] uppercase tracking-wide">Pending</div>
+            <div className="mt-2 text-2xl font-bold text-[#EA580C] dark:text-[#FB923C]">{stats.pending}</div>
           </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
-            <div className="text-xs font-medium text-blue-800 dark:text-blue-200">Preparing</div>
-            <div className="mt-2 text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.preparing}</div>
+          <div className="rounded-xl border border-[#0284C7]/20 bg-[#0284C7]/10 p-4 dark:border-[#38BDF8]/20 dark:bg-[#38BDF8]/10">
+            <div className="text-xs font-medium text-[#0284C7] dark:text-[#38BDF8] uppercase tracking-wide">Preparing</div>
+            <div className="mt-2 text-2xl font-bold text-[#0284C7] dark:text-[#38BDF8]">{stats.preparing}</div>
           </div>
-          <div className="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/50 dark:bg-green-950/30">
-            <div className="text-xs font-medium text-green-800 dark:text-green-200">Ready</div>
-            <div className="mt-2 text-2xl font-bold text-green-900 dark:text-green-100">{stats.ready}</div>
+          <div className="rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/10 p-4 dark:border-[#4ADE80]/20 dark:bg-[#4ADE80]/10">
+            <div className="text-xs font-medium text-[#16A34A] dark:text-[#4ADE80] uppercase tracking-wide">Ready</div>
+            <div className="mt-2 text-2xl font-bold text-[#16A34A] dark:text-[#4ADE80]">{stats.ready}</div>
           </div>
         </div>
 
         {/* Filters and Search */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
           <div className="flex-1">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-2 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="rounded-2xl border border-[#0284C7]/10 bg-white p-2 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
               <div className="flex gap-2 overflow-x-auto">
                 {statusOptions.map((status) => {
                   const isActive = status === statusFilter;
@@ -274,8 +310,8 @@ export default function ManagerOrdersPage() {
                       onClick={() => setStatusFilter(status)}
                       className={
                         isActive
-                          ? "shrink-0 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white dark:bg-zinc-50 dark:text-zinc-900"
-                          : "shrink-0 rounded-xl px-4 py-2 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                          ? "shrink-0 rounded-xl bg-[#0F172A] px-4 py-2 text-xs font-semibold text-white dark:bg-[#0A0E1A] dark:text-white border border-[#0284C7]/30"
+                          : "shrink-0 rounded-xl px-4 py-2 text-xs font-semibold text-[#0F172A]/60 hover:bg-[#0284C7]/5 dark:text-white/60 dark:hover:bg-[#0A0E1A]/60"
                       }
                     >
                       {status} ({count})
@@ -291,50 +327,70 @@ export default function ManagerOrdersPage() {
             placeholder="Search by order # or table..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 w-full sm:w-64"
+            className="rounded-xl border border-[#0284C7]/10 bg-white px-4 py-2 text-sm dark:border-[#38BDF8]/10 dark:bg-[#151F32] dark:text-white w-full sm:w-64 placeholder:text-[#0F172A]/40 dark:placeholder:text-white/40"
           />
         </div>
 
         {/* Loading/Error States */}
         {loading && (
           <div className="text-center py-12">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Loading orders...</p>
+            <p className="text-sm text-[#0F172A]/60 dark:text-white/60">Loading orders...</p>
           </div>
         )}
 
         {error && (
-          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="rounded-lg bg-[#EA580C]/10 dark:bg-[#FB923C]/10 border border-[#EA580C]/20 dark:border-[#FB923C]/20 p-4">
+            <div className="flex items-start gap-3">
+              <svg className="h-5 w-5 shrink-0 text-[#EA580C] dark:text-[#FB923C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[#EA580C] dark:text-[#FB923C] mb-2">{error}</p>
+                {error.includes('429') && (
+                  <p className="text-xs text-[#EA580C]/80 dark:text-[#FB923C]/80 mb-2">
+                    Too many requests. Please wait a moment before refreshing. The page will automatically retry in 60 seconds.
+                  </p>
+                )}
+                {error.includes('login') && (
+                  <Link 
+                    href="/manager/login" 
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#0284C7] hover:text-[#0284C7]/80 dark:text-[#38BDF8] dark:hover:text-[#38BDF8]/80"
+                  >
+                    Go to Login →
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         {/* Orders Table */}
         {!loading && !error && (
-          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <div className="overflow-hidden rounded-xl border border-[#0284C7]/10 dark:border-[#38BDF8]/10 bg-white dark:bg-[#151F32]">
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-zinc-50 dark:bg-zinc-900">
-                  <tr className="text-zinc-600 dark:text-zinc-300">
-                    <th className="px-4 py-3 font-medium">Order #</th>
-                    <th className="px-4 py-3 font-medium">Table</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Total</th>
-                    <th className="px-4 py-3 font-medium">Time</th>
-                    <th className="px-4 py-3 font-medium">Actions</th>
+                <thead className="bg-[#F8FAFC] dark:bg-[#0A0E1A]">
+                  <tr className="text-[#0F172A]/70 dark:text-white/70">
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Order #</th>
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Table</th>
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Status</th>
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Total</th>
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Time</th>
+                    <th className="px-4 py-3 font-medium uppercase tracking-wide text-xs">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <tbody className="divide-y divide-[#0284C7]/10 dark:divide-[#38BDF8]/10">
                   {filteredOrders.map((order) => {
                     const createdAt = new Date(order.created_at);
                     const now = new Date();
                     const minutesAgo = Math.floor((now.getTime() - createdAt.getTime()) / 60000);
                     
                     return (
-                      <tr key={order.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
+                      <tr key={order.id} className="hover:bg-[#0284C7]/5 dark:hover:bg-[#0A0E1A]/60">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-zinc-900 dark:text-zinc-50">#{order.order_number}</div>
+                          <div className="font-medium text-[#0F172A] dark:text-white">#{order.order_number}</div>
                         </td>
-                        <td className="px-4 py-3 text-zinc-700 dark:text-zinc-200">
+                        <td className="px-4 py-3 text-[#0F172A]/70 dark:text-white/70">
                           Table {order.table_id}
                         </td>
                         <td className="px-4 py-3">
@@ -342,16 +398,16 @@ export default function ManagerOrdersPage() {
                             {order.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-zinc-900 dark:text-zinc-50 font-medium">
+                        <td className="px-4 py-3 text-[#0F172A] dark:text-white font-medium">
                           KSh {order.total_amount ? parseFloat(order.total_amount).toLocaleString() : "-"}
                         </td>
-                        <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                        <td className="px-4 py-3 text-[#0F172A]/60 dark:text-white/60">
                           {minutesAgo < 1 ? "Just now" : `${minutesAgo}m ago`}
                         </td>
                         <td className="px-4 py-3">
                           <button
                             onClick={() => setSelectedOrder(order)}
-                            className="rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                            className="rounded-lg bg-[#0284C7]/10 px-3 py-1.5 text-xs font-medium text-[#0284C7] hover:bg-[#0284C7]/20 dark:bg-[#38BDF8]/10 dark:text-[#38BDF8] dark:hover:bg-[#38BDF8]/20"
                           >
                             View Details
                           </button>
@@ -362,7 +418,7 @@ export default function ManagerOrdersPage() {
 
                   {filteredOrders.length === 0 && (
                     <tr>
-                      <td className="px-4 py-8 text-center text-zinc-600 dark:text-zinc-300" colSpan={6}>
+                      <td className="px-4 py-8 text-center text-[#0F172A]/60 dark:text-white/60" colSpan={6}>
                         No orders found
                       </td>
                     </tr>
