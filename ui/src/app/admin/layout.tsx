@@ -149,19 +149,23 @@ export default function AdminLayout({
   const visibleNavItems = navigationItems.filter((item) => hasAccess(item.roles));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#0F172A' }}>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-200 bg-white transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ 
+          backgroundColor: '#0B0F19',
+          borderRight: '1px solid #334155'
+        }}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
+        <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #334155' }}>
           <span className="text-2xl">🍖</span>
           <div>
-            <p className="font-black text-zinc-950">Meat Lovers</p>
-            <p className="text-xs text-zinc-500">Admin Portal</p>
+            <p className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</p>
+            <p className="text-xs" style={{ color: '#94A3B8' }}>Admin Portal</p>
           </div>
         </div>
 
@@ -175,9 +179,13 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-red-50 text-red-800"
-                    : "text-zinc-700 hover:bg-zinc-100"
+                    ? "text-white"
+                    : "hover:bg-[#1E293B]"
                 }`}
+                style={{
+                  backgroundColor: isActive(item.href) ? '#3B82F6' : 'transparent',
+                  color: isActive(item.href) ? '#FFFFFF' : '#94A3B8'
+                }}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
@@ -187,18 +195,22 @@ export default function AdminLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="border-t border-zinc-200 p-4">
+        <div className="p-4" style={{ borderTop: '1px solid #334155' }}>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-800">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold" style={{ backgroundColor: '#3B82F6', color: '#FFFFFF' }}>
               {user?.full_name?.charAt(0) || 'A'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-zinc-950">{user?.full_name || 'Admin User'}</p>
-              <p className="text-xs text-zinc-500">{userRole}</p>
+              <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{user?.full_name || 'Admin User'}</p>
+              <p className="text-xs" style={{ color: '#94A3B8' }}>{userRole}</p>
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-lg border border-zinc-200 p-2 text-zinc-600 hover:bg-zinc-100"
+              className="rounded-lg p-2 transition hover:bg-[#1E293B]"
+              style={{ 
+                border: '1px solid #334155',
+                color: '#94A3B8'
+              }}
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +224,7 @@ export default function AdminLayout({
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-zinc-950/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -220,10 +232,17 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 border-b border-zinc-200 bg-white px-4 lg:hidden">
+        <header className="flex h-16 items-center gap-4 px-4 lg:hidden" style={{ 
+          borderBottom: '1px solid #334155',
+          backgroundColor: '#0B0F19'
+        }}>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="rounded-lg border border-zinc-300 p-2 text-zinc-700 hover:bg-zinc-50"
+            className="rounded-lg p-2 transition hover:bg-[#1E293B]"
+            style={{ 
+              border: '1px solid #334155',
+              color: '#94A3B8'
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -241,7 +260,7 @@ export default function AdminLayout({
           </button>
           <div className="flex items-center gap-2">
             <span className="text-xl">🍖</span>
-            <span className="font-black text-zinc-950">Meat Lovers</span>
+            <span className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</span>
           </div>
         </header>
 
@@ -252,31 +271,41 @@ export default function AdminLayout({
       {/* Security Warning Modal */}
       {showSecurityWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 max-w-md w-full shadow-2xl">
+          <div className="rounded-xl p-6 max-w-md w-full shadow-2xl" style={{ backgroundColor: '#1E293B' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-                <ExclamationTriangleIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: '#EAB308' }}>
+                <ExclamationTriangleIcon className="h-6 w-6" style={{ color: '#0F172A' }} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Session Timeout Warning</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">Your session is about to expire</p>
+                <h3 className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>Session Timeout Warning</h3>
+                <p className="text-sm" style={{ color: '#94A3B8' }}>Your session is about to expire</p>
               </div>
             </div>
             
-            <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-6">
+            <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>
               You have been inactive for 30 minutes. For security purposes, your session will expire soon. Please continue your session or log out.
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={handleContinueSession}
-                className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+                style={{ backgroundColor: '#3B82F6' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
               >
                 Continue Session
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
+                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition"
+                style={{ 
+                  border: '1px solid #334155',
+                  backgroundColor: '#0B0F19',
+                  color: '#94A3B8'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E293B'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0B0F19'}
               >
                 Logout
               </button>

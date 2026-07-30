@@ -66,12 +66,27 @@ export default function DispatcherDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showRiderModal, setShowRiderModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [selectedRiderId, setSelectedRiderId] = useState("");
   const [pickupAddress, setPickupAddress] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [pendingOrders, setPendingOrders] = useState<any[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [manualOrderId, setManualOrderId] = useState("");
+  const [showManualOrder, setShowManualOrder] = useState(false);
+  
+  // Rider form state
+  const [riderForm, setRiderForm] = useState({
+    user_id: "",
+    phone: "",
+    license_number: "",
+    vehicle_type: "",
+    vehicle_plate: "",
+    current_location: "",
+  });
 
   const fetchDashboardData = async (retryCount = 0) => {
     try {
@@ -82,16 +97,17 @@ export default function DispatcherDashboard() {
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-      const [ridersRes, availableRes, deliveriesRes, summaryRes] = await Promise.all([
+      const [ridersRes, availableRes, deliveriesRes, summaryRes, ordersRes] = await Promise.all([
         fetch(`${baseUrl}/riders`, { headers: getAuthHeader() }),
         fetch(`${baseUrl}/riders/available`, { headers: getAuthHeader() }),
         fetch(`${baseUrl}/deliveries?${params.toString()}`, { headers: getAuthHeader() }),
         fetch(`${baseUrl}/deliveries/summary`, { headers: getAuthHeader() }),
+        fetch(`${baseUrl}/orders/all?status=PAID`, { headers: getAuthHeader() }),
       ]);
 
       // Handle rate limiting
       if (ridersRes.status === 429 || availableRes.status === 429 || 
-          deliveriesRes.status === 429 || summaryRes.status === 429) {
+          deliveriesRes.status === 429 || summaryRes.status === 429 || ordersRes.status === 429) {
         if (retryCount < 3) {
           const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -118,6 +134,11 @@ export default function DispatcherDashboard() {
       if (summaryRes.ok) {
         const data = await summaryRes.json();
         setSummary(data.data || data);
+      }
+
+      if (ordersRes.ok) {
+        const data = await ordersRes.json();
+        setPendingOrders(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -162,9 +183,19 @@ export default function DispatcherDashboard() {
       setPickupAddress("");
       setDeliveryAddress("");
       setDeliveryNotes("");
+      setSelectedOrder(null);
       fetchDashboardData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to assign delivery");
+    }
+  };
+
+  const handleOrderSelect = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    const order = pendingOrders.find(o => String(o.id) === orderId);
+    setSelectedOrder(order);
+    if (order) {
+      setDeliveryAddress(order.delivery_address || "");
     }
   };
 
@@ -503,17 +534,57 @@ export default function DispatcherDashboard() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Order ID
+                        Select Order
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={selectedOrderId}
-                        onChange={(e) => setSelectedOrderId(e.target.value)}
+                        onChange={(e) => handleOrderSelect(e.target.value)}
                         required
                         className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2"
-                        placeholder="Enter order ID"
-                      />
+                      >
+                        <option value="">Select an order</option>
+                        {pendingOrders.filter(o => !deliveries.some(d => String(d.order_id) === String(o.id))).map((order) => (
+                          <option key={order.id} value={String(order.id)}>
+                            Order #{order.order_number} - KES {parseFloat(order.total_amount || "0").toFixed(2)} - Table {order.table_id}
+                          </option>
+                        ))}
+                      </select>
                     </div>
+
+                    {selectedOrder && (
+                      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Order #:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedOrder.order_number}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Amount:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">KES {parseFloat(selectedOrder.total_amount || "0").toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Table:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedOrder.table_id}</span>
+                        </div>
+                        {selectedOrder.items && selectedOrder.items.length > 0 && (
+                          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Items:</span>
+                            <div className="mt-1 space-y-1">
+                              {selectedOrder.items.slice(0, 3).map((item: any, idx: number) => (
+                                <div key={idx} className="text-xs text-gray-900 dark:text-white">
+                                  {item.product_name} x{item.quantity}
+                                </div>
+                              ))}
+                              {selectedOrder.items.length > 3 && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  +{selectedOrder.items.length - 3} more items
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Select Rider
@@ -528,6 +599,10 @@ export default function DispatcherDashboard() {
                         {availableRiders.map((rider) => (
                           <option key={rider.id} value={rider.id}>
                             {rider.user?.full_name} - {rider.phone}
+                            {rider.vehicle_type && ` (${rider.vehicle_type}`}
+                            {rider.vehicle_plate && ` - ${rider.vehicle_plate})`}
+                            {rider.vehicle_type && !rider.vehicle_plate && ')'}
+                            {rider.current_location && ` - 📍 ${rider.current_location}`}
                           </option>
                         ))}
                       </select>
@@ -573,7 +648,15 @@ export default function DispatcherDashboard() {
                   <div className="flex gap-3 mt-6">
                     <button
                       type="button"
-                      onClick={() => setShowAssignModal(false)}
+                      onClick={() => {
+                        setShowAssignModal(false);
+                        setSelectedOrderId("");
+                        setSelectedRiderId("");
+                        setPickupAddress("");
+                        setDeliveryAddress("");
+                        setDeliveryNotes("");
+                        setSelectedOrder(null);
+                      }}
                       className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Cancel

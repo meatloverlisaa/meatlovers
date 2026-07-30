@@ -221,13 +221,13 @@ export default function SuperAdminDashboard() {
 
   if (loading && summary.currentSales === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="min-h-screen p-6" style={{ backgroundColor: '#090D16' }}>
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="h-8 rounded w-1/4" style={{ backgroundColor: '#1F2937' }}></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div key={i} className="h-32 rounded" style={{ backgroundColor: '#1F2937' }}></div>
               ))}
             </div>
           </div>
@@ -237,45 +237,51 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen p-6" style={{ backgroundColor: '#090D16' }}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold" style={{ color: '#F9FAFB' }}>
               Live Monitoring Dashboard
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color: '#9CA3AF' }}>
               Real-time system-wide oversight
             </p>
           </div>
           <div className="text-right">
             <button
               onClick={fetchMonitoringData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 text-white rounded-lg transition-colors"
+              style={{ backgroundColor: '#6366F1' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4F46E5'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6366F1'}
             >
               Refresh Now
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-xs mt-2" style={{ color: '#64748B' }}>
               Last updated: {lastUpdate.toLocaleTimeString()}
             </p>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-800 dark:text-red-200">{error}</p>
+          <div className="rounded-lg p-4" style={{ 
+            backgroundColor: '#7F1D1D',
+            border: '1px solid #DC2626'
+          }}>
+            <p style={{ color: '#FEE2E2' }}>{error}</p>
           </div>
         )}
 
         {/* Live Metrics Cards (8) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Current Sales */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Current Sales</p>
-                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Current Sales</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#22C55E' }}>
                   {formatCurrency(summary.currentSales)}
                 </p>
               </div>
@@ -284,11 +290,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Open Orders */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Open Orders</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Open Orders</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#6366F1' }}>
                   {summary.openOrders}
                 </p>
               </div>
@@ -297,11 +303,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Active Staff */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Active Staff</p>
-                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Active Staff</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#4F46E5' }}>
                   {summary.activeStaff}
                 </p>
               </div>
@@ -310,11 +316,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Kitchen Queue */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Kitchen Queue</p>
-                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Kitchen Queue</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#EAB308' }}>
                   {summary.kitchenQueue}
                 </p>
               </div>
@@ -323,11 +329,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Bar Queue */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Bar Queue</p>
-                <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Bar Queue</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#6366F1' }}>
                   {summary.barQueue}
                 </p>
               </div>
@@ -336,11 +342,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Active Deliveries */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Active Deliveries</p>
-                <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Active Deliveries</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#22C55E' }}>
                   {summary.activeDeliveries}
                 </p>
               </div>
@@ -349,11 +355,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Pending Approvals */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Pending Approvals</p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Pending Approvals</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#EAB308' }}>
                   {summary.pendingApprovals}
                 </p>
               </div>
@@ -362,11 +368,11 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* High Risk Alerts */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">High Risk Alerts</p>
-                <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>High Risk Alerts</p>
+                <p className="text-2xl font-bold mt-1" style={{ color: '#DC2626' }}>
                   {summary.highRiskAlerts}
                 </p>
               </div>
@@ -376,38 +382,38 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* P&L Snapshot */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: '#F9FAFB' }}>
             Today's P&L Snapshot
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Revenue</p>
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>Revenue</p>
+              <p className="text-lg font-bold" style={{ color: '#22C55E' }}>
                 {formatCurrency(plSnapshot.revenue)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">COGS</p>
-              <p className="text-lg font-bold text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>COGS</p>
+              <p className="text-lg font-bold" style={{ color: '#9CA3AF' }}>
                 {formatCurrency(plSnapshot.cogs)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Expenses</p>
-              <p className="text-lg font-bold text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>Expenses</p>
+              <p className="text-lg font-bold" style={{ color: '#9CA3AF' }}>
                 {formatCurrency(plSnapshot.expenses)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Profit</p>
-              <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>Profit</p>
+              <p className="text-lg font-bold" style={{ color: '#6366F1' }}>
                 {formatCurrency(plSnapshot.profit)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Margin</p>
-              <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+              <p className="text-sm" style={{ color: '#9CA3AF' }}>Margin</p>
+              <p className="text-lg font-bold" style={{ color: '#4F46E5' }}>
                 {plSnapshot.margin.toFixed(1)}%
               </p>
             </div>
@@ -417,27 +423,28 @@ export default function SuperAdminDashboard() {
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Open Order Board */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#F9FAFB' }}>
               Open Orders ({openOrders.length})
             </h2>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {openOrders.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                <p className="text-center py-8" style={{ color: '#64748B' }}>
                   No open orders
                 </p>
               ) : (
                 openOrders.slice(0, 10).map((order) => (
                   <div
                     key={order.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                    className="rounded-lg p-4"
+                    style={{ border: '1px solid #1F2937' }}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">
+                        <p className="font-semibold" style={{ color: '#F9FAFB' }}>
                           Order #{order.orderNumber}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm" style={{ color: '#64748B' }}>
                           Table {order.tableNumber}
                         </p>
                       </div>
@@ -446,7 +453,7 @@ export default function SuperAdminDashboard() {
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-900 dark:text-white font-medium">
+                      <span className="font-medium" style={{ color: '#F9FAFB' }}>
                         {formatCurrency(order.totalAmount)}
                       </span>
                       <span className={`font-medium ${getOrderAgeColor(order.ageMinutes)}`}>
@@ -460,32 +467,32 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* Kitchen & Bar Queue Summary */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#F9FAFB' }}>
               Kitchen & Bar Queue
             </h2>
             <div className="space-y-4">
               {/* Kitchen */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <h3 className="text-sm font-medium mb-2" style={{ color: '#9CA3AF' }}>
                   Kitchen
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Pending</p>
-                    <p className="text-xl font-bold text-amber-600 dark:text-amber-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#78350F', border: '1px solid #92400E' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Pending</p>
+                    <p className="text-xl font-bold" style={{ color: '#EAB308' }}>
                       {kitchenBarQueue.kitchenPending}
                     </p>
                   </div>
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Preparing</p>
-                    <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#1E3A8A', border: '1px solid #1E40AF' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Preparing</p>
+                    <p className="text-xl font-bold" style={{ color: '#6366F1' }}>
                       {kitchenBarQueue.kitchenPreparing}
                     </p>
                   </div>
-                  <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Ready</p>
-                    <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#064E3B', border: '1px solid #065F46' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Ready</p>
+                    <p className="text-xl font-bold" style={{ color: '#22C55E' }}>
                       {kitchenBarQueue.kitchenReady}
                     </p>
                   </div>
@@ -494,25 +501,25 @@ export default function SuperAdminDashboard() {
 
               {/* Bar */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <h3 className="text-sm font-medium mb-2" style={{ color: '#9CA3AF' }}>
                   Bar
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Pending</p>
-                    <p className="text-xl font-bold text-amber-600 dark:text-amber-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#78350F', border: '1px solid #92400E' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Pending</p>
+                    <p className="text-xl font-bold" style={{ color: '#EAB308' }}>
                       {kitchenBarQueue.barPending}
                     </p>
                   </div>
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Preparing</p>
-                    <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#1E3A8A', border: '1px solid #1E40AF' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Preparing</p>
+                    <p className="text-xl font-bold" style={{ color: '#6366F1' }}>
                       {kitchenBarQueue.barPreparing}
                     </p>
                   </div>
-                  <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded p-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Ready</p>
-                    <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="rounded p-3" style={{ backgroundColor: '#064E3B', border: '1px solid #065F46' }}>
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>Ready</p>
+                    <p className="text-xl font-bold" style={{ color: '#22C55E' }}>
                       {kitchenBarQueue.barReady}
                     </p>
                   </div>
@@ -520,16 +527,16 @@ export default function SuperAdminDashboard() {
               </div>
 
               {/* Metrics */}
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-2 gap-4 pt-4" style={{ borderTop: '1px solid #1F2937' }}>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Delayed Orders</p>
-                  <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                  <p className="text-sm" style={{ color: '#64748B' }}>Delayed Orders</p>
+                  <p className="text-lg font-bold" style={{ color: '#DC2626' }}>
                     {kitchenBarQueue.delayedOrders}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Avg Prep Time</p>
-                  <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
+                  <p className="text-sm" style={{ color: '#64748B' }}>Avg Prep Time</p>
+                  <p className="text-lg font-bold" style={{ color: '#F9FAFB' }}>
                     {kitchenBarQueue.avgPrepTime} min
                   </p>
                 </div>

@@ -38,30 +38,34 @@ function SummaryCards({ cards }: { cards: SummaryCard[] }) {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm"
+          className="rounded-xl p-5 shadow-sm"
+          style={{
+            backgroundColor: '#1E293B',
+            border: '1px solid #334155'
+          }}
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#94A3B8' }}>
                 {card.label}
               </p>
-              <p className="mt-2 text-3xl font-black text-zinc-950">{card.value}</p>
+              <p className="mt-2 text-3xl font-black" style={{ color: '#F8FAFC' }}>{card.value}</p>
               {card.change && (
                 <p
-                  className={`mt-1 text-xs font-semibold ${
-                    card.trend === "up"
-                      ? "text-emerald-600"
-                      : card.trend === "down"
-                      ? "text-red-600"
-                      : "text-zinc-500"
-                  }`}
+                  className="mt-1 text-xs font-semibold"
+                  style={{
+                    color: card.trend === "up" ? "#22C55E" : card.trend === "down" ? "#EF4444" : "#94A3B8"
+                  }}
                 >
                   {card.change}
                 </p>
               )}
             </div>
             <span
-              className={`rounded-lg ${card.color} flex h-12 w-12 items-center justify-center text-2xl`}
+              className={`rounded-lg flex h-12 w-12 items-center justify-center text-2xl`}
+              style={{
+                backgroundColor: card.trend === "up" ? "#22C55E20" : card.trend === "down" ? "#EF444420" : "#3B82F620"
+              }}
             >
               {card.icon}
             </span>
@@ -76,24 +80,24 @@ function SummaryCards({ cards }: { cards: SummaryCard[] }) {
 // ─── Revenue Snapshot ─────────────────────────────────────────────────────────
 function RevenueSnapshot({ data }: { data: { today: number; week: number; month: number } }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="font-black text-zinc-950">Revenue Snapshot</h3>
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
+      <h3 className="font-black" style={{ color: '#F8FAFC' }}>Revenue Snapshot</h3>
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-semibold text-zinc-500">Today</p>
-          <p className="mt-1 text-2xl font-black text-zinc-950">
+          <p className="text-xs font-semibold" style={{ color: '#94A3B8' }}>Today</p>
+          <p className="mt-1 text-2xl font-black" style={{ color: '#F8FAFC' }}>
             KSh {data.today.toLocaleString()}
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-zinc-500">This Week</p>
-          <p className="mt-1 text-2xl font-black text-emerald-600">
+          <p className="text-xs font-semibold" style={{ color: '#94A3B8' }}>This Week</p>
+          <p className="mt-1 text-2xl font-black" style={{ color: '#22C55E' }}>
             KSh {data.week.toLocaleString()}
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-zinc-500">This Month</p>
-          <p className="mt-1 text-2xl font-black text-red-700">
+          <p className="text-xs font-semibold" style={{ color: '#94A3B8' }}>This Month</p>
+          <p className="mt-1 text-2xl font-black" style={{ color: '#3B82F6' }}>
             KSh {data.month.toLocaleString()}
           </p>
         </div>
@@ -105,20 +109,21 @@ function RevenueSnapshot({ data }: { data: { today: number; week: number; month:
 // ─── Open Orders Widget ───────────────────────────────────────────────────────
 function OpenOrdersWidget({ count }: { count: number }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-black text-zinc-950">Open Orders</h3>
-          <p className="mt-1 text-xs text-zinc-500">Pending & in progress</p>
+          <h3 className="font-black" style={{ color: '#F8FAFC' }}>Open Orders</h3>
+          <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Pending & in progress</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-3xl">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#EAB30820' }}>
           📋
         </span>
       </div>
-      <p className="mt-4 text-4xl font-black text-zinc-950">{count}</p>
+      <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
       <Link
         href="/admin/orders"
-        className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800"
+        className="mt-4 inline-flex items-center text-sm font-semibold transition hover:opacity-80"
+        style={{ color: '#3B82F6' }}
       >
         View all orders →
       </Link>
@@ -129,29 +134,30 @@ function OpenOrdersWidget({ count }: { count: number }) {
 // ─── Stock Alert Widget ───────────────────────────────────────────────────────
 function StockAlertWidget({ alerts }: { alerts: { low: number; out: number } }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-black text-zinc-950">Stock Alerts</h3>
-          <p className="mt-1 text-xs text-zinc-500">Low stock warnings</p>
+          <h3 className="font-black" style={{ color: '#F8FAFC' }}>Stock Alerts</h3>
+          <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Low stock warnings</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-3xl">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#EF444420' }}>
           ⚠️
         </span>
       </div>
       <div className="mt-4 flex gap-4">
         <div>
-          <p className="text-xs font-semibold text-zinc-500">Low Stock</p>
-          <p className="mt-1 text-3xl font-black text-amber-600">{alerts.low}</p>
+          <p className="text-xs font-semibold" style={{ color: '#94A3B8' }}>Low Stock</p>
+          <p className="mt-1 text-3xl font-black" style={{ color: '#EAB308' }}>{alerts.low}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-zinc-500">Out of Stock</p>
-          <p className="mt-1 text-3xl font-black text-red-600">{alerts.out}</p>
+          <p className="text-xs font-semibold" style={{ color: '#94A3B8' }}>Out of Stock</p>
+          <p className="mt-1 text-3xl font-black" style={{ color: '#EF4444' }}>{alerts.out}</p>
         </div>
       </div>
       <Link
         href="/admin/stock"
-        className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800"
+        className="mt-4 inline-flex items-center text-sm font-semibold transition hover:opacity-80"
+        style={{ color: '#3B82F6' }}
       >
         Manage stock →
       </Link>
@@ -162,20 +168,21 @@ function StockAlertWidget({ alerts }: { alerts: { low: number; out: number } }) 
 // ─── Approval Queue Widget ────────────────────────────────────────────────────
 function ApprovalQueueWidget({ count }: { count: number }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-black text-zinc-950">Approval Queue</h3>
-          <p className="mt-1 text-xs text-zinc-500">Pending approvals</p>
+          <h3 className="font-black" style={{ color: '#F8FAFC' }}>Approval Queue</h3>
+          <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Pending approvals</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-3xl">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#3B82F620' }}>
           ✓
         </span>
       </div>
-      <p className="mt-4 text-4xl font-black text-zinc-950">{count}</p>
+      <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
       <Link
         href="/admin/approvals"
-        className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800"
+        className="mt-4 inline-flex items-center text-sm font-semibold transition hover:opacity-80"
+        style={{ color: '#3B82F6' }}
       >
         Review approvals →
       </Link>
@@ -187,20 +194,21 @@ function ApprovalQueueWidget({ count }: { count: number }) {
 // ─── Lead Widget ──────────────────────────────────────────────────────────────
 function LeadWidget({ count }: { count: number }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-black text-zinc-950">New Leads</h3>
-          <p className="mt-1 text-xs text-zinc-500">Awaiting follow-up</p>
+          <h3 className="font-black" style={{ color: '#F8FAFC' }}>New Leads</h3>
+          <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Awaiting follow-up</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-3xl">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#22C55E20' }}>
           📬
         </span>
       </div>
-      <p className="mt-4 text-4xl font-black text-zinc-950">{count}</p>
+      <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
       <Link
         href="/admin/cms"
-        className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800"
+        className="mt-4 inline-flex items-center text-sm font-semibold transition hover:opacity-80"
+        style={{ color: '#3B82F6' }}
       >
         View leads →
       </Link>
@@ -228,21 +236,21 @@ function ActivityTimeline({ activities }: { activities: Activity[] }) {
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="font-black text-zinc-950">Recent Activity</h3>
-      <p className="mt-1 text-xs text-zinc-500">Latest system events</p>
+    <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
+      <h3 className="font-black" style={{ color: '#F8FAFC' }}>Recent Activity</h3>
+      <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Latest system events</p>
       <div className="mt-6 space-y-4">
         {activities.length === 0 ? (
-          <p className="py-8 text-center text-sm text-zinc-400">No recent activity</p>
+          <p className="py-8 text-center text-sm" style={{ color: '#94A3B8' }}>No recent activity</p>
         ) : (
           activities.map((activity) => (
             <div key={activity.id} className="flex items-start gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-lg">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg" style={{ backgroundColor: '#334155' }}>
                 {getActivityIcon(activity.type)}
               </span>
               <div className="flex-1">
-                <p className="text-sm text-zinc-700">{activity.message}</p>
-                <div className="mt-1 flex items-center gap-2 text-xs text-zinc-400">
+                <p className="text-sm" style={{ color: '#F8FAFC' }}>{activity.message}</p>
+                <div className="mt-1 flex items-center gap-2 text-xs" style={{ color: '#94A3B8' }}>
                   <span>{activity.user}</span>
                   <span>•</span>
                   <span>{activity.timestamp}</span>
@@ -263,37 +271,48 @@ function AlertBanner({ alerts }: { alerts: Alert[] }) {
   const getAlertColor = (type: Alert["type"]) => {
     switch (type) {
       case "error":
-        return "border-red-200 bg-red-50 text-red-800";
+        return { bg: '#EF444410', border: '#EF4444', text: '#EF4444' };
       case "warning":
-        return "border-amber-200 bg-amber-50 text-amber-800";
+        return { bg: '#EAB30810', border: '#EAB308', text: '#EAB308' };
       case "info":
-        return "border-blue-200 bg-blue-50 text-blue-800";
+        return { bg: '#3B82F610', border: '#3B82F6', text: '#3B82F6' };
     }
   };
 
   return (
     <div className="space-y-3">
-      {alerts.map((alert) => (
-        <div
-          key={alert.id}
-          className={`flex items-center justify-between rounded-lg border p-4 ${getAlertColor(alert.type)}`}
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-xl">
-              {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
-            </span>
-            <p className="text-sm font-semibold">{alert.message}</p>
+      {alerts.map((alert) => {
+        const colors = getAlertColor(alert.type);
+        return (
+          <div
+            key={alert.id}
+            className="flex items-center justify-between rounded-lg p-4"
+            style={{
+              backgroundColor: colors.bg,
+              border: `1px solid ${colors.border}`
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">
+                {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
+              </span>
+              <p className="text-sm font-semibold" style={{ color: colors.text }}>{alert.message}</p>
+            </div>
+            {alert.action && (
+              <Link
+                href={alert.action.href}
+                className="rounded-md px-3 py-1.5 text-xs font-bold transition"
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  color: colors.text
+                }}
+              >
+                {alert.action.label}
+              </Link>
+            )}
           </div>
-          {alert.action && (
-            <Link
-              href={alert.action.href}
-              className="rounded-md border border-current px-3 py-1.5 text-xs font-bold transition hover:bg-white"
-            >
-              {alert.action.label}
-            </Link>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -401,7 +420,7 @@ export default function AdminDashboard() {
         change: "+12% vs yesterday",
         trend: "up",
         icon: "💰",
-        color: "bg-emerald-100",
+        color: "",
       },
       {
         label: "Open Orders",
@@ -409,7 +428,7 @@ export default function AdminDashboard() {
         change: "8 pending, 4 in progress",
         trend: "neutral",
         icon: "📋",
-        color: "bg-blue-100",
+        color: "",
       },
       {
         label: "New Leads",
@@ -417,7 +436,7 @@ export default function AdminDashboard() {
         change: "From website forms",
         trend: "neutral",
         icon: "📬",
-        color: "bg-purple-100",
+        color: "",
       },
       {
         label: "Stock Alerts",
@@ -425,37 +444,53 @@ export default function AdminDashboard() {
         change: "5 low, 2 out of stock",
         trend: "down",
         icon: "⚠️",
-        color: "bg-red-100",
+        color: "",
       },
     ]);
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#0F172A' }}>
       {/* Header */}
-      <div className="border-b border-zinc-200 bg-white">
+      <div style={{ 
+        borderBottom: '1px solid #334155',
+        backgroundColor: '#1E293B'
+      }}>
         <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-black text-zinc-950">Admin Operations Dashboard</h1>
-              <p className="mt-1 text-sm text-zinc-500">
+              <h1 className="text-2xl font-black" style={{ color: '#F8FAFC' }}>Admin Operations Dashboard</h1>
+              <p className="mt-1 text-sm" style={{ color: '#94A3B8' }}>
                 Welcome back — here's what's happening today
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Link
                 href="/admin/orders"
-                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+                className="rounded-lg px-4 py-2 text-sm font-semibold transition hover:bg-[#334155]"
+                style={{ 
+                  border: '1px solid #334155',
+                  color: '#94A3B8'
+                }}
               >
                 📋 Orders
               </Link>
               <Link
                 href="/"
-                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+                className="rounded-lg px-4 py-2 text-sm font-semibold transition hover:bg-[#334155]"
+                style={{ 
+                  border: '1px solid #334155',
+                  color: '#94A3B8'
+                }}
               >
                 View Website
               </Link>
-              <button className="rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-800">
+              <button 
+                className="rounded-lg px-4 py-2 text-sm font-bold text-white transition"
+                style={{ backgroundColor: '#3B82F6' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+              >
                 Quick Actions
               </button>
             </div>
@@ -484,20 +519,21 @@ export default function AdminDashboard() {
           <div className="grid gap-6 lg:grid-cols-3">
             <ApprovalQueueWidget count={approvalQueue} />
             <LeadWidget count={newLeads} />
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-zinc-950">Active Users</h3>
-                  <p className="mt-1 text-xs text-zinc-500">Currently online</p>
+                  <h3 className="font-black" style={{ color: '#F8FAFC' }}>Active Users</h3>
+                  <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Currently online</p>
                 </div>
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-3xl">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#22C55E20' }}>
                   👥
                 </span>
               </div>
-              <p className="mt-4 text-4xl font-black text-zinc-950">8</p>
+              <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>8</p>
               <Link
                 href="/admin/users"
-                className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800"
+                className="mt-4 inline-flex items-center text-sm font-semibold transition hover:opacity-80"
+                style={{ color: '#3B82F6' }}
               >
                 View all users →
               </Link>
@@ -509,18 +545,30 @@ export default function AdminDashboard() {
 
           {/* Module Grid */}
           <div>
-            <h2 className="mb-4 text-lg font-black text-zinc-950">Quick Access</h2>
+            <h2 className="mb-4 text-lg font-black" style={{ color: '#F8FAFC' }}>Quick Access</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {adminModules.map((mod) => (
                 <Link
                   key={mod.href}
                   href={mod.href}
-                  className="flex items-start gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-red-300 hover:shadow-md"
+                  className="flex items-start gap-4 rounded-xl p-5 shadow-sm transition"
+                  style={{
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #334155'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#3B82F6';
+                    e.currentTarget.style.backgroundColor = '#1E3A5F';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#334155';
+                    e.currentTarget.style.backgroundColor = '#1E293B';
+                  }}
                 >
                   <span className="text-3xl">{mod.icon}</span>
                   <div>
-                    <p className="font-bold text-zinc-950">{mod.label}</p>
-                    <p className="mt-0.5 text-xs text-zinc-500">{mod.desc}</p>
+                    <p className="font-bold" style={{ color: '#F8FAFC' }}>{mod.label}</p>
+                    <p className="mt-0.5 text-xs" style={{ color: '#94A3B8' }}>{mod.desc}</p>
                   </div>
                 </Link>
               ))}
