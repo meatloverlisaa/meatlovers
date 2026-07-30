@@ -1,9 +1,8 @@
-// Bar Operations Oversight Page - Manager View Only
+// Bar Operations Summary Page - Admin/Manager/Storekeeper Oversight
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { BarSalesSummary } from '@/components/admin/bar/BarSalesSummary';
 import { PendingDrinkList } from '@/components/admin/bar/PendingDrinkList';
 import { BarStockMovementTable } from '@/components/admin/bar/BarStockMovementTable';
@@ -17,7 +16,7 @@ function getToken(): string {
   return '';
 }
 
-export default function ManagerBarOversightPage() {
+export default function BarOversightPage() {
   const [salesData, setSalesData] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [movements, setMovements] = useState<any[]>([]);
@@ -118,20 +117,20 @@ export default function ManagerBarOversightPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+    <div className="min-h-screen bg-zinc-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Bar Operations (Oversight Only)</h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Monitor bar sales, pending orders, and stock movements</p>
+            <h1 className="text-3xl font-bold text-zinc-900">Bar Operations Summary</h1>
+            <p className="mt-1 text-sm text-zinc-600">Monitor bar sales, pending orders, and stock movements</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Date Filter */}
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 text-zinc-900 dark:text-zinc-50"
+              className="px-4 py-2 border border-zinc-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
             >
               <option value="today">Today</option>
               <option value="week">Last 7 Days</option>
@@ -141,7 +140,7 @@ export default function ManagerBarOversightPage() {
             {/* Refresh Button */}
             <button
               onClick={handleRefresh}
-              className="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-zinc-900 dark:text-zinc-50"
+              className="px-4 py-2 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -160,37 +159,37 @@ export default function ManagerBarOversightPage() {
           <PendingDrinkList orders={orders} isLoading={isLoadingOrders} />
 
           {/* Quick Stats */}
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-4">Bar Performance</h3>
+          <div className="bg-white rounded-lg border border-zinc-200 p-6">
+            <h3 className="text-lg font-bold text-zinc-900 mb-4">Bar Performance</h3>
             
             <div className="space-y-4">
               {/* Average Prep Time */}
-              <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/50">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 font-semibold">Avg Prep Time</p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">For completed orders</p>
+                  <p className="text-sm text-blue-700 font-semibold">Avg Prep Time</p>
+                  <p className="text-xs text-blue-600">For completed orders</p>
                 </div>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">~8 min</p>
+                <p className="text-2xl font-bold text-blue-900">~8 min</p>
               </div>
 
               {/* Orders in Queue */}
-              <div className="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-900/50">
+              <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
                 <div>
-                  <p className="text-sm text-amber-700 dark:text-amber-300 font-semibold">Orders in Queue</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400">Pending + Preparing</p>
+                  <p className="text-sm text-amber-700 font-semibold">Orders in Queue</p>
+                  <p className="text-xs text-amber-600">Pending + Preparing</p>
                 </div>
-                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+                <p className="text-2xl font-bold text-amber-900">
                   {orders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING').length}
                 </p>
               </div>
 
               {/* Completed Today */}
-              <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-900/50">
+              <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
                 <div>
-                  <p className="text-sm text-green-700 dark:text-green-300 font-semibold">Completed Today</p>
-                  <p className="text-xs text-green-600 dark:text-green-400">Served orders</p>
+                  <p className="text-sm text-green-700 font-semibold">Completed Today</p>
+                  <p className="text-xs text-green-600">Served orders</p>
                 </div>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                <p className="text-2xl font-bold text-green-900">
                   {salesData?.totalOrders || 0}
                 </p>
               </div>
@@ -200,35 +199,6 @@ export default function ManagerBarOversightPage() {
 
         {/* Stock Movements Table */}
         <BarStockMovementTable movements={movements} isLoading={isLoadingMovements} />
-
-        {/* Oversight Notice */}
-        <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20 p-6">
-          <div className="flex items-start gap-3">
-            <svg
-              className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div className="flex-1 text-sm text-amber-900 dark:text-amber-100">
-              <p className="font-semibold mb-2">Manager Oversight Guide</p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Monitor bar sales performance and trends</li>
-                <li>Track pending drink orders requiring attention</li>
-                <li>Review stock movements for bar inventory</li>
-                <li>Contact bar staff for operational issues</li>
-                <li>This is a view-only oversight page - contact admin for changes</li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
