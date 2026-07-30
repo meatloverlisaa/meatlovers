@@ -27,10 +27,18 @@ type RoleSupplierDirectoryProps = {
   hint: string;
 };
 
+function getToken(): string {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth_token') || '';
+  }
+  return '';
+}
+
 async function getSuppliers(): Promise<Supplier[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/suppliers`, {
     cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` }
   });
 
   if (!res.ok) {
@@ -104,7 +112,24 @@ export function RoleSupplierDirectory({ title, description, hint }: RoleSupplier
       <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{title}</h1>
-          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
+          <p className="mt-4 text-sm text-zinc-600">Loading suppliers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!getToken()) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{title}</h1>
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-700">You need to log in to access the Supplier Directory.</p>
+            <a href="/storekeeper/login" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium">
+              Go to Login Page
+            </a>
+          </div>
         </div>
       </div>
     );

@@ -22,7 +22,7 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Get()
-  @Roles(...FINANCE_ROLES)
+  @Roles(...FINANCE_ROLES, ...CASHIER_ROLES)
   findAll(@Query() query: any) {
     return this.paymentsService.findAll(query);
   }

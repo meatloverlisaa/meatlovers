@@ -63,8 +63,79 @@ export default function AccountantDashboard() {
   const fetchDashboardData = async () => {
     try {
       setError(null);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const token = localStorage.getItem('auth_token');
 
-      // Use mock data if API fails
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Fetch finance summary
+      const summaryResponse = await fetch(`${apiUrl}/finance-transactions/summary`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!summaryResponse.ok) {
+        throw new Error('Failed to fetch finance summary');
+      }
+
+      const summaryData = await summaryResponse.json();
+
+      // Fetch recent transactions
+      const today = new Date();
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      
+      const transactionsResponse = await fetch(
+        `${apiUrl}/finance-transactions?startDate=${startOfDay}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!transactionsResponse.ok) {
+        throw new Error('Failed to fetch transactions');
+      }
+
+      const transactionsData = await transactionsResponse.json();
+
+      // Update state with real data
+      setSummary({
+        pendingPayments: summaryData.totalTransactions || 0,
+        todayRevenue: summaryData.totalIncome || 0,
+        unreconciled: 0, // Would need reconciliation status from API
+        reportsDue: 0, // Would need report scheduling from API
+      });
+
+      setTransactions(transactionsData.slice(0, 5).map((t: any) => ({
+        id: t.id,
+        transactionType: t.type,
+        category: t.category,
+        amount: Number(t.amount),
+        transactionDate: t.transaction_date,
+        description: t.description || `${t.type} - ${t.category}`,
+      })));
+
+      setTasks([
+        {
+          id: "reconcile-payments",
+          title: `Reconcile ${summaryData.totalTransactions || 0} pending transactions`,
+          priority: "HIGH",
+          dueDate: "Today",
+          action: { label: "Reconcile", href: "/accountant/reconciliation" },
+        },
+      ]);
+
+      setAlerts([]);
+
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+      
+      // Fallback to mock data on error
       setSummary({
         pendingPayments: 5,
         todayRevenue: 125000,
@@ -80,21 +151,13 @@ export default function AccountantDashboard() {
           dueDate: "Today",
           action: { label: "Reconcile", href: "/accountant/reconciliation" },
         },
-        {
-          id: "monthly-report",
-          title: "Generate monthly financial report",
-          priority: "MEDIUM",
-          dueDate: "July 31",
-          action: { label: "Generate", href: "/accountant/reports" },
-        },
       ]);
 
       setAlerts([
         {
-          id: "variance",
+          id: "api-error",
           type: "warning",
-          message: "2 payment variances require review",
-          action: { label: "Review", href: "/accountant/reconciliation" },
+          message: "Using mock data - API connection failed",
         },
       ]);
 
@@ -107,43 +170,7 @@ export default function AccountantDashboard() {
           transactionDate: new Date().toISOString(),
           description: "Table 12 payment",
         },
-        {
-          id: "2",
-          transactionType: "INCOME",
-          category: "Delivery",
-          amount: 8500,
-          transactionDate: new Date(Date.now() - 3600000).toISOString(),
-          description: "Order #4567 delivery",
-        },
-        {
-          id: "3",
-          transactionType: "EXPENSE",
-          category: "Supplies",
-          amount: 5000,
-          transactionDate: new Date(Date.now() - 7200000).toISOString(),
-          description: "Kitchen supplies purchase",
-        },
-        {
-          id: "4",
-          transactionType: "INCOME",
-          category: "Takeout",
-          amount: 4200,
-          transactionDate: new Date(Date.now() - 10800000).toISOString(),
-          description: "Takeout order #4566",
-        },
-        {
-          id: "5",
-          transactionType: "INCOME",
-          category: "Dine-in",
-          amount: 18000,
-          transactionDate: new Date(Date.now() - 14400000).toISOString(),
-          description: "Table 8 payment",
-        },
       ]);
-
-    } catch (err) {
-      console.error("Error fetching dashboard data:", err);
-      // Still use mock data on error
     } finally {
       setLoading(false);
     }

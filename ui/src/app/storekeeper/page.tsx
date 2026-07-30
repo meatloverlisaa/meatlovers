@@ -43,9 +43,16 @@ interface StockMovement {
   timestamp: string;
 }
 
+function getToken(): string {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth_token') || '';
+  }
+  return '';
+}
+
 export default function StorekeeperDashboard() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
-  
+
   const [summary, setSummary] = useState({
     stockItems: 0,
     lowStock: 0,
@@ -62,31 +69,49 @@ export default function StorekeeperDashboard() {
   const fetchDashboardData = async () => {
     try {
       setError(null);
+      setLoading(true);
 
-      // Fetch summary data
+      // Fetch summary data in parallel
       const [stockCountRes, lowStockRes, outStockRes, pendingOrdersRes, movementsRes] =
         await Promise.all([
-          fetch("http://localhost:3001/stock?count=true"),
-          fetch("http://localhost:3001/stock?status=LOW"),
-          fetch("http://localhost:3001/stock?status=OUT"),
-          fetch("http://localhost:3001/purchases?status=PENDING"),
-          fetch("http://localhost:3001/stock/movements?limit=10"),
+          fetch("http://localhost:3001/stock?count=true", {
+            headers: { Authorization: `Bearer ${getToken()}` }
+          }),
+          fetch("http://localhost:3001/stock?status=LOW", {
+            headers: { Authorization: `Bearer ${getToken()}` }
+          }),
+          fetch("http://localhost:3001/stock?status=OUT", {
+            headers: { Authorization: `Bearer ${getToken()}` }
+          }),
+          fetch("http://localhost:3001/purchases?status=PENDING", {
+            headers: { Authorization: `Bearer ${getToken()}` }
+          }),
+          fetch("http://localhost:3001/stock/movements?limit=10", {
+            headers: { Authorization: `Bearer ${getToken()}` }
+          }),
         ]);
 
-      if (stockCountRes.ok) {
-        const data = await stockCountRes.json();
-        setSummary((prev) => ({ ...prev, stockItems: data.count || data.data?.count || 0 }));
+      // Process responses in parallel
+      const [stockCountData, lowStockData, outStockData, pendingOrdersData, movementsData] =
+        await Promise.all([
+          stockCountRes.ok ? stockCountRes.json().catch(() => null) : Promise.resolve(null),
+          lowStockRes.ok ? lowStockRes.json().catch(() => null) : Promise.resolve(null),
+          outStockRes.ok ? outStockRes.json().catch(() => null) : Promise.resolve(null),
+          pendingOrdersRes.ok ? pendingOrdersRes.json().catch(() => null) : Promise.resolve(null),
+          movementsRes.ok ? movementsRes.json().catch(() => null) : Promise.resolve(null),
+        ]);
+
+      if (stockCountData) {
+        setSummary((prev) => ({ ...prev, stockItems: stockCountData.count || stockCountData.data?.count || 0 }));
       }
 
-      if (lowStockRes.ok) {
-        const data = await lowStockRes.json();
-        const count = Array.isArray(data.data) ? data.data.length : data.length || 0;
+      if (lowStockData) {
+        const count = Array.isArray(lowStockData.data) ? lowStockData.data.length : lowStockData.length || 0;
         setSummary((prev) => ({ ...prev, lowStock: count }));
       }
 
-      if (outStockRes.ok) {
-        const data = await outStockRes.json();
-        const count = Array.isArray(data.data) ? data.data.length : data.length || 0;
+      if (outStockData) {
+        const count = Array.isArray(outStockData.data) ? outStockData.data.length : outStockData.length || 0;
         setSummary((prev) => ({ ...prev, outOfStock: count }));
 
         // Generate alerts for out of stock
@@ -103,9 +128,8 @@ export default function StorekeeperDashboard() {
         }
       }
 
-      if (pendingOrdersRes.ok) {
-        const data = await pendingOrdersRes.json();
-        const count = Array.isArray(data.data) ? data.data.length : data.length || 0;
+      if (pendingOrdersData) {
+        const count = Array.isArray(pendingOrdersData.data) ? pendingOrdersData.data.length : pendingOrdersData.length || 0;
         setSummary((prev) => ({ ...prev, pendingOrders: count }));
 
         // Generate tasks for pending orders
@@ -123,9 +147,8 @@ export default function StorekeeperDashboard() {
         }
       }
 
-      if (movementsRes.ok) {
-        const data = await movementsRes.json();
-        setMovements(data.data || data || []);
+      if (movementsData) {
+        setMovements(movementsData.data || movementsData || []);
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);

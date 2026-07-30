@@ -23,6 +23,12 @@ export class KitchenService {
       include: {
         items: {
           include: {
+            product: {
+              select: {
+                id: true,
+                product_category: true,
+              },
+            },
             order: false,
           },
         },
@@ -36,12 +42,10 @@ export class KitchenService {
       },
     });
 
-    // Filter orders that contain food items
+    // Filter orders that contain food items (optimized - no N+1 queries)
     const foodOrders = orders.filter((order) => {
       return order.items.some((item: any) => {
-        // Check if the product is a food item
-        // We need to fetch the product to check category
-        return this.isFoodItem(item.product_id);
+        return item.product?.product_category === 'FOOD';
       });
     });
 
@@ -127,11 +131,24 @@ export class KitchenService {
         status: { in: ['PENDING', 'PREPARING', 'READY'] },
       },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: {
+              select: {
+                product_category: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    const foodOrders = orders.filter((order) => this.orderHasFoodItems(order));
+    // Filter food orders (optimized - no N+1 queries)
+    const foodOrders = orders.filter((order) => {
+      return order.items.some((item: any) => {
+        return item.product?.product_category === 'FOOD';
+      });
+    });
 
     const summary = {
       pending: 0,

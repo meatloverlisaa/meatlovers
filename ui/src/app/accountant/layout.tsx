@@ -1,0 +1,152 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  ChartBarIcon,
+  BanknotesIcon,
+  DocumentTextIcon,
+  ScaleIcon,
+  ChartPieIcon,
+  TruckIcon,
+  CogIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const navigationItems: NavItem[] = [
+  { href: "/accountant", label: "Dashboard", icon: ChartBarIcon },
+  { href: "/accountant/reports", label: "Finance Reports", icon: DocumentTextIcon },
+  { href: "/accountant/reconciliation", label: "Reconciliation", icon: ScaleIcon },
+  { href: "/accountant/tax", label: "Tax Management", icon: BanknotesIcon },
+  { href: "/accountant/analytics", label: "Analytics", icon: ChartPieIcon },
+  { href: "/accountant/suppliers", label: "Suppliers", icon: TruckIcon },
+  { href: "/accountant/pricing", label: "Pricing", icon: CogIcon },
+];
+
+export default function AccountantLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  const isActive = (href: string) => {
+    if (href === "/accountant") return pathname === "/accountant";
+    return pathname?.startsWith(href);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-blue-900/50 bg-slate-900/95 backdrop-blur-sm transition-transform duration-300 lg:static lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center gap-3 border-b border-blue-900/50 px-6">
+          <span className="text-2xl">🍖</span>
+          <div>
+            <p className="font-black text-white">Meat Lovers</p>
+            <p className="text-xs text-blue-400">Accountant Portal</p>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-1">
+            {navigationItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                  isActive(item.href)
+                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                    : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                }`}
+              >
+                <item.icon className="h-5 w-5" />
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        {/* User Profile */}
+        <div className="border-t border-blue-900/50 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600/20 font-bold text-blue-400">
+              {user?.full_name?.charAt(0) || "A"}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-white">{user?.full_name || "Accountant"}</p>
+              <p className="text-xs text-slate-400">{user?.role || "ACCOUNTANT"}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-400 hover:bg-red-900/20 rounded-lg transition"
+          >
+            <ArrowRightOnRectangleIcon className="h-5 w-5" />
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Mobile header */}
+        <header className="flex h-16 items-center gap-4 border-b border-blue-900/50 bg-slate-900/95 backdrop-blur-sm px-4 lg:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="rounded-lg border border-blue-800/50 p-2 text-slate-300 hover:bg-slate-800/50"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🍖</span>
+            <span className="font-black text-white">Meat Lovers</span>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">{children}</main>
+      </div>
+    </div>
+  );
+}

@@ -1,9 +1,13 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { revalidatePath } from "next/cache";
-import React from "react";
 import { KitchenStockTable } from "./components/KitchenStockTable";
 import { UsageForm } from "./components/UsageForm";
 import { WasteShortcut } from "./components/WasteShortcut";
 import { LowStockBanner } from "./components/LowStockBanner";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -29,7 +33,10 @@ type StockBalance = {
 
 async function getProducts(): Promise<Product[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/products`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load products: ${res.status}`);
@@ -40,7 +47,10 @@ async function getProducts(): Promise<Product[]> {
 
 async function getKitchenStock(): Promise<StockBalance[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/stock/balance`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/stock/balance`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -60,78 +70,40 @@ async function getKitchenStock(): Promise<StockBalance[]> {
   }));
 }
 
-async function recordUsage(payload: {
-  productId: string;
-  quantity: number;
-  usageType: string;
-  notes?: string;
-}) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+export default function KitchenStockPage() {
+  const { user, isLoading: authLoading } = useRequireAuth(['CHEF']);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stock, setStock] = useState<StockBalance[]>([]);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [stockError, setStockError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Record as adjustment (negative quantity)
-  const res = await fetch(`${baseUrl}/stock/adjustment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      productId: payload.productId,
-      quantity: -payload.quantity, // Negative for usage
-      notes: `Kitchen Usage - ${payload.usageType}: ${payload.notes || ""}`,
-    }),
-  });
+  useEffect(() => {
+    if (!authLoading && user) {
+      async function loadData() {
+        setLoading(true);
+        try {
+          const productsData = await getProducts();
+          setProducts(productsData);
+          setProductsError(null);
+        } catch (e) {
+          setProductsError(e instanceof Error ? e.message : "Unknown error");
+        }
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Failed to record usage: ${res.status}${text ? ` - ${text}` : ""}`);
-  }
+        try {
+          const stockData = await getKitchenStock();
+          setStock(stockData);
+          setStockError(null);
+        } catch (e) {
+          setStockError(e instanceof Error ? e.message : "Unknown error");
+        }
 
-  return res.json();
-}
+        setLoading(false);
+      }
 
-async function recordWaste(payload: {
-  productId: string;
-  quantity: number;
-  reason: string;
-  notes: string;
-}) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  // Record as adjustment (negative quantity) with waste notation
-  const res = await fetch(`${baseUrl}/stock/adjustment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      productId: payload.productId,
-      quantity: -payload.quantity, // Negative for waste
-      reference: `WASTE-${payload.reason}`,
-      notes: `Kitchen Waste - ${payload.reason}: ${payload.notes}`,
-    }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Failed to record waste: ${res.status}${text ? ` - ${text}` : ""}`);
-  }
-
-  return res.json();
-}
-
-export default async function KitchenStockPage() {
-  let products: Product[] = [];
-  let stock: StockBalance[] = [];
-  let productsError: string | null = null;
-  let stockError: string | null = null;
-
-  try {
-    products = await getProducts();
-  } catch (e) {
-    productsError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    stock = await getKitchenStock();
-  } catch (e) {
-    stockError = e instanceof Error ? e.message : "Unknown error";
-  }
+      loadData();
+    }
+  }, [authLoading, user]);
 
   // Filter for kitchen location for forms
   const kitchenStock = stock
@@ -143,8 +115,6 @@ export default async function KitchenStockPage() {
     }));
 
   const handleUsage = async (formData: FormData) => {
-    "use server";
-
     const productId = String(formData.get("productId") ?? "").trim();
     const quantityRaw = String(formData.get("quantity") ?? "").trim();
     const usageType = String(formData.get("usageType") ?? "").trim();
@@ -157,19 +127,31 @@ export default async function KitchenStockPage() {
       throw new Error("Quantity must be a positive number.");
     if (!usageType) throw new Error("Usage type is required.");
 
-    await recordUsage({
-      productId,
-      quantity,
-      usageType,
-      notes: notes.length ? notes : undefined,
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    const res = await fetch(`${baseUrl}/stock/adjustment`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        productId,
+        quantity: -quantity,
+        notes: `Kitchen Usage - ${usageType}: ${notes || ""}`,
+      }),
     });
 
-    revalidatePath("/kitchen/stock");
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Failed to record usage: ${res.status}${text ? ` - ${text}` : ""}`);
+    }
+
+    // Reload data
+    const stockData = await getKitchenStock();
+    setStock(stockData);
   };
 
   const handleWaste = async (formData: FormData) => {
-    "use server";
-
     const productId = String(formData.get("productId") ?? "").trim();
     const quantityRaw = String(formData.get("quantity") ?? "").trim();
     const reason = String(formData.get("reason") ?? "").trim();
@@ -183,14 +165,29 @@ export default async function KitchenStockPage() {
     if (!reason) throw new Error("Reason is required.");
     if (!notes) throw new Error("Description is required.");
 
-    await recordWaste({
-      productId,
-      quantity,
-      reason,
-      notes,
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    const res = await fetch(`${baseUrl}/stock/adjustment`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        productId,
+        quantity: -quantity,
+        reference: `WASTE-${reason}`,
+        notes: `Kitchen Waste - ${reason}: ${notes}`,
+      }),
     });
 
-    revalidatePath("/kitchen/stock");
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Failed to record waste: ${res.status}${text ? ` - ${text}` : ""}`);
+    }
+
+    // Reload data
+    const stockData = await getKitchenStock();
+    setStock(stockData);
   };
 
   return (

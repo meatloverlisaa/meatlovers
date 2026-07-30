@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { getAuthHeader } from "@/lib/auth";
 
 type OrderStatus = "SERVED" | "PAID";
 
@@ -28,11 +29,17 @@ async function fetchCashierStats(): Promise<CashierStats> {
   
   try {
     // Fetch orders
-    const ordersRes = await fetch(`${baseUrl}/orders`, { cache: "no-store" });
+    const ordersRes = await fetch(`${baseUrl}/orders`, { 
+      cache: "no-store",
+      headers: getAuthHeader(),
+    });
     const orders = ordersRes.ok ? await ordersRes.json() : [];
     
     // Fetch payments
-    const paymentsRes = await fetch(`${baseUrl}/payments`, { cache: "no-store" });
+    const paymentsRes = await fetch(`${baseUrl}/payments`, { 
+      cache: "no-store",
+      headers: getAuthHeader(),
+    });
     const payments = paymentsRes.ok ? await paymentsRes.json() : [];
     
     const now = new Date();
@@ -64,12 +71,17 @@ async function fetchCashierStats(): Promise<CashierStats> {
 async function fetchPendingOrders(): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   
-  const res = await fetch(`${baseUrl}/orders?status=SERVED`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/orders?status=SERVED`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
   
-  return res.json();
+  const data = await res.json();
+  // Ensure we always return an array
+  return Array.isArray(data) ? data : [];
 }
 
 function StatCard({ 
@@ -204,7 +216,7 @@ export default function CashierDashboard() {
           </Link>
 
           <Link
-            href="/admin/payments"
+            href="/cashier/payments"
             className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900"
           >
             <div>

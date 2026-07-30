@@ -117,17 +117,17 @@ export const getDashboardRoute = (role: string): string => {
  */
 export const getLoginRoute = (role: string): string => {
   const roleRoutes: Record<string, string> = {
-    SUPER_ADMIN: '/admin/login',
+    SUPER_ADMIN: '/super-admin/login',
     ADMIN: '/admin/login',
-    MANAGER: '/staff/login',
+    MANAGER: '/manager/login',
     CASHIER: '/cashier/login',
     WAITER: '/pos/login',
     CHEF: '/kitchen/login',
-    STOREKEEPER: '/staff/login',
+    STOREKEEPER: '/storekeeper/login',
     BARMAN: '/bar/login',
-    DISPATCHER: '/staff/login',
-    ACCOUNTANT: '/staff/login',
-    HR: '/staff/login',
+    DISPATCHER: '/dispatcher/login',
+    ACCOUNTANT: '/accountant/login',
+    HR: '/hr/login',
   };
 
   return roleRoutes[role] || '/admin/login';

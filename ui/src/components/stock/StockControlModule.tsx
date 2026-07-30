@@ -1,5 +1,6 @@
-import { revalidatePath } from "next/cache";
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { StockBalanceTable } from "@/app/admin/stock/components/StockBalanceTable";
 import { StockInForm } from "@/app/admin/stock/components/StockInForm";
 import { TransferForm } from "@/app/admin/stock/components/TransferForm";
@@ -44,9 +45,19 @@ type StockControlModuleProps = {
   canManage?: boolean;
 };
 
+function getToken(): string {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth_token') || '';
+  }
+  return '';
+}
+
 async function getProducts(): Promise<Product[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/products`, { 
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load products: ${res.status}`);
@@ -57,7 +68,10 @@ async function getProducts(): Promise<Product[]> {
 
 async function getStockBalance(): Promise<StockBalance[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/stock/balance`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/stock/balance`, { 
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -80,7 +94,10 @@ async function getRecentMovements(): Promise<StockMovement[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   try {
-    const allStockItems = await fetch(`${baseUrl}/stock`, { cache: "no-store" });
+    const allStockItems = await fetch(`${baseUrl}/stock`, { 
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
 
     if (!allStockItems.ok) {
       return [];
@@ -114,7 +131,10 @@ async function postStockIn(payload: {
 
   const res = await fetch(`${baseUrl}/stock/purchase`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`
+    },
     body: JSON.stringify(payload),
   });
 
@@ -138,7 +158,10 @@ async function postTransfer(payload: {
 
   const res = await fetch(`${baseUrl}/stock/transfer`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`
+    },
     body: JSON.stringify(payload),
   });
 
@@ -160,7 +183,10 @@ async function postAdjustment(payload: {
 
   const res = await fetch(`${baseUrl}/stock/adjustment`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`
+    },
     body: JSON.stringify(payload),
   });
 
@@ -172,117 +198,166 @@ async function postAdjustment(payload: {
   return res.json();
 }
 
-export async function handleStockIn(formData: FormData) {
-  "use server";
+export function StockControlModule({ role, canManage = true }: StockControlModuleProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [balance, setBalance] = useState<StockBalance[]>([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const productId = String(formData.get("product_id") ?? "").trim();
-  const quantityRaw = String(formData.get("quantity") ?? "").trim();
-  const reference = String(formData.get("reference") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        // Load all data in parallel for faster loading
+        const [productsData, balanceData, movementsData] = await Promise.allSettled([
+          getProducts(),
+          getStockBalance(),
+          getRecentMovements(),
+        ]);
 
-  const quantity = Number(quantityRaw);
+        if (productsData.status === 'fulfilled') {
+          setProducts(productsData.value);
+        } else {
+          setProductsError(productsData.reason instanceof Error ? productsData.reason.message : "Unknown error");
+        }
 
-  if (!productId) throw new Error("Product is required.");
-  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+        if (balanceData.status === 'fulfilled') {
+          setBalance(balanceData.value);
+        } else {
+          setBalanceError(balanceData.reason instanceof Error ? balanceData.reason.message : "Unknown error");
+        }
 
-  await postStockIn({
-    productId,
-    quantity,
-    reference: reference.length ? reference : undefined,
-    notes: notes.length ? notes : undefined,
-  });
+        if (movementsData.status === 'fulfilled') {
+          setMovements(movementsData.value);
+        } else {
+          console.warn("Failed to load movements:", movementsData.reason);
+        }
+      } catch (e) {
+        console.error("Error loading data:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  revalidatePath("/admin/stock");
-  revalidatePath("/manager/stock");
-  revalidatePath("/storekeeper/stock");
-}
+    loadData();
+  }, []);
 
-export async function handleTransfer(formData: FormData) {
-  "use server";
+  const handleStockIn = async (formData: FormData) => {
+    const productId = String(formData.get("product_id") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
 
-  const productId = String(formData.get("productId") ?? "").trim();
-  const quantityRaw = String(formData.get("quantity") ?? "").trim();
-  const fromLocation = String(formData.get("fromLocation") ?? "").trim();
-  const toLocation = String(formData.get("toLocation") ?? "").trim();
-  const reference = String(formData.get("reference") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
+    const quantity = Number(quantityRaw);
 
-  const quantity = Number(quantityRaw);
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
 
-  if (!productId) throw new Error("Product is required.");
-  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-  if (!fromLocation || !toLocation) throw new Error("Both locations are required.");
-  if (fromLocation === toLocation) throw new Error("Source and destination must be different.");
+    await postStockIn({
+      productId,
+      quantity,
+      reference: reference.length ? reference : undefined,
+      notes: notes.length ? notes : undefined,
+    });
 
-  await postTransfer({
-    productId,
-    quantity,
-    fromLocation,
-    toLocation,
-    reference: reference.length ? reference : undefined,
-    notes: notes.length ? notes : undefined,
-  });
+    // Refresh data
+    const balanceData = await getStockBalance();
+    setBalance(balanceData);
+    const movementsData = await getRecentMovements();
+    setMovements(movementsData);
+  };
 
-  revalidatePath("/admin/stock");
-  revalidatePath("/manager/stock");
-  revalidatePath("/storekeeper/stock");
-}
+  const handleTransfer = async (formData: FormData) => {
+    const productId = String(formData.get("productId") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const fromLocation = String(formData.get("fromLocation") ?? "").trim();
+    const toLocation = String(formData.get("toLocation") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
 
-export async function handleAdjustment(formData: FormData) {
-  "use server";
+    const quantity = Number(quantityRaw);
 
-  const productId = String(formData.get("productId") ?? "").trim();
-  const quantityRaw = String(formData.get("quantity") ?? "").trim();
-  const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
-  const reason = String(formData.get("reason") ?? "").trim();
-  const reference = String(formData.get("reference") ?? "").trim();
-  const notes = String(formData.get("notes") ?? "").trim();
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
+    if (!fromLocation || !toLocation) throw new Error("Both locations are required.");
+    if (fromLocation === toLocation) throw new Error("Source and destination must be different.");
 
-  let quantity = Number(quantityRaw);
-  if (adjustmentType === "decrease") {
-    quantity = -quantity;
+    await postTransfer({
+      productId,
+      quantity,
+      fromLocation,
+      toLocation,
+      reference: reference.length ? reference : undefined,
+      notes: notes.length ? notes : undefined,
+    });
+
+    // Refresh data
+    const balanceData = await getStockBalance();
+    setBalance(balanceData);
+    const movementsData = await getRecentMovements();
+    setMovements(movementsData);
+  };
+
+  const handleAdjustment = async (formData: FormData) => {
+    const productId = String(formData.get("productId") ?? "").trim();
+    const quantityRaw = String(formData.get("quantity") ?? "").trim();
+    const adjustmentType = String(formData.get("adjustmentType") ?? "decrease").trim();
+    const reason = String(formData.get("reason") ?? "").trim();
+    const reference = String(formData.get("reference") ?? "").trim();
+    const notes = String(formData.get("notes") ?? "").trim();
+
+    let quantity = Number(quantityRaw);
+    if (adjustmentType === "decrease") {
+      quantity = -quantity;
+    }
+
+    if (!productId) throw new Error("Product is required.");
+    if (!Number.isFinite(quantity) || quantity === 0) throw new Error("Quantity must be non-zero.");
+    if (!reason) throw new Error("Reason is required.");
+    if (!notes) throw new Error("Notes are required for audit trail.");
+
+    await postAdjustment({
+      productId,
+      quantity,
+      reference: reference.length ? reference : undefined,
+      notes: `${reason}: ${notes}`,
+    });
+
+    // Refresh data
+    const balanceData = await getStockBalance();
+    setBalance(balanceData);
+    const movementsData = await getRecentMovements();
+    setMovements(movementsData);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Stock Control</h1>
+          <p className="mt-4 text-sm text-zinc-600">Loading stock data...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!productId) throw new Error("Product is required.");
-  if (!Number.isFinite(quantity) || quantity === 0) throw new Error("Quantity must be non-zero.");
-  if (!reason) throw new Error("Reason is required.");
-  if (!notes) throw new Error("Notes are required for audit trail.");
-
-  await postAdjustment({
-    productId,
-    quantity,
-    reference: reference.length ? reference : undefined,
-    notes: `${reason}: ${notes}`,
-  });
-
-  revalidatePath("/admin/stock");
-  revalidatePath("/manager/stock");
-  revalidatePath("/storekeeper/stock");
-}
-
-export async function StockControlModule({ role, canManage = true }: StockControlModuleProps) {
-  let products: Product[] = [];
-  let balance: StockBalance[] = [];
-  let movements: StockMovement[] = [];
-  let productsError: string | null = null;
-  let balanceError: string | null = null;
-
-  try {
-    products = await getProducts();
-  } catch (e) {
-    productsError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    balance = await getStockBalance();
-  } catch (e) {
-    balanceError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    movements = await getRecentMovements();
-  } catch (e) {
-    console.warn("Failed to load movements:", e);
+  // Check if user is authenticated
+  if (!getToken()) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Authentication Required</h1>
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-700">You need to log in to access the Stock Control module.</p>
+            <a href="/storekeeper/login" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium">
+              Go to Login Page
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const roleLabel = role === "MANAGER" ? "Manager" : role === "STOREKEEPER" ? "Storekeeper" : "Admin";

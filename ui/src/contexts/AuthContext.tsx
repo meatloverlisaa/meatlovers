@@ -81,7 +81,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearAuth();
       setUser(null);
       setIsLoading(false);
-      router.push('/admin/login');
+      // Redirect to appropriate login based on current path
+      const currentPath = window.location.pathname;
+      let loginRoute = '/admin/login';
+      
+      if (currentPath.startsWith('/super-admin')) {
+        loginRoute = '/super-admin/login';
+      } else if (currentPath.startsWith('/storekeeper')) {
+        loginRoute = '/storekeeper/login';
+      } else if (currentPath.startsWith('/accountant')) {
+        loginRoute = '/accountant/login';
+      } else if (currentPath.startsWith('/hr')) {
+        loginRoute = '/hr/login';
+      } else if (currentPath.startsWith('/manager')) {
+        loginRoute = '/manager/login';
+      } else if (currentPath.startsWith('/dispatcher')) {
+        loginRoute = '/dispatcher/login';
+      } else if (currentPath.startsWith('/bar')) {
+        loginRoute = '/bar/login';
+      } else if (currentPath.startsWith('/kitchen')) {
+        loginRoute = '/kitchen/login';
+      } else if (currentPath.startsWith('/cashier')) {
+        loginRoute = '/cashier/login';
+      } else if (currentPath.startsWith('/pos')) {
+        loginRoute = '/pos/login';
+      }
+      
+      router.push(loginRoute);
     }
   }, [router]);
 

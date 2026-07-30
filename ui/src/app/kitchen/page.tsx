@@ -1,4 +1,9 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type KitchenSummary = {
   pending: number;
@@ -10,7 +15,10 @@ type KitchenSummary = {
 async function getKitchenSummary(): Promise<KitchenSummary | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-    const res = await fetch(`${baseUrl}/kitchen/summary`, { cache: "no-store" });
+    const res = await fetch(`${baseUrl}/kitchen/summary`, { 
+      cache: "no-store",
+      headers: getAuthHeader(),
+    });
 
     if (!res.ok) {
       return null;
@@ -23,8 +31,21 @@ async function getKitchenSummary(): Promise<KitchenSummary | null> {
   }
 }
 
-export default async function KitchenDashboardPage() {
-  const summary = await getKitchenSummary();
+export default function KitchenDashboardPage() {
+  const { user, isLoading: authLoading } = useRequireAuth(['CHEF']);
+  const [summary, setSummary] = useState<KitchenSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      async function loadSummary() {
+        const data = await getKitchenSummary();
+        setSummary(data);
+        setLoading(false);
+      }
+      loadSummary();
+    }
+  }, [authLoading, user]);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">

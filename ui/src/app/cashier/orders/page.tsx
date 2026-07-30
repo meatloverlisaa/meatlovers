@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { getAuthHeader } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -28,20 +30,28 @@ type Order = {
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  // Ensure we always return an array
+  return Array.isArray(data) ? data : [];
 }
 
 async function settleOrder(orderId: string): Promise<void> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/orders/${orderId}/status`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ status: "PAID" }),
   });
 
@@ -51,6 +61,8 @@ async function settleOrder(orderId: string): Promise<void> {
 }
 
 export default function CashierOrdersPage() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CASHIER']);
+  
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +73,9 @@ export default function CashierOrdersPage() {
     try {
       setLoading(true);
       const data = await fetchOrders("SERVED");
-      data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      setOrders(data);
+      // Sort by created_at descending (newest first)
+      const sortedData = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setOrders(sortedData);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load orders");

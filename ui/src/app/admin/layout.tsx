@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ChartBarIcon,
   ClipboardDocumentListIcon,
@@ -23,6 +24,7 @@ import {
   CheckCircleIcon,
   ShieldCheckIcon,
   CogIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -68,9 +70,71 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
-  // Mock user role - in production, get from auth context
-  const userRole = "SUPER_ADMIN";
+  // Session timeout (30 minutes of inactivity)
+  const SESSION_TIMEOUT = 30 * 60 * 1000;
+
+  useEffect(() => {
+    const checkActivity = () => {
+      const now = Date.now();
+      const inactiveTime = now - lastActivity;
+      
+      if (inactiveTime > SESSION_TIMEOUT) {
+        setShowSecurityWarning(true);
+      }
+    };
+
+    const activityInterval = setInterval(checkActivity, 60000); // Check every minute
+    
+    // Track user activity
+    const handleActivity = () => {
+      setLastActivity(Date.now());
+      if (showSecurityWarning) {
+        setShowSecurityWarning(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('click', handleActivity);
+
+    return () => {
+      clearInterval(activityInterval);
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('click', handleActivity);
+    };
+  }, [lastActivity, showSecurityWarning]);
+
+  // Redirect if not authenticated or not admin role
+  useEffect(() => {
+    if (!user) {
+      router.push('/admin/login');
+      return;
+    }
+
+    const adminRoles = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'HR'];
+    if (!adminRoles.includes(user.role)) {
+      router.push('/');
+      return;
+    }
+  }, [user, router]);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/admin/login');
+  };
+
+  const handleContinueSession = () => {
+    setLastActivity(Date.now());
+    setShowSecurityWarning(false);
+  };
+
+  const userRole = user?.role || "";
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
@@ -126,12 +190,21 @@ export default function AdminLayout({
         <div className="border-t border-zinc-200 p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-800">
-              A
+              {user?.full_name?.charAt(0) || 'A'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-zinc-950">Admin User</p>
+              <p className="text-sm font-bold text-zinc-950">{user?.full_name || 'Admin User'}</p>
               <p className="text-xs text-zinc-500">{userRole}</p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="rounded-lg border border-zinc-200 p-2 text-zinc-600 hover:bg-zinc-100"
+              title="Logout"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </aside>
@@ -175,6 +248,42 @@ export default function AdminLayout({
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+
+      {/* Security Warning Modal */}
+      {showSecurityWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                <ExclamationTriangleIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Session Timeout Warning</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">Your session is about to expire</p>
+              </div>
+            </div>
+            
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-6">
+              You have been inactive for 30 minutes. For security purposes, your session will expire soon. Please continue your session or log out.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleContinueSession}
+                className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+              >
+                Continue Session
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
