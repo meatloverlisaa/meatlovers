@@ -242,12 +242,12 @@ export default function SystemDiagnosticsPage() {
               <div className="flex items-center">
                 {getStatusIcon(summary.systemStatus)}
                 <h2 className="text-xl font-semibold ml-3">
-                  System Status: {summary.systemStatus}
+                  System Status: {summary.systemStatus || 'N/A'}
                 </h2>
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium">Uptime</p>
-                <p className="text-2xl font-bold">{formatUptime(summary.uptime)}</p>
+                <p className="text-2xl font-bold">{summary.uptime ? formatUptime(summary.uptime) : 'N/A'}</p>
               </div>
             </div>
           </div>
@@ -266,11 +266,11 @@ export default function SystemDiagnosticsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total:</span>
-                  <span className="font-semibold">{summary.totalOrders.toLocaleString()}</span>
+                  <span className="font-semibold">{summary.totalOrders?.toLocaleString() || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Pending:</span>
-                  <span className="font-semibold text-yellow-600">{summary.pendingOrders}</span>
+                  <span className="font-semibold text-yellow-600">{summary.pendingOrders || 0}</span>
                 </div>
               </div>
             </div>
@@ -285,11 +285,11 @@ export default function SystemDiagnosticsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Products:</span>
-                  <span className="font-semibold">{summary.totalProducts}</span>
+                  <span className="font-semibold">{summary.totalProducts || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Low Stock:</span>
-                  <span className="font-semibold text-red-600">{summary.lowStockItems}</span>
+                  <span className="font-semibold text-red-600">{summary.lowStockItems || 0}</span>
                 </div>
               </div>
             </div>
@@ -304,11 +304,11 @@ export default function SystemDiagnosticsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Users:</span>
-                  <span className="font-semibold">{summary.totalUsers}</span>
+                  <span className="font-semibold">{summary.totalUsers || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Customers:</span>
-                  <span className="font-semibold">{summary.totalCustomers}</span>
+                  <span className="font-semibold">{summary.totalCustomers || 0}</span>
                 </div>
               </div>
             </div>
