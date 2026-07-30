@@ -10,7 +10,8 @@ import { Role } from '@prisma/client';
  * MANAGER can view website content but cannot create, edit, or publish
  */
 @Controller('manager/cms')
-@Public()
+@UseGuards(JwtAuthGuard)
+@Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
 export class ManagerCmsController {
   constructor(private readonly managerCmsService: ManagerCmsService) {}
 

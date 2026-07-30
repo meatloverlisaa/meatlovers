@@ -17,7 +17,8 @@ import { Role, OrderStatus } from '@prisma/client';
  * MANAGER can view all orders, order details, and history but CANNOT modify orders
  */
 @Controller('manager/orders')
-@Public()
+@UseGuards(JwtAuthGuard)
+@Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
 export class ManagerOrdersController {
   constructor(private readonly managerOrdersService: ManagerOrdersService) {}
 

@@ -17,7 +17,8 @@ import { Role } from '@prisma/client';
  * MANAGER can view products and inventory but cannot create, edit, or delete
  */
 @Controller('manager/products')
-@Public()
+@UseGuards(JwtAuthGuard)
+@Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
 export class ManagerProductsController {
   constructor(
     private readonly managerProductsService: ManagerProductsService,

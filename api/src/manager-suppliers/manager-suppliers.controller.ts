@@ -24,7 +24,8 @@ import { Role, SupplierType, SupplierStatus } from '@prisma/client';
  * MANAGER can view, create, edit, and manage all supplier relationships
  */
 @Controller('manager/suppliers')
-@Public()
+@UseGuards(JwtAuthGuard)
+@Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
 export class ManagerSuppliersController {
   constructor(
     private readonly managerSuppliersService: ManagerSuppliersService,

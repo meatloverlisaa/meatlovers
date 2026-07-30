@@ -17,7 +17,8 @@ import { Role, MovementType, ProductCategory } from '@prisma/client';
  * MANAGER can view stock levels, movements, and alerts but CANNOT make adjustments
  */
 @Controller('manager/stock')
-@Public()
+@UseGuards(JwtAuthGuard)
+@Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
 export class ManagerStockController {
   constructor(private readonly managerStockService: ManagerStockService) {}
 
