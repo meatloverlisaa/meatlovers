@@ -20,13 +20,24 @@ type Order = {
   }>;
 };
 
-async function fetchServedOrders(): Promise<Order[]> {
+async function fetchServedOrders(retryCount = 0): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   
-  const res = await fetch(`${baseUrl}/orders?status=SERVED`, { 
+  const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, { 
     cache: "no-store",
     headers: getAuthHeader(),
   });
+
+  // Handle rate limiting with exponential backoff
+  if (res.status === 429) {
+    if (retryCount < 5) {
+      const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchServedOrders(retryCount + 1);
+    }
+    throw new Error(`Rate limit exceeded. Please wait a moment and try again.`);
+  }
+
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }

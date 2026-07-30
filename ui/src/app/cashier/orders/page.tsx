@@ -27,13 +27,24 @@ type Order = {
   }>;
 };
 
-async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
+async function fetchOrders(status?: OrderStatus, retryCount = 0): Promise<Order[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
+  const url = status ? `${baseUrl}/orders/all?status=${status}` : `${baseUrl}/orders/all`;
+  
   const res = await fetch(url, { 
     cache: "no-store",
     headers: getAuthHeader(),
   });
+
+  // Handle rate limiting with exponential backoff
+  if (res.status === 429) {
+    if (retryCount < 5) {
+      const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchOrders(status, retryCount + 1);
+    }
+    throw new Error(`Rate limit exceeded. Please wait a moment and try again.`);
+  }
 
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
@@ -68,9 +79,13 @@ export default function CashierOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Prevent concurrent requests
 
   async function loadOrders() {
+    if (isLoading) return; // Prevent concurrent requests
+    
     try {
+      setIsLoading(true);
       setLoading(true);
       const data = await fetchOrders("SERVED");
       // Sort by created_at descending (newest first)
@@ -81,13 +96,15 @@ export default function CashierOrdersPage() {
       setError(e instanceof Error ? e.message : "Failed to load orders");
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
     void loadOrders();
-    const interval = setInterval(() => void loadOrders(), 15000);
-    return () => clearInterval(interval);
+    // Disabled auto-refresh to prevent rate limiting - user can manually refresh
+    // const interval = setInterval(() => void loadOrders(), 60000);
+    // return () => clearInterval(interval);
   }, []);
 
   const filteredOrders = useMemo(() => {
@@ -130,6 +147,16 @@ export default function CashierOrdersPage() {
               Settle served orders and confirm payment collection.
             </p>
           </div>
+          <button
+            onClick={() => void loadOrders()}
+            disabled={isLoading}
+            className="rounded-xl border border-zinc-200 bg-white p-2 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900 disabled:opacity-50"
+            title="Refresh orders"
+          >
+            <svg className={`h-5 w-5 text-zinc-600 dark:text-zinc-300 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
         </div>
 
         <div className="mb-4 rounded-2xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
