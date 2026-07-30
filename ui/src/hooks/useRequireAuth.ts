@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoginRoute } from '@/lib/auth';
+import { getLoginRoute, getDashboardRoute } from '@/lib/auth';
 
 /**
  * Hook to protect routes that require authentication
@@ -50,9 +50,9 @@ export function useRequireAuth(allowedRoles?: string[]) {
       // Check if user has required role
       if (allowedRoles && allowedRoles.length > 0) {
         if (!allowedRoles.includes(user.role)) {
-          // User doesn't have required role, redirect to their appropriate login
-          const loginRoute = getLoginRoute(user.role);
-          router.push(loginRoute);
+          // User doesn't have required role, redirect to their appropriate dashboard
+          const dashboardRoute = getDashboardRoute(user.role);
+          router.push(dashboardRoute);
         }
       }
     }

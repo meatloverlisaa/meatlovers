@@ -1,9 +1,37 @@
 import { PrismaClient, PageType, LeadSource, LeadStatus, ProductCategory, PricingRuleType } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting seed...');
+
+  // ─── seed_superadmin_user ────────────────────────────────────────────────
+  const existingSuperAdmin = await prisma.user.findFirst({
+    where: { role: 'SUPER_ADMIN' }
+  });
+
+  if (!existingSuperAdmin) {
+    const hashedPassword = await bcrypt.hash('Admin@1234', 10);
+    
+    const superAdmin = await prisma.user.create({
+      data: {
+        full_name: 'Super Administrator',
+        email: 'superadmin@meatlovers.com',
+        phone: '+254799999999',
+        role: 'SUPER_ADMIN',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Super Admin user created');
+    console.log('    Email: superadmin@meatlovers.com');
+    console.log('    Phone: +254799999999');
+    console.log('    Password: Admin@1234');
+  } else {
+    console.log('  ↳ Super Admin user already exists');
+  }
 
   // ─── seed_homepage_content ───────────────────────────────────────────────
   const contentPages = [

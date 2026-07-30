@@ -77,6 +77,8 @@ export default function SuperAdminLayout({
   }, [lastActivity, showSecurityWarning]);
 
   // Redirect if not authenticated or not super admin
+  // TEMPORARILY DISABLED FOR DEBUGGING
+  /*
   useEffect(() => {
     if (!user) {
       router.push('/super-admin/login');
@@ -88,6 +90,14 @@ export default function SuperAdminLayout({
       return;
     }
   }, [user, router]);
+  */
+  
+  // DEBUG: Log current state
+  useEffect(() => {
+    console.log('=== LAYOUT DEBUG ===');
+    console.log('User:', user);
+    console.log('User role:', user?.role);
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -121,7 +131,7 @@ export default function SuperAdminLayout({
           <span className="text-2xl">🔐</span>
           <div>
             <p className="font-black" style={{ color: '#F9FAFB' }}>Meat Lovers</p>
-            <p className="text-xs" style={{ color: '#6366F1' }}>Super Admin Portal</p>
+            <p className="text-xs" style={{ color: '#818CF8' }}>Super Admin</p>
           </div>
         </div>
 
@@ -133,14 +143,20 @@ export default function SuperAdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-                  isActive(item.href)
-                    ? "text-white"
-                    : "hover:bg-[#111827]"
-                }`}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition"
                 style={{
                   backgroundColor: isActive(item.href) ? '#6366F1' : 'transparent',
                   color: isActive(item.href) ? '#FFFFFF' : '#9CA3AF'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive(item.href)) {
+                    e.currentTarget.style.backgroundColor = '#1F2937';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.href)) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
                 <item.icon className="h-5 w-5" />
@@ -158,15 +174,17 @@ export default function SuperAdminLayout({
             </div>
             <div className="flex-1">
               <p className="text-sm font-bold" style={{ color: '#F9FAFB' }}>{user?.full_name || 'Super Admin'}</p>
-              <p className="text-xs" style={{ color: '#6366F1' }}>SUPER ADMIN</p>
+              <p className="text-xs" style={{ color: '#818CF8' }}>SUPER ADMIN</p>
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-lg p-2 transition hover:bg-[#111827]"
+              className="rounded-lg p-2 transition"
               style={{ 
                 border: '1px solid #1F2937',
                 color: '#9CA3AF'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1F2937'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

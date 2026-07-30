@@ -36,4 +36,34 @@ export class MonitoringController {
   getActiveUsers() {
     return this.monitoringService.getActiveUsers();
   }
+
+  @Get('pl-today')
+  getPlToday() {
+    return this.monitoringService.getPlToday();
+  }
+
+  @Get('orders')
+  getOpenOrders() {
+    return this.monitoringService.getOpenOrders();
+  }
+
+  @Get('kitchen-bar')
+  getKitchenBarQueue() {
+    return this.monitoringService.getKitchenBarQueue();
+  }
+
+  @Get('risk-alerts')
+  getRiskAlerts() {
+    return this.monitoringService.getRiskAlerts();
+  }
+
+  @Get('stock-alerts')
+  getStockAlerts() {
+    return this.monitoringService.getStockAlerts();
+  }
+
+  @Get('delivery')
+  getDeliveryStatus() {
+    return this.monitoringService.getDeliveryStatus();
+  }
 }

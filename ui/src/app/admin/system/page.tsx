@@ -80,19 +80,45 @@ export default function SystemDiagnosticsPage() {
   const fetchData = async () => {
     try {
       setError(null);
+      
+      // Get auth token from localStorage
+      const token = localStorage.getItem('auth_token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const [summaryRes, dbRes, healthRes, perfRes, usersRes] = await Promise.all([
-        fetch(`${API_BASE}/monitoring/summary`),
-        fetch(`${API_BASE}/monitoring/database`),
-        fetch(`${API_BASE}/monitoring/api-health`),
-        fetch(`${API_BASE}/monitoring/performance`),
-        fetch(`${API_BASE}/monitoring/active-users`),
+        fetch(`${API_BASE}/monitoring/summary`, { headers }),
+        fetch(`${API_BASE}/monitoring/database`, { headers }),
+        fetch(`${API_BASE}/monitoring/api-health`, { headers }),
+        fetch(`${API_BASE}/monitoring/performance`, { headers }),
+        fetch(`${API_BASE}/monitoring/active-users`, { headers }),
       ]);
 
-      if (summaryRes.ok) setSummary(await summaryRes.json());
-      if (dbRes.ok) setDatabase(await dbRes.json());
-      if (healthRes.ok) setApiHealth(await healthRes.json());
-      if (perfRes.ok) setPerformance(await perfRes.json());
-      if (usersRes.ok) setActiveUsers(await usersRes.json());
+      if (summaryRes.ok) {
+        const data = await summaryRes.json();
+        setSummary(data.data || data);
+      }
+      if (dbRes.ok) {
+        const data = await dbRes.json();
+        setDatabase(data.data || data);
+      }
+      if (healthRes.ok) {
+        const data = await healthRes.json();
+        setApiHealth(data.data || data);
+      }
+      if (perfRes.ok) {
+        const data = await perfRes.json();
+        setPerformance(data.data || data);
+      }
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        setActiveUsers(data.data || data);
+      }
 
       setLastUpdated(new Date());
     } catch (err) {
@@ -114,7 +140,9 @@ export default function SystemDiagnosticsPage() {
     return `${hours}h ${minutes}m`;
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | undefined) => {
+    if (!status) return 'text-gray-600 bg-gray-50 border-gray-200';
+    
     switch (status.toUpperCase()) {
       case 'OPERATIONAL':
       case 'HEALTHY':
@@ -130,7 +158,9 @@ export default function SystemDiagnosticsPage() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string | undefined) => {
+    if (!status) return <ServerIcon className="w-5 h-5" />;
+    
     switch (status.toUpperCase()) {
       case 'OPERATIONAL':
       case 'HEALTHY':
@@ -292,24 +322,24 @@ export default function SystemDiagnosticsPage() {
               <CircleStackIcon className="w-6 h-6 text-blue-600" />
               <h2 className="text-xl font-semibold text-gray-900 ml-3">Database Metrics</h2>
               <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(database.status)}`}>
-                {database.status}
+                {database.status || 'N/A'}
               </span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div>
                 <p className="text-gray-600 text-sm">Total Records</p>
-                <p className="text-2xl font-bold text-gray-900">{database.totalRecords.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">{database.totalRecords?.toLocaleString() || 0}</p>
               </div>
               <div>
                 <p className="text-gray-600 text-sm">Tables</p>
-                <p className="text-2xl font-bold text-gray-900">{database.tables.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{database.tables?.length || 0}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {database.tables.map((table) => (
+              {database.tables?.map((table) => (
                 <div key={table.name} className="bg-gray-50 rounded p-3">
                   <p className="text-xs text-gray-600">{table.name}</p>
-                  <p className="text-lg font-semibold text-gray-900">{table.count.toLocaleString()}</p>
+                  <p className="text-lg font-semibold text-gray-900">{table.count?.toLocaleString() || 0}</p>
                 </div>
               ))}
             </div>
@@ -323,26 +353,26 @@ export default function SystemDiagnosticsPage() {
               <CpuChipIcon className="w-6 h-6 text-green-600" />
               <h2 className="text-xl font-semibold text-gray-900 ml-3">API Health</h2>
               <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(apiHealth.status)}`}>
-                {apiHealth.status}
+                {apiHealth.status || 'N/A'}
               </span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
                 <p className="text-gray-600 text-sm">Version</p>
-                <p className="text-lg font-semibold text-gray-900">{apiHealth.version}</p>
+                <p className="text-lg font-semibold text-gray-900">{apiHealth.version || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600 text-sm">Environment</p>
-                <p className="text-lg font-semibold text-gray-900">{apiHealth.environment}</p>
+                <p className="text-lg font-semibold text-gray-900">{apiHealth.environment || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600 text-sm">Uptime</p>
-                <p className="text-lg font-semibold text-gray-900">{formatUptime(apiHealth.uptime)}</p>
+                <p className="text-lg font-semibold text-gray-900">{apiHealth.uptime ? formatUptime(apiHealth.uptime) : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600 text-sm">Memory (Heap)</p>
                 <p className="text-lg font-semibold text-gray-900">
-                  {apiHealth.memory.heapUsed}/{apiHealth.memory.heapTotal} MB
+                  {apiHealth.memory ? `${apiHealth.memory.heapUsed}/${apiHealth.memory.heapTotal} MB` : 'N/A'}
                 </p>
               </div>
             </div>
