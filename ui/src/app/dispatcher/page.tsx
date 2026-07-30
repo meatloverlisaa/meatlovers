@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { getAuthHeader } from "@/lib/auth";
 
 interface Rider {
   id: string;
@@ -72,19 +73,32 @@ export default function DispatcherDashboard() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (retryCount = 0) => {
     try {
       setError(null);
 
       const params = new URLSearchParams();
       if (statusFilter) params.append("status", statusFilter);
 
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+
       const [ridersRes, availableRes, deliveriesRes, summaryRes] = await Promise.all([
-        fetch("http://localhost:3001/riders"),
-        fetch("http://localhost:3001/riders/available"),
-        fetch(`http://localhost:3001/deliveries?${params.toString()}`),
-        fetch("http://localhost:3001/deliveries/summary"),
+        fetch(`${baseUrl}/riders`, { headers: getAuthHeader() }),
+        fetch(`${baseUrl}/riders/available`, { headers: getAuthHeader() }),
+        fetch(`${baseUrl}/deliveries?${params.toString()}`, { headers: getAuthHeader() }),
+        fetch(`${baseUrl}/deliveries/summary`, { headers: getAuthHeader() }),
       ]);
+
+      // Handle rate limiting
+      if (ridersRes.status === 429 || availableRes.status === 429 || 
+          deliveriesRes.status === 429 || summaryRes.status === 429) {
+        if (retryCount < 3) {
+          const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return fetchDashboardData(retryCount + 1);
+        }
+        throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+      }
 
       if (ridersRes.ok) {
         const data = await ridersRes.json();
@@ -107,7 +121,7 @@ export default function DispatcherDashboard() {
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
-      setError("Failed to load dashboard data");
+      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -116,18 +130,21 @@ export default function DispatcherDashboard() {
   useEffect(() => {
     fetchDashboardData();
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchDashboardData, 30000);
-
-    return () => clearInterval(interval);
+    // Disabled auto-refresh to prevent rate limiting - user can manually refresh
+    // const interval = setInterval(fetchDashboardData, 30000);
+    // return () => clearInterval(interval);
   }, [statusFilter]);
 
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3001/deliveries", {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+      const res = await fetch(`${baseUrl}/deliveries`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify({
           order_id: selectedOrderId,
           rider_id: selectedRiderId,
@@ -153,9 +170,13 @@ export default function DispatcherDashboard() {
 
   const handleStatusUpdate = async (deliveryId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/deliveries/${deliveryId}/status`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+      const res = await fetch(`${baseUrl}/deliveries/${deliveryId}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -215,7 +236,7 @@ export default function DispatcherDashboard() {
             </p>
           </div>
           <button
-            onClick={fetchDashboardData}
+            onClick={() => void fetchDashboardData()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Refresh
