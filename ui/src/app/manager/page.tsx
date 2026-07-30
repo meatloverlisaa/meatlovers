@@ -47,8 +47,12 @@ async function fetchManagerStats(): Promise<DashboardStats> {
       headers 
     });
     
-    const orders: ManagerOrder[] = ordersRes.ok ? await ordersRes.json() : [];
-    const stockAlerts: unknown[] = stockRes.ok ? await stockRes.json() : [];
+    const ordersData = ordersRes.ok ? await ordersRes.json() : [];
+    const stockData = stockRes.ok ? await stockRes.json() : [];
+    
+    // Ensure orders is an array
+    const orders: ManagerOrder[] = Array.isArray(ordersData) ? ordersData : [];
+    const stockAlerts: unknown[] = Array.isArray(stockData) ? stockData : [];
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -62,7 +66,7 @@ async function fetchManagerStats(): Promise<DashboardStats> {
         .reduce((sum, order) => sum + Number(order.total_amount ?? 0), 0)
         .toFixed(2),
       staffOnDuty: 0, // Placeholder
-      lowStockItems: Array.isArray(stockAlerts) ? stockAlerts.length : 0,
+      lowStockItems: stockAlerts.length,
       readyOrders: orders.filter((order) => order.status === "READY").length,
     };
   } catch (error) {
