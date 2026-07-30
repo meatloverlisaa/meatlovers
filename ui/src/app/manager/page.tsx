@@ -70,18 +70,18 @@ function QuickActionCard({
   icon: React.ReactNode;
   variant?: "default" | "primary";
 }) {
-  const baseClasses = "flex items-center justify-between rounded-2xl border p-5 shadow-sm transition";
+  const baseClasses = "flex items-center justify-between rounded-2xl border p-5 shadow-sm transition hover:shadow-md";
   const variantClasses = variant === "primary"
-    ? "border-zinc-200 bg-zinc-900 hover:bg-zinc-800 dark:border-zinc-800 dark:bg-zinc-50"
-    : "border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900";
+    ? "border-[#0284C7]/20 bg-[#0F172A] hover:bg-[#0F172A]/90 dark:border-[#38BDF8]/20 dark:bg-[#0A0E1A]"
+    : "border-[#0284C7]/10 bg-white hover:bg-[#F8FAFC] dark:border-[#38BDF8]/10 dark:bg-[#151F32] dark:hover:bg-[#151F32]/80";
   
   const textClasses = variant === "primary"
-    ? "text-white dark:text-zinc-900"
-    : "text-zinc-900 dark:text-zinc-50";
+    ? "text-white dark:text-white"
+    : "text-[#0F172A] dark:text-white";
   
   const subtextClasses = variant === "primary"
-    ? "text-zinc-300 dark:text-zinc-600"
-    : "text-zinc-600 dark:text-zinc-300";
+    ? "text-white/70 dark:text-white/70"
+    : "text-[#0F172A]/60 dark:text-white/60";
   
   return (
     <Link href={href} className={`${baseClasses} ${variantClasses}`}>
@@ -110,34 +110,42 @@ function StatCard({
   href?: string;
 }) {
   const colors = {
-    zinc: "bg-zinc-100 dark:bg-zinc-900",
-    green: "bg-green-100 dark:bg-green-950/30",
-    blue: "bg-blue-100 dark:bg-blue-950/30",
-    amber: "bg-amber-100 dark:bg-amber-950/30",
-    red: "bg-red-100 dark:bg-red-950/30",
+    zinc: "bg-[#0284C7]/10 dark:bg-[#38BDF8]/10",
+    green: "bg-[#16A34A]/10 dark:bg-[#4ADE80]/10",
+    blue: "bg-[#0284C7]/10 dark:bg-[#38BDF8]/10",
+    amber: "bg-[#EA580C]/10 dark:bg-[#FB923C]/10",
+    red: "bg-[#EA580C]/10 dark:bg-[#FB923C]/10",
+  };
+
+  const iconColors = {
+    zinc: "text-[#0284C7] dark:text-[#38BDF8]",
+    green: "text-[#16A34A] dark:text-[#4ADE80]",
+    blue: "text-[#0284C7] dark:text-[#38BDF8]",
+    amber: "text-[#EA580C] dark:text-[#FB923C]",
+    red: "text-[#EA580C] dark:text-[#FB923C]",
   };
   
   const content = (
     <>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{title}</div>
-          <div className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-50">{value}</div>
+          <div className="text-xs font-medium text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">{title}</div>
+          <div className="mt-2 text-3xl font-bold text-[#0F172A] dark:text-white">{value}</div>
           {subtitle && (
-            <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{subtitle}</div>
+            <div className="mt-1 text-xs text-[#0F172A]/50 dark:text-white/50">{subtitle}</div>
           )}
         </div>
         <div className={`rounded-xl p-3 ${colors[color]}`}>
-          {icon}
+          <div className={iconColors[color]}>{icon}</div>
         </div>
       </div>
     </>
   );
   
-  const baseClasses = "rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950";
+  const baseClasses = "rounded-2xl border border-[#0284C7]/10 bg-white p-5 shadow-sm dark:border-[#38BDF8]/10 dark:bg-[#151F32]";
   
   return href ? (
-    <Link href={href} className={`${baseClasses} hover:shadow-md transition`}>
+    <Link href={href} className={`${baseClasses} hover:shadow-md transition hover:border-[#0284C7]/30 dark:hover:border-[#38BDF8]/30`}>
       {content}
     </Link>
   ) : (
@@ -189,12 +197,12 @@ export default function ManagerDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17]">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Manager Dashboard</h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+          <h1 className="text-3xl font-bold text-[#0F172A] dark:text-white">Manager Dashboard</h1>
+          <p className="mt-2 text-sm text-[#0F172A]/70 dark:text-white/70">
             Oversee operations, manage staff, and monitor performance
           </p>
         </div>
@@ -282,21 +290,21 @@ export default function ManagerDashboard() {
 
         {/* Error State */}
         {error && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+          <div className="mb-6 rounded-2xl border border-[#EA580C]/20 bg-[#EA580C]/10 px-4 py-3 text-sm text-[#EA580C] dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10 dark:text-[#FB923C]">
             {error}
           </div>
         )}
 
         {/* Stats Grid */}
         <div className="mb-6">
-          <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">Operations Overview</h2>
+          <h2 className="mb-4 text-xl font-semibold text-[#0F172A] dark:text-white">Operations Overview</h2>
           
           {loading ? (
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-32 animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="h-32 animate-pulse rounded-2xl border border-[#0284C7]/10 bg-[#0284C7]/5 dark:border-[#38BDF8]/10 dark:bg-[#38BDF8]/5"
                 />
               ))}
             </div>
@@ -308,7 +316,7 @@ export default function ManagerDashboard() {
                 subtitle="In progress"
                 href="/admin/orders"
                 icon={
-                  <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 }
@@ -321,7 +329,7 @@ export default function ManagerDashboard() {
                 subtitle="Awaiting service"
                 href="/admin/orders?status=READY"
                 icon={
-                  <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
@@ -334,7 +342,7 @@ export default function ManagerDashboard() {
                 subtitle="Require action"
                 href="/admin/approvals"
                 icon={
-                  <svg className="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 }
@@ -347,7 +355,7 @@ export default function ManagerDashboard() {
                 subtitle="Need reorder"
                 href="/admin/stock?filter=low"
                 icon={
-                  <svg className="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 }
@@ -360,7 +368,7 @@ export default function ManagerDashboard() {
                 subtitle="Total collected"
                 href="/manager/payments"
                 icon={
-                  <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
@@ -373,10 +381,11 @@ export default function ManagerDashboard() {
                 subtitle="Active now"
                 href="/admin/staff"
                 icon={
-                  <svg className="h-5 w-5 text-zinc-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 }
+                color="zinc"
               />
             </div>
           )}
@@ -387,25 +396,25 @@ export default function ManagerDashboard() {
           {/* Left Column */}
           <div className="space-y-6">
             {/* Alerts */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Alerts & Notifications</h3>
+            <div className="rounded-2xl border border-[#0284C7]/10 bg-white p-6 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+              <h3 className="text-lg font-semibold text-[#0F172A] dark:text-white">Alerts & Notifications</h3>
               <div className="mt-4 space-y-3">
                 {stats.lowStockItems > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-900/50 dark:bg-red-950/30">
-                    <svg className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-start gap-3 rounded-xl border border-[#EA580C]/20 bg-[#EA580C]/10 p-3 dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10">
+                    <svg className="h-5 w-5 shrink-0 text-[#EA580C] dark:text-[#FB923C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <div className="flex-1">
-                      <div className="text-sm font-semibold text-red-800 dark:text-red-200">
+                      <div className="text-sm font-semibold text-[#EA580C] dark:text-[#FB923C]">
                         Low Stock Alert
                       </div>
-                      <div className="mt-1 text-xs text-red-700 dark:text-red-300">
+                      <div className="mt-1 text-xs text-[#EA580C]/80 dark:text-[#FB923C]/80">
                         {stats.lowStockItems} items below reorder level
                       </div>
                     </div>
                     <Link
                       href="/admin/stock?filter=low"
-                      className="text-xs font-semibold text-red-600 hover:text-red-700 dark:text-red-400"
+                      className="text-xs font-semibold text-[#EA580C] hover:text-[#EA580C]/80 dark:text-[#FB923C]"
                     >
                       View →
                     </Link>
@@ -413,21 +422,21 @@ export default function ManagerDashboard() {
                 )}
                 
                 {stats.readyOrders > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-3 dark:border-green-900/50 dark:bg-green-950/30">
-                    <svg className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-start gap-3 rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/10 p-3 dark:border-[#4ADE80]/20 dark:bg-[#4ADE80]/10">
+                    <svg className="h-5 w-5 shrink-0 text-[#16A34A] dark:text-[#4ADE80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div className="flex-1">
-                      <div className="text-sm font-semibold text-green-800 dark:text-green-200">
+                      <div className="text-sm font-semibold text-[#16A34A] dark:text-[#4ADE80]">
                         Orders Ready
                       </div>
-                      <div className="mt-1 text-xs text-green-700 dark:text-green-300">
+                      <div className="mt-1 text-xs text-[#16A34A]/80 dark:text-[#4ADE80]/80">
                         {stats.readyOrders} orders waiting for service
                       </div>
                     </div>
                     <Link
                       href="/admin/orders?status=READY"
-                      className="text-xs font-semibold text-green-600 hover:text-green-700 dark:text-green-400"
+                      className="text-xs font-semibold text-[#16A34A] hover:text-[#16A34A]/80 dark:text-[#4ADE80]"
                     >
                       View →
                     </Link>
@@ -435,11 +444,11 @@ export default function ManagerDashboard() {
                 )}
                 
                 {stats.lowStockItems === 0 && stats.readyOrders === 0 && (
-                  <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
-                    <svg className="mx-auto h-10 w-10 text-zinc-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="rounded-xl border border-[#0284C7]/10 bg-[#0284C7]/5 p-8 text-center dark:border-[#38BDF8]/10 dark:bg-[#38BDF8]/5">
+                    <svg className="mx-auto h-10 w-10 text-[#0284C7]/30 dark:text-[#38BDF8]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">No urgent alerts</p>
+                    <p className="mt-2 text-sm text-[#0F172A]/60 dark:text-white/60">No urgent alerts</p>
                   </div>
                 )}
               </div>
@@ -449,54 +458,54 @@ export default function ManagerDashboard() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Quick Links */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Management Tools</h3>
+            <div className="rounded-2xl border border-[#0284C7]/10 bg-white p-6 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
+              <h3 className="text-lg font-semibold text-[#0F172A] dark:text-white">Management Tools</h3>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Link
                   href="/manager/products"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Products
                 </Link>
                 <Link
                   href="/manager/suppliers"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Suppliers
                 </Link>
                 <Link
                   href="/manager/payments"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Payments
                 </Link>
                 <Link
                   href="/manager/production-plans"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Production Plans
                 </Link>
                 <Link
                   href="/admin/waste"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Waste Log
                 </Link>
                 <Link
                   href="/admin/delivery-tracking"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Deliveries
                 </Link>
                 <Link
                   href="/manager/cms"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Website CMS
                 </Link>
                 <Link
                   href="/admin/kitchen"
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-center text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-[#0284C7]/10 bg-[#F8FAFC] p-3 text-center text-sm font-medium text-[#0F172A] hover:bg-[#0284C7]/10 hover:border-[#0284C7]/30 transition dark:border-[#38BDF8]/10 dark:bg-[#0A0E1A] dark:text-white dark:hover:bg-[#0A0E1A]/80"
                 >
                   Kitchen
                 </Link>
