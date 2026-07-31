@@ -69,21 +69,7 @@ interface DeliveryStatus {
 }
 
 export default function SuperAdminDashboard() {
-  // Temporarily commented out to debug
-  // useRequireAuth(['SUPER_ADMIN']);
-  
-  // Debug: Log auth state
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    const userData = localStorage.getItem('user_data');
-    console.log('=== DEBUG INFO ===');
-    console.log('Token exists:', !!token);
-    console.log('User data:', userData);
-    if (userData) {
-      const user = JSON.parse(userData);
-      console.log('User role:', user.role);
-    }
-  }, []);
+  useRequireAuth(['SUPER_ADMIN']);
   
   const [summary, setSummary] = useState<MonitoringSummary>({
     currentSales: 0,

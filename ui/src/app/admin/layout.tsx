@@ -75,8 +75,8 @@ export default function AdminLayout({
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
-  // Session timeout (30 minutes of inactivity)
-  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  // Session timeout (15 minutes of inactivity)
+  const SESSION_TIMEOUT = 15 * 60 * 1000;
 
   useEffect(() => {
     const checkActivity = () => {
@@ -283,7 +283,7 @@ export default function AdminLayout({
             </div>
             
             <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>
-              You have been inactive for 30 minutes. For security purposes, your session will expire soon. Please continue your session or log out.
+              You have been inactive for 15 minutes. For security purposes, your session will expire soon. Please continue your session or log out.
             </p>
 
             <div className="flex gap-3">

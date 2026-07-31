@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export default function BarDebugPage() {
-  const [debug, setDebug] = useState<any>({});
+  const [debug, setDebug] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const authToken = localStorage.getItem('auth_token');
@@ -26,8 +26,8 @@ export default function BarDebugPage() {
           'Authorization': `Bearer ${authToken}`,
         },
       })
-        .then(res => {
-          setDebug(prev => ({
+        .then((res) => {
+          setDebug((prev: Record<string, any>) => ({
             ...prev,
             apiTest: {
               status: res.status,
@@ -37,14 +37,14 @@ export default function BarDebugPage() {
           }));
           return res.json();
         })
-        .then(data => {
-          setDebug(prev => ({
+        .then((data) => {
+          setDebug((prev: Record<string, any>) => ({
             ...prev,
             apiData: data,
           }));
         })
-        .catch(err => {
-          setDebug(prev => ({
+        .catch((err: Error) => {
+          setDebug((prev: Record<string, any>) => ({
             ...prev,
             apiError: err.message,
           }));

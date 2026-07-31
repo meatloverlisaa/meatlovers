@@ -6,6 +6,8 @@
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const USER_KEY = 'user_data';
+const LAST_ACTIVITY_KEY = 'auth_last_activity';
+export const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
 
 export interface User {
   id: string;
@@ -81,6 +83,24 @@ export const clearAuth = (): void => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(LAST_ACTIVITY_KEY);
+};
+
+export const touchSession = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+};
+
+export const hasSessionExpired = (): boolean => {
+  if (typeof window === 'undefined') return true;
+
+  const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) ?? 0);
+  if (!lastActivity) {
+    touchSession();
+    return false;
+  }
+
+  return Date.now() - lastActivity > SESSION_TIMEOUT_MS;
 };
 
 /**

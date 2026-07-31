@@ -42,8 +42,8 @@ export default function SuperAdminLayout({
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
-  // Session timeout (30 minutes of inactivity)
-  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  // Session timeout (15 minutes of inactivity)
+  const SESSION_TIMEOUT = 15 * 60 * 1000;
 
   useEffect(() => {
     const checkActivity = () => {
@@ -77,8 +77,6 @@ export default function SuperAdminLayout({
   }, [lastActivity, showSecurityWarning]);
 
   // Redirect if not authenticated or not super admin
-  // TEMPORARILY DISABLED FOR DEBUGGING
-  /*
   useEffect(() => {
     if (!user) {
       router.push('/super-admin/login');
@@ -90,14 +88,6 @@ export default function SuperAdminLayout({
       return;
     }
   }, [user, router]);
-  */
-  
-  // DEBUG: Log current state
-  useEffect(() => {
-    console.log('=== LAYOUT DEBUG ===');
-    console.log('User:', user);
-    console.log('User role:', user?.role);
-  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -257,7 +247,7 @@ export default function SuperAdminLayout({
             </div>
             
             <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
-              You have been inactive for 30 minutes. For security purposes, your super admin session will expire soon. Please continue your session or log out.
+              You have been inactive for 15 minutes. For security purposes, your super admin session will expire soon. Please continue your session or log out.
             </p>
 
             <div className="flex gap-3">

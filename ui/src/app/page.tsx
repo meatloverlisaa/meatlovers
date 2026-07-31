@@ -252,15 +252,12 @@ export default function Home() {
   const [contactSource, setContactSource] = useState<LeadSource>("LANDING_PAGE");
 
   // Redirect authenticated users to their dashboard
-  // TEMPORARILY DISABLED FOR DEBUGGING
-  /*
   useEffect(() => {
     if (!isLoading && user) {
       const dashboardRoute = getDashboardRoute(user.role);
       router.push(dashboardRoute);
     }
   }, [user, isLoading, router]);
-  */
 
   const scrollToContact = useCallback((source: LeadSource) => {
     setContactSource(source);

@@ -17,9 +17,9 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 @Injectable()
 export class AuthService {
   private readonly SALT_ROUNDS = 12; // Increased from 10
-  private readonly REFRESH_TOKEN_EXPIRY = '7d';
-  private readonly ACCESS_TOKEN_EXPIRY = '8h';
-  private readonly PRIVILEGED_SESSION_EXPIRY = '15m';
+  private readonly REFRESH_TOKEN_EXPIRY = '7d' as const;
+  private readonly ACCESS_TOKEN_EXPIRY = '15m' as const;
+  private readonly PRIVILEGED_SESSION_EXPIRY = '15m' as const;
   private readonly PRIVILEGED_SESSION_DURATION_MS = 15 * 60 * 1000;
   private readonly MAX_LOGIN_ATTEMPTS = 5;
   private readonly LOCKOUT_DURATION_MINUTES = 30;
@@ -511,10 +511,8 @@ export class AuthService {
     return role === 'ADMIN' || role === 'SUPER_ADMIN';
   }
 
-  private getAccessTokenExpiry(role: string): string {
-    return this.hasPrivilegedSessionTimeout(role)
-      ? this.PRIVILEGED_SESSION_EXPIRY
-      : this.ACCESS_TOKEN_EXPIRY;
+  private getAccessTokenExpiry(role: string): '15m' {
+    return this.ACCESS_TOKEN_EXPIRY;
   }
 
   /**

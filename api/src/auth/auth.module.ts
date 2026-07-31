@@ -44,7 +44,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 
         return {
           secret: secret || 'meat-lovers-dev-secret',
-          signOptions: { expiresIn: '8h' },
+          signOptions: { expiresIn: '15m' },
         };
       },
       inject: [ConfigService],

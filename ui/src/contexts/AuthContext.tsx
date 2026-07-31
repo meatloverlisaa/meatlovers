@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { setAuth, getUser, clearAuth, isAuthenticated, getDashboardRoute, refreshAccessToken, type User } from '@/lib/auth';
+import { setAuth, getUser, clearAuth, isAuthenticated, getDashboardRoute, refreshAccessToken, touchSession, hasSessionExpired, type User } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -19,13 +19,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const expireSession = useCallback(() => {
+    clearAuth();
+    setUser(null);
+    const currentPath = window.location.pathname;
+    let loginRoute = '/admin/login';
+
+    if (currentPath.startsWith('/super-admin')) {
+      loginRoute = '/super-admin/login';
+    } else if (currentPath.startsWith('/storekeeper')) {
+      loginRoute = '/storekeeper/login';
+    } else if (currentPath.startsWith('/accountant')) {
+      loginRoute = '/accountant/login';
+    } else if (currentPath.startsWith('/hr')) {
+      loginRoute = '/hr/login';
+    } else if (currentPath.startsWith('/manager')) {
+      loginRoute = '/manager/login';
+    } else if (currentPath.startsWith('/dispatcher')) {
+      loginRoute = '/dispatcher/login';
+    } else if (currentPath.startsWith('/bar')) {
+      loginRoute = '/bar/login';
+    } else if (currentPath.startsWith('/kitchen')) {
+      loginRoute = '/kitchen/login';
+    } else if (currentPath.startsWith('/cashier')) {
+      loginRoute = '/cashier/login';
+    } else if (currentPath.startsWith('/pos')) {
+      loginRoute = '/pos/login';
+    }
+
+    router.push(loginRoute);
+  }, [router]);
+
+  useEffect(() => {
+    const trackActivity = () => touchSession();
+    const handleActivity = () => {
+      if (isAuthenticated()) {
+        touchSession();
+      }
+    };
+
+    const checkSession = () => {
+      if (isAuthenticated() && hasSessionExpired()) {
+        expireSession();
+      }
+    };
+
+    if (isAuthenticated()) {
+      touchSession();
+    }
+
+    const interval = setInterval(checkSession, 30000);
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('touchstart', handleActivity);
+    window.addEventListener('scroll', trackActivity, { passive: true });
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+      window.removeEventListener('scroll', trackActivity);
+    };
+  }, [expireSession]);
+
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       if (isAuthenticated()) {
         const userData = getUser();
         setUser(userData);
-        
+        touchSession();
+
+        if (hasSessionExpired()) {
+          expireSession();
+          setIsLoading(false);
+          return;
+        }
+
         // Try to refresh token if needed
         await refreshAccessToken();
       }
@@ -33,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     checkAuth();
-  }, []);
+  }, [expireSession]);
 
   const login = useCallback(async (email_or_phone: string, password: string) => {
     setIsLoading(true);
@@ -53,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = await response.json();
       setAuth(data);
+      touchSession();
       setUser(data.user);
 
       // Redirect to role-specific dashboard
