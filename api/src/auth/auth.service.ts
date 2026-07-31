@@ -19,6 +19,8 @@ export class AuthService {
   private readonly SALT_ROUNDS = 12; // Increased from 10
   private readonly REFRESH_TOKEN_EXPIRY = '7d';
   private readonly ACCESS_TOKEN_EXPIRY = '8h';
+  private readonly PRIVILEGED_SESSION_EXPIRY = '15m';
+  private readonly PRIVILEGED_SESSION_DURATION_MS = 15 * 60 * 1000;
   private readonly MAX_LOGIN_ATTEMPTS = 5;
   private readonly LOCKOUT_DURATION_MINUTES = 30;
   private readonly PASSWORD_RESET_EXPIRY_HOURS = 1;
@@ -229,6 +231,15 @@ export class AuthService {
       throw new UnauthorizedException('User not found or inactive');
     }
 
+    // Admin sessions have a fixed 15-minute lifetime. Retain the original
+    // session start during refresh-token rotation so refreshing cannot extend it.
+    if (
+      this.hasPrivilegedSessionTimeout(user.role) &&
+      storedToken.created_at.getTime() + this.PRIVILEGED_SESSION_DURATION_MS <= Date.now()
+    ) {
+      throw new UnauthorizedException('Admin session expired. Please log in again.');
+    }
+
     // Revoke old refresh token (token rotation)
     await this.prisma.refreshToken.update({
       where: { id: storedToken.id },
@@ -239,7 +250,12 @@ export class AuthService {
     });
 
     // Generate new tokens
-    const tokens = await this.generateTokens(user, ipAddress, userAgent);
+    const tokens = await this.generateTokens(
+      user,
+      ipAddress,
+      userAgent,
+      storedToken.created_at,
+    );
 
     // Log token refresh
     await this.auditLog.logTokenRefresh(user.id, ipAddress, userAgent);
@@ -452,6 +468,7 @@ export class AuthService {
     },
     ipAddress?: string,
     userAgent?: string,
+    sessionStartedAt = new Date(),
   ) {
     const payload = {
       sub: user.id.toString(),
@@ -460,7 +477,7 @@ export class AuthService {
     };
 
     const access_token = this.jwtService.sign(payload, {
-      expiresIn: this.ACCESS_TOKEN_EXPIRY,
+      expiresIn: this.getAccessTokenExpiry(user.role),
     });
 
     // Generate refresh token with random component for uniqueness
@@ -468,13 +485,17 @@ export class AuthService {
     const tokenHash = this.hashToken(refreshTokenRaw);
 
     // Store refresh token in database
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = this.hasPrivilegedSessionTimeout(user.role)
+      ? new Date(sessionStartedAt.getTime() + this.PRIVILEGED_SESSION_DURATION_MS)
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     await this.prisma.refreshToken.create({
       data: {
         user_id: user.id,
         token_hash: tokenHash,
         expires_at: expiresAt,
+        // Preserve the original start time during privileged token rotation.
+        created_at: sessionStartedAt,
         ip_address: ipAddress,
         user_agent: userAgent,
       },
@@ -484,6 +505,16 @@ export class AuthService {
       access_token,
       refresh_token: refreshTokenRaw,
     };
+  }
+
+  private hasPrivilegedSessionTimeout(role: string): boolean {
+    return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  }
+
+  private getAccessTokenExpiry(role: string): string {
+    return this.hasPrivilegedSessionTimeout(role)
+      ? this.PRIVILEGED_SESSION_EXPIRY
+      : this.ACCESS_TOKEN_EXPIRY;
   }
 
   /**

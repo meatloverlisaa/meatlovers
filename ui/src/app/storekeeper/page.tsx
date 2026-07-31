@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SummaryCard {
   label: string;
@@ -52,6 +53,7 @@ function getToken(): string {
 
 export default function StorekeeperDashboard() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   const [summary, setSummary] = useState({
     stockItems: 0,
@@ -159,13 +161,15 @@ export default function StorekeeperDashboard() {
   };
 
   useEffect(() => {
+    if (isAuthLoading || !user) return;
+
     fetchDashboardData();
 
     // Auto-refresh every 60 seconds
     const interval = setInterval(fetchDashboardData, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthLoading, user]);
 
   const summaryCards: SummaryCard[] = [
     {

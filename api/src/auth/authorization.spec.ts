@@ -251,6 +251,12 @@ describe('Authorization System - Part C', () => {
     });
 
     describe('BARMAN', () => {
+      it('should be able to read products for bar stock and sales', () => {
+        expect(hasPermission('BARMAN', Resource.PRODUCTS, Action.READ)).toBe(
+          true,
+        );
+      });
+
       it('should be able to update bar queue', () => {
         expect(hasPermission('BARMAN', Resource.BAR_QUEUE, Action.READ)).toBe(
           true,

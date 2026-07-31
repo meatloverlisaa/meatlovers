@@ -582,6 +582,9 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   // BARMAN - Beverage Preparation
   // ====================
   BARMAN: [
+    // Products (view beverage catalog for stock and sales)
+    { resource: Resource.PRODUCTS, actions: [Action.READ] },
+
     // Bar Queue
     { resource: Resource.BAR_QUEUE, actions: [Action.READ, Action.UPDATE] },
 

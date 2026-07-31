@@ -1,10 +1,12 @@
-// Bar Stock Oversight Page - Storekeeper View
-
 'use client';
+
+// Bar Stock Oversight Page - Storekeeper View
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { BarStockMovementTable } from '@/components/admin/bar/BarStockMovementTable';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -16,6 +18,8 @@ function getToken(): string {
 }
 
 export default function StorekeeperBarOversightPage() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [movements, setMovements] = useState<any[]>([]);
   const [isLoadingMovements, setIsLoadingMovements] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>('today');
@@ -55,13 +59,15 @@ export default function StorekeeperBarOversightPage() {
   }, [dateFilter]);
 
   useEffect(() => {
+    if (isAuthLoading || !user) return;
+
     fetchMovements();
 
     // Auto-refresh every 60 seconds
     const interval = setInterval(fetchMovements, 60000);
 
     return () => clearInterval(interval);
-  }, [fetchMovements]);
+  }, [fetchMovements, isAuthLoading, user]);
 
   const handleRefresh = () => {
     fetchMovements();

@@ -14,9 +14,9 @@ async function createHRUser() {
 
     if (existingHR) {
       console.log('HR user already exists:', existingHR.email);
-      console.log('Updating password to: HR@1234');
+      console.log('Updating password to: Hr@12345678');
       
-      const password_hash = await bcrypt.hash('HR@1234', 12);
+      const password_hash = await bcrypt.hash('Hr@12345678', 12);
       
       await prisma.user.update({
         where: { id: existingHR.id },
@@ -33,7 +33,7 @@ async function createHRUser() {
     }
 
     // Create new HR user
-    const password_hash = await bcrypt.hash('HR@1234', 12);
+    const password_hash = await bcrypt.hash('Hr@12345678', 12);
 
     const hr = await prisma.user.create({
       data: {
@@ -49,7 +49,7 @@ async function createHRUser() {
     console.log('✅ HR user created successfully');
     console.log('Email:', hr.email);
     console.log('Phone:', hr.phone);
-    console.log('Password: HR@1234');
+    console.log('Password: Hr@12345678');
     console.log('Role:', hr.role);
   } catch (error) {
     console.error('Error creating HR user:', error);

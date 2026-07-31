@@ -7,6 +7,7 @@ import { TransferForm } from "@/app/admin/stock/components/TransferForm";
 import { AdjustmentForm } from "@/app/admin/stock/components/AdjustmentForm";
 import { ReorderAlertList } from "@/app/admin/stock/components/ReorderAlertList";
 import { MovementTimeline } from "@/app/admin/stock/components/MovementTimeline";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -129,7 +130,7 @@ async function postStockIn(payload: {
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/stock/purchase`, {
+  const res = await fetch(`${baseUrl}/stock/purchases`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -156,7 +157,7 @@ async function postTransfer(payload: {
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/stock/transfer`, {
+  const res = await fetch(`${baseUrl}/stock/transfers`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -181,7 +182,7 @@ async function postAdjustment(payload: {
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  const res = await fetch(`${baseUrl}/stock/adjustment`, {
+  const res = await fetch(`${baseUrl}/stock/adjustment-requests`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -199,6 +200,7 @@ async function postAdjustment(payload: {
 }
 
 export function StockControlModule({ role, canManage = true }: StockControlModuleProps) {
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [balance, setBalance] = useState<StockBalance[]>([]);
   const [movements, setMovements] = useState<StockMovement[]>([]);
@@ -207,6 +209,13 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isAuthLoading) return;
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     async function loadData() {
       setLoading(true);
       try {
@@ -242,7 +251,7 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
     }
 
     loadData();
-  }, []);
+  }, [isAuthLoading, user]);
 
   const handleStockIn = async (formData: FormData) => {
     const productId = String(formData.get("product_id") ?? "").trim();

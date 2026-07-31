@@ -87,7 +87,7 @@ const users: UserConfig[] = [
     full_name: 'Human Resources Manager',
     email: 'hr@meatlovers.com',
     phone: '+254799000000',
-    password: 'HR@1234',
+    password: 'Hr@12345678',
   },
 ];
 

@@ -128,6 +128,10 @@ describe('AuthService', () => {
       const result = await service.login(loginDto, ipAddress, userAgent);
 
       expect(result).toHaveProperty('access_token');
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ expiresIn: '15m' }),
+      );
       expect(result).toHaveProperty('refresh_token');
       expect(result).toHaveProperty('user');
       expect(mockAuditLogService.logLoginSuccess).toHaveBeenCalled();
@@ -201,6 +205,7 @@ describe('AuthService', () => {
         token: refreshTokenDto.refresh_token,
         user_id: '1',
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_at: new Date(),
         is_revoked: false,
         user: mockUser,
       };

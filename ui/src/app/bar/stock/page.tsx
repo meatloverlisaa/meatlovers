@@ -1,5 +1,8 @@
-import { revalidatePath } from "next/cache";
-import React from "react";
+'use client';
+
+import React, { useState, useEffect } from "react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { getAuthHeader } from "@/lib/auth";
 import { BarStockTable } from "./components/BarStockTable";
 import { BarSaleDeductionForm } from "./components/BarSaleDeductionForm";
 import { TransferReceiptList } from "./components/TransferReceiptList";
@@ -46,117 +49,139 @@ type TransferReceipt = {
   };
 };
 
-async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-  if (!res.ok) {
-    throw new Error(`Failed to load products: ${res.status}`);
-  }
+export default function BarStockPage() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);
 
-  return res.json();
-}
+  const [products, setProducts] = useState<Product[]>([]);
+  const [balance, setBalance] = useState<StockBalance[]>([]);
+  const [transfers, setTransfers] = useState<TransferReceipt[]>([]);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-async function getBarStockBalance(): Promise<StockBalance[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/stock/balance?location=Bar`, { cache: "no-store" });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Failed to load bar stock balance: ${res.status}${text ? ` - ${text}` : ""}`);
-  }
-
-  return res.json();
-}
-
-async function getBarTransfers(): Promise<TransferReceipt[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  
-  try {
-    const res = await fetch(`${baseUrl}/bar/stock/transfers`, { cache: "no-store" });
+  const loadData = async () => {
+    setLoading(true);
     
-    if (!res.ok) {
-      return [];
+    // Get products
+    try {
+      const authHeader = getAuthHeader();
+      const res = await fetch(`${baseUrl}/products`, { 
+        cache: "no-store",
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to load products: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setProducts(data);
+      setProductsError(null);
+    } catch (e) {
+      setProductsError(e instanceof Error ? e.message : "Unknown error");
     }
-    
-    return res.json();
-  } catch (error) {
-    console.warn("Error loading transfers:", error);
-    return [];
-  }
-}
 
-async function postBarSaleDeduction(payload: {
-  productId: string;
-  quantity: number;
-  notes?: string;
-}) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    // Get bar stock balance
+    try {
+      const authHeader = getAuthHeader();
+      const res = await fetch(`${baseUrl}/stock/balance?location=Bar`, { 
+        cache: "no-store",
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      });
 
-  const res = await fetch(`${baseUrl}/bar/stock/sale-deduction`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Failed to load bar stock balance: ${res.status}${text ? ` - ${text}` : ""}`);
+      }
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Failed to record sale: ${res.status}${text ? ` - ${text}` : ""}`);
-  }
+      const data = await res.json();
+      setBalance(data);
+      setBalanceError(null);
+    } catch (e) {
+      setBalanceError(e instanceof Error ? e.message : "Unknown error");
+    }
 
-  return res.json();
-}
+    // Get transfers
+    try {
+      const authHeader = getAuthHeader();
+      const res = await fetch(`${baseUrl}/bar/stock/transfers`, { 
+        cache: "no-store",
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setTransfers(data);
+      }
+    } catch (error) {
+      console.warn("Error loading transfers:", error);
+    }
 
-export default async function BarStockPage() {
-  let products: Product[] = [];
-  let balance: StockBalance[] = [];
-  let transfers: TransferReceipt[] = [];
-  let productsError: string | null = null;
-  let balanceError: string | null = null;
+    setLoading(false);
+  };
 
-  try {
-    products = await getProducts();
-  } catch (e) {
-    productsError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    balance = await getBarStockBalance();
-  } catch (e) {
-    balanceError = e instanceof Error ? e.message : "Unknown error";
-  }
-
-  try {
-    transfers = await getBarTransfers();
-  } catch (e) {
-    console.warn("Failed to load transfers:", e);
-  }
+  useEffect(() => {
+    loadData();
+  }, []);
 
   // Filter products to only beverages (SOFT_DRINK and ALCOHOLIC_DRINK)
   const beverageProducts = products.filter(
     (p) => p.product_category === "SOFT_DRINK" || p.product_category === "ALCOHOLIC_DRINK"
   );
 
-  const handleSaleDeduction = async (formData: FormData) => {
-    "use server";
+  const handleSaleDeduction = async (productId: string, quantity: number, notes?: string) => {
+    setSubmitting(true);
+    try {
+      const authHeader = getAuthHeader();
+      const res = await fetch(`${baseUrl}/bar/stock/sale-deduction`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          ...authHeader
+        },
+        body: JSON.stringify({ productId, quantity, notes }),
+      });
 
-    const productId = String(formData.get("productId") ?? "").trim();
-    const quantityRaw = String(formData.get("quantity") ?? "").trim();
-    const notes = String(formData.get("notes") ?? "").trim();
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Failed to record sale: ${res.status}${text ? ` - ${text}` : ""}`);
+      }
 
-    const quantity = Number(quantityRaw);
-
-    if (!productId) throw new Error("Product is required.");
-    if (!Number.isFinite(quantity) || quantity <= 0) throw new Error("Quantity must be a positive number.");
-
-    await postBarSaleDeduction({
-      productId,
-      quantity,
-      notes: notes.length ? notes : undefined,
-    });
-
-    revalidatePath("/bar/stock");
+      // Reload data after successful submission
+      await loadData();
+      return { success: true };
+    } catch (error) {
+      console.error("Sale deduction error:", error);
+      throw error;
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
+            <p className="mt-4 text-zinc-600 dark:text-zinc-400">Loading bar stock...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
@@ -175,6 +200,15 @@ export default async function BarStockPage() {
             <span className="text-sm text-zinc-600 dark:text-zinc-400">
               Access: <span className="font-medium text-zinc-900 dark:text-zinc-50">BARMAN</span>
             </span>
+            <button
+              onClick={loadData}
+              className="px-4 py-2 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh
+            </button>
           </div>
         </div>
 
@@ -206,7 +240,8 @@ export default async function BarStockPage() {
             <BarSaleDeductionForm 
               products={beverageProducts} 
               balance={balance}
-              onSubmit={handleSaleDeduction} 
+              onSubmit={handleSaleDeduction}
+              isSubmitting={submitting}
             />
           </div>
         </div>
