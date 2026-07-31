@@ -2,11 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Navigation() {
   const pathname = usePathname();
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    setTheme(current);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    document.documentElement.classList.toggle("light", nextTheme === "light");
+    document.documentElement.style.colorScheme = nextTheme;
+    localStorage.setItem("theme", nextTheme);
+    setTheme(nextTheme);
+  };
 
   if (pathname === "/") {
     const publicItems = [
@@ -35,6 +50,14 @@ export function Navigation() {
             ))}
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 transition hover:border-red-700 hover:text-red-800"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
             <Link
               href="#menu"
               className="hidden rounded-md border border-zinc-300 px-4 py-2 text-sm font-bold text-zinc-900 transition hover:border-red-700 hover:text-red-800 sm:inline-flex"
@@ -92,6 +115,15 @@ export function Navigation() {
             <span className="text-xl font-bold text-red-900 dark:text-red-100">Meat Lovers</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 transition hover:border-red-700 hover:text-red-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-red-500 dark:hover:text-red-300"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+
             {navItems.map((item) => (
               <Link
                 key={item.href}

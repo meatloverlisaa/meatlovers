@@ -24,14 +24,17 @@ type StockBalance = {
 type Props = {
   products: Product[];
   balance: StockBalance[];
-  onSubmit: (formData: FormData) => Promise<void>;
+  onSubmit: (productId: string, quantity: number, notes?: string) => Promise<{ success: boolean } | void>;
+  isSubmitting?: boolean;
 };
 
-export function BarSaleDeductionForm({ products, balance, onSubmit }: Props) {
+export function BarSaleDeductionForm({ products, balance, onSubmit, isSubmitting: externalIsSubmitting = false }: Props) {
   const [productSearch, setProductSearch] = useState("");
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submitState = externalIsSubmitting || isSubmitting;
 
   const filteredProducts = useMemo(() => {
     if (!productSearch) return [];
@@ -61,8 +64,12 @@ export function BarSaleDeductionForm({ products, balance, onSubmit }: Props) {
 
     try {
       const formData = new FormData(e.currentTarget);
-      await onSubmit(formData);
-      
+      const productId = String(formData.get("productId") ?? "");
+      const quantity = Number(formData.get("quantity") ?? 0);
+      const notes = typeof formData.get("notes") === "string" ? String(formData.get("notes") ?? "") : undefined;
+
+      await onSubmit(productId, quantity, notes || undefined);
+
       // Reset form
       setSelectedProductId("");
       setProductSearch("");
@@ -195,10 +202,10 @@ export function BarSaleDeductionForm({ products, balance, onSubmit }: Props) {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={isSubmitting || !selectedProductId || availableQuantity === 0}
+          disabled={submitState || !selectedProductId || availableQuantity === 0}
           className="w-full bg-red-600 hover:bg-red-700 disabled:bg-zinc-300 disabled:dark:bg-zinc-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg transition"
         >
-          {isSubmitting ? "Recording..." : "Record Sale"}
+          {submitState ? "Recording..." : "Record Sale"}
         </button>
 
         <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center">

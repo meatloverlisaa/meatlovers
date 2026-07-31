@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Professional Dark Theme Palette */
   --app-background: #0F172A;
@@ -9,15 +11,29 @@
   --primary-text: #F8FAFC;
   --muted-text: #94A3B8;
   --border-divider: #334155;
-  
+
   /* Semantic Status Colors */
   --success: #22C55E;
   --warning: #EAB308;
   --danger: #EF4444;
-  
+
   /* Legacy variables for compatibility */
   --background: #0F172A;
   --foreground: #F8FAFC;
+}
+
+html {
+  background: var(--app-background);
+  color: var(--primary-text);
+  scroll-behavior: smooth;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -25,7 +41,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   /* Custom theme colors */
   --color-app-bg: var(--app-background);
   --color-card: var(--card-surface);

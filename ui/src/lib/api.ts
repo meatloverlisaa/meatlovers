@@ -38,15 +38,26 @@ export async function apiRequest<T = unknown>(
   } = options;
 
   // Build headers
-  const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...headers,
-  };
+  const requestHeaders = new Headers();
+
+  if (headers instanceof Headers) {
+    headers.forEach((value, key) => requestHeaders.set(key, value));
+  } else if (Array.isArray(headers)) {
+    headers.forEach(([key, value]) => requestHeaders.set(key, value));
+  } else if (headers) {
+    Object.entries(headers).forEach(([key, value]) => {
+      if (value !== undefined) requestHeaders.set(key, String(value));
+    });
+  }
+
+  requestHeaders.set('Content-Type', 'application/json');
 
   // Add auth header if required
   if (requiresAuth) {
     const authHeader = getAuthHeader();
-    Object.assign(requestHeaders, authHeader);
+    Object.entries(authHeader).forEach(([key, value]) => {
+      if (value) requestHeaders.set(key, String(value));
+    });
   }
 
   // Make request
@@ -62,7 +73,9 @@ export async function apiRequest<T = unknown>(
     if (refreshed) {
       // Retry request with new token
       const newAuthHeader = getAuthHeader();
-      Object.assign(requestHeaders, newAuthHeader);
+      Object.entries(newAuthHeader).forEach(([key, value]) => {
+        if (value) requestHeaders.set(key, String(value));
+      });
       response = await fetch(url, {
         ...fetchOptions,
         headers: requestHeaders,

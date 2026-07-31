@@ -50,10 +50,7 @@ export function LowStockBanner({ stock, threshold = 10 }: Props) {
                 </p>
                 <div className="mt-3 space-y-2">
                   {criticalStock.map((item) => {
-                    const productId =
-                      typeof item.product_id === "bigint"
-                        ? item.product_id.toString()
-                        : String(item.product_id);
+                    const productId = String(item.product_id);
                     return (
                       <div
                         key={productId}
@@ -113,10 +110,7 @@ export function LowStockBanner({ stock, threshold = 10 }: Props) {
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {veryLowStock.map((item) => {
-                    const productId =
-                      typeof item.product_id === "bigint"
-                        ? item.product_id.toString()
-                        : String(item.product_id);
+                    const productId = String(item.product_id);
                     return (
                       <div
                         key={productId}

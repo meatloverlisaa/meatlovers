@@ -14,6 +14,7 @@ export interface ContentPage {
 export interface WebsiteLead {
   id: string;
   name: string;
+  full_name?: string | null;
   email: string | null;
   phone: string | null;
   source: string;

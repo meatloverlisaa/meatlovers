@@ -204,11 +204,12 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
     if (filter.source && lead.source !== filter.source) return false;
     if (filter.search) {
       const search = filter.search.toLowerCase();
+      const leadName = (lead.full_name ?? lead.name ?? "").toLowerCase();
       return (
-        lead.full_name?.toLowerCase().includes(search) ||
-        lead.email?.toLowerCase().includes(search) ||
-        lead.phone?.toLowerCase().includes(search) ||
-        lead.message?.toLowerCase().includes(search)
+        leadName.includes(search) ||
+        (lead.email ?? "").toLowerCase().includes(search) ||
+        (lead.phone ?? "").toLowerCase().includes(search) ||
+        (lead.message ?? "").toLowerCase().includes(search)
       );
     }
     return true;
@@ -297,33 +298,36 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-900 dark:text-zinc-50">{lead.full_name}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="text-zinc-700 dark:text-zinc-200">{lead.email}</div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400">{lead.phone}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs text-zinc-600 dark:text-zinc-300">
-                      {lead.source.replace(/_/g, " ")}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <LeadStatusBadge status={lead.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="max-w-[300px] truncate text-zinc-700 dark:text-zinc-200">
-                      {lead.message || "-"}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
-                    {new Date(lead.created_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
+              {filteredLeads.map((lead) => {
+                const leadName = lead.full_name ?? lead.name ?? "Unknown lead";
+                return (
+                  <tr key={lead.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40">
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-zinc-900 dark:text-zinc-50">{leadName}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-zinc-700 dark:text-zinc-200">{lead.email}</div>
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400">{lead.phone}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs text-zinc-600 dark:text-zinc-300">
+                        {lead.source.replace(/_/g, " ")}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <LeadStatusBadge status={lead.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="max-w-[300px] truncate text-zinc-700 dark:text-zinc-200">
+                        {lead.message || "-"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
+                      {new Date(lead.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
