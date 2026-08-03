@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SuperAdminLogin() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,39 +20,35 @@ export default function SuperAdminLogin() {
     setLoading(true);
 
     try {
-      let endpoint, body;
-
       if (passwordlessMode) {
         // Passwordless login for super admin
-        endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/super-admin-login`;
-        body = JSON.stringify({ email_or_phone: email });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/super-admin-login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email_or_phone: email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Login failed");
+        }
+
+        // Manually store auth data for passwordless login
+        localStorage.setItem("auth_token", data.access_token);
+        localStorage.setItem("refresh_token", data.refresh_token);
+        localStorage.setItem("user_data", JSON.stringify(data.user));
+        localStorage.setItem("auth_last_activity", String(Date.now()));
+
+        // Redirect manually
+        router.push("/super-admin");
       } else {
-        // Regular login with password
-        endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`;
-        body = JSON.stringify({ email_or_phone: email, password });
+        // Regular login with password through AuthContext
+        await login(email, password);
+        // AuthContext handles redirect to appropriate dashboard
       }
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Store auth data
-      localStorage.setItem("auth_token", data.access_token);
-      localStorage.setItem("refresh_token", data.refresh_token);
-      localStorage.setItem("user_data", JSON.stringify(data.user));
-
-      // Redirect to super admin dashboard
-      router.push("/super-admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
