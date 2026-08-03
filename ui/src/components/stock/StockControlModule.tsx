@@ -346,22 +346,8 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
     );
   }
 
-  // Check if user is authenticated
-  if (!getToken()) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Authentication Required</h1>
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">You need to log in to access the Stock Control module.</p>
-            <a href="/storekeeper/login" className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium">
-              Go to Login Page
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Authentication is handled by useRequireAuth hook in parent components
+  // No additional auth check needed here
 
   const roleLabel = role === "MANAGER" ? "Manager" : role === "STOREKEEPER" ? "Storekeeper" : "Admin";
   const accessText = canManage

@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAuthHeader } from "@/lib/auth";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface SummaryCard {
   label: string;
@@ -44,15 +47,8 @@ interface StockMovement {
   timestamp: string;
 }
 
-function getToken(): string {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token') || '';
-  }
-  return '';
-}
-
 export default function StorekeeperDashboard() {
-  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
+  useRequireAuth(['STOREKEEPER']);
   const { user, isLoading: isAuthLoading } = useAuth();
 
   const [summary, setSummary] = useState({
@@ -76,20 +72,20 @@ export default function StorekeeperDashboard() {
       // Fetch summary data in parallel
       const [stockCountRes, lowStockRes, outStockRes, pendingOrdersRes, movementsRes] =
         await Promise.all([
-          fetch("http://localhost:3001/stock?count=true", {
-            headers: { Authorization: `Bearer ${getToken()}` }
+          fetch(`${API_BASE}/stock?count=true`, {
+            headers: getAuthHeader()
           }),
-          fetch("http://localhost:3001/stock?status=LOW", {
-            headers: { Authorization: `Bearer ${getToken()}` }
+          fetch(`${API_BASE}/stock?status=LOW`, {
+            headers: getAuthHeader()
           }),
-          fetch("http://localhost:3001/stock?status=OUT", {
-            headers: { Authorization: `Bearer ${getToken()}` }
+          fetch(`${API_BASE}/stock?status=OUT`, {
+            headers: getAuthHeader()
           }),
-          fetch("http://localhost:3001/purchases?status=PENDING", {
-            headers: { Authorization: `Bearer ${getToken()}` }
+          fetch(`${API_BASE}/purchases?status=PENDING`, {
+            headers: getAuthHeader()
           }),
-          fetch("http://localhost:3001/stock/movements?limit=10", {
-            headers: { Authorization: `Bearer ${getToken()}` }
+          fetch(`${API_BASE}/stock/movements?limit=10`, {
+            headers: getAuthHeader()
           }),
         ]);
 

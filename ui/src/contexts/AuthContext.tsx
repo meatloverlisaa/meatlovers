@@ -131,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Redirect to role-specific dashboard
       const dashboardRoute = getDashboardRoute(data.user.role);
+      setIsLoading(false);
       router.push(dashboardRoute);
     } catch (error) {
       setIsLoading(false);
