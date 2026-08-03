@@ -49,7 +49,7 @@ type TransferReceipt = {
   };
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function BarStockPage() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);

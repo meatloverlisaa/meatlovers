@@ -30,7 +30,7 @@ export default function AccountantAnalytics() {
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<"WEEK" | "MONTH" | "QUARTER" | "YEAR">("MONTH");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
     fetchAnalytics();

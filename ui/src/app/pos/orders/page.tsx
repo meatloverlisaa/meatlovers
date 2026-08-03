@@ -37,9 +37,9 @@ const statusLabels: Record<OrderStatus, string> = {
 };
 
 async function fetchMyOrders(): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/orders`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/orders`, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
@@ -317,9 +317,9 @@ export default function MyOrdersPage() {
   }, [successMessage]);
 
   async function handleEditRequest(orderId: string, reason: string) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     
-    const res = await fetch(`${baseUrl}/orders/${orderId}/edit-request`, {
+    const res = await fetch(`${API_BASE}/orders/${orderId}/edit-request`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reason }),

@@ -8,6 +8,7 @@ import { AdjustmentForm } from "@/app/admin/stock/components/AdjustmentForm";
 import { ReorderAlertList } from "@/app/admin/stock/components/ReorderAlertList";
 import { MovementTimeline } from "@/app/admin/stock/components/MovementTimeline";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAuthHeader } from "@/lib/auth";
 
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -46,18 +47,11 @@ type StockControlModuleProps = {
   canManage?: boolean;
 };
 
-function getToken(): string {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token') || '';
-  }
-  return '';
-}
-
 async function getProducts(): Promise<Product[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/products`, { 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const res = await fetch(`${API_BASE}/products`, { 
     cache: "no-store",
-    headers: { Authorization: `Bearer ${getToken()}` }
+    headers: getAuthHeader()
   });
 
   if (!res.ok) {
@@ -68,10 +62,10 @@ async function getProducts(): Promise<Product[]> {
 }
 
 async function getStockBalance(): Promise<StockBalance[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/stock/balance`, { 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const res = await fetch(`${API_BASE}/stock/balance`, { 
     cache: "no-store",
-    headers: { Authorization: `Bearer ${getToken()}` }
+    headers: getAuthHeader()
   });
 
   if (!res.ok) {
@@ -92,12 +86,12 @@ async function getStockBalance(): Promise<StockBalance[]> {
 }
 
 async function getRecentMovements(): Promise<StockMovement[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   try {
-    const allStockItems = await fetch(`${baseUrl}/stock`, { 
+    const res = await fetch(`${API_BASE}/stock/movements?limit=50`, { 
       cache: "no-store",
-      headers: { Authorization: `Bearer ${getToken()}` }
+      headers: getAuthHeader()
     });
 
     if (!allStockItems.ok) {
@@ -128,13 +122,13 @@ async function postStockIn(payload: {
   reference?: string;
   notes?: string;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  const res = await fetch(`${baseUrl}/stock/purchases`, {
+  const res = await fetch(`${API_BASE}/stock/purchases`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
+      ...getAuthHeader()
     },
     body: JSON.stringify(payload),
   });
@@ -155,13 +149,13 @@ async function postTransfer(payload: {
   reference?: string;
   notes?: string;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  const res = await fetch(`${baseUrl}/stock/transfers`, {
+  const res = await fetch(`${API_BASE}/stock/transfers`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
+      ...getAuthHeader()
     },
     body: JSON.stringify(payload),
   });
@@ -180,13 +174,13 @@ async function postAdjustment(payload: {
   reference?: string;
   notes?: string;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  const res = await fetch(`${baseUrl}/stock/adjustment-requests`, {
+  const res = await fetch(`${API_BASE}/stock/adjustment-requests`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
+      ...getAuthHeader()
     },
     body: JSON.stringify(payload),
   });

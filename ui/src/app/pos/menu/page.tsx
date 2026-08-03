@@ -26,9 +26,9 @@ function normalizeId(id: bigint | number): string {
 const categories: ProductCategory[] = ["FOOD", "SOFT_DRINK", "ALCOHOLIC_DRINK"];
 
 async function fetchProducts(): Promise<Product[]> {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  const res = await fetch(`${baseUrl}/products`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/products`, { cache: "no-store" });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`Failed to load products: ${res.status}${text ? ` - ${text}` : ""}`);
@@ -248,7 +248,7 @@ export default function PosMenuPage() {
       quantity: it.quantity,
     }));
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
     try {
       setSubmitting(true);

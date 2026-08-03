@@ -39,6 +39,22 @@ export class AuthController {
   }
 
   /**
+   * POST /auth/super-admin-login
+   * Passwordless login for SUPER_ADMIN only
+   * Allows super admin to login without entering password
+   */
+  @Public()
+  @Post('super-admin-login')
+  @HttpCode(HttpStatus.OK)
+  async superAdminLogin(
+    @Body() body: { email_or_phone: string },
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.loginSuperAdmin(body.email_or_phone, ip, userAgent);
+  }
+
+  /**
    * GET /auth/profile
    * Get current authenticated user profile
    * Requires valid JWT token

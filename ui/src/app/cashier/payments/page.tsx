@@ -33,9 +33,9 @@ type Order = {
 };
 
 async function fetchPayments(): Promise<Payment[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/payments/settlement/summary`, { 
+  const res = await fetch(`${API_BASE}/payments/settlement/summary`, { 
     cache: "no-store",
     headers: getAuthHeader(),
   });
@@ -48,9 +48,9 @@ async function fetchPayments(): Promise<Payment[]> {
 }
 
 async function fetchOrders(): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, { 
+  const res = await fetch(`${API_BASE}/orders/all?status=SERVED`, { 
     cache: "no-store",
     headers: getAuthHeader(),
   });
@@ -63,9 +63,9 @@ async function fetchOrders(): Promise<Order[]> {
 }
 
 async function createPayment(payload: any): Promise<Payment[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/payments/settle`, {
+  const res = await fetch(`${API_BASE}/payments/settle`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -83,9 +83,9 @@ async function createPayment(payload: any): Promise<Payment[]> {
 }
 
 async function generateReceipt(paymentId: string): Promise<any> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/payments/${paymentId}/receipt`, {
+  const res = await fetch(`${API_BASE}/payments/${paymentId}/receipt`, {
     cache: "no-store",
     headers: getAuthHeader(),
   });

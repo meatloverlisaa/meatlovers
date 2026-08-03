@@ -52,8 +52,8 @@ export function SupplierCreateForm({ onSuccess, onCancel }: SupplierCreateFormPr
     }
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-      const res = await fetch(`${baseUrl}/suppliers`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/suppliers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

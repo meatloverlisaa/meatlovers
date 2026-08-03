@@ -21,9 +21,9 @@ type Order = {
 };
 
 async function fetchServedOrders(retryCount = 0): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
-  const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, { 
+  const res = await fetch(`${API_BASE}/orders/all?status=SERVED`, { 
     cache: "no-store",
     headers: getAuthHeader(),
   });

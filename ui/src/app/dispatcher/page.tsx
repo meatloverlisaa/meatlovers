@@ -95,14 +95,14 @@ export default function DispatcherDashboard() {
       const params = new URLSearchParams();
       if (statusFilter) params.append("status", statusFilter);
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
       const [ridersRes, availableRes, deliveriesRes, summaryRes, ordersRes] = await Promise.all([
-        fetch(`${baseUrl}/riders`, { headers: getAuthHeader() }),
-        fetch(`${baseUrl}/riders/available`, { headers: getAuthHeader() }),
-        fetch(`${baseUrl}/deliveries?${params.toString()}`, { headers: getAuthHeader() }),
-        fetch(`${baseUrl}/deliveries/summary`, { headers: getAuthHeader() }),
-        fetch(`${baseUrl}/orders/all?status=PAID`, { headers: getAuthHeader() }),
+        fetch(`${API_BASE}/riders`, { headers: getAuthHeader() }),
+        fetch(`${API_BASE}/riders/available`, { headers: getAuthHeader() }),
+        fetch(`${API_BASE}/deliveries?${params.toString()}`, { headers: getAuthHeader() }),
+        fetch(`${API_BASE}/deliveries/summary`, { headers: getAuthHeader() }),
+        fetch(`${API_BASE}/orders/all?status=PAID`, { headers: getAuthHeader() }),
       ]);
 
       // Handle rate limiting
@@ -159,8 +159,8 @@ export default function DispatcherDashboard() {
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-      const res = await fetch(`${baseUrl}/deliveries`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -201,8 +201,8 @@ export default function DispatcherDashboard() {
 
   const handleStatusUpdate = async (deliveryId: string, newStatus: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-      const res = await fetch(`${baseUrl}/deliveries/${deliveryId}/status`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}/status`, {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",

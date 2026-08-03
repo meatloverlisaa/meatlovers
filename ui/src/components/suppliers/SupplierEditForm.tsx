@@ -77,8 +77,8 @@ export function SupplierEditForm({ supplier, onSuccess, onCancel }: SupplierEdit
 
     try {
       const id = typeof supplier.id === "bigint" ? supplier.id.toString() : String(supplier.id);
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-      const res = await fetch(`${baseUrl}/suppliers/${id}`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/suppliers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

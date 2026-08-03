@@ -10,6 +10,7 @@ export default function SuperAdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passwordlessMode, setPasswordlessMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,12 +18,24 @@ export default function SuperAdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`, {
+      let endpoint, body;
+
+      if (passwordlessMode) {
+        // Passwordless login for super admin
+        endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/super-admin-login`;
+        body = JSON.stringify({ email_or_phone: email });
+      } else {
+        // Regular login with password
+        endpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`;
+        body = JSON.stringify({ email_or_phone: email, password });
+      }
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email_or_phone: email, password }),
+        body,
       });
 
       const data = await response.json();
@@ -80,19 +93,32 @@ export default function SuperAdminLogin() {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-blue-900/50 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                placeholder="••••••••"
-                required
-              />
+            {!passwordlessMode && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border border-blue-900/50 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            )}
+
+            {/* Passwordless Toggle */}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setPasswordlessMode(!passwordlessMode)}
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                {passwordlessMode ? "← Use password instead" : "Sign in without password"}
+              </button>
             </div>
 
             <button
@@ -100,7 +126,7 @@ export default function SuperAdminLogin() {
               disabled={loading}
               className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : passwordlessMode ? "Sign In (No Password)" : "Sign In"}
             </button>
           </form>
 

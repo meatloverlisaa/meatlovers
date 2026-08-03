@@ -110,19 +110,8 @@ export default function AdminLayout({
     };
   }, [lastActivity, showSecurityWarning]);
 
-  // Redirect if not authenticated or not admin role
-  useEffect(() => {
-    if (!user) {
-      router.push('/admin/login');
-      return;
-    }
-
-    const adminRoles = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'HR'];
-    if (!adminRoles.includes(user.role)) {
-      router.push('/');
-      return;
-    }
-  }, [user, router]);
+  // Authentication and role checking is handled by useRequireAuth in page components
+  // No need for duplicate redirect logic here
 
   const handleLogout = async () => {
     await logout();

@@ -7,15 +7,9 @@ import Link from 'next/link';
 import { BarStockMovementTable } from '@/components/admin/bar/BarStockMovementTable';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
+import { getAuthHeader } from '@/lib/auth';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-function getToken(): string {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token') || '';
-  }
-  return '';
-}
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
 
 export default function StorekeeperBarOversightPage() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
@@ -44,7 +38,7 @@ export default function StorekeeperBarOversightPage() {
 
       const response = await fetch(
         `${API_BASE}/stock/movements?location=BAR&startDate=${startDate}&endDate=${endDate}&limit=100`,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        { headers: getAuthHeader() }
       );
       
       if (response.ok) {

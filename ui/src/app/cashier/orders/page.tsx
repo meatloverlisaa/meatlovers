@@ -28,8 +28,8 @@ type Order = {
 };
 
 async function fetchOrders(status?: OrderStatus, retryCount = 0): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const url = status ? `${baseUrl}/orders/all?status=${status}` : `${baseUrl}/orders/all`;
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const url = status ? `${API_BASE}/orders/all?status=${status}` : `${API_BASE}/orders/all`;
   
   const res = await fetch(url, { 
     cache: "no-store",
@@ -56,8 +56,8 @@ async function fetchOrders(status?: OrderStatus, retryCount = 0): Promise<Order[
 }
 
 async function settleOrder(orderId: string): Promise<void> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/orders/${orderId}/status`, {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
     method: "PATCH",
     headers: { 
       "Content-Type": "application/json",

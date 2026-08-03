@@ -8,31 +8,16 @@ import type {
   RecordBarSaleResponse,
   StockLevel,
 } from '@/types/bar';
+import { getAuthHeader } from '@/lib/auth';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-function getToken(): string {
-  // Check both token storage keys for compatibility
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('token') || localStorage.getItem('auth_token') || '';
-  }
-  return '';
-}
-
-function getAuthHeaders(): HeadersInit {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-  };
-}
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
 
 export async function fetchBarOrders(status?: string): Promise<DrinkOrder[]> {
   const url = new URL(`${API_BASE}/bar/orders`);
   if (status) url.searchParams.set('status', status);
 
   const response = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
+    headers: getAuthHeader(),
   });
 
   if (!response.ok) {
@@ -44,7 +29,7 @@ export async function fetchBarOrders(status?: string): Promise<DrinkOrder[]> {
 
 export async function fetchBarSummary(): Promise<BarSummary> {
   const response = await fetch(`${API_BASE}/bar/summary`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeader(),
   });
 
   if (!response.ok) {
@@ -65,7 +50,7 @@ export async function fetchBarTransfers(params?: {
   if (params?.limit) url.searchParams.set('limit', String(params.limit));
 
   const response = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
+    headers: getAuthHeader(),
   });
 
   if (!response.ok) {
@@ -81,7 +66,10 @@ export async function updateOrderStatus(
 ): Promise<DrinkOrder> {
   const response = await fetch(`${API_BASE}/bar/orders/${orderId}/status`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ status }),
   });
 
@@ -100,7 +88,10 @@ export async function recordBarSale(
 ): Promise<RecordBarSaleResponse> {
   const response = await fetch(`${API_BASE}/stock/bar-sale`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ productId, quantity, sourceOrderId }),
   });
 
@@ -119,7 +110,7 @@ export async function fetchBarStock(productIds?: string[]): Promise<StockLevel[]
   }
 
   const response = await fetch(url.toString(), {
-    headers: getAuthHeaders(),
+    headers: getAuthHeader(),
   });
 
   if (!response.ok) {

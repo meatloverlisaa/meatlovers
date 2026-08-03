@@ -6,7 +6,7 @@ import { MarginAlertPanel } from "../../admin/pricing-control/components/MarginA
 import { PriceAuditTimeline } from "../../admin/pricing-control/components/PriceAuditTimeline";
 import type { PricingRule, MarginAlert } from "../../admin/pricing-control/page";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 async function getPricingRules(): Promise<PricingRule[]> {
   const res = await fetch(`${API_BASE_URL}/pricing-rules`, {

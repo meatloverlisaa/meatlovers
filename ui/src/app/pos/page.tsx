@@ -35,7 +35,7 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 async function fetchMyOrders(): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
   // For now, fetch all orders. In production, filter by waiter ID
   const res = await fetch(`${baseUrl}/orders`, { cache: "no-store" });

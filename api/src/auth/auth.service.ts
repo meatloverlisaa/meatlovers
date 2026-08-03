@@ -32,6 +32,101 @@ export class AuthService {
   ) {}
 
   /**
+   * Passwordless login for SUPER_ADMIN only
+   * Allows super admin to login without entering password
+   */
+  async loginSuperAdmin(emailOrPhone: string, ipAddress?: string, userAgent?: string) {
+    const sanitizedInput = this.sanitizeInput(emailOrPhone);
+
+    // Find user by email or phone
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: sanitizedInput }, { phone: sanitizedInput }],
+      },
+    });
+
+    if (!user) {
+      await this.auditLog.logLoginFailed(
+        sanitizedInput,
+        'User not found',
+        ipAddress,
+        userAgent,
+      );
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Verify user is SUPER_ADMIN
+    if (user.role !== 'SUPER_ADMIN') {
+      await this.auditLog.logLoginFailed(
+        sanitizedInput,
+        'Passwordless login not allowed for this role',
+        ipAddress,
+        userAgent,
+      );
+      throw new UnauthorizedException('Passwordless login is only available for SUPER_ADMIN');
+    }
+
+    // Check if account is locked
+    if (user.account_locked_until && user.account_locked_until > new Date()) {
+      const lockDuration = Math.ceil(
+        (user.account_locked_until.getTime() - Date.now()) / 60000,
+      );
+      await this.auditLog.logLoginFailed(
+        sanitizedInput,
+        'Account locked',
+        ipAddress,
+        userAgent,
+      );
+      throw new UnauthorizedException(
+        `Account is locked due to multiple failed login attempts. Try again in ${lockDuration} minutes.`,
+      );
+    }
+
+    // Check if user is active
+    if (!user.is_active) {
+      await this.auditLog.logLoginFailed(
+        sanitizedInput,
+        'Account inactive',
+        ipAddress,
+        userAgent,
+      );
+      throw new UnauthorizedException(
+        'Account is inactive. Contact administrator.',
+      );
+    }
+
+    // Reset failed login attempts and update last login
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failed_login_attempts: 0,
+        account_locked_until: null,
+        last_login_at: new Date(),
+        last_login_ip: ipAddress,
+      },
+    });
+
+    // Generate tokens
+    const tokens = await this.generateTokens(user, ipAddress, userAgent);
+
+    // Log successful passwordless login
+    await this.auditLog.logLoginSuccess(user.id, ipAddress, userAgent);
+
+    return {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      user: {
+        id: user.id.toString(),
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        is_active: user.is_active,
+      },
+    };
+  }
+
+  /**
    * Login with email or phone + password
    * Includes account lockout, audit logging, and security checks
    */

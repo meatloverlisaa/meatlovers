@@ -76,18 +76,8 @@ export default function SuperAdminLayout({
     };
   }, [lastActivity, showSecurityWarning]);
 
-  // Redirect if not authenticated or not super admin
-  useEffect(() => {
-    if (!user) {
-      router.push('/super-admin/login');
-      return;
-    }
-
-    if (user.role !== 'SUPER_ADMIN') {
-      router.push('/');
-      return;
-    }
-  }, [user, router]);
+  // Authentication and role checking is handled by useRequireAuth in page components
+  // No need for duplicate redirect logic here
 
   const handleLogout = async () => {
     await logout();
