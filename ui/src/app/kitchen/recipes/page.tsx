@@ -246,7 +246,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function KitchenRecipesPage() {
-  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

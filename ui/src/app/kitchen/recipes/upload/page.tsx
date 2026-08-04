@@ -68,7 +68,7 @@ async function uploadRecipes(recipes: RecipeUpload[]): Promise<UploadResult> {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function UploadRecipesPage() {
-  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
+  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
   const router = useRouter();
   
   const [file, setFile] = useState<File | null>(null);
