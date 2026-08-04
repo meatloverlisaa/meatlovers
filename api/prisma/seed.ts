@@ -8,13 +8,13 @@ async function main() {
 
   // ─── seed_superadmin_user ────────────────────────────────────────────────
   const existingSuperAdmin = await prisma.user.findFirst({
-    where: { role: 'SUPER_ADMIN' }
+    where: { email: 'superadmin@meatlovers.com' }
   });
 
   if (!existingSuperAdmin) {
-    const hashedPassword = await bcrypt.hash('Admin@1234', 10);
+    const hashedPassword = await bcrypt.hash('SuperAdmin@1234', 10);
     
-    const superAdmin = await prisma.user.create({
+    await prisma.user.create({
       data: {
         full_name: 'Super Administrator',
         email: 'superadmin@meatlovers.com',
@@ -27,37 +27,284 @@ async function main() {
 
     console.log('  ✓ Super Admin user created');
     console.log('    Email: superadmin@meatlovers.com');
-    console.log('    Phone: +254799999999');
-    console.log('    Password: Admin@1234');
+    console.log('    Password: SuperAdmin@1234');
   } else {
     console.log('  ↳ Super Admin user already exists');
   }
 
-  // ─── seed_manager_user ───────────────────────────────────────────────────
-  const existingManager = await prisma.user.findFirst({
-    where: { role: 'MANAGER' }
+  // ─── seed_admin_user ─────────────────────────────────────────────────────
+  const existingAdmin = await prisma.user.findFirst({
+    where: { email: 'admin@test.com' }
   });
 
-  if (!existingManager) {
-    const hashedPassword = await bcrypt.hash('Manager@1234', 10);
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('Admin@1234', 10);
     
-    const manager = await prisma.user.create({
+    await prisma.user.create({
       data: {
-        full_name: 'Restaurant Manager',
-        email: 'manager@meatlovers.com',
-        phone: '+254788888888',
-        role: 'MANAGER',
+        full_name: 'System Admin',
+        email: 'admin@test.com',
+        phone: '+254700000001',
+        role: 'ADMIN',
         password_hash: hashedPassword,
         is_active: true,
       },
     });
 
-    console.log('  ✓ Manager user created');
-    console.log('    Email: manager@meatlovers.com');
-    console.log('    Phone: +254788888888');
-    console.log('    Password: Manager@1234');
+    console.log('  ✓ Admin user created');
+    console.log('    Email: admin@test.com');
+    console.log('    Password: Admin@1234');
   } else {
-    console.log('  ↳ Manager user already exists');
+    console.log('  ↳ Admin user already exists');
+  }
+
+  // ─── seed_manager_users ───────────────────────────────────────────────────
+  const managerUsers = [
+    {
+      email: 'manager@meatlovers.com',
+      full_name: 'Restaurant Manager',
+      phone: '+254788888888',
+      password: 'Admin@1234'
+    },
+    {
+      email: 'kevin254@gmail.com',
+      full_name: 'Kevin Macharia',
+      phone: '+254700000002',
+      password: 'Admin@1234'
+    }
+  ];
+
+  for (const manager of managerUsers) {
+    const existing = await prisma.user.findFirst({
+      where: { email: manager.email }
+    });
+
+    if (!existing) {
+      const hashedPassword = await bcrypt.hash(manager.password, 10);
+      
+      await prisma.user.create({
+        data: {
+          full_name: manager.full_name,
+          email: manager.email,
+          phone: manager.phone,
+          role: 'MANAGER',
+          password_hash: hashedPassword,
+          is_active: true,
+        },
+      });
+
+      console.log(`  ✓ Manager user created: ${manager.email}`);
+    } else {
+      console.log(`  ↳ Manager user already exists: ${manager.email}`);
+    }
+  }
+
+  // ─── seed_storekeeper_user ───────────────────────────────────────────────
+  const existingStorekeeper = await prisma.user.findFirst({
+    where: { email: 'storekeeper@meatlovers.com' }
+  });
+
+  if (!existingStorekeeper) {
+    const hashedPassword = await bcrypt.hash('Storekeeper@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Store Keeper',
+        email: 'storekeeper@meatlovers.com',
+        phone: '+254700000003',
+        role: 'STOREKEEPER',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Storekeeper user created');
+    console.log('    Email: storekeeper@meatlovers.com');
+    console.log('    Password: Storekeeper@1234');
+  } else {
+    console.log('  ↳ Storekeeper user already exists');
+  }
+
+  // ─── seed_dispatcher_user ────────────────────────────────────────────────
+  const existingDispatcher = await prisma.user.findFirst({
+    where: { email: 'dispatcher@meatlovers.com' }
+  });
+
+  if (!existingDispatcher) {
+    const hashedPassword = await bcrypt.hash('Dispatcher@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Dispatcher',
+        email: 'dispatcher@meatlovers.com',
+        phone: '+254700000004',
+        role: 'DISPATCHER',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Dispatcher user created');
+    console.log('    Email: dispatcher@meatlovers.com');
+    console.log('    Password: Dispatcher@1234');
+  } else {
+    console.log('  ↳ Dispatcher user already exists');
+  }
+
+  // ─── seed_accountant_user ────────────────────────────────────────────────
+  const existingAccountant = await prisma.user.findFirst({
+    where: { email: 'accountant@meatlovers.com' }
+  });
+
+  if (!existingAccountant) {
+    const hashedPassword = await bcrypt.hash('Admin@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Accountant',
+        email: 'accountant@meatlovers.com',
+        phone: '+254700000005',
+        role: 'ACCOUNTANT',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Accountant user created');
+    console.log('    Email: accountant@meatlovers.com');
+    console.log('    Password: Admin@1234');
+  } else {
+    console.log('  ↳ Accountant user already exists');
+  }
+
+  // ─── seed_hr_user ────────────────────────────────────────────────────────
+  const existingHr = await prisma.user.findFirst({
+    where: { email: 'hr@meatlovers.com' }
+  });
+
+  if (!existingHr) {
+    const hashedPassword = await bcrypt.hash('Hr@12345678', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'HR Manager',
+        email: 'hr@meatlovers.com',
+        phone: '+254700000006',
+        role: 'HR',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ HR user created');
+    console.log('    Email: hr@meatlovers.com');
+    console.log('    Password: Hr@12345678');
+  } else {
+    console.log('  ↳ HR user already exists');
+  }
+
+  // ─── seed_waiter_user ────────────────────────────────────────────────────
+  const existingWaiter = await prisma.user.findFirst({
+    where: { email: 'waiter@meatlovers.com' }
+  });
+
+  if (!existingWaiter) {
+    const hashedPassword = await bcrypt.hash('Waiter@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Waiter',
+        email: 'waiter@meatlovers.com',
+        phone: '+254700000007',
+        role: 'WAITER',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Waiter user created');
+    console.log('    Email: waiter@meatlovers.com');
+    console.log('    Password: Waiter@1234');
+  } else {
+    console.log('  ↳ Waiter user already exists');
+  }
+
+  // ─── seed_chef_user ──────────────────────────────────────────────────────
+  const existingChef = await prisma.user.findFirst({
+    where: { email: 'chef@meatlovers.com' }
+  });
+
+  if (!existingChef) {
+    const hashedPassword = await bcrypt.hash('Chef@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Head Chef',
+        email: 'chef@meatlovers.com',
+        phone: '+254700000008',
+        role: 'CHEF',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Chef user created');
+    console.log('    Email: chef@meatlovers.com');
+    console.log('    Password: Chef@1234');
+  } else {
+    console.log('  ↳ Chef user already exists');
+  }
+
+  // ─── seed_barman_user ────────────────────────────────────────────────────
+  const existingBarman = await prisma.user.findFirst({
+    where: { email: 'barman@meatlovers.com' }
+  });
+
+  if (!existingBarman) {
+    const hashedPassword = await bcrypt.hash('Barman@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Barman',
+        email: 'barman@meatlovers.com',
+        phone: '+254700000009',
+        role: 'BARMAN',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Barman user created');
+    console.log('    Email: barman@meatlovers.com');
+    console.log('    Password: Barman@1234');
+  } else {
+    console.log('  ↳ Barman user already exists');
+  }
+
+  // ─── seed_cashier_user ───────────────────────────────────────────────────
+  const existingCashier = await prisma.user.findFirst({
+    where: { email: 'cashier@meatlovers.com' }
+  });
+
+  if (!existingCashier) {
+    const hashedPassword = await bcrypt.hash('Cashier@1234', 10);
+    
+    await prisma.user.create({
+      data: {
+        full_name: 'Cashier',
+        email: 'cashier@meatlovers.com',
+        phone: '+254700000010',
+        role: 'CASHIER',
+        password_hash: hashedPassword,
+        is_active: true,
+      },
+    });
+
+    console.log('  ✓ Cashier user created');
+    console.log('    Email: cashier@meatlovers.com');
+    console.log('    Password: Cashier@1234');
+  } else {
+    console.log('  ↳ Cashier user already exists');
   }
 
   // ─── seed_homepage_content ───────────────────────────────────────────────
