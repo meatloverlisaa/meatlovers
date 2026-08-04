@@ -331,6 +331,7 @@ const adminModules = [
   { href: "/admin/dispatch", label: "Dispatch", icon: "🚴", desc: "Delivery operations" },
   { href: "/admin/delivery-tracking", label: "Delivery Tracking", icon: "📍", desc: "Live delivery log" },
   { href: "/admin/waste", label: "Waste Management", icon: "♻️", desc: "Waste declarations" },
+  { href: "/kitchen/recipes", label: "Recipes Management", icon: "📖", desc: "Standardized recipes & costs" },
   { href: "/admin/kitchen", label: "Kitchen Oversight", icon: "👨‍🍳", desc: "Kitchen operations" },
   { href: "/admin/bar", label: "Bar Oversight", icon: "🍺", desc: "Bar operations" },
   { href: "/admin/reports", label: "Reports", icon: "📊", desc: "Business intelligence" },

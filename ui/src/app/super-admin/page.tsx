@@ -798,6 +798,20 @@ export default function SuperAdminDashboard() {
             </a>
 
             <a
+              href="/kitchen/recipes"
+              className="flex items-center gap-3 p-4 rounded-lg transition-colors"
+              style={{ backgroundColor: '#7C2D12', border: '1px solid #92400E' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#92400E'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7C2D12'}
+            >
+              <span className="text-2xl">📖</span>
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Recipes</p>
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>Standardized recipes</p>
+              </div>
+            </a>
+
+            <a
               href="/super-admin/pricing"
               className="flex items-center gap-3 p-4 rounded-lg transition-colors"
               style={{ backgroundColor: '#065F46', border: '1px solid #047857' }}
