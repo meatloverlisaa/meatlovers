@@ -129,22 +129,25 @@ export default function KitchenDashboardPage() {
             </div>
           </Link>
 
-          {/* Recipes Card - Placeholder */}
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">
+          {/* Recipes Card */}
+          <Link
+            href="/kitchen/recipes"
+            className="group block rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 transition hover:border-red-300 dark:hover:border-red-700 hover:shadow-lg"
+          >
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-2xl">
-                📝
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-2xl">
+                📖
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-red-700 dark:group-hover:text-red-400">
                   Recipes
                 </h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Coming soon
+                  View standardized recipes
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Production Plans Card - Placeholder */}
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 opacity-50">

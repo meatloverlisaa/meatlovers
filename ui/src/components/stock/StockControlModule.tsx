@@ -94,11 +94,11 @@ async function getRecentMovements(): Promise<StockMovement[]> {
       headers: getAuthHeader()
     });
 
-    if (!allStockItems.ok) {
+    if (!res.ok) {
       return [];
     }
 
-    const items = await allStockItems.json();
+    const items = await res.json();
     const allMovements: StockMovement[] = [];
 
     for (const item of items) {

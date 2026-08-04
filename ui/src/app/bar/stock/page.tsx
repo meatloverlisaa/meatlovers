@@ -51,8 +51,6 @@ type TransferReceipt = {
   };
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 export default function BarStockPage() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'BARMAN']);
 
