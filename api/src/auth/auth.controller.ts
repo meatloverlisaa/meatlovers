@@ -19,6 +19,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Role } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -62,7 +63,7 @@ export class AuthController {
    * Requires valid JWT token
    */
   @Get('profile')
-  @Roles() // Allow all authenticated users
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CHEF, Role.STOREKEEPER, Role.BARMAN, Role.DISPATCHER, Role.ACCOUNTANT, Role.HR)
   async getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.sub as string);
   }
@@ -73,7 +74,7 @@ export class AuthController {
    * Requires valid JWT token
    */
   @Patch('profile')
-  @Roles() // Allow all authenticated users
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CHEF, Role.STOREKEEPER, Role.BARMAN, Role.DISPATCHER, Role.ACCOUNTANT, Role.HR)
   async updateProfile(
     @Request() req: any,
     @Body() updateDto: { full_name?: string; email?: string; phone?: string },
@@ -87,7 +88,7 @@ export class AuthController {
    * Requires valid JWT token and current password
    */
   @Post('change-password')
-  @Roles() // Allow all authenticated users
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CHEF, Role.STOREKEEPER, Role.BARMAN, Role.DISPATCHER, Role.ACCOUNTANT, Role.HR)
   @HttpCode(HttpStatus.OK)
   async changePassword(
     @Request() req: any,
@@ -158,7 +159,7 @@ export class AuthController {
    * Revokes all refresh tokens
    */
   @Post('logout')
-  @Roles() // Allow all authenticated users
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.WAITER, Role.CHEF, Role.STOREKEEPER, Role.BARMAN, Role.DISPATCHER, Role.ACCOUNTANT, Role.HR)
   @HttpCode(HttpStatus.OK)
   async logout(
     @Request() req: any,
