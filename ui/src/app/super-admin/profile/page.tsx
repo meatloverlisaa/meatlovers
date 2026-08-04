@@ -43,11 +43,32 @@ export default function ProfilePage() {
   async function fetchProfile() {
     try {
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      
+      // Check if auth token exists
+      const authHeaders = getAuthHeader();
+      if (!authHeaders.Authorization) {
+        throw new Error("Not authenticated. Please log in again.");
+      }
+      
       const res = await fetch(`${API_BASE}/auth/profile`, {
-        headers: getAuthHeader(),
+        headers: authHeaders,
       });
 
-      if (!res.ok) throw new Error("Failed to load profile");
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Session expired. Please log in again.");
+        }
+        if (res.status === 404) {
+          throw new Error("Profile not found.");
+        }
+        if (res.status === 403) {
+          throw new Error("Access denied. Please contact your administrator.");
+        }
+        if (res.status === 500) {
+          throw new Error("Server error. Please try again later.");
+        }
+        throw new Error("Unable to load profile. Please refresh the page or contact support.");
+      }
 
       const data = await res.json();
       setProfile(data);
@@ -55,6 +76,7 @@ export default function ProfilePage() {
       setEmail(data.email);
       setPhone(data.phone);
     } catch (err) {
+      console.error("Profile fetch error:", err);
       setError(err instanceof Error ? err.message : "Failed to load profile");
     } finally {
       setLoading(false);
