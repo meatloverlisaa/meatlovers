@@ -38,7 +38,7 @@ async function fetchMyOrders(): Promise<Order[]> {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   
   // For now, fetch all orders. In production, filter by waiter ID
-  const res = await fetch(`${baseUrl}/orders`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/orders`, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }

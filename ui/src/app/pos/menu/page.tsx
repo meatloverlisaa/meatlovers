@@ -252,7 +252,7 @@ export default function PosMenuPage() {
 
     try {
       setSubmitting(true);
-      const res = await fetch(`${baseUrl}/orders`, {
+      const res = await fetch(`${API_BASE}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tableId: coercedTableId, waiterId: coercedWaiterId, items }),

@@ -48,7 +48,7 @@ interface StockMovement {
 }
 
 export default function StorekeeperDashboard() {
-  useRequireAuth(['STOREKEEPER']);
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STOREKEEPER']);
   const { user, isLoading: isAuthLoading } = useAuth();
 
   const [summary, setSummary] = useState({

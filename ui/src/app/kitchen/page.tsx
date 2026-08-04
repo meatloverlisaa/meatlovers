@@ -32,7 +32,7 @@ async function getKitchenSummary(): Promise<KitchenSummary | null> {
 }
 
 export default function KitchenDashboardPage() {
-  const { user, isLoading: authLoading } = useRequireAuth(['CHEF']);
+  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
   const [summary, setSummary] = useState<KitchenSummary | null>(null);
   const [loading, setLoading] = useState(true);
 

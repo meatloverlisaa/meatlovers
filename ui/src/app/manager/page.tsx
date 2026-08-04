@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type DashboardStats = {
   activeOrders: number;
@@ -179,6 +180,8 @@ function StatCard({
 }
 
 export default function ManagerDashboard() {
+  useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  
   const [stats, setStats] = useState<DashboardStats>({
     activeOrders: 0,
     pendingApprovals: 0,

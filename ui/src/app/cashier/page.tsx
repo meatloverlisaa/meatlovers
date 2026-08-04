@@ -29,14 +29,14 @@ async function fetchCashierStats(): Promise<CashierStats> {
   
   try {
     // Fetch orders
-    const ordersRes = await fetch(`${baseUrl}/orders`, { 
+    const ordersRes = await fetch(`${API_BASE}/orders`, { 
       cache: "no-store",
       headers: getAuthHeader(),
     });
     const orders = ordersRes.ok ? await ordersRes.json() : [];
     
     // Fetch payments
-    const paymentsRes = await fetch(`${baseUrl}/payments`, { 
+    const paymentsRes = await fetch(`${API_BASE}/payments`, { 
       cache: "no-store",
       headers: getAuthHeader(),
     });

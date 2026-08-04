@@ -7,6 +7,8 @@ import { BarStockTable } from "./components/BarStockTable";
 import { BarSaleDeductionForm } from "./components/BarSaleDeductionForm";
 import { TransferReceiptList } from "./components/TransferReceiptList";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
 type Product = {
@@ -68,7 +70,7 @@ export default function BarStockPage() {
     // Get products
     try {
       const authHeader = getAuthHeader();
-      const res = await fetch(`${baseUrl}/products`, { 
+      const res = await fetch(`${API_BASE}/products`, { 
         cache: "no-store",
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +92,7 @@ export default function BarStockPage() {
     // Get bar stock balance
     try {
       const authHeader = getAuthHeader();
-      const res = await fetch(`${baseUrl}/stock/balance?location=Bar`, { 
+      const res = await fetch(`${API_BASE}/stock/balance?location=Bar`, { 
         cache: "no-store",
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +115,7 @@ export default function BarStockPage() {
     // Get transfers
     try {
       const authHeader = getAuthHeader();
-      const res = await fetch(`${baseUrl}/bar/stock/transfers`, { 
+      const res = await fetch(`${API_BASE}/bar/stock/transfers`, { 
         cache: "no-store",
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +147,7 @@ export default function BarStockPage() {
     setSubmitting(true);
     try {
       const authHeader = getAuthHeader();
-      const res = await fetch(`${baseUrl}/bar/stock/sale-deduction`, {
+      const res = await fetch(`${API_BASE}/bar/stock/sale-deduction`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
