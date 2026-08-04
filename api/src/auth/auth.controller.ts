@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Body,
   UseGuards,
   Request,
@@ -63,6 +64,43 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.sub as string);
+  }
+
+  /**
+   * PATCH /auth/profile
+   * Update current authenticated user profile
+   * Requires valid JWT token
+   */
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(
+    @Request() req: any,
+    @Body() updateDto: { full_name?: string; email?: string; phone?: string },
+  ) {
+    return this.authService.updateProfile(req.user.sub as string, updateDto);
+  }
+
+  /**
+   * POST /auth/change-password
+   * Change user password
+   * Requires valid JWT token and current password
+   */
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @Request() req: any,
+    @Body() changePasswordDto: { current_password: string; new_password: string },
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.changePassword(
+      req.user.sub as string,
+      changePasswordDto.current_password,
+      changePasswordDto.new_password,
+      ip,
+      userAgent,
+    );
   }
 
   /**

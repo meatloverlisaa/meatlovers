@@ -182,6 +182,56 @@ export class AuditLogService {
   }
 
   /**
+   * Log profile update
+   */
+  async logProfileUpdate(
+    userId: bigint | string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
+    await this.log({
+      userId,
+      action: 'PROFILE_UPDATED',
+      ipAddress,
+      userAgent,
+    });
+  }
+
+  /**
+   * Log password change
+   */
+  async logPasswordChange(
+    userId: bigint | string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
+    await this.log({
+      userId,
+      action: 'PASSWORD_CHANGED',
+      ipAddress,
+      userAgent,
+    });
+  }
+
+  /**
+   * Log failed password change attempt
+   */
+  async logPasswordChangeFailed(
+    userId: bigint | string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
+    await this.log({
+      userId,
+      action: 'PASSWORD_CHANGE_FAILED',
+      ipAddress,
+      userAgent,
+      success: false,
+      errorMessage: 'Current password verification failed',
+    });
+  }
+
+  /**
    * Get audit logs for a user
    */
   async getUserAuditLogs(userId: bigint | string, limit: number = 50) {

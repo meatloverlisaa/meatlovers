@@ -272,6 +272,14 @@ export class AuthService {
         last_login_at: true,
         created_at: true,
         updated_at: true,
+        employee_profile: {
+          select: {
+            department: true,
+            position_title: true,
+            emergency_contact_name: true,
+            emergency_contact_phone: true,
+          },
+        },
       },
     });
 
@@ -289,6 +297,170 @@ export class AuthService {
       last_login_at: user.last_login_at,
       created_at: user.created_at,
       updated_at: user.updated_at,
+      employee_profile: user.employee_profile,
+    };
+  }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(
+    userId: string,
+    updateDto: {
+      full_name?: string;
+      email?: string;
+      phone?: string;
+    },
+  ) {
+    // Check if user exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: BigInt(userId) },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // If email is being updated, check if it's already taken by another user
+    if (updateDto.email && updateDto.email !== existingUser.email) {
+      const emailExists = await this.prisma.user.findFirst({
+        where: {
+          email: updateDto.email,
+          id: { not: BigInt(userId) },
+        },
+      });
+
+      if (emailExists) {
+        throw new BadRequestException('Email already in use');
+      }
+    }
+
+    // If phone is being updated, check if it's already taken by another user
+    if (updateDto.phone && updateDto.phone !== existingUser.phone) {
+      const phoneExists = await this.prisma.user.findFirst({
+        where: {
+          phone: updateDto.phone,
+          id: { not: BigInt(userId) },
+        },
+      });
+
+      if (phoneExists) {
+        throw new BadRequestException('Phone number already in use');
+      }
+    }
+
+    // Update user
+    const updatedUser = await this.prisma.user.update({
+      where: { id: BigInt(userId) },
+      data: {
+        ...(updateDto.full_name && { full_name: updateDto.full_name }),
+        ...(updateDto.email && { email: updateDto.email }),
+        ...(updateDto.phone && { phone: updateDto.phone }),
+        updated_at: new Date(),
+      },
+      select: {
+        id: true,
+        full_name: true,
+        email: true,
+        phone: true,
+        role: true,
+        is_active: true,
+        last_login_at: true,
+        created_at: true,
+        updated_at: true,
+        employee_profile: {
+          select: {
+            department: true,
+            position_title: true,
+            emergency_contact_name: true,
+            emergency_contact_phone: true,
+          },
+        },
+      },
+    });
+
+    // Log profile update
+    await this.auditLog.logProfileUpdate(userId);
+
+    return {
+      id: updatedUser.id.toString(),
+      full_name: updatedUser.full_name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      role: updatedUser.role,
+      is_active: updatedUser.is_active,
+      last_login_at: updatedUser.last_login_at,
+      created_at: updatedUser.created_at,
+      updated_at: updatedUser.updated_at,
+      employee_profile: updatedUser.employee_profile,
+    };
+  }
+
+  /**
+   * Change user password
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    // Find user
+    const user = await this.prisma.user.findUnique({
+      where: { id: BigInt(userId) },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password_hash,
+    );
+
+    if (!isCurrentPasswordValid) {
+      await this.auditLog.logPasswordChangeFailed(userId, ipAddress, userAgent);
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Ensure new password is different from current
+    const isSameAsOld = await bcrypt.compare(newPassword, user.password_hash);
+    if (isSameAsOld) {
+      throw new BadRequestException(
+        'New password must be different from current password',
+      );
+    }
+
+    // Validate new password strength
+    this.validatePasswordStrength(newPassword);
+
+    // Hash new password
+    const password_hash = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
+
+    // Update password
+    await this.prisma.user.update({
+      where: { id: BigInt(userId) },
+      data: {
+        password_hash,
+        password_changed_at: new Date(),
+      },
+    });
+
+    // Revoke all existing refresh tokens for security (force re-login)
+    await this.prisma.refreshToken.updateMany({
+      where: { user_id: user.id, is_revoked: false },
+      data: { is_revoked: true, revoked_at: new Date() },
+    });
+
+    // Log password change
+    await this.auditLog.logPasswordChange(userId, ipAddress, userAgent);
+
+    return {
+      message:
+        'Password changed successfully. Please log in again with your new password.',
     };
   }
 
