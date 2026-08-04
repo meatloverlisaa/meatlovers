@@ -235,11 +235,22 @@ export default function ManagerDashboard() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17]">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#0F172A] dark:text-white">Manager Dashboard</h1>
-          <p className="mt-2 text-sm text-[#0F172A]/70 dark:text-white/70">
-            Oversee operations, manage staff, and monitor performance
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-[#0F172A] dark:text-white">Manager Dashboard</h1>
+            <p className="mt-2 text-sm text-[#0F172A]/70 dark:text-white/70">
+              Oversee operations, manage staff, and monitor performance
+            </p>
+          </div>
+          <Link
+            href="/manager/profile"
+            className="flex items-center gap-2 rounded-lg border border-[#0284C7]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0F172A] hover:bg-[#0284C7]/10 dark:border-[#38BDF8]/20 dark:bg-[#151F32] dark:text-white dark:hover:bg-[#151F32]/80"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            My Profile
+          </Link>
         </div>
 
         {/* Quick Actions */}

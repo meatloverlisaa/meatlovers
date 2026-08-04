@@ -185,7 +185,7 @@ export default function AdminLayout({
 
         {/* User Profile */}
         <div className="p-4" style={{ borderTop: '1px solid #334155' }}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold" style={{ backgroundColor: '#3B82F6', color: '#FFFFFF' }}>
               {user?.full_name?.charAt(0) || 'A'}
             </div>
@@ -193,18 +193,28 @@ export default function AdminLayout({
               <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{user?.full_name || 'Admin User'}</p>
               <p className="text-xs" style={{ color: '#94A3B8' }}>{userRole}</p>
             </div>
+          </div>
+          <div className="space-y-1">
+            <Link
+              href="/admin/profile"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition hover:bg-[#1E293B]"
+              style={{ color: '#94A3B8' }}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Profile
+            </Link>
             <button
               onClick={handleLogout}
-              className="rounded-lg p-2 transition hover:bg-[#1E293B]"
-              style={{ 
-                border: '1px solid #334155',
-                color: '#94A3B8'
-              }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition hover:bg-[#1E293B]"
+              style={{ color: '#EF4444' }}
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
+              Logout
             </button>
           </div>
         </div>

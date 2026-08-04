@@ -98,13 +98,24 @@ export default function AccountantLayout({
               <p className="text-xs text-slate-400">{user?.role || "ACCOUNTANT"}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-400 hover:bg-red-900/20 rounded-lg transition"
-          >
-            <ArrowRightOnRectangleIcon className="h-5 w-5" />
-            Logout
-          </button>
+          <div className="space-y-1">
+            <Link
+              href="/accountant/profile"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-blue-300 hover:bg-blue-900/20 rounded-lg transition"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-400 hover:bg-red-900/20 rounded-lg transition"
+            >
+              <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              Logout
+            </button>
+          </div>
         </div>
       </aside>
 

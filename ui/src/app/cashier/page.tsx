@@ -176,11 +176,22 @@ export default function CashierDashboard() {
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Cashier Dashboard</h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            Process payments and manage order settlements
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Cashier Dashboard</h1>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+              Process payments and manage order settlements
+            </p>
+          </div>
+          <Link
+            href="/cashier/profile"
+            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            My Profile
+          </Link>
         </div>
 
         {/* Quick Actions */}
