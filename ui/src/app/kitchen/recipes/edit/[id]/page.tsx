@@ -123,7 +123,7 @@ async function updateRecipe(id: string, data: {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function EditRecipePage() {
-  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
   const params = useParams();
   const router = useRouter();
   

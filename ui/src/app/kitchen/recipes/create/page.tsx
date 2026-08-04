@@ -85,7 +85,7 @@ async function createRecipe(data: {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function CreateRecipePage() {
-  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  const { user, isLoading: authLoading } = useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'CHEF']);
   const router = useRouter();
   
   const [products, setProducts] = useState<Product[]>([]);
