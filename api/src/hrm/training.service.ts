@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import {
-  TrainingType,
-  TrainingStatus,
-} from '@prisma/client';
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { TrainingType, TrainingStatus } from '@prisma/client';
 
 @Injectable()
 export class TrainingService {
@@ -97,14 +98,17 @@ export class TrainingService {
   /**
    * Update training program
    */
-  async updateProgram(id: string, data: Partial<{
-    program_name: string;
-    training_type: TrainingType;
-    description: string;
-    duration_hours: number;
-    is_mandatory: boolean;
-    validity_months: number;
-  }>) {
+  async updateProgram(
+    id: string,
+    data: Partial<{
+      program_name: string;
+      training_type: TrainingType;
+      description: string;
+      duration_hours: number;
+      is_mandatory: boolean;
+      validity_months: number;
+    }>,
+  ) {
     return this.prisma.trainingProgram.update({
       where: { id: BigInt(id) },
       data,
@@ -206,13 +210,16 @@ export class TrainingService {
   /**
    * Update enrollment
    */
-  async updateEnrollment(id: string, data: {
-    status?: TrainingStatus;
-    completion_date?: string;
-    score?: number;
-    certificate_url?: string;
-    feedback?: string;
-  }) {
+  async updateEnrollment(
+    id: string,
+    data: {
+      status?: TrainingStatus;
+      completion_date?: string;
+      score?: number;
+      certificate_url?: string;
+      feedback?: string;
+    },
+  ) {
     const updateData: any = { ...data };
 
     if (data.completion_date) {
@@ -232,11 +239,14 @@ export class TrainingService {
   /**
    * Mark training as completed
    */
-  async completeTraining(id: string, data: {
-    score?: number;
-    certificate_url?: string;
-    feedback?: string;
-  }) {
+  async completeTraining(
+    id: string,
+    data: {
+      score?: number;
+      certificate_url?: string;
+      feedback?: string;
+    },
+  ) {
     return this.updateEnrollment(id, {
       ...data,
       status: TrainingStatus.COMPLETED,
@@ -267,9 +277,10 @@ export class TrainingService {
 
     const complianceData = mandatoryPrograms.map((program) => {
       const completedCount = program.enrollments.length;
-      const complianceRate = totalEmployees > 0
-        ? ((completedCount / totalEmployees) * 100).toFixed(2)
-        : '0.00';
+      const complianceRate =
+        totalEmployees > 0
+          ? ((completedCount / totalEmployees) * 100).toFixed(2)
+          : '0.00';
 
       return {
         program_id: program.id.toString(),
@@ -340,9 +351,10 @@ export class TrainingService {
       totalPrograms,
       totalEnrollments,
       completedEnrollments,
-      completionRate: totalEnrollments > 0
-        ? ((completedEnrollments / totalEnrollments) * 100).toFixed(2) + '%'
-        : '0%',
+      completionRate:
+        totalEnrollments > 0
+          ? ((completedEnrollments / totalEnrollments) * 100).toFixed(2) + '%'
+          : '0%',
       byType: byType.map((item) => ({
         type: item.training_type,
         count: item._count,

@@ -16,7 +16,10 @@ export class MonitoringService {
         status: 'PAID',
       },
     });
-    const currentSales = todayOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+    const currentSales = todayOrders.reduce(
+      (sum, order) => sum + (order.total_amount || 0),
+      0,
+    );
 
     // Get open orders count
     const openOrders = await this.prisma.order.count({
@@ -57,18 +60,28 @@ export class MonitoringService {
     }
 
     // Get pending approvals
-    const pendingApprovals = await this.prisma.approvalRequest.count({
-      where: { status: 'PENDING' },
-    }).catch(() => 0);
+    const pendingApprovals = await this.prisma.approvalRequest
+      .count({
+        where: { status: 'PENDING' },
+      })
+      .catch(() => 0);
 
     // Get high risk alerts (failed login attempts)
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const highRiskAlerts = await this.prisma.auditLog.count({
-      where: {
-        created_at: { gte: oneDayAgo },
-        action: { in: ['LOGIN_FAILED', 'UNAUTHORIZED_ACCESS_ATTEMPT', 'ACCOUNT_LOCKED'] },
-      },
-    }).catch(() => 0);
+    const highRiskAlerts = await this.prisma.auditLog
+      .count({
+        where: {
+          created_at: { gte: oneDayAgo },
+          action: {
+            in: [
+              'LOGIN_FAILED',
+              'UNAUTHORIZED_ACCESS_ATTEMPT',
+              'ACCOUNT_LOCKED',
+            ],
+          },
+        },
+      })
+      .catch(() => 0);
 
     return {
       currentSales,
@@ -211,7 +224,10 @@ export class MonitoringService {
     });
 
     // Calculate revenue
-    const revenue = todayOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+    const revenue = todayOrders.reduce(
+      (sum, order) => sum + (order.total_amount || 0),
+      0,
+    );
 
     // Estimate COGS (55% of revenue as a default)
     const cogs = revenue * 0.55;
@@ -335,7 +351,8 @@ export class MonitoringService {
     const riskAlerts = recentLogs.map((log) => {
       // Determine severity based on action
       const severity =
-        log.action === 'UNAUTHORIZED_ACCESS_ATTEMPT' || log.action === 'ACCOUNT_LOCKED'
+        log.action === 'UNAUTHORIZED_ACCESS_ATTEMPT' ||
+        log.action === 'ACCOUNT_LOCKED'
           ? 'CRITICAL'
           : 'HIGH';
 

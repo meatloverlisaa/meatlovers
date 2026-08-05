@@ -1,9 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  ReviewPeriod,
-  ReviewStatus,
-} from '@prisma/client';
+import { ReviewPeriod, ReviewStatus } from '@prisma/client';
 
 @Injectable()
 export class PerformanceService {
@@ -281,7 +278,10 @@ export class PerformanceService {
       },
     });
 
-    const departmentStats: Record<string, { total: number; sum: number; count: number }> = {};
+    const departmentStats: Record<
+      string,
+      { total: number; sum: number; count: number }
+    > = {};
 
     reviews.forEach((review) => {
       const dept = review.user.employee_profile?.department || 'Unassigned';

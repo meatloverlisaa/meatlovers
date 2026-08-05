@@ -1025,15 +1025,29 @@ export class HrmService {
   }
 
   async approveLeave(id: string, approvedBy: string) {
-    const request = await this.prisma.leaveRequest.findUnique({ where: { id: BigInt(id) } });
-    if (!request || request.status !== LeaveStatus.PENDING) throw new BadRequestException('Leave request cannot be approved');
-    const finalStep = request.current_approval_step >= request.required_approval_steps;
-    await this.prisma.leaveApproval.create({ data: { leave_request_id: BigInt(id), approver_id: BigInt(approvedBy), sequence: request.current_approval_step, status: 'APPROVED', acted_at: new Date() } });
+    const request = await this.prisma.leaveRequest.findUnique({
+      where: { id: BigInt(id) },
+    });
+    if (!request || request.status !== LeaveStatus.PENDING)
+      throw new BadRequestException('Leave request cannot be approved');
+    const finalStep =
+      request.current_approval_step >= request.required_approval_steps;
+    await this.prisma.leaveApproval.create({
+      data: {
+        leave_request_id: BigInt(id),
+        approver_id: BigInt(approvedBy),
+        sequence: request.current_approval_step,
+        status: 'APPROVED',
+        acted_at: new Date(),
+      },
+    });
     const updated = await this.prisma.leaveRequest.update({
       where: { id: BigInt(id) },
       data: {
         status: finalStep ? 'APPROVED' : 'PENDING',
-        current_approval_step: finalStep ? request.current_approval_step : request.current_approval_step + 1,
+        current_approval_step: finalStep
+          ? request.current_approval_step
+          : request.current_approval_step + 1,
         approved_by: BigInt(approvedBy),
         approved_at: new Date(),
       },
@@ -1042,7 +1056,15 @@ export class HrmService {
         approver: true,
       },
     });
-    if (finalStep) await this.prisma.leaveCalendarEvent.create({ data: { leave_request_id: BigInt(id), user_id: request.user_id, start_date: request.start_date, end_date: request.end_date } });
+    if (finalStep)
+      await this.prisma.leaveCalendarEvent.create({
+        data: {
+          leave_request_id: BigInt(id),
+          user_id: request.user_id,
+          start_date: request.start_date,
+          end_date: request.end_date,
+        },
+      });
     return updated;
   }
 
@@ -1240,11 +1262,11 @@ export class HrmService {
     const taxablePay = Math.max(grossSalary - nssf, 0);
     let tax = 0;
     if (taxablePay <= 24000) {
-      tax = taxablePay * 0.10;
+      tax = taxablePay * 0.1;
     } else if (taxablePay <= 32333) {
-      tax = (24000 * 0.10) + ((taxablePay - 24000) * 0.25);
+      tax = 24000 * 0.1 + (taxablePay - 24000) * 0.25;
     } else {
-      tax = (24000 * 0.10) + (8333 * 0.25) + ((taxablePay - 32333) * 0.30);
+      tax = 24000 * 0.1 + 8333 * 0.25 + (taxablePay - 32333) * 0.3;
     }
     const paye = Math.max(tax - 2400, 0);
 
@@ -1279,7 +1301,11 @@ export class HrmService {
         paye: Math.round(paye * 100) / 100,
         nssf: Math.round(nssf * 100) / 100,
         shif: Math.round(shif * 100) / 100,
-        other_deductions: Math.max(0, Math.round((Number(payroll.deductions) - paye - nssf - shif) * 100) / 100),
+        other_deductions: Math.max(
+          0,
+          Math.round((Number(payroll.deductions) - paye - nssf - shif) * 100) /
+            100,
+        ),
       },
       net_salary: Number(payroll.net_salary),
       payment: {
@@ -1313,7 +1339,9 @@ export class HrmService {
     return this.prisma.payroll.update({
       where: { id: BigInt(id) },
       data: {
-        payment_date: data.payment_date ? new Date(data.payment_date) : new Date(),
+        payment_date: data.payment_date
+          ? new Date(data.payment_date)
+          : new Date(),
         payment_method: data.payment_method,
         payment_reference: data.payment_reference || `PAY-${Date.now()}`,
       },
@@ -1327,7 +1355,9 @@ export class HrmService {
     payment_method: string;
     payment_reference?: string;
   }) {
-    const paymentDate = data.payment_date ? new Date(data.payment_date) : new Date();
+    const paymentDate = data.payment_date
+      ? new Date(data.payment_date)
+      : new Date();
     const ref = data.payment_reference || `BULK-PAY-${Date.now()}`;
 
     const updateResults = await Promise.all(
@@ -1392,7 +1422,6 @@ export class HrmService {
 
     const results: any[] = [];
 
-
     for (const emp of employees) {
       const basicSalary = defaultRoleSalaries[emp.role] || 40000;
 
@@ -1414,14 +1443,16 @@ export class HrmService {
         );
         const standardHours = 160;
         const extraHours = Math.max(0, totalHours - standardHours);
-        const hourlyRate = data.overtime_hourly_rate || (basicSalary / 160) * 1.5;
+        const hourlyRate =
+          data.overtime_hourly_rate || (basicSalary / 160) * 1.5;
         overtimePay = Math.round(extraHours * hourlyRate * 100) / 100;
       }
 
       const housingAllowancePct = data.housing_allowance_percent ?? 15;
       const housingAllowance = (basicSalary * housingAllowancePct) / 100;
       const transportAllowance = data.transport_allowance_flat ?? 3000;
-      const allowances = Math.round((housingAllowance + transportAllowance) * 100) / 100;
+      const allowances =
+        Math.round((housingAllowance + transportAllowance) * 100) / 100;
 
       const grossSalary = basicSalary + allowances + overtimePay;
 
@@ -1432,11 +1463,11 @@ export class HrmService {
         const taxablePay = Math.max(grossSalary - nssf, 0);
         let tax = 0;
         if (taxablePay <= 24000) {
-          tax = taxablePay * 0.10;
+          tax = taxablePay * 0.1;
         } else if (taxablePay <= 32333) {
-          tax = (24000 * 0.10) + ((taxablePay - 24000) * 0.25);
+          tax = 24000 * 0.1 + (taxablePay - 24000) * 0.25;
         } else {
-          tax = (24000 * 0.10) + (8333 * 0.25) + ((taxablePay - 32333) * 0.30);
+          tax = 24000 * 0.1 + 8333 * 0.25 + (taxablePay - 32333) * 0.3;
         }
         const paye = Math.max(tax - 2400, 0);
         totalDeductions = Math.round((paye + nssf + shif) * 100) / 100;
@@ -1509,18 +1540,24 @@ export class HrmService {
       },
     });
 
-    const deptMap: Record<string, {
-      department: string;
-      staff_count: number;
-      total_basic: number;
-      total_allowances: number;
-      total_overtime: number;
-      total_deductions: number;
-      total_net: number;
-    }> = {};
+    const deptMap: Record<
+      string,
+      {
+        department: string;
+        staff_count: number;
+        total_basic: number;
+        total_allowances: number;
+        total_overtime: number;
+        total_deductions: number;
+        total_net: number;
+      }
+    > = {};
 
     for (const record of records) {
-      const dept = record.user.employee_profile?.department || record.user.role || 'General Staff';
+      const dept =
+        record.user.employee_profile?.department ||
+        record.user.role ||
+        'General Staff';
       if (!deptMap[dept]) {
         deptMap[dept] = {
           department: dept,
@@ -1596,7 +1633,10 @@ export class HrmService {
       r.payment_reference || 'N/A',
     ]);
 
-    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.join(',')),
+    ].join('\n');
 
     return {
       filename: `MeatLovers_Payroll_BankFile_${new Date().toISOString().split('T')[0]}.csv`,
@@ -1605,4 +1645,3 @@ export class HrmService {
     };
   }
 }
-

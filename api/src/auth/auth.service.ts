@@ -35,7 +35,11 @@ export class AuthService {
    * Passwordless login for SUPER_ADMIN only
    * Allows super admin to login without entering password
    */
-  async loginSuperAdmin(emailOrPhone: string, ipAddress?: string, userAgent?: string) {
+  async loginSuperAdmin(
+    emailOrPhone: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
     const sanitizedInput = this.sanitizeInput(emailOrPhone);
 
     // Find user by email or phone
@@ -63,7 +67,9 @@ export class AuthService {
         ipAddress,
         userAgent,
       );
-      throw new UnauthorizedException('Passwordless login is only available for SUPER_ADMIN');
+      throw new UnauthorizedException(
+        'Passwordless login is only available for SUPER_ADMIN',
+      );
     }
 
     // Check if account is locked
@@ -502,9 +508,12 @@ export class AuthService {
     // session start during refresh-token rotation so refreshing cannot extend it.
     if (
       this.hasPrivilegedSessionTimeout(user.role) &&
-      storedToken.created_at.getTime() + this.PRIVILEGED_SESSION_DURATION_MS <= Date.now()
+      storedToken.created_at.getTime() + this.PRIVILEGED_SESSION_DURATION_MS <=
+        Date.now()
     ) {
-      throw new UnauthorizedException('Admin session expired. Please log in again.');
+      throw new UnauthorizedException(
+        'Admin session expired. Please log in again.',
+      );
     }
 
     // Revoke old refresh token (token rotation)
@@ -753,7 +762,9 @@ export class AuthService {
 
     // Store refresh token in database
     const expiresAt = this.hasPrivilegedSessionTimeout(user.role)
-      ? new Date(sessionStartedAt.getTime() + this.PRIVILEGED_SESSION_DURATION_MS)
+      ? new Date(
+          sessionStartedAt.getTime() + this.PRIVILEGED_SESSION_DURATION_MS,
+        )
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     await this.prisma.refreshToken.create({

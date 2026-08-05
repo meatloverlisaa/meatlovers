@@ -157,12 +157,15 @@ export class DocumentsService {
   /**
    * Update document
    */
-  async updateDocument(id: string, data: {
-    document_name?: string;
-    issue_date?: string;
-    expiry_date?: string;
-    notes?: string;
-  }) {
+  async updateDocument(
+    id: string,
+    data: {
+      document_name?: string;
+      issue_date?: string;
+      expiry_date?: string;
+      notes?: string;
+    },
+  ) {
     const updateData: any = { ...data };
 
     if (data.issue_date) {

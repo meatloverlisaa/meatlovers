@@ -160,4 +160,3 @@ export class BulkPayPayrollDto {
   @IsOptional()
   payment_reference?: string;
 }
-

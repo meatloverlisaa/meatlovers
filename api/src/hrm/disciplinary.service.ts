@@ -148,13 +148,16 @@ export class DisciplinaryService {
   /**
    * Update disciplinary action
    */
-  async updateDisciplinaryAction(id: string, data: {
-    status?: DisciplinaryStatus;
-    action_taken?: string;
-    resolution?: string;
-    appeal_notes?: string;
-    resolved_date?: string;
-  }) {
+  async updateDisciplinaryAction(
+    id: string,
+    data: {
+      status?: DisciplinaryStatus;
+      action_taken?: string;
+      resolution?: string;
+      appeal_notes?: string;
+      resolved_date?: string;
+    },
+  ) {
     const updateData: any = { ...data };
 
     if (data.resolved_date) {
@@ -369,11 +372,14 @@ export class DisciplinaryService {
   /**
    * Update grievance status
    */
-  async updateGrievance(id: string, data: {
-    status?: GrievanceStatus;
-    resolution?: string;
-    notes?: string;
-  }) {
+  async updateGrievance(
+    id: string,
+    data: {
+      status?: GrievanceStatus;
+      resolution?: string;
+      notes?: string;
+    },
+  ) {
     const updateData: any = { ...data };
 
     if (data.status === GrievanceStatus.RESOLVED) {

@@ -35,7 +35,6 @@ import {
   BulkPayPayrollDto,
 } from './dto/payroll.dto';
 
-
 @Controller('hrm')
 @Public()
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -297,7 +296,6 @@ export class HrmController {
     return this.hrmService.generatePayslip(id);
   }
 
-
   // ==================== PERFORMANCE MANAGEMENT ====================
 
   @Post('performance/reviews')
@@ -337,7 +335,10 @@ export class HrmController {
   }
 
   @Patch('performance/reviews/:id/complete')
-  completePerformanceReview(@Param('id') id: string, @Body() body: { employee_comments?: string }) {
+  completePerformanceReview(
+    @Param('id') id: string,
+    @Body() body: { employee_comments?: string },
+  ) {
     return this.performanceService.completeReview(id, body.employee_comments);
   }
 
@@ -366,7 +367,12 @@ export class HrmController {
   ) {
     return this.trainingService.getPrograms({
       training_type,
-      is_mandatory: is_mandatory === 'true' ? true : is_mandatory === 'false' ? false : undefined,
+      is_mandatory:
+        is_mandatory === 'true'
+          ? true
+          : is_mandatory === 'false'
+            ? false
+            : undefined,
     });
   }
 
@@ -460,8 +466,14 @@ export class HrmController {
   }
 
   @Patch('disciplinary/actions/:id/close')
-  closeDisciplinaryAction(@Param('id') id: string, @Body() body: { resolution: string }) {
-    return this.disciplinaryService.closeDisciplinaryAction(id, body.resolution);
+  closeDisciplinaryAction(
+    @Param('id') id: string,
+    @Body() body: { resolution: string },
+  ) {
+    return this.disciplinaryService.closeDisciplinaryAction(
+      id,
+      body.resolution,
+    );
   }
 
   @Get('disciplinary/statistics')
@@ -504,7 +516,10 @@ export class HrmController {
   }
 
   @Patch('grievances/:id/assign')
-  assignGrievance(@Param('id') id: string, @Body() body: { assigned_to: string }) {
+  assignGrievance(
+    @Param('id') id: string,
+    @Body() body: { assigned_to: string },
+  ) {
     return this.disciplinaryService.assignGrievance(id, body.assigned_to);
   }
 
@@ -514,7 +529,10 @@ export class HrmController {
   }
 
   @Patch('grievances/:id/resolve')
-  resolveGrievance(@Param('id') id: string, @Body() body: { resolution: string }) {
+  resolveGrievance(
+    @Param('id') id: string,
+    @Body() body: { resolution: string },
+  ) {
     return this.disciplinaryService.resolveGrievance(id, body.resolution);
   }
 
@@ -540,7 +558,12 @@ export class HrmController {
     return this.documentsService.getDocuments({
       userId,
       documentType,
-      isVerified: isVerified === 'true' ? true : isVerified === 'false' ? false : undefined,
+      isVerified:
+        isVerified === 'true'
+          ? true
+          : isVerified === 'false'
+            ? false
+            : undefined,
     });
   }
 
@@ -550,8 +573,15 @@ export class HrmController {
   }
 
   @Patch('documents/:id/verify')
-  verifyDocument(@Param('id') id: string, @Body() body: { verified_by: string; notes?: string }) {
-    return this.documentsService.verifyDocument(id, body.verified_by, body.notes);
+  verifyDocument(
+    @Param('id') id: string,
+    @Body() body: { verified_by: string; notes?: string },
+  ) {
+    return this.documentsService.verifyDocument(
+      id,
+      body.verified_by,
+      body.notes,
+    );
   }
 
   @Patch('documents/:id')
@@ -566,7 +596,9 @@ export class HrmController {
 
   @Get('documents/alerts/expiring')
   getExpiringDocuments(@Query('days') days?: string) {
-    return this.documentsService.getExpiringDocuments(days ? parseInt(days) : 30);
+    return this.documentsService.getExpiringDocuments(
+      days ? parseInt(days) : 30,
+    );
   }
 
   @Get('documents/alerts/expired')
