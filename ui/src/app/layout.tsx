@@ -34,9 +34,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fontClassNames} h-full antialiased dark`}
+      className={`${fontClassNames} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-50 dark:bg-slate-950 dark:text-slate-50">
+      <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <AuthProvider>
           {children}

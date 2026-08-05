@@ -106,6 +106,7 @@ export class ManagerSuppliersController {
    * Create a new supplier
    */
   @Post()
+  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
   create(@Body() createSupplierDto: CreateSupplierDto) {
     return this.managerSuppliersService.create(createSupplierDto);
   }
@@ -115,6 +116,7 @@ export class ManagerSuppliersController {
    * Update supplier details
    */
   @Patch(':id')
+  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateSupplierDto: UpdateSupplierDto,
@@ -127,6 +129,7 @@ export class ManagerSuppliersController {
    * Update supplier status (ACTIVE/SUSPENDED)
    */
   @Patch(':id/status')
+  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStatusDto: UpdateSupplierStatusDto,
@@ -142,6 +145,7 @@ export class ManagerSuppliersController {
    * Delete/remove a supplier
    */
   @Delete(':id')
+  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPER_ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.managerSuppliersService.remove(id);
   }
