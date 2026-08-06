@@ -10,8 +10,17 @@ export function Navigation() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
-    setTheme(current);
+    let mounted = true;
+    const timer = setTimeout(() => {
+      if (mounted) {
+        const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+        setTheme(current);
+      }
+    }, 0);
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   const toggleTheme = () => {

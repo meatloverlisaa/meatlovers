@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -79,16 +79,10 @@ export default function CashierOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Prevent concurrent requests
-
-  async function loadOrders() {
-    if (isLoading) return; // Prevent concurrent requests
-    
+  const loadOrders = useCallback(async () => {
     try {
-      setIsLoading(true);
       setLoading(true);
       const data = await fetchOrders("SERVED");
-      // Sort by created_at descending (newest first)
       const sortedData = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setOrders(sortedData);
       setError(null);
@@ -96,16 +90,21 @@ export default function CashierOrdersPage() {
       setError(e instanceof Error ? e.message : "Failed to load orders");
     } finally {
       setLoading(false);
-      setIsLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    void loadOrders();
-    // Disabled auto-refresh to prevent rate limiting - user can manually refresh
-    // const interval = setInterval(() => void loadOrders(), 60000);
-    // return () => clearInterval(interval);
-  }, []);
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadOrders();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [loadOrders]);
 
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -149,11 +148,11 @@ export default function CashierOrdersPage() {
           </div>
           <button
             onClick={() => void loadOrders()}
-            disabled={isLoading}
+            disabled={loading}
             className="rounded-xl border border-zinc-200 bg-white p-2 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900 disabled:opacity-50"
             title="Refresh orders"
           >
-            <svg className={`h-5 w-5 text-zinc-600 dark:text-zinc-300 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`h-5 w-5 text-zinc-600 dark:text-zinc-300 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>

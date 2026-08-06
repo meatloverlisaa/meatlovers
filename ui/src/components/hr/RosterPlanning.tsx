@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useCallback } from "react";
 import {
   createRoster,
   DutyRoster,
@@ -26,7 +26,7 @@ export function RosterPlanning() {
     notes: "",
   });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const [entries, employees] = await Promise.all([
         getRoster(date),
@@ -37,11 +37,20 @@ export function RosterPlanning() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load roster.");
     }
-  };
+  }, [date]);
 
   useEffect(() => {
-    load();
-  }, [date]);
+    let mounted = true;
+    const run = async () => {
+      if (mounted) {
+        await load();
+      }
+    };
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [load]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();

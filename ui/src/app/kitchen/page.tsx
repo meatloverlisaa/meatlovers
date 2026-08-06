@@ -37,14 +37,20 @@ export default function KitchenDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     if (!authLoading && user) {
       async function loadSummary() {
         const data = await getKitchenSummary();
-        setSummary(data);
-        setLoading(false);
+        if (mounted) {
+          setSummary(data);
+          setLoading(false);
+        }
       }
       loadSummary();
     }
+    return () => {
+      mounted = false;
+    };
   }, [authLoading, user]);
 
   return (

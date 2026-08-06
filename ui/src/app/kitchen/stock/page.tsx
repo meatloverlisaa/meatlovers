@@ -79,30 +79,38 @@ export default function KitchenStockPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     if (!authLoading && user) {
       async function loadData() {
-        setLoading(true);
+        if (mounted) setLoading(true);
         try {
           const productsData = await getProducts();
-          setProducts(productsData);
-          setProductsError(null);
+          if (mounted) {
+            setProducts(productsData);
+            setProductsError(null);
+          }
         } catch (e) {
-          setProductsError(e instanceof Error ? e.message : "Unknown error");
+          if (mounted) setProductsError(e instanceof Error ? e.message : "Unknown error");
         }
 
         try {
           const stockData = await getKitchenStock();
-          setStock(stockData);
-          setStockError(null);
+          if (mounted) {
+            setStock(stockData);
+            setStockError(null);
+          }
         } catch (e) {
-          setStockError(e instanceof Error ? e.message : "Unknown error");
+          if (mounted) setStockError(e instanceof Error ? e.message : "Unknown error");
         }
 
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
 
       loadData();
     }
+    return () => {
+      mounted = false;
+    };
   }, [authLoading, user]);
 
   // Filter for kitchen location for forms

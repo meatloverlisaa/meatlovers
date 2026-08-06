@@ -1,0 +1,139 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm-up"
+    # Normal load
+    - duration: 300
+      arrivalRate: 10
+      name: "Normal load"
+    # Peak load
+    - duration: 300
+      arrivalRate: 25
+      name: "Peak load"
+    # Stress test
+    - duration: 180
+      arrivalRate: 50
+      name: "Stress test"
+  processor: "./load-test-functions.js"
+
+scenarios:
+  # Authentication flow
+  - name: "Login and Access Dashboard"
+    weight: 20
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            email: "admin@meatlovers.com"
+            password: "Admin123!@#"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+      - get:
+          url: "/admin/dashboard/summary"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+
+  # Order management flow
+  - name: "View and Create Orders"
+    weight: 30
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            email: "waiter@meatlovers.com"
+            password: "Waiter123!@#"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+      - get:
+          url: "/orders"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+      - post:
+          url: "/orders"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          json:
+            table_id: 1
+            customer_id: 1
+            order_type: "DINE_IN"
+            special_instructions: "Load test order"
+          expect:
+            - statusCode: 201
+
+  # Product browsing
+  - name: "Browse Products"
+    weight: 25
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            email: "chef@meatlovers.com"
+            password: "Chef123!@#"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+      - get:
+          url: "/products?limit=20"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+      - get:
+          url: "/products/1"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+
+  # Stock checking
+  - name: "Check Stock Levels"
+    weight: 15
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            email: "storekeeper@meatlovers.com"
+            password: "Store123!@#"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+      - get:
+          url: "/stock?limit=50"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+
+  # Finance dashboard
+  - name: "View Financial Data"
+    weight: 10
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            email: "accountant@meatlovers.com"
+            password: "Account123!@#"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+      - get:
+          url: "/finance/transactions?limit=50"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200
+      - get:
+          url: "/accountant/dashboard"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          expect:
+            - statusCode: 200

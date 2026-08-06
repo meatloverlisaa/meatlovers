@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -269,7 +269,7 @@ export default function ProductionPlansPage() {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("");
 
-  const loadPlans = async () => {
+  const loadPlans = useCallback(async () => {
     if (!authLoading && user) {
       try {
         const data = await getProductionPlans();
@@ -282,11 +282,20 @@ export default function ProductionPlansPage() {
         setLoading(false);
       }
     }
-  };
+  }, [authLoading, user]);
 
   useEffect(() => {
-    loadPlans();
-  }, [authLoading, user]);
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadPlans();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [loadPlans]);
 
   // Filter plans
   const filteredPlans = plans.filter((plan) => {

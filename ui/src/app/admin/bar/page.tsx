@@ -96,18 +96,27 @@ export default function BarOversightPage() {
   }, []);
 
   useEffect(() => {
-    fetchSalesData();
-    fetchOrders();
-    fetchMovements();
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await Promise.all([fetchSalesData(), fetchOrders(), fetchMovements()]);
+      }
+    };
+    load();
 
     // Auto-refresh every 60 seconds
     const interval = setInterval(() => {
-      fetchSalesData();
-      fetchOrders();
-      fetchMovements();
+      if (mounted) {
+        fetchSalesData();
+        fetchOrders();
+        fetchMovements();
+      }
     }, 60000);
 
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [fetchSalesData, fetchOrders, fetchMovements]);
 
   const handleRefresh = () => {

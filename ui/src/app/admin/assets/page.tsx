@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   CubeIcon,
   WrenchScrewdriverIcon,
@@ -82,7 +82,7 @@ export default function AssetsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
       const params = new URLSearchParams();
@@ -103,11 +103,20 @@ export default function AssetsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryFilter, statusFilter]);
 
   useEffect(() => {
-    fetchData();
-  }, [categoryFilter, statusFilter]);
+    let mounted = true;
+    const loadData = async () => {
+      if (mounted) {
+        await fetchData();
+      }
+    };
+    loadData();
+    return () => {
+      mounted = false;
+    };
+  }, [fetchData]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

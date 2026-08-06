@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -243,7 +243,7 @@ export default function WasteTrackingPage() {
   // Delete confirmation
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | number | null>(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!authLoading && user) {
       try {
         const [wasteData, productsData] = await Promise.all([
@@ -260,11 +260,20 @@ export default function WasteTrackingPage() {
         setLoading(false);
       }
     }
-  };
+  }, [authLoading, user]);
 
   useEffect(() => {
-    loadData();
-  }, [authLoading, user]);
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadData();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [loadData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -203,15 +203,17 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isAuthLoading) return;
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    let mounted = true;
 
     async function loadData() {
-      setLoading(true);
+      if (isAuthLoading) return;
+
+      if (!user) {
+        if (mounted) setLoading(false);
+        return;
+      }
+
+      if (mounted) setLoading(true);
       try {
         // Load all data in parallel for faster loading
         const [productsData, balanceData, movementsData] = await Promise.allSettled([
@@ -219,6 +221,8 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
           getStockBalance(),
           getRecentMovements(),
         ]);
+
+        if (!mounted) return;
 
         if (productsData.status === 'fulfilled') {
           setProducts(productsData.value);
@@ -240,11 +244,15 @@ export function StockControlModule({ role, canManage = true }: StockControlModul
       } catch (e) {
         console.error("Error loading data:", e);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     loadData();
+
+    return () => {
+      mounted = false;
+    };
   }, [isAuthLoading, user]);
 
   const handleStockIn = async (formData: FormData) => {

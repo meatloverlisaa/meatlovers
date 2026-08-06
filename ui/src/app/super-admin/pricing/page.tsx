@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { PricingRuleForm } from "../../admin/pricing-control/components/PricingRuleForm";
 import { PricingRuleTable } from "../../admin/pricing-control/components/PricingRuleTable";
@@ -70,7 +70,7 @@ export default function SuperAdminPricingPage() {
   const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
   const [activeTab, setActiveTab] = useState<"rules" | "alerts" | "audit">("rules");
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -85,11 +85,20 @@ export default function SuperAdminPricingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadData();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [loadData]);
 
   const handleRuleCreated = () => {
     setShowRuleForm(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 type UserRole = 
@@ -123,15 +123,7 @@ export default function AdminStaffPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<UserRole | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  async function loadStaff() {
-    if (!isMounted) return;
-    
+  const loadStaff = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -151,17 +143,29 @@ export default function AdminStaffPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    if (!isMounted) return;
-    
-    loadStaff();
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadStaff();
+      }
+    };
+    load();
     
     // Auto-refresh every 60 seconds
-    const interval = setInterval(loadStaff, 60000);
-    return () => clearInterval(interval);
-  }, [isMounted]);
+    const interval = setInterval(() => {
+      if (mounted) {
+        loadStaff();
+      }
+    }, 60000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [loadStaff]);
 
   const filteredStaff = staff.filter(member => {
     const matchesSearch = 

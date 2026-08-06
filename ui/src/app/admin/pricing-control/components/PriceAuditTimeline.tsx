@@ -22,19 +22,28 @@ export function PriceAuditTimeline() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     async function loadAudits() {
-      setLoading(true);
-      setError(null);
       try {
         const data = await getPriceAudits();
-        setAudits(data);
+        if (mounted) {
+          setAudits(data);
+          setError(null);
+        }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load price audit");
+        if (mounted) {
+          setError(e instanceof Error ? e.message : "Failed to load price audit");
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
     loadAudits();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) {

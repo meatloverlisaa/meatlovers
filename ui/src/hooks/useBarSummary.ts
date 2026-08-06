@@ -29,12 +29,23 @@ export function useBarSummary(refreshInterval = 30000): UseBarSummaryReturn {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await fetchData();
+      }
+    };
+    load();
 
     // Set up auto-refresh
-    const interval = setInterval(fetchData, refreshInterval);
+    const interval = setInterval(() => {
+      if (mounted) fetchData();
+    }, refreshInterval);
 
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [fetchData, refreshInterval]);
 
   const refresh = useCallback(async () => {

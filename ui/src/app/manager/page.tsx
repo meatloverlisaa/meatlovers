@@ -192,44 +192,36 @@ export default function ManagerDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return;
-    
-    let cancelled = false;
+    let mounted = true;
 
     async function loadStats() {
       try {
         setLoading(true);
         const data = await fetchManagerStats();
-        if (cancelled) return;
+        if (!mounted) return;
         
         setStats(data);
         setError(null);
       } catch (e) {
-        if (cancelled) return;
+        if (!mounted) return;
         const message = e instanceof Error ? e.message : "Failed to load stats";
         setError(message);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     loadStats();
     
-    // Auto-refresh every 60 seconds (increased from 30 to reduce rate limiting)
+    // Auto-refresh every 60 seconds
     const interval = setInterval(loadStats, 60000);
 
     return () => {
-      cancelled = true;
+      mounted = false;
       clearInterval(interval);
     };
-  }, [isMounted]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17]">

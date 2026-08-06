@@ -263,9 +263,16 @@ export default function AdminCMS() {
   }, []);
 
   useEffect(() => {
-    fetchPages();
-    fetchLeads();
-    fetchAnalytics();
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await Promise.all([fetchPages(), fetchLeads(), fetchAnalytics()]);
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
   }, [fetchPages, fetchLeads, fetchAnalytics]);
 
   const handleTogglePublish = async (id: string) => {

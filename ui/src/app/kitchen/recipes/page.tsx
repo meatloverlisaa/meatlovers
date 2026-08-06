@@ -254,21 +254,31 @@ export default function KitchenRecipesPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
 
   useEffect(() => {
+    let mounted = true;
     if (!authLoading && user) {
       async function loadRecipes() {
         try {
           const data = await getRecipes();
-          setRecipes(data);
-          setError(null);
+          if (mounted) {
+            setRecipes(data);
+            setError(null);
+          }
         } catch (e) {
           console.error('Error loading recipes:', e);
-          setError(e instanceof Error ? e.message : "Unknown error");
+          if (mounted) {
+            setError(e instanceof Error ? e.message : "Unknown error");
+          }
         } finally {
-          setLoading(false);
+          if (mounted) {
+            setLoading(false);
+          }
         }
       }
       loadRecipes();
     }
+    return () => {
+      mounted = false;
+    };
   }, [authLoading, user]);
 
   // Filter recipes

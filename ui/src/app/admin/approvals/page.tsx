@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -71,7 +71,7 @@ export default function ApprovalsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
       const params = new URLSearchParams();
@@ -92,11 +92,20 @@ export default function ApprovalsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, typeFilter]);
 
   useEffect(() => {
-    fetchData();
-  }, [statusFilter, typeFilter]);
+    let mounted = true;
+    const loadData = async () => {
+      if (mounted) {
+        await fetchData();
+      }
+    };
+    loadData();
+    return () => {
+      mounted = false;
+    };
+  }, [fetchData]);
 
   const handleApprove = async (id: string) => {
     try {

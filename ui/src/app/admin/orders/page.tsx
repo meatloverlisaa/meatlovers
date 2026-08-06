@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
@@ -273,7 +273,7 @@ export default function OrderManagementPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const filter = statusFilter === "ALL" ? undefined : statusFilter;
@@ -290,15 +290,29 @@ export default function OrderManagementPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [statusFilter]);
 
   useEffect(() => {
-    loadOrders();
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadOrders();
+      }
+    };
+    load();
     
     // Auto-refresh every 10 seconds
-    const interval = setInterval(loadOrders, 10000);
-    return () => clearInterval(interval);
-  }, [statusFilter]);
+    const interval = setInterval(() => {
+      if (mounted) {
+        loadOrders();
+      }
+    }, 10000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [loadOrders]);
 
   async function handleStatusChange(orderId: string, newStatus: OrderStatus) {
     await updateOrderStatus(orderId, newStatus);

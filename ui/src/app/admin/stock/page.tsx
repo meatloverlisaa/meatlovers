@@ -204,15 +204,16 @@ export default function StockControlPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     async function loadData() {
       try {
         const [productsData, balanceData, movementsData] = await Promise.all([
           getProducts().catch(e => {
-            setProductsError(e instanceof Error ? e.message : "Unknown error");
+            if (mounted) setProductsError(e instanceof Error ? e.message : "Unknown error");
             return [];
           }),
           getStockBalance().catch(e => {
-            setBalanceError(e instanceof Error ? e.message : "Unknown error");
+            if (mounted) setBalanceError(e instanceof Error ? e.message : "Unknown error");
             return [];
           }),
           getRecentMovements().catch(e => {
@@ -220,14 +221,19 @@ export default function StockControlPage() {
             return [];
           }),
         ]);
-        setProducts(productsData);
-        setBalance(balanceData);
-        setMovements(movementsData);
+        if (mounted) {
+          setProducts(productsData);
+          setBalance(balanceData);
+          setMovements(movementsData);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
     loadData();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleStockIn = async (formData: FormData) => {
