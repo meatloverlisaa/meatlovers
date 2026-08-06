@@ -49,7 +49,7 @@ export default function StorekeeperLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/storekeeper/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "STOREKEEPER";

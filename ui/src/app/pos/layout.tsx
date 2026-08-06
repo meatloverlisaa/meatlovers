@@ -32,7 +32,7 @@ export default function PosLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/pos/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "WAITER";

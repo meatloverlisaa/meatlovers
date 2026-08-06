@@ -15,8 +15,9 @@ type NavItem = {
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
   { href: "/cashier", label: "Cashier Dashboard", icon: "💰" },
-  { href: "/cashier/transactions", label: "Transactions", icon: "💳" },
+  { href: "/cashier/orders", label: "Orders", icon: "📋" },
   { href: "/cashier/payments", label: "Payments", icon: "💵" },
+  { href: "/cashier/settle", label: "Settle Bills", icon: "💳" },
 ];
 
 // ─── Cashier Layout Component ─────────────────────────────────────────────────
@@ -32,7 +33,7 @@ export default function CashierLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/cashier/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "CASHIER";

@@ -15,9 +15,10 @@ type NavItem = {
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
   { href: "/manager", label: "Manager Dashboard", icon: "📊" },
+  { href: "/manager/orders", label: "Orders", icon: "📋" },
   { href: "/manager/reports", label: "Reports", icon: "📈" },
-  { href: "/manager/operations", label: "Operations", icon: "⚙️" },
-  { href: "/manager/staff", label: "Staff Overview", icon: "👥" },
+  { href: "/manager/stock", label: "Stock", icon: "📦" },
+  { href: "/manager/staff", label: "Staff", icon: "👥" },
 ];
 
 // ─── Manager Layout Component ─────────────────────────────────────────────────
@@ -33,7 +34,7 @@ export default function ManagerLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/manager/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "MANAGER";

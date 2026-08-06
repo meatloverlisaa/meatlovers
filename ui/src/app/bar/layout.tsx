@@ -31,7 +31,7 @@ export default function BarLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/bar/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "BARMAN";

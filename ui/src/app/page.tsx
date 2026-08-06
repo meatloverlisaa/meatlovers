@@ -298,7 +298,7 @@ export default function Home() {
         {/* Staff Login Button - Floating in top-right */}
         <div className="absolute top-6 right-6 z-10">
           <Link
-            href="/admin/login"
+            href="/login"
             className="inline-flex items-center gap-2 rounded-md border border-white/40 bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white/60"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

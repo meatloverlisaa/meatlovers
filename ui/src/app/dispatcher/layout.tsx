@@ -15,8 +15,6 @@ type NavItem = {
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
   { href: "/dispatcher", label: "Dispatcher Dashboard", icon: "🚚" },
-  { href: "/dispatcher/deliveries", label: "Deliveries", icon: "📦" },
-  { href: "/dispatcher/tracking", label: "Tracking", icon: "📍" },
 ];
 
 // ─── Dispatcher Layout Component ─────────────────────────────────────────────────
@@ -32,7 +30,7 @@ export default function DispatcherLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/dispatcher/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "DISPATCHER";

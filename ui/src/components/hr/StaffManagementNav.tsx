@@ -19,7 +19,7 @@ export function StaffManagementNav() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/hr/login');
+    router.push('/login');
   };
 
   return (

@@ -32,7 +32,7 @@ export default function KitchenLayout({
 
   const handleLogout = async () => {
     await logout();
-    router.push('/kitchen/login');
+    router.push('/login');
   };
 
   const userRole = user?.role || "CHEF";
