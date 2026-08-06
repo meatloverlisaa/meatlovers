@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
-import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
-import { Controller } from '@nestjs/common/interfaces';
 import { ROLES_KEY, IS_PUBLIC_KEY } from './constants/auth-metadata.constants';
 
 export interface EndpointAuthInfo {

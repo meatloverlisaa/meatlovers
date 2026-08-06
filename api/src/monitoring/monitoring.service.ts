@@ -133,7 +133,7 @@ export class MonitoringService {
     }
   }
 
-  async getApiHealth() {
+  getApiHealth() {
     const memoryUsage = process.memoryUsage();
 
     return {
@@ -153,7 +153,7 @@ export class MonitoringService {
     };
   }
 
-  async getPerformanceMetrics() {
+  getPerformanceMetrics() {
     // Calculate average response times from recent operations
     // This is a simplified version - in production, use proper monitoring tools
 
@@ -166,7 +166,7 @@ export class MonitoringService {
     };
   }
 
-  async getRecentErrors() {
+  getRecentErrors() {
     // In production, this would query from an error logging table
     // For now, return mock data structure
 

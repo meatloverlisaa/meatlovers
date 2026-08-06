@@ -9,7 +9,6 @@ import {
 import { ManagerOrdersService } from './manager-orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
-import { Public } from '../auth/public.decorator';
 import { Role, OrderStatus } from '@prisma/client';
 
 /**

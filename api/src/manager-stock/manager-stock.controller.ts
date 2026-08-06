@@ -9,7 +9,6 @@ import {
 import { ManagerStockService } from './manager-stock.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
-import { Public } from '../auth/public.decorator';
 import { Role, MovementType, ProductCategory } from '@prisma/client';
 
 /**
