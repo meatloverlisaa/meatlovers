@@ -4,7 +4,6 @@ import {
   Get,
   Patch,
   Body,
-  UseGuards,
   Request,
   HttpCode,
   HttpStatus,
@@ -18,8 +17,8 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
-import { JwtAuthGuard } from './jwt-auth.guard';
 import { Role } from '@prisma/client';
+import type { AuthenticatedRequest } from './types/authenticated-request.type';
 
 @Controller('auth')
 export class AuthController {
@@ -76,8 +75,8 @@ export class AuthController {
     Role.ACCOUNTANT,
     Role.HR,
   )
-  async getProfile(@Request() req: any) {
-    return this.authService.getProfile(req.user.sub as string);
+  async getProfile(@Request() req: AuthenticatedRequest) {
+    return this.authService.getProfile(req.user.sub);
   }
 
   /**
@@ -100,10 +99,10 @@ export class AuthController {
     Role.HR,
   )
   async updateProfile(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Body() updateDto: { full_name?: string; email?: string; phone?: string },
   ) {
-    return this.authService.updateProfile(req.user.sub as string, updateDto);
+    return this.authService.updateProfile(req.user.sub, updateDto);
   }
 
   /**
@@ -127,14 +126,14 @@ export class AuthController {
   )
   @HttpCode(HttpStatus.OK)
   async changePassword(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Body()
     changePasswordDto: { current_password: string; new_password: string },
     @Ip() ip: string,
     @Headers('user-agent') userAgent?: string,
   ) {
     return this.authService.changePassword(
-      req.user.sub as string,
+      req.user.sub,
       changePasswordDto.current_password,
       changePasswordDto.new_password,
       ip,
@@ -211,10 +210,10 @@ export class AuthController {
   )
   @HttpCode(HttpStatus.OK)
   async logout(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Ip() ip: string,
     @Headers('user-agent') userAgent?: string,
   ) {
-    return this.authService.logout(req.user.sub as string, ip, userAgent);
+    return this.authService.logout(req.user.sub, ip, userAgent);
   }
 }

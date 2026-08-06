@@ -2,6 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderStatus, PaymentStatus, LeadStatus } from '@prisma/client';
 
+export interface Activity {
+  type: string;
+  timestamp: Date;
+  description: string;
+  details: Record<string, unknown>;
+}
+
 @Injectable()
 export class AdminDashboardService {
   constructor(private prisma: PrismaService) {}
@@ -233,7 +240,7 @@ export class AdminDashboardService {
     );
 
     // Format as unified activity timeline
-    const activities: any[] = [];
+    const activities: Activity[] = [];
 
     recentOrders.forEach((order) => {
       activities.push({
@@ -418,7 +425,7 @@ export class AdminDashboardService {
         id: true,
         status: true,
         created_at: true,
-        table: { select: { table_name: true } },
+        table: { select: { id: true, table_name: true } },
         waiter: { select: { full_name: true } },
       },
     });
@@ -475,7 +482,7 @@ export class AdminDashboardService {
         stuckOrders: stuckOrders.map((order) => ({
           orderId: order.id,
           status: order.status,
-          table: order.table.table_name || `Table ${order.table}`,
+          table: order.table.table_name || `Table ${order.table.id}`,
           waiter: order.waiter.full_name,
           createdAt: order.created_at,
           hoursStuck: Math.floor(

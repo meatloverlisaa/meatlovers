@@ -1,14 +1,15 @@
 import { Request } from 'express';
 import { Role } from '@prisma/client';
 
-export type AuthenticatedUser = {
-  id: bigint;
+export interface JwtPayload {
+  sub: string;
   email: string;
-  fullName: string;
   role: Role;
-  isActive: boolean;
-};
+  isActive?: boolean;
+  iat?: number;
+  exp?: number;
+}
 
-export type AuthenticatedRequest = Request & {
-  user: AuthenticatedUser;
-};
+export interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
