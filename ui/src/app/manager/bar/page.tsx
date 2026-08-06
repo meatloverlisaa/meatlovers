@@ -31,7 +31,7 @@ export default function BarOversightPage() {
       const today = new Date().toISOString().split('T')[0];
       
       let startDate = today;
-      let endDate = today;
+      const endDate = today;
       
       if (dateFilter === 'week') {
         const weekAgo = new Date();

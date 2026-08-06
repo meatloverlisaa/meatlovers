@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getPayrollRecords, getStaffDirectory, PayrollRecord, Employee, readable, dateValue } from "@/lib/hr";
 
 export function PayrollRecords() {
@@ -9,7 +9,7 @@ export function PayrollRecords() {
   const [filterUserId, setFilterUserId] = useState("");
   const [filterPeriod, setFilterPeriod] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const [s, r] = await Promise.all([
         getStaffDirectory("active"),
@@ -20,9 +20,9 @@ export function PayrollRecords() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load payroll records.");
     }
-  };
+  }, [filterUserId, filterPeriod]);
 
-  useEffect(() => { load(); }, [filterUserId, filterPeriod]);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 type UserRole = 
@@ -129,7 +129,7 @@ export default function AdminStaffPage() {
     setIsMounted(true);
   }, []);
 
-  async function loadStaff() {
+  const loadStaff = useCallback(async () => {
     if (!isMounted) return;
     
     setLoading(true);
@@ -151,7 +151,7 @@ export default function AdminStaffPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [isMounted]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -161,7 +161,7 @@ export default function AdminStaffPage() {
     // Auto-refresh every 60 seconds
     const interval = setInterval(loadStaff, 60000);
     return () => clearInterval(interval);
-  }, [isMounted]);
+  }, [isMounted, loadStaff]);
 
   const filteredStaff = staff.filter(member => {
     const matchesSearch = 

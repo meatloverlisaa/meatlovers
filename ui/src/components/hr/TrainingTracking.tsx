@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getStaffDirectory, Employee } from "@/lib/hr";
 
 export function TrainingTracking() {
@@ -8,7 +8,7 @@ export function TrainingTracking() {
   const [error, setError] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     getStaffDirectory("active").then((s) => {
       setStaff(s);
       // Mock training history data
@@ -23,11 +23,11 @@ export function TrainingTracking() {
       }));
       setTrainingHistory(mockHistory);
     }).catch((e) => setError(e instanceof Error ? e.message : "Unable to load training tracking data."));
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const filteredHistory = selectedEmployee 
     ? trainingHistory.filter((h) => String(h.user.id) === selectedEmployee)
@@ -134,8 +134,8 @@ export function TrainingTracking() {
         <h2 className="font-black text-white">Mandatory Training Compliance</h2>
         <p className="mt-1 text-sm text-zinc-400">Track compliance with mandatory training requirements.</p>
         <div className="mt-4 space-y-3">
-          {staff.slice(0, 5).map((employee) => {
-            const compliance = Math.random() > 0.3 ? "Compliant" : "Non-Compliant";
+          {staff.slice(0, 5).map((employee, idx) => {
+            const compliance = (idx % 2 === 0) ? "Compliant" : "Non-Compliant";
             return (
               <div key={String(employee.id)} className="flex items-center justify-between rounded-lg bg-zinc-950 p-3">
                 <div>

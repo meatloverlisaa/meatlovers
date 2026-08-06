@@ -438,7 +438,7 @@ function SummaryCards({ summary }: { summary: HrmSummary }) {
       color: "bg-green-100",
     },
     {
-      label: "Today's Attendance",
+      label: "Today&apos;s Attendance",
       value: summary.todayAttendance,
       icon: "📋",
       color: "bg-purple-100",
@@ -557,7 +557,7 @@ function AttendanceTable({ attendance }: { attendance: Attendance[] }) {
   return (
     <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
       <div className="border-b border-zinc-200 px-6 py-4">
-        <h3 className="font-black text-zinc-950">Today's Attendance</h3>
+        <h3 className="font-black text-zinc-950">Today&apos;s Attendance</h3>
         <p className="mt-1 text-xs text-zinc-500">Attendance records for today</p>
       </div>
       <div className="overflow-x-auto">
@@ -739,7 +739,7 @@ function DutyRosterTable({ roster }: { roster: DutyRoster[] }) {
   return (
     <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
       <div className="border-b border-zinc-200 px-6 py-4">
-        <h3 className="font-black text-zinc-950">Today's Duty Roster</h3>
+        <h3 className="font-black text-zinc-950">Today&apos;s Duty Roster</h3>
         <p className="mt-1 text-xs text-zinc-500">Scheduled shifts for today</p>
       </div>
       <div className="overflow-x-auto">
@@ -1115,9 +1115,9 @@ function MarkPaidModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [method, setMethod] = useState("Bank Transfer");
-  const [reference, setReference] = useState(`PAY-${Date.now().toString().slice(-6)}`);
+  const [reference, setReference] = useState(() => `PAY-${Date.now().toString().slice(-6)}`);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1225,9 +1225,9 @@ function BulkPayModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [method, setMethod] = useState("Bank Transfer");
-  const [reference, setReference] = useState(`BULK-${Date.now().toString().slice(-6)}`);
+  const [reference, setReference] = useState(() => `BULK-${Date.now().toString().slice(-6)}`);
   const [loading, setLoading] = useState(false);
 
   const selectedRecords = payroll.filter((r) => selectedIds.includes(String(r.id)));

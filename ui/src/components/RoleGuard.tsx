@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getAuthHeader } from "@/lib/auth";
 
@@ -13,13 +13,8 @@ type RoleGuardProps = {
 export default function RoleGuard({ allowedRoles, children, redirectTo }: RoleGuardProps) {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<string>("");
 
-  useEffect(() => {
-    checkAccess();
-  }, []);
-
-  async function checkAccess() {
+  const checkAccess = useCallback(async () => {
     try {
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       const authHeaders = getAuthHeader();
@@ -39,7 +34,6 @@ export default function RoleGuard({ allowedRoles, children, redirectTo }: RoleGu
       }
 
       const data = await res.json();
-      setUserRole(data.role);
 
       // Check if user's role is in the allowed roles
       if (allowedRoles.includes(data.role)) {
@@ -68,7 +62,11 @@ export default function RoleGuard({ allowedRoles, children, redirectTo }: RoleGu
       console.error("Access check error:", error);
       router.push("/login");
     }
-  }
+  }, [allowedRoles, redirectTo, router]);
+
+  useEffect(() => {
+    checkAccess();
+  }, [checkAccess]);
 
   // Show loading state while checking
   if (isAuthorized === null) {
@@ -96,7 +94,7 @@ export default function RoleGuard({ allowedRoles, children, redirectTo }: RoleGu
             Access Denied
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-4">
-            You don't have permission to view this page. Redirecting to your profile...
+            You don&apos;t have permission to view this page. Redirecting to your profile...
           </p>
         </div>
       </div>

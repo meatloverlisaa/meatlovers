@@ -127,7 +127,7 @@ export default function ReportsPage() {
 
       // Route to appropriate endpoint based on report type
       let endpoint = '';
-      let queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams();
 
       if (dateFrom) queryParams.append('startDate', dateFrom);
       if (dateTo) queryParams.append('endDate', dateTo);

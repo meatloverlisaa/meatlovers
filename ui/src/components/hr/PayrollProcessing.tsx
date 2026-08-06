@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useCallback } from "react";
 import { processBulkPayroll, getStaffDirectory, Employee, readable } from "@/lib/hr";
 
 export function PayrollProcessing() {
@@ -14,16 +14,16 @@ export function PayrollProcessing() {
     include_bonuses: false
   });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const s = await getStaffDirectory("active");
       setStaff(s);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load staff directory.");
     }
-  };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();

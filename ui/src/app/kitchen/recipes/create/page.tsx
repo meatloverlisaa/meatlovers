@@ -446,7 +446,7 @@ export default function CreateRecipePage() {
                 <li>Use consistent units (kg for solids, liters for liquids)</li>
                 <li>Write clear, step-by-step instructions</li>
                 <li>Include cooking temperatures and timing</li>
-                <li>Mark as "Active" only when recipe is ready for production</li>
+                <li>Mark as &quot;Active&quot; only when recipe is ready for production</li>
               </ul>
             </div>
           </div>

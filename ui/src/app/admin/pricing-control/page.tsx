@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PricingRuleForm } from "./components/PricingRuleForm";
 import { PricingRuleTable } from "./components/PricingRuleTable";
 import { MarginAlertPanel } from "./components/MarginAlertPanel";
@@ -69,7 +69,7 @@ export default function PricingControlPage() {
   const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
   const [activeTab, setActiveTab] = useState<"rules" | "alerts" | "audit">("rules");
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -84,11 +84,20 @@ export default function PricingControlPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    let mounted = true;
+    const load = async () => {
+      if (mounted) {
+        await loadData();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [loadData]);
 
   const handleRuleCreated = () => {
     setShowRuleForm(false);

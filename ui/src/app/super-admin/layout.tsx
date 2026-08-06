@@ -30,6 +30,8 @@ const navigationItems: NavItem[] = [
 ];
 
 // ─── Super Admin Layout Component ─────────────────────────────────────────────
+const SESSION_TIMEOUT = 15 * 60 * 1000;
+
 export default function SuperAdminLayout({
   children,
 }: {
@@ -39,11 +41,8 @@ export default function SuperAdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [lastActivity, setLastActivity] = useState(() => Date.now());
   const [showSecurityWarning, setShowSecurityWarning] = useState(false);
-
-  // Session timeout (15 minutes of inactivity)
-  const SESSION_TIMEOUT = 15 * 60 * 1000;
 
   useEffect(() => {
     const checkActivity = () => {

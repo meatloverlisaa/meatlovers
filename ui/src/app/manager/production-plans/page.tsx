@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { revalidatePath } from "next/cache";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -218,11 +218,7 @@ export default function ProductionPlansPage() {
     produced_quantity: "",
   });
 
-  useEffect(() => {
-    loadData();
-  }, [statusFilter, startDate, endDate]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [plansData, summaryData, recipesData] = await Promise.all([
@@ -239,7 +235,11 @@ export default function ProductionPlansPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, startDate, endDate]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreate = async () => {
     try {

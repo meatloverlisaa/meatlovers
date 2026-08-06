@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { getAuthHeader } from "@/lib/auth";
 
@@ -46,6 +46,73 @@ type ReportData = {
   };
 };
 
+function filterByDateRange(data: any[], range: DateRange, dateField = "declared_at") {
+  const now = new Date();
+  const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+  let cutoffDate: Date;
+  switch (range) {
+    case "today":
+      cutoffDate = startOfDay;
+      break;
+    case "week":
+      cutoffDate = startOfWeek;
+      break;
+    case "month":
+      cutoffDate = startOfMonth;
+      break;
+    case "year":
+      cutoffDate = startOfYear;
+      break;
+    default:
+      cutoffDate = startOfDay;
+  }
+
+  return data.filter((item: any) => {
+    const itemDate = new Date(item[dateField]);
+    return itemDate >= cutoffDate;
+  });
+}
+
+function calculateWasteByReason(waste: any[]) {
+  const reasonMap = new Map<
+    string,
+    { count: number; cost: number }
+  >();
+
+  waste.forEach((w: any) => {
+    const reason = w.reason || "OTHER";
+    const cost =
+      parseFloat(w.product?.cost_price || "0") * parseFloat(w.quantity);
+    const existing = reasonMap.get(reason) || { count: 0, cost: 0 };
+    reasonMap.set(reason, {
+      count: existing.count + 1,
+      cost: existing.cost + cost,
+    });
+  });
+
+  return Array.from(reasonMap.entries())
+    .map(([reason, data]) => ({
+      reason,
+      count: data.count,
+      cost: data.cost,
+    }))
+    .sort((a, b) => b.cost - a.cost);
+}
+
+function calculateRecipeCost(recipe: any): number {
+  if (!recipe.ingredients || recipe.ingredients.length === 0) return 0;
+
+  return recipe.ingredients.reduce((sum: number, ing: any) => {
+    const costPrice = parseFloat(ing.stock_item?.product?.cost_price || "0");
+    const quantity = parseFloat(ing.quantity || "0");
+    return sum + costPrice * quantity;
+  }, 0);
+}
+
 export default function KitchenReportsPage() {
   const { user, isLoading: authLoading } = useRequireAuth([
     "SUPER_ADMIN",
@@ -57,13 +124,7 @@ export default function KitchenReportsPage() {
   const [loading, setLoading] = useState(true);
   const [reportData, setReportData] = useState<ReportData | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      loadReportData();
-    }
-  }, [authLoading, user, dateRange]);
-
-  async function loadReportData() {
+  const loadReportData = useCallback(async () => {
     setLoading(true);
     try {
       const baseUrl =
@@ -204,74 +265,13 @@ export default function KitchenReportsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [dateRange]);
 
-  function filterByDateRange(data: any[], range: DateRange, dateField = "declared_at") {
-    const now = new Date();
-    const startOfDay = new Date(now.setHours(0, 0, 0, 0));
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-
-    let cutoffDate: Date;
-    switch (range) {
-      case "today":
-        cutoffDate = startOfDay;
-        break;
-      case "week":
-        cutoffDate = startOfWeek;
-        break;
-      case "month":
-        cutoffDate = startOfMonth;
-        break;
-      case "year":
-        cutoffDate = startOfYear;
-        break;
-      default:
-        cutoffDate = startOfDay;
+  useEffect(() => {
+    if (!authLoading && user) {
+      loadReportData();
     }
-
-    return data.filter((item: any) => {
-      const itemDate = new Date(item[dateField]);
-      return itemDate >= cutoffDate;
-    });
-  }
-
-  function calculateWasteByReason(waste: any[]) {
-    const reasonMap = new Map<
-      string,
-      { count: number; cost: number }
-    >();
-
-    waste.forEach((w: any) => {
-      const reason = w.reason || "OTHER";
-      const cost =
-        parseFloat(w.product?.cost_price || "0") * parseFloat(w.quantity);
-      const existing = reasonMap.get(reason) || { count: 0, cost: 0 };
-      reasonMap.set(reason, {
-        count: existing.count + 1,
-        cost: existing.cost + cost,
-      });
-    });
-
-    return Array.from(reasonMap.entries())
-      .map(([reason, data]) => ({
-        reason,
-        count: data.count,
-        cost: data.cost,
-      }))
-      .sort((a, b) => b.cost - a.cost);
-  }
-
-  function calculateRecipeCost(recipe: any): number {
-    if (!recipe.ingredients || recipe.ingredients.length === 0) return 0;
-
-    return recipe.ingredients.reduce((sum: number, ing: any) => {
-      const costPrice = parseFloat(ing.stock_item?.product?.cost_price || "0");
-      const quantity = parseFloat(ing.quantity || "0");
-      return sum + costPrice * quantity;
-    }, 0);
-  }
+  }, [authLoading, user, loadReportData]);
 
   function formatCurrency(amount: number): string {
     return `KES ${amount.toFixed(2)}`;

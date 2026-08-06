@@ -462,7 +462,7 @@ export default function AdminDashboard() {
             <div>
               <h1 className="text-2xl font-black" style={{ color: '#F8FAFC' }}>Admin Operations Dashboard</h1>
               <p className="mt-1 text-sm" style={{ color: '#94A3B8' }}>
-                Welcome back — here's what's happening today
+                Welcome back — here&apos;s what&apos;s happening today
               </p>
             </div>
             <div className="flex items-center gap-3">

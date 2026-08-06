@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Employee, EmployeeStatistics, getEmployees, getEmployeeStatistics, readable, STAFF_ROLES } from "@/lib/hr";
 
 const inputClass = "w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-900";
@@ -16,7 +16,7 @@ export function StaffDirectory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadStaff = async () => {
+  const loadStaff = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -28,9 +28,9 @@ export function StaffDirectory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  useEffect(() => { loadStaff(); }, [filters.role, filters.status, filters.department]);
+  useEffect(() => { loadStaff(); }, [loadStaff]);
 
   const departments = useMemo(() => Array.from(new Set((statistics?.byDepartment ?? []).map((item) => item.department).filter(Boolean))) as string[], [statistics]);
   const submitSearch = (event: React.FormEvent) => { event.preventDefault(); loadStaff(); };

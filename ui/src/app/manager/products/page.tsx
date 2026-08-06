@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
@@ -269,7 +269,7 @@ export default function ManagerProductsPage() {
     setIsMounted(true);
   }, []);
 
-  const loadProducts = async (category?: ProductCategory) => {
+  const loadProducts = useCallback(async (category?: ProductCategory) => {
     if (!isMounted) return;
     
     setLoading(true);
@@ -290,20 +290,21 @@ export default function ManagerProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isMounted]);
 
   useEffect(() => {
     if (!isMounted) return;
     
-    loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+    const cat = selectedCategory === "ALL" ? undefined : selectedCategory;
+    loadProducts(cat);
     
     // Auto-refresh every 60 seconds
     const interval = setInterval(() => {
-      loadProducts(selectedCategory === "ALL" ? undefined : selectedCategory);
+      loadProducts(cat);
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [selectedCategory, isMounted]);
+  }, [selectedCategory, isMounted, loadProducts]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] p-6">

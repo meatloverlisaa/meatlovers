@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getPayrollSummary, getDepartmentPayrollSummary, PayrollSummary } from "@/lib/hr";
 
 export function PayrollSummaryPage() {
@@ -7,7 +7,7 @@ export function PayrollSummaryPage() {
   const [departmentSummary, setDepartmentSummary] = useState<any[]>([]);
   const [error, setError] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const [s, d] = await Promise.all([
         getPayrollSummary(),
@@ -18,9 +18,9 @@ export function PayrollSummaryPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load payroll summary.");
     }
-  };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">

@@ -325,7 +325,7 @@ export default function KitchenStockPage() {
                   analysis
                 </li>
                 <li>
-                  • <strong>Stock Levels:</strong> Shows what's currently available in the kitchen
+                  • <strong>Stock Levels:</strong> Shows what&apos;s currently available in the kitchen
                 </li>
                 <li>
                   • <strong>Alerts:</strong> Notifies when ingredients are running low

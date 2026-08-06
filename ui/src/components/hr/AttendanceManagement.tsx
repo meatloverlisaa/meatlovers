@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useCallback } from "react";
 import { AttendanceRecord, AttendanceSummary, Employee, getAttendance, getAttendanceSummary, getStaffDirectory, markAttendance, readable, updateAttendance } from "@/lib/hr";
 
 const STATUSES = ["PRESENT", "LATE", "ABSENT", "HALF_DAY", "ON_LEAVE"];
@@ -19,14 +19,14 @@ export function AttendanceManagement() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setError("");
     try {
       const [attendance, attendanceSummary, staff] = await Promise.all([getAttendance(date, status), getAttendanceSummary(date), getStaffDirectory("active")]);
       setRecords(attendance); setSummary(attendanceSummary); setEmployees(staff);
     } catch (err) { setError(err instanceof Error ? err.message : "Unable to load attendance."); }
-  };
-  useEffect(() => { load(); }, [date, status]);
+  }, [date, status]);
+  useEffect(() => { load(); }, [load]);
 
   async function submit(event: FormEvent) {
     event.preventDefault(); setSaving(true); setError("");

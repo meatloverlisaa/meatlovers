@@ -1,20 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getStaffDirectory, Employee } from "@/lib/hr";
 
 export function DashboardMetrics() {
   const [staff, setStaff] = useState<Employee[]>([]);
   const [error, setError] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     getStaffDirectory("active").then((s) => {
       setStaff(s);
     }).catch((e) => setError(e instanceof Error ? e.message : "Unable to load dashboard metrics."));
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   // Mock dashboard metrics
   const metrics = {
@@ -70,7 +70,7 @@ export function DashboardMetrics() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-zinc-400">Today's Attendance</p>
+            <p className="text-sm font-medium text-zinc-400">Today&apos;s Attendance</p>
             <span className="text-2xl">◷</span>
           </div>
           <p className="mt-2 text-3xl font-black text-emerald-400">{metrics.todayAttendance}%</p>

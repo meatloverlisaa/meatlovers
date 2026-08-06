@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
   <a href={href} className={className}>
@@ -172,11 +172,7 @@ export default function DispatchPage() {
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  useEffect(() => {
-    loadData();
-  }, [statusFilter]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -195,7 +191,11 @@ export default function DispatchPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
@@ -186,7 +186,7 @@ export default function ManagerOrdersPage() {
     setIsMounted(true);
   }, []);
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!isMounted) return;
     
     try {
@@ -214,7 +214,7 @@ export default function ManagerOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [isMounted, statusFilter]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -224,7 +224,7 @@ export default function ManagerOrdersPage() {
     // Auto-refresh every 60 seconds (increased to reduce rate limiting)
     const interval = setInterval(loadOrders, 60000);
     return () => clearInterval(interval);
-  }, [statusFilter, isMounted]);
+  }, [isMounted, loadOrders]);
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 

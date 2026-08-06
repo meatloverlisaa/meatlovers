@@ -108,7 +108,7 @@ export default function CashierSettlePage() {
             </svg>
             <h3 className="mt-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">No orders to settle</h3>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-              All caught up! Orders will appear here when they're marked as SERVED.
+              All caught up! Orders will appear here when they&apos;re marked as SERVED.
             </p>
           </div>
         ) : (

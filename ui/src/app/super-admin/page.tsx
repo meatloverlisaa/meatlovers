@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface MonitoringSummary {
@@ -114,7 +115,7 @@ export default function SuperAdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  const fetchMonitoringData = async () => {
+  const fetchMonitoringData = useCallback(async () => {
     try {
       setError(null);
 
@@ -189,7 +190,7 @@ export default function SuperAdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMonitoringData();
@@ -198,7 +199,7 @@ export default function SuperAdminDashboard() {
     const interval = setInterval(fetchMonitoringData, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchMonitoringData]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -445,7 +446,7 @@ export default function SuperAdminDashboard() {
 
           {/* P&L Snapshot */}
           <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#111827', border: '1px solid #1F2937' }}>
-          <h3 className="font-black" style={{ color: '#F9FAFB' }}>Today's P&L Snapshot</h3>
+          <h3 className="font-black" style={{ color: '#F9FAFB' }}>Today&apos;s P&L Snapshot</h3>
           <div className="mt-4 grid gap-4 sm:grid-cols-5">
             <div>
               <p className="text-xs font-semibold" style={{ color: '#64748B' }}>Revenue</p>
@@ -797,7 +798,7 @@ export default function SuperAdminDashboard() {
               </div>
             </a>
 
-            <a
+            <Link
               href="/kitchen/recipes"
               className="flex items-center gap-3 p-4 rounded-lg transition-colors"
               style={{ backgroundColor: '#7C2D12', border: '1px solid #92400E' }}
@@ -809,7 +810,7 @@ export default function SuperAdminDashboard() {
                 <p className="font-semibold" style={{ color: '#F9FAFB' }}>Recipes</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Standardized recipes</p>
               </div>
-            </a>
+            </Link>
 
             <a
               href="/super-admin/pricing"

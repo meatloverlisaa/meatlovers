@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -60,7 +60,7 @@ export default function AccountantDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setError(null);
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -110,13 +110,13 @@ export default function AccountantDashboard() {
         reportsDue: 0, // Would need report scheduling from API
       });
 
-      setTransactions(transactionsData.slice(0, 5).map((t: FinanceTransaction) => ({
+      setTransactions(transactionsData.slice(0, 5).map((t: any) => ({
         id: t.id,
-        transactionType: t.type,
-        category: t.category,
-        amount: Number(t.amount),
-        transactionDate: t.transaction_date,
-        description: t.description || `${t.type} - ${t.category}`,
+        transactionType: t.transaction_type || t.transactionType || t.type || "UNKNOWN",
+        category: t.category || "General",
+        amount: Number(t.amount || 0),
+        transactionDate: t.transaction_date || t.transactionDate || new Date().toISOString(),
+        description: t.description || `${t.transaction_type || t.type} - ${t.category}`,
       })));
 
       setTasks([
@@ -174,7 +174,7 @@ export default function AccountantDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const initialize = async () => {
@@ -188,7 +188,7 @@ export default function AccountantDashboard() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchDashboardData]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-KE", {

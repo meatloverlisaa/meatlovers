@@ -56,7 +56,7 @@ const getNextStatus = (current: OrderStatus): OrderStatus | null => {
 export function DrinkTicket({ order, onStatusUpdate }: DrinkTicketProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(Date.now() - new Date(order.createdAt).getTime());
+  const [elapsedTime, setElapsedTime] = useState(() => Date.now() - new Date(order.createdAt).getTime());
 
   const drinkItems = order.items.filter(
     (item) => item.productCategory === 'SOFT_DRINK' || item.productCategory === 'ALCOHOLIC_DRINK'

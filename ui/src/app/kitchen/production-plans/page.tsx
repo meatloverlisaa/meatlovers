@@ -408,7 +408,7 @@ export default function ProductionPlansPage() {
         {todayPlans.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-              Today's Production ({todayPlans.length})
+              Today&apos;s Production ({todayPlans.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {todayPlans.map((plan) => (

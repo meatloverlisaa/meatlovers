@@ -1,15 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { deactivateEmployee, Employee, getEmployee, reactivateEmployee, readable } from "@/lib/hr";
 
 export function EmployeeProfile({ id }: { id: string }) {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
-  const load = async () => { try { setError(""); setEmployee(await getEmployee(id)); } catch (err) { setError(err instanceof Error ? err.message : "Unable to load employee profile."); } };
-  useEffect(() => { load(); }, [id]);
+
+  const load = useCallback(async () => {
+    try {
+      setError("");
+      setEmployee(await getEmployee(id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load employee profile.");
+    }
+  }, [id]);
+
+  useEffect(() => { load(); }, [load]);
   const changeStatus = async () => {
     if (!employee) return;
     const reason = employee.is_active ? window.prompt("Reason for offboarding (optional):") ?? undefined : undefined;
