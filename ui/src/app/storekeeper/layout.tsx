@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ChartBarIcon,
   CubeIcon,
@@ -43,11 +44,17 @@ export default function StorekeeperLayout({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
-  // Mock user role - in production, get from auth context
-  const userRole = "STOREKEEPER";
-  const userName = "John Storekeeper";
-  const userEmail = "storekeeper@meatlovers.com";
+  const handleLogout = async () => {
+    await logout();
+    router.push('/storekeeper/login');
+  };
+
+  const userRole = user?.role || "STOREKEEPER";
+  const userName = user?.full_name || "Storekeeper";
+  const userEmail = user?.email || "storekeeper@meatlovers.com";
 
   const isActive = (href: string) => {
     if (href === "/storekeeper") return pathname === "/storekeeper";
@@ -137,13 +144,13 @@ export default function StorekeeperLayout({
               </svg>
               My Profile
             </Link>
-            <Link
-              href="/storekeeper/login"
-              className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800 transition py-2 px-3 rounded-lg hover:bg-red-50"
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 w-full text-sm text-red-600 hover:text-red-800 transition py-2 px-3 rounded-lg hover:bg-red-50"
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
               Logout
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
@@ -248,12 +255,12 @@ export default function StorekeeperLayout({
                     <p className="text-xs text-zinc-500">{userEmail}</p>
                   </div>
                   <div className="py-2">
-                    <Link
-                      href="/storekeeper/login"
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       Logout
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}
