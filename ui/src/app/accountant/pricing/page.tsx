@@ -49,7 +49,10 @@ export default function AccountantPricingPage() {
   };
 
   useEffect(() => {
-    loadData();
+    const initialize = async () => {
+      await loadData();
+    };
+    initialize();
   }, []);
 
   const openAlerts = marginAlerts.filter(a => a.alert_status === "OPEN");

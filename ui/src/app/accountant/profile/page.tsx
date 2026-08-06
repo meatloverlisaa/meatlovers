@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { getAuthHeader } from "@/lib/auth";
 
 type UserProfile = {
@@ -38,11 +39,7 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  async function fetchProfile() {
+  const fetchProfile = useCallback(async () => {
     try {
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       
@@ -84,7 +81,16 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadProfile = async () => {
+      if (mounted) await fetchProfile();
+    };
+    loadProfile();
+    return () => { mounted = false; };
+  }, [fetchProfile]);
 
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -313,9 +319,11 @@ export default function ProfilePage() {
               <div className="absolute -bottom-12 left-8">
                 <div className="relative group">
                   {profilePhoto ? (
-                    <img 
+                    <Image 
                       src={profilePhoto} 
                       alt={profile.full_name}
+                      width={96}
+                      height={96}
                       className="w-24 h-24 rounded-2xl border-4 border-white dark:border-slate-950 shadow-xl object-cover"
                     />
                   ) : (

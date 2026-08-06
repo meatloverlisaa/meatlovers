@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -35,13 +35,7 @@ export default function AccountantReports() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-  useEffect(() => {
-    fetchReports();
-  }, [selectedCategory]);
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -103,12 +97,21 @@ export default function AccountantReports() {
         generatingReports: filteredReports.filter(r => r.status === "GENERATING").length,
         failedReports: filteredReports.filter(r => r.status === "FAILED").length,
       });
-    } catch (err) {
+    } catch {
       // Still use mock data on error
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadReports = async () => {
+      if (mounted) await fetchReports();
+    };
+    loadReports();
+    return () => { mounted = false; };
+  }, [selectedCategory, fetchReports]);
 
   const generateReport = async (type: string, category: string) => {
     try {

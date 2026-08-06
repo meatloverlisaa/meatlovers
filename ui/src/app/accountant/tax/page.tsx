@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -39,11 +39,7 @@ export default function AccountantTax() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  useEffect(() => {
-    fetchTaxRecords();
-  }, [selectedType]);
-
-  const fetchTaxRecords = async () => {
+  const fetchTaxRecords = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -105,12 +101,21 @@ export default function AccountantTax() {
           .filter(r => r.status === "PENDING")
           .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]?.dueDate || "",
       });
-    } catch (err) {
+    } catch {
       // Still use mock data on error
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedType]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadTaxRecords = async () => {
+      if (mounted) await fetchTaxRecords();
+    };
+    loadTaxRecords();
+    return () => { mounted = false; };
+  }, [selectedType, fetchTaxRecords]);
 
   const markAsPaid = async (recordId: string) => {
     try {

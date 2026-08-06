@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -30,13 +30,7 @@ export default function AccountantAnalytics() {
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<"WEEK" | "MONTH" | "QUARTER" | "YEAR">("MONTH");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -82,12 +76,21 @@ export default function AccountantAnalytics() {
       };
 
       setAnalytics(mockAnalytics);
-    } catch (err) {
+    } catch {
       // Still use mock data on error
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadAnalytics = async () => {
+      if (mounted) await fetchAnalytics();
+    };
+    loadAnalytics();
+    return () => { mounted = false; };
+  }, [timeRange, fetchAnalytics]);
 
   const kpiCards: KPICard[] = [
     {
@@ -137,10 +140,10 @@ export default function AccountantAnalytics() {
 
         {/* Time Range Selector */}
         <div className="mb-6 flex flex-wrap gap-2">
-          {["WEEK", "MONTH", "QUARTER", "YEAR"].map((range) => (
+          {(["WEEK", "MONTH", "QUARTER", "YEAR"] as const).map((range) => (
             <button
               key={range}
-              onClick={() => setTimeRange(range as any)}
+              onClick={() => setTimeRange(range)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 timeRange === range
                   ? "bg-blue-600 text-white"

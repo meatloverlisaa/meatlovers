@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -41,11 +41,7 @@ export default function AccountantReconciliation() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  useEffect(() => {
-    fetchReconciliationItems();
-  }, [selectedStatus]);
-
-  const fetchReconciliationItems = async () => {
+  const fetchReconciliationItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -74,7 +70,7 @@ export default function AccountantReconciliation() {
         partialItems: itemsData.filter((r: ReconciliationItem) => r.status === "PARTIAL").length,
         totalVariance: itemsData.reduce((sum: number, r: ReconciliationItem) => sum + Math.abs(r.variance), 0),
       });
-    } catch (err) {
+    } catch {
       // Use mock data for demo without showing error
       const mockItems = [
         {
@@ -122,7 +118,16 @@ export default function AccountantReconciliation() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus, API_BASE]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadItems = async () => {
+      if (mounted) await fetchReconciliationItems();
+    };
+    loadItems();
+    return () => { mounted = false; };
+  }, [selectedStatus, fetchReconciliationItems]);
 
   const reconcileItem = async (itemId: string, actualAmount: number) => {
     try {

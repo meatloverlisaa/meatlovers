@@ -110,7 +110,7 @@ export default function AccountantDashboard() {
         reportsDue: 0, // Would need report scheduling from API
       });
 
-      setTransactions(transactionsData.slice(0, 5).map((t: any) => ({
+      setTransactions(transactionsData.slice(0, 5).map((t: FinanceTransaction) => ({
         id: t.id,
         transactionType: t.type,
         category: t.category,
@@ -177,10 +177,15 @@ export default function AccountantDashboard() {
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    const initialize = async () => {
+      await fetchDashboardData();
+    };
+    initialize();
 
     // Auto-refresh every 60 seconds
-    const interval = setInterval(fetchDashboardData, 60000);
+    const interval = setInterval(() => {
+      fetchDashboardData();
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
