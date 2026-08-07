@@ -13,8 +13,6 @@ import {
   ClockIcon,
   UserIcon,
   MapPinIcon,
-  CalendarIcon,
-  CurrencyDollarIcon,
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
@@ -98,8 +96,8 @@ export default function AssetsPage() {
       if (assetsRes.ok) setAssets(await assetsRes.json());
 
       setLastUpdated(new Date());
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : 'Failed to load assets');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load assets');
     } finally {
       setLoading(false);
     }
@@ -167,8 +165,8 @@ export default function AssetsPage() {
       } else {
         alert('Failed to delete asset');
       }
-    } catch (_err) {
-      alert('Error deleting asset');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error deleting asset');
     }
   };
 
