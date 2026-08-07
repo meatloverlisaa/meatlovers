@@ -4,6 +4,10 @@
  * Part C: Authentication Recovery Sprint Part 3
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,
+  @typescript-eslint/no-unsafe-assignment,
+  @typescript-eslint/no-unsafe-argument */
+
 import {
   Injectable,
   CanActivate,

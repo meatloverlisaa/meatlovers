@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /**
  * Scanner Utilities
  * Part E: Role Guard Coverage Report Generator

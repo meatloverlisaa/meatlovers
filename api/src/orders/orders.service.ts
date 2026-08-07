@@ -10,6 +10,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import type {
+  Order,
+  OrderItem,
+  Payment,
+  ApprovalRequest,
+  Delivery,
+  User,
+  Table,
+  Customer,
+} from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -28,7 +38,7 @@ export class OrdersService {
     const { tableId, waiterId, items } = createOrderDto;
 
     // Validate table exists
-    const table = await (this.prisma as any).table.findUnique({
+    const table = await this.prisma.table.findUnique({
       where: { id: BigInt(tableId) },
     });
     if (!table) {
@@ -142,7 +152,7 @@ export class OrdersService {
     if (tableId) where.table_id = BigInt(tableId);
     if (waiterId) where.waiter_id = BigInt(waiterId);
 
-    return (this.prisma as any).order.findFirst({
+    return this.prisma.order.findFirst({
       where,
       orderBy: { created_at: 'desc' },
       include: {
@@ -159,7 +169,7 @@ export class OrdersService {
       where.status = status;
     }
 
-    return (this.prisma as any).order.findMany({
+    return this.prisma.order.findMany({
       where,
       orderBy: { created_at: 'desc' },
       include: {
@@ -171,7 +181,7 @@ export class OrdersService {
   }
 
   async updateStatus({ id, status }: { id: string } & UpdateOrderStatusDto) {
-    const order = await (this.prisma as any).order.findUnique({
+    const order = await this.prisma.order.findUnique({
       where: { id: BigInt(id) },
       include: { items: true },
     });
@@ -215,7 +225,7 @@ export class OrdersService {
       }
     }
 
-    return (this.prisma as any).order.update({
+    return this.prisma.order.update({
       where: { id: BigInt(id) },
       data: { status },
       include: { items: true, waiter: true, table: true },
@@ -570,21 +580,31 @@ export class OrdersService {
   /**
    * Helper: Serialize order for response
    */
-  private serializeOrder(order: any) {
+  private serializeOrder(
+    order: Order & {
+      items?: OrderItem[];
+      payments?: Payment[];
+      approval_requests?: ApprovalRequest[];
+      delivery?: Delivery | null;
+      waiter?: User | null;
+      table?: Table | null;
+      customer?: Customer | null;
+    },
+  ) {
     return {
       id: order.id.toString(),
       tableId: order.table_id?.toString(),
       tableName: order.table?.table_name,
-      customerId: order.customer_id?.toString(),
+      customerId: (order as any).customer_id?.toString(),
       customerName: order.customer?.name,
       customerPhone: order.customer?.phone,
       customerEmail: order.customer?.email,
-      waiterId: order.waiter_id?.toString(),
+      waiterId: (order as any).waiter_id?.toString(),
       waiterName: order.waiter?.full_name,
       waiterPhone: order.waiter?.phone,
       status: order.status,
       totalAmount: order.total_amount,
-      items: order.items?.map((item: any) => ({
+      items: order.items?.map((item) => ({
         id: item.id.toString(),
         productId: item.product_id?.toString(),
         productName: item.product_name,
@@ -592,7 +612,7 @@ export class OrdersService {
         unitPrice: item.unit_price,
         lineTotal: item.line_total,
       })),
-      payments: order.payments?.map((payment: any) => ({
+      payments: order.payments?.map((payment) => ({
         id: payment.id.toString(),
         method: payment.payment_method,
         amount: Number(payment.amount),
@@ -600,16 +620,16 @@ export class OrdersService {
         reference: payment.transaction_reference,
         createdAt: payment.created_at,
       })),
-      approvalRequests: order.approval_requests?.map((req: any) => ({
+      approvalRequests: order.approval_requests?.map((req) => ({
         id: req.id.toString(),
         type: req.request_type,
         status: req.status,
         reason: req.reason,
         metadata: req.metadata,
         requestedBy: req.requested_by?.toString(),
-        requesterName: req.requester?.full_name,
-        reviewedBy: req.reviewed_by?.toString(),
-        reviewerName: req.reviewer?.full_name,
+        requesterName: (req as any).requester?.full_name,
+        reviewedBy: (req as any).reviewed_by?.toString(),
+        reviewerName: (req as any).reviewer?.full_name,
         createdAt: req.created_at,
         updatedAt: req.updated_at,
       })),
@@ -618,8 +638,8 @@ export class OrdersService {
             id: order.delivery.id.toString(),
             status: order.delivery.status,
             address: order.delivery.delivery_address,
-            riderName: order.delivery.rider?.user?.full_name,
-            riderPhone: order.delivery.rider?.phone,
+            riderName: (order.delivery as any).rider?.user?.full_name,
+            riderPhone: (order.delivery as any).rider?.phone,
           }
         : null,
       createdAt: order.created_at,
