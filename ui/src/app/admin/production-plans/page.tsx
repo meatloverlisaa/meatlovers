@@ -309,17 +309,6 @@ export default function ProductionPlansPage() {
     }
   };
 
-  const calculateIngredientConsumption = (plan: ProductionPlan) => {
-    if (!plan.recipe?.ingredients) return [];
-    
-    return plan.recipe.ingredients.map((ingredient) => ({
-      ingredientName: ingredient.stock_item.product?.product_name || "Unknown",
-      quantityPerUnit: ingredient.quantity,
-      unit: ingredient.unit,
-      totalConsumed: ingredient.quantity * plan.produced_quantity,
-    }));
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PLANNED":

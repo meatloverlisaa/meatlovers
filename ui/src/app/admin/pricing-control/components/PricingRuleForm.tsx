@@ -55,8 +55,8 @@ export function PricingRuleForm({ rule, onClose, onSuccess }: PricingRuleFormPro
       }
 
       onSuccess();
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : `Failed to ${isEdit ? "update" : "create"} pricing rule`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : `Failed to ${isEdit ? "update" : "create"} pricing rule`);
       setSubmitting(false);
     }
   };

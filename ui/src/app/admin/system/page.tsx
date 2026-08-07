@@ -48,7 +48,7 @@ interface ApiHealth {
     heapUsed: number;
     external: number;
   };
-  cpu: any;
+  cpu: Record<string, string | number | null>;
 }
 
 interface PerformanceMetrics {

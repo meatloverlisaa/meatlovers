@@ -106,7 +106,73 @@ type Payroll = {
   };
 };
 
-type PerformanceReview = {
+type Payslip = {
+  employee: {
+    name: string;
+    email: string;
+    role: string;
+    department?: string | null;
+    position?: string | null;
+    bank_account?: {
+      bank_name?: string | null;
+      account_number?: string | null;
+      account_name?: string | null;
+    };
+  };
+  period: {
+    start: string;
+    end: string;
+  };
+  payment: {
+    date?: string | null;
+    reference?: string | null;
+  };
+  earnings: {
+    basic_salary: number;
+    allowances: number;
+    overtime_pay: number;
+    gross_salary: number;
+  };
+  deductions?: {
+    paye?: number;
+    nssf?: number;
+    shif?: number;
+    other_deductions?: number;
+    total: number;
+  } | null;
+  net_salary: number;
+  generated_at: string;
+  slip_number?: string;
+  comments?: string | null;
+};
+
+type ProcessBulkPayrollPayload = {
+  period_start: string;
+  period_end: string;
+  department?: string;
+  calculate_overtime_from_attendance: boolean;
+  housing_allowance_percent: number;
+  transport_allowance_flat: number;
+  apply_statutory_deductions: boolean;
+};
+
+type UpdatePayrollRecordPayload = {
+  basic_salary: number;
+  allowances: number;
+  overtime_pay: number;
+  deductions: number;
+  net_salary: number;
+  notes?: string | null;
+};
+
+type BulkPayPayload = {
+  payroll_ids: string[];
+  payment_date?: string;
+  payment_method: string;
+  payment_reference?: string;
+};
+
+type LeaveRequest = {
   id: string | number;
   user_id: string | number;
   reviewer_id: string | number;
@@ -330,7 +396,7 @@ async function rejectLeaveRequest(leaveId: string, approvedBy: string, notes: st
   return res.json();
 }
 
-async function processBulkPayrollApi(payload: any) {
+async function processBulkPayrollApi(payload: ProcessBulkPayrollPayload) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/process-bulk`, {
     method: "POST",
@@ -364,12 +430,7 @@ async function markPayrollPaidApi(
   return res.json();
 }
 
-async function bulkPayPayrollApi(payload: {
-  payroll_ids: string[];
-  payment_date?: string;
-  payment_method: string;
-  payment_reference?: string;
-}) {
+async function bulkPayPayrollApi(payload: BulkPayPayload) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/bulk-pay`, {
     method: "POST",
@@ -384,7 +445,7 @@ async function bulkPayPayrollApi(payload: {
   return res.json();
 }
 
-async function updatePayrollRecordApi(id: string | number, payload: any) {
+async function updatePayrollRecordApi(id: string | number, payload: UpdatePayrollRecordPayload) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/${id}`, {
     method: "PATCH",
@@ -707,22 +768,20 @@ function LeaveRequestsTable({ leaveRequests, onApprove, onReject }: {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex gap-2">
-                      <form action={approveLeaveRequest.bind(null, String(request.id), "1")}>
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-green-700"
-                        >
-                          Approve
-                        </button>
-                      </form>
-                      <form action={rejectLeaveRequest.bind(null, String(request.id), "1", "Rejected by admin")}>
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
-                        >
-                          Reject
-                        </button>
-                      </form>
+                      <button
+                        type="button"
+                        onClick={() => onApprove(String(request.id), "1")}
+                        className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-green-700"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onReject(String(request.id), "1", "Rejected by admin")}
+                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
+                      >
+                        Reject
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -809,7 +868,7 @@ function DutyRosterTable({ roster }: { roster: DutyRoster[] }) {
 }
 
 // ─── Payroll Management Component & Modals ───────────────────────────────────────
-function PayslipModal({ payslip, onClose }: { payslip: any; onClose: () => void }) {
+function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => void }) {
   if (!payslip) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
@@ -977,8 +1036,8 @@ function ProcessPayrollModal({
       });
       onProcessed();
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Failed to process payroll");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to process payroll");
     } finally {
       setLoading(false);
     }
@@ -1131,8 +1190,8 @@ function MarkPaidModal({
       });
       onSuccess();
       onClose();
-    } catch (_err) {
-      alert("Failed to mark as paid");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to mark as paid");
     } finally {
       setLoading(false);
     }
@@ -1245,8 +1304,8 @@ function BulkPayModal({
       });
       onSuccess();
       onClose();
-    } catch (_err) {
-      alert("Failed bulk payment execution");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed bulk payment execution");
     } finally {
       setLoading(false);
     }
@@ -1363,8 +1422,8 @@ function EditPayrollModal({
       });
       onSuccess();
       onClose();
-    } catch (_err) {
-      alert("Failed to update payroll record");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to update payroll record");
     } finally {
       setLoading(false);
     }
@@ -1481,7 +1540,7 @@ function PayrollManagementSection({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
   // Modals state
-  const [activePayslip, setActivePayslip] = useState<any | null>(null);
+  const [activePayslip, setActivePayslip] = useState<Payslip | null>(null);
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [markPaidRecord, setMarkPaidRecord] = useState<Payroll | null>(null);
   const [showBulkPayModal, setShowBulkPayModal] = useState(false);
@@ -1536,8 +1595,8 @@ function PayrollManagementSection({
     try {
       const slip = await fetchPayslipApi(id);
       setActivePayslip(slip);
-    } catch (_err) {
-      alert("Failed to load payslip data");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to load payslip data");
     }
   };
 
@@ -1553,8 +1612,8 @@ function PayrollManagementSection({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (_err) {
-      alert("Failed to export bank file");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to export bank file");
     }
   };
 
@@ -1626,7 +1685,7 @@ function PayrollManagementSection({
 
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
+            onChange={(e) => setStatusFilter(e.currentTarget.value as "ALL" | "PAID" | "PENDING")}
             className="rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-blue-600 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
             <option value="ALL">All Statuses</option>

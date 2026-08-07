@@ -68,10 +68,10 @@ async function getStockBalance(): Promise<StockBalance[]> {
     throw new Error(`Failed to load stock balance: ${res.status}${text ? ` - ${text}` : ""}`);
   }
 
-  const rawBalance = await res.json();
-  
+  const rawBalance = (await res.json()) as StockBalance[];
+
   // Transform the response to match our StockBalance type
-  return rawBalance.map((item: any) => ({
+  return rawBalance.map((item) => ({
     id: item.id,
     product_id: item.product_id,
     quantity: item.quantity,
