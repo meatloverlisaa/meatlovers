@@ -62,7 +62,7 @@ export default function UsersPage() {
       setUsers(usersData);
       setFilteredUsers(usersData);
     } catch (_err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
+      setError(_err instanceof Error ? _err.message : 'Failed to load users');
     } finally {
       setLoading(false);
     }

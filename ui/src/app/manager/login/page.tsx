@@ -23,7 +23,7 @@ export default function ManagerLogin() {
       await login(email, password);
       // AuthContext handles redirect to appropriate dashboard
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(_err instanceof Error ? _err.message : "Login failed");
     } finally {
       setLoading(false);
     }

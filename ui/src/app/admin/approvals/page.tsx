@@ -6,7 +6,6 @@ import {
   XCircleIcon,
   ClockIcon,
   ArrowPathIcon,
-  ExclamationTriangleIcon,
   DocumentTextIcon,
   ShoppingCartIcon,
   UserIcon,
@@ -88,7 +87,7 @@ export default function ApprovalsPage() {
 
       setLastUpdated(new Date());
     } catch (_err) {
-      setError(err instanceof Error ? err.message : 'Failed to load approvals');
+      setError(_err instanceof Error ? _err.message : 'Failed to load approvals');
     } finally {
       setLoading(false);
     }

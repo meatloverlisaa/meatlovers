@@ -32,7 +32,7 @@ export default function HRDashboard() {
       if (!summaryResponse.ok) throw new Error("Unable to load the HR dashboard.");
       setSummary(await summaryResponse.json());
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Unable to load the HR dashboard.");
+      setError(_err instanceof Error ? _err.message : "Unable to load the HR dashboard.");
     } finally {
       setLoading(false);
     }

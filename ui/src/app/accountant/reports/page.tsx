@@ -137,7 +137,7 @@ export default function AccountantReports() {
         );
       }, 2000);
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Failed to generate report");
+      setError(_err instanceof Error ? _err.message : "Failed to generate report");
     }
   };
 

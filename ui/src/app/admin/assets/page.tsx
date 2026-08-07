@@ -99,7 +99,7 @@ export default function AssetsPage() {
 
       setLastUpdated(new Date());
     } catch (_err) {
-      setError(err instanceof Error ? err.message : 'Failed to load assets');
+      setError(_err instanceof Error ? _err.message : 'Failed to load assets');
     } finally {
       setLoading(false);
     }

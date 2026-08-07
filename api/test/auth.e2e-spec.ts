@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -169,7 +169,8 @@ describe('Authentication (e2e)', () => {
         where: { id: userId },
       });
 
-      expect(user.failed_login_attempts).toBeGreaterThan(0);
+      expect(user).not.toBeNull();
+      expect(user!.failed_login_attempts).toBeGreaterThan(0);
 
       // Reset for other tests
       await prismaService.user.update({
@@ -198,9 +199,10 @@ describe('Authentication (e2e)', () => {
         where: { id: userId },
       });
 
-      expect(user.failed_login_attempts).toBe(5);
-      expect(user.account_locked_until).toBeDefined();
-      expect(user.account_locked_until.getTime()).toBeGreaterThan(Date.now());
+      expect(user).not.toBeNull();
+      expect(user!.failed_login_attempts).toBe(5);
+      expect(user!.account_locked_until).toBeDefined();
+      expect(user!.account_locked_until!.getTime()).toBeGreaterThan(Date.now());
 
       // Clean up - unlock account
       await prismaService.user.update({
@@ -477,7 +479,7 @@ describe('Authentication (e2e)', () => {
       await prismaService.passwordResetToken.create({
         data: {
           email: testUser.email,
-          token: hashedToken,
+          token_hash: hashedToken,
           expires_at: new Date(Date.now() + 60 * 60 * 1000),
           is_used: false,
         },

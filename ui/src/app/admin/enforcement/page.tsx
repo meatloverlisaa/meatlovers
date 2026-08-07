@@ -84,8 +84,8 @@ export default function EnforcementDashboardPage() {
       if (actionsRes.ok) setActions(await actionsRes.json());
 
       setLastUpdated(new Date());
-    } catch (_err) {
-      setError(err instanceof Error ? err.message : 'Failed to load enforcement data');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load enforcement data');
     } finally {
       setLoading(false);
     }

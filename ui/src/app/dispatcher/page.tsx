@@ -141,8 +141,8 @@ export default function DispatcherDashboard() {
         setPendingOrders(Array.isArray(data) ? data : []);
       }
     } catch (_err) {
-      console.error("Error fetching dashboard data:", err);
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+      console.error("Error fetching dashboard data:", _err);
+      setError(_err instanceof Error ? _err.message : "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -186,7 +186,7 @@ export default function DispatcherDashboard() {
       setSelectedOrder(null);
       fetchDashboardData();
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Failed to assign delivery");
+      setError(_err instanceof Error ? _err.message : "Failed to assign delivery");
     }
   };
 
@@ -215,7 +215,7 @@ export default function DispatcherDashboard() {
 
       fetchDashboardData();
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Failed to update status");
+      setError(_err instanceof Error ? _err.message : "Failed to update status");
     }
   };
 

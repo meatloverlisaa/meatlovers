@@ -116,7 +116,7 @@ export default function ManagerDeliveryTrackingPage() {
       setDeliveries(deliveriesData);
       setSummary(summaryData);
     } catch (_err) {
-      setError(err instanceof Error ? err.message : "Failed to load data");
+      setError(_err instanceof Error ? _err.message : "Failed to load data");
     } finally {
       setLoading(false);
     }

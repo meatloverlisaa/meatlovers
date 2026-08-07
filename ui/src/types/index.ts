@@ -16,6 +16,25 @@ export interface DrinkSalesData {
   }>;
 }
 
+// Bar Sales Data (for BarSalesSummary component)
+export interface BarSale {
+  orderId: string;
+  table: { tableName: string };
+  totalAmount: number;
+  softDrinkAmount: number;
+  alcoholAmount: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface BarSalesData {
+  totalOrders: number;
+  totalAmount: number;
+  softDrinkSales: number;
+  alcoholSales: number;
+  orders: BarSale[];
+}
+
 export interface DrinkOrder {
   id: number;
   drink_name: string;

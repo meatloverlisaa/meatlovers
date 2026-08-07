@@ -149,7 +149,7 @@ export default function StorekeeperDashboard() {
         setMovements(movementsData.data || movementsData || []);
       }
     } catch (_err) {
-      console.error("Error fetching dashboard data:", err);
+      console.error("Error fetching dashboard data:", _err);
       setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
