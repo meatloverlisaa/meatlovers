@@ -4,11 +4,6 @@ import { useState, useEffect } from "react";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
 
 type PaymentMethod = "CASH" | "MPESA" | "CARD";
 type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
@@ -31,6 +26,39 @@ type Order = {
   status: string;
   total_amount: number;
   created_at?: string | null;
+};
+
+type PaymentLine = {
+  payment_method: PaymentMethod;
+  amount: number;
+  transaction_reference?: string;
+};
+
+type CreatePaymentPayload = {
+  order_id: number;
+  payments: PaymentLine[];
+};
+
+type ReceiptItem = {
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+};
+
+type ReceiptDetails = {
+  items: ReceiptItem[];
+  subtotal: number;
+};
+
+type Receipt = {
+  receipt_number: string;
+  order_id: bigint | number;
+  payment_method: PaymentMethod;
+  amount_paid: number;
+  transaction_reference?: string | null;
+  payment_date: string;
+  order_details: ReceiptDetails;
 };
 
 async function getPayments(): Promise<Payment[]> {
@@ -64,7 +92,7 @@ async function getOrders(): Promise<Order[]> {
   return res.json();
 }
 
-async function createPayment(payload: any): Promise<Payment[]> {
+async function createPayment(payload: CreatePaymentPayload): Promise<Payment[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/payments`, {
@@ -84,7 +112,7 @@ async function createPayment(payload: any): Promise<Payment[]> {
   return res.json();
 }
 
-async function generateReceipt(paymentId: string): Promise<any> {
+async function generateReceipt(paymentId: string): Promise<Receipt> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
   const res = await fetch(`${baseUrl}/payments/${paymentId}/receipt`, {
@@ -107,9 +135,8 @@ export default function AdminPaymentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
-  const [currentReceipt, setCurrentReceipt] = useState<any>(null);
+  const [currentReceipt, setCurrentReceipt] = useState<Receipt | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -218,7 +245,7 @@ export default function AdminPaymentsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      ${currentReceipt.order_details.items.map((item: any) => `
+                      ${currentReceipt.order_details.items.map((item: ReceiptItem) => `
                         <tr>
                           <td>${item.product_name}</td>
                           <td>${item.quantity}</td>
@@ -478,7 +505,7 @@ export default function AdminPaymentsPage() {
                 <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
                   <h4 className="font-semibold text-zinc-900 dark:text-zinc-50 mb-2">Order Items</h4>
                   <div className="space-y-1 text-sm">
-                    {currentReceipt.order_details.items.map((item: any, index: number) => (
+                    {currentReceipt.order_details.items.map((item: ReceiptItem, index: number) => (
                       <div key={index} className="flex justify-between">
                         <span className="text-zinc-700 dark:text-zinc-300">
                           {item.product_name} x{item.quantity}

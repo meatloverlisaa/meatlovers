@@ -2,11 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
 
 type Rider = {
   id: bigint | number;
@@ -54,13 +49,6 @@ type Delivery = {
   cancellation_reason?: string | null;
   order?: Order;
   rider?: Rider;
-};
-
-type DeliveryProgress = {
-  delivery: Delivery;
-  progress: number;
-  estimatedTime?: string;
-  currentLocation?: string;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
@@ -145,8 +133,8 @@ export default function DeliveryTrackingPage() {
       ]);
       setDeliveries(deliveriesData);
       setSummary(summaryData);
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : "Failed to load data");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to load data");
     } finally {
       setLoading(false);
     }

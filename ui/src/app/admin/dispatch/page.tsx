@@ -2,11 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const Link = ({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
 
 type Rider = {
   id: bigint | number;
@@ -68,18 +63,6 @@ type DeliverySummary = {
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
-async function getRiders(): Promise<Rider[]> {
-  const res = await fetch(`${baseUrl}/riders`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to load riders: ${res.status}`);
-  }
-
-  return res.json();
-}
-
 async function getAvailableRiders(): Promise<Rider[]> {
   const res = await fetch(`${baseUrl}/riders/available`, {
     cache: "no-store",
@@ -119,75 +102,28 @@ async function getDeliverySummary(): Promise<DeliverySummary> {
   return res.json();
 }
 
-async function createDelivery(data: {
-  order_id: string;
-  rider_id: string;
-  pickup_address?: string;
-  delivery_address: string;
-  delivery_notes?: string;
-}): Promise<Delivery> {
-  const res = await fetch(`${baseUrl}/deliveries`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to create delivery: ${res.status}`);
-  }
-
-  return res.json();
-}
-
-async function updateDeliveryStatus(
-  id: string,
-  status: string,
-  cancellation_reason?: string
-): Promise<Delivery> {
-  const res = await fetch(`${baseUrl}/deliveries/${id}/status`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status, cancellation_reason }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to update delivery status: ${res.status}`);
-  }
-
-  return res.json();
-}
-
 export default function DispatchPage() {
-  const [riders, setRiders] = useState<Rider[]>([]);
   const [availableRiders, setAvailableRiders] = useState<Rider[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [summary, setSummary] = useState<DeliverySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState("");
-  const [selectedRiderId, setSelectedRiderId] = useState("");
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [deliveryNotes, setDeliveryNotes] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const [ridersData, availableRidersData, deliveriesData, summaryData] = await Promise.all([
-        getRiders(),
+      const [availableRidersData, deliveriesData, summaryData] = await Promise.all([
         getAvailableRiders(),
         getDeliveries(statusFilter),
         getDeliverySummary(),
       ]);
-      setRiders(ridersData);
       setAvailableRiders(availableRidersData);
       setDeliveries(deliveriesData);
       setSummary(summaryData);
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : "Failed to load data");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -196,37 +132,6 @@ export default function DispatchPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  const handleAssignDelivery = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await createDelivery({
-        order_id: selectedOrderId,
-        rider_id: selectedRiderId,
-        pickup_address: pickupAddress || undefined,
-        delivery_address: deliveryAddress,
-        delivery_notes: deliveryNotes || undefined,
-      });
-      setShowAssignModal(false);
-      setSelectedOrderId("");
-      setSelectedRiderId("");
-      setPickupAddress("");
-      setDeliveryAddress("");
-      setDeliveryNotes("");
-      loadData();
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : "Failed to assign delivery");
-    }
-  };
-
-  const handleStatusUpdate = async (deliveryId: string, newStatus: string) => {
-    try {
-      await updateDeliveryStatus(deliveryId, newStatus);
-      loadData();
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : "Failed to update status");
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
