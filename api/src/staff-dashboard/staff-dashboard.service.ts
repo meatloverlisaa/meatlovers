@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';

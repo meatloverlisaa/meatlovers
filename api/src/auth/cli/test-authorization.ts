@@ -1,9 +1,5 @@
 #!/usr/bin/env ts-node
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-  @typescript-eslint/no-unsafe-assignment,
-  @typescript-eslint/no-unsafe-call,
-  @typescript-eslint/no-unsafe-return,
-  @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 /**
  * Authorization Test CLI
