@@ -22,9 +22,11 @@ export interface AuthorizationCoverageRow {
   covered: boolean;
 }
 
+type ControllerConstructor = new (...args: any[]) => any;
+
 interface ControllerWrapper {
   instance?: object;
-  metatype?: Function;
+  metatype?: ControllerConstructor;
 }
 
 interface ModulesContainerLike {
@@ -75,7 +77,7 @@ export function scanAuthorizationCoverage(
       );
 
       for (const handlerName of handlerNames) {
-        const handler = prototype[handlerName] as Function;
+        const handler = prototype[handlerName] as (...args: any[]) => unknown;
 
         // Get handler path
         const handlerPath = Reflect.getMetadata(PATH_METADATA, handler) ?? '';

@@ -49,7 +49,7 @@ export class AuthorizationScannerService {
   /**
    * Scan all controllers and endpoints to generate authorization coverage report
    */
-  async scanAuthorization(): Promise<AuthorizationReport> {
+  scanAuthorization(): Promise<AuthorizationReport> {
     const controllers = this.discoveryService.getControllers();
     const endpoints: EndpointAuthInfo[] = [];
 
@@ -132,7 +132,7 @@ export class AuthorizationScannerService {
       }
     }
 
-    return this.generateReport(endpoints);
+    return Promise.resolve(this.generateReport(endpoints));
   }
 
   /**

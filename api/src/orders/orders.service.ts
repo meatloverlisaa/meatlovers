@@ -311,7 +311,7 @@ export class OrdersService {
     ]);
 
     return {
-      data: orders.map((order) => this.serializeOrder(order)),
+      data: orders.map((order) => this.serializeOrder(order as any)),
       pagination: {
         total,
         limit,
@@ -390,7 +390,7 @@ export class OrdersService {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    return this.serializeOrder(order);
+    return this.serializeOrder(order as any);
   }
 
   /**
@@ -460,7 +460,7 @@ export class OrdersService {
       },
     });
 
-    return this.serializeOrder(updatedOrder);
+    return this.serializeOrder(updatedOrder as any);
   }
 
   /**
@@ -573,7 +573,7 @@ export class OrdersService {
       discountApplied: discountValue,
       discountPercent: discountPercentActual.toFixed(2),
       newTotal,
-      order: this.serializeOrder(updatedOrder),
+      order: this.serializeOrder(updatedOrder as any),
     };
   }
 
@@ -669,7 +669,7 @@ export class OrdersService {
       },
     });
 
-    return this.serializeOrder(updatedOrder);
+    return this.serializeOrder(updatedOrder as any);
   }
 
   /**
@@ -759,6 +759,6 @@ export class OrdersService {
       },
     });
 
-    return this.serializeOrder(updatedOrder);
+    return this.serializeOrder(updatedOrder as any);
   }
 }
