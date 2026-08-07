@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PricingRule, PricingRuleType, ProductCategory } from "../page";
+import { PricingRule, PricingRuleType } from "../page";
 
 type PricingRuleFormProps = {
   rule: PricingRule | null;

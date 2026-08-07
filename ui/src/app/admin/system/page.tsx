@@ -121,8 +121,8 @@ export default function SystemDiagnosticsPage() {
       }
 
       setLastUpdated(new Date());
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : 'Failed to load system diagnostics');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load system diagnostics');
     } finally {
       setLoading(false);
     }

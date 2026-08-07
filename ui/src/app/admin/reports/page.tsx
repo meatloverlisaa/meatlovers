@@ -9,10 +9,8 @@ import {
   ShoppingCartIcon,
   UserGroupIcon,
   CubeIcon,
-  ClockIcon,
   ArrowDownTrayIcon,
   CalendarIcon,
-  FunnelIcon,
 } from '@heroicons/react/24/outline';
 
 type ReportType = 

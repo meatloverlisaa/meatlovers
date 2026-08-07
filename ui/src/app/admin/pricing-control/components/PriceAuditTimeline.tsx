@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { PriceAudit } from "../page";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
 // Note: This endpoint doesn't exist yet in the backend
 // We'll need to add GET /price-audit endpoint to the API
 async function getPriceAudits(): Promise<PriceAudit[]> {

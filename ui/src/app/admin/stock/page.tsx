@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { revalidatePath } from "next/cache";
 import { StockBalanceTable } from "./components/StockBalanceTable";
 import { StockInForm } from "./components/StockInForm";
 import { TransferForm } from "./components/TransferForm";
