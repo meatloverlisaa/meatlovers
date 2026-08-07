@@ -142,8 +142,8 @@ export default function AccountantReconciliation() {
       }
 
       await fetchReconciliationItems();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reconcile item");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to reconcile item");
     }
   };
 

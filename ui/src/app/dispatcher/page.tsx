@@ -140,9 +140,9 @@ export default function DispatcherDashboard() {
         const data = await ordersRes.json();
         setPendingOrders(Array.isArray(data) ? data : []);
       }
-    } catch (err) {
-      console.error("Error fetching dashboard data:", err);
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+    } catch (_err) {
+      console.error("Error fetching dashboard data:", _err);
+      setError(_err instanceof Error ? _err.message : "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -185,8 +185,8 @@ export default function DispatcherDashboard() {
       setDeliveryNotes("");
       setSelectedOrder(null);
       fetchDashboardData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to assign delivery");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to assign delivery");
     }
   };
 
@@ -214,8 +214,8 @@ export default function DispatcherDashboard() {
       if (!res.ok) throw new Error("Failed to update status");
 
       fetchDashboardData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update status");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to update status");
     }
   };
 

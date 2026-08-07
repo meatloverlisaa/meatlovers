@@ -9,10 +9,8 @@ import {
   ShoppingCartIcon,
   UserGroupIcon,
   CubeIcon,
-  ClockIcon,
   ArrowDownTrayIcon,
   CalendarIcon,
-  FunnelIcon,
 } from '@heroicons/react/24/outline';
 
 type ReportType = 
@@ -167,9 +165,9 @@ export default function ReportsPage() {
       console.log('Report data:', data);
       alert('Report generated! Check console for data. Download feature coming soon.');
 
-    } catch (err) {
-      console.error('Report generation error:', err);
-      alert(err instanceof Error ? err.message : 'Failed to generate report');
+    } catch (error) {
+      console.error('Report generation error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to generate report');
     } finally {
       setLoading(false);
     }

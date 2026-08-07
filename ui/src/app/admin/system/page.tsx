@@ -48,7 +48,7 @@ interface ApiHealth {
     heapUsed: number;
     external: number;
   };
-  cpu: any;
+  cpu: Record<string, string | number | null>;
 }
 
 interface PerformanceMetrics {
@@ -121,8 +121,8 @@ export default function SystemDiagnosticsPage() {
       }
 
       setLastUpdated(new Date());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load system diagnostics');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load system diagnostics');
     } finally {
       setLoading(false);
     }

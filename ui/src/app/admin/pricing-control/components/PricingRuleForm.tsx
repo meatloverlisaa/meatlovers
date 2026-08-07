@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PricingRule, PricingRuleType, ProductCategory } from "../page";
+import { PricingRule, PricingRuleType } from "../page";
 
 type PricingRuleFormProps = {
   rule: PricingRule | null;
@@ -55,8 +55,8 @@ export function PricingRuleForm({ rule, onClose, onSuccess }: PricingRuleFormPro
       }
 
       onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : `Failed to ${isEdit ? "update" : "create"} pricing rule`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : `Failed to ${isEdit ? "update" : "create"} pricing rule`);
       setSubmitting(false);
     }
   };

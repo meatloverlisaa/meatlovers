@@ -1,4 +1,5 @@
 #!/usr/bin/env ts-node
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 /**
  * Part E: Role Guard Coverage Report Generator

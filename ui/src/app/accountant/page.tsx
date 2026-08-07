@@ -131,9 +131,9 @@ export default function AccountantDashboard() {
 
       setAlerts([]);
 
-    } catch (err) {
-      console.error("Error fetching dashboard data:", err);
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+    } catch (_err) {
+      console.error("Error fetching dashboard data:", _err);
+      setError(_err instanceof Error ? _err.message : "Failed to load dashboard data");
       
       // Fallback to mock data on error
       setSummary({

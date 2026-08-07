@@ -59,8 +59,8 @@ export function ProductEditDrawer({ product, onClose, onSuccess }: ProductEditDr
     try {
       await updateProduct(productId, payload);
       onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update product");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to update product");
       setSubmitting(false);
     }
   };

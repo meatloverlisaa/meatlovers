@@ -54,8 +54,8 @@ export function ProductCreateForm({ onClose, onSuccess }: ProductCreateFormProps
     try {
       await createProduct(payload);
       onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create product");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to create product");
       setSubmitting(false);
     }
   };

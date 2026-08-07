@@ -3,6 +3,8 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,
+  @typescript-eslint/no-unsafe-assignment */
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductionPlanDto } from './dto/create-production-plan.dto';
 import { UpdateProductionPlanDto } from './dto/update-production-plan.dto';

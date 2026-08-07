@@ -1,5 +1,4 @@
 import { revalidatePath } from "next/cache";
-import React from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FinanceTransaction = {
@@ -37,29 +36,6 @@ async function getFinanceSummary(): Promise<FinanceSummary> {
 
   if (!res.ok) {
     throw new Error(`Failed to load finance summary: ${res.status}`);
-  }
-
-  return res.json();
-}
-
-async function getFinanceTransactions(filters?: {
-  type?: string;
-  category?: string;
-  startDate?: string;
-  endDate?: string;
-}): Promise<FinanceTransaction[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const params = new URLSearchParams();
-  
-  if (filters?.type) params.append('type', filters.type);
-  if (filters?.category) params.append('category', filters.category);
-  if (filters?.startDate) params.append('startDate', filters.startDate);
-  if (filters?.endDate) params.append('endDate', filters.endDate);
-
-  const res = await fetch(`${baseUrl}/finance-transactions?${params.toString()}`, { cache: "no-store" });
-
-  if (!res.ok) {
-    throw new Error(`Failed to load transactions: ${res.status}`);
   }
 
   return res.json();
@@ -169,9 +145,8 @@ function SummaryCards({ summary }: { summary: FinanceSummary }) {
   );
 }
 
-function TransactionsTable({ transactions, onDelete }: { 
+function TransactionsTable({ transactions }: { 
   transactions: FinanceTransaction[];
-  onDelete: (id: string) => Promise<void>;
 }) {
   return (
     <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
@@ -464,7 +439,7 @@ export default async function FinanceDashboard() {
 
           {/* Transactions Table */}
           <div className="lg:col-span-2">
-            <TransactionsTable transactions={transactions} onDelete={deleteTransaction} />
+            <TransactionsTable transactions={transactions} />
           </div>
         </div>
 

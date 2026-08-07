@@ -29,7 +29,7 @@ type Alert = {
   action?: { label: string; href: string };
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+// const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 // ─── Summary Cards ────────────────────────────────────────────────────────────
 function SummaryCards({ cards }: { cards: SummaryCard[] }) {

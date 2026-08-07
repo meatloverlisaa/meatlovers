@@ -1,0 +1,115 @@
+==========================================
+FULL SYSTEM DIAGNOSTIC
+==========================================
+
+Date: Thu Aug  6 04:44:29 PM EAT 2026
+
+==========================================
+PART 1: DATABASE DIAGNOSTIC
+==========================================
+
+1.1 Checking Database Connection...
+[0;32m✓ .env file exists[0m
+[0;32m✓ DATABASE_URL configured[0m
+
+1.2 Checking Prisma Schema...
+[0;32m✓ Prisma schema exists[0m
+  → Found 50 models
+  [0;32m✓[0m User model exists
+  [0;32m✓[0m Order model exists
+  [0;32m✓[0m OrderItem model exists
+  [0;32m✓[0m Product model exists
+  [0;32m✓[0m Table model exists
+
+1.3 Testing Database Connection...
+[0;32m✓ Database connection successful[0m
+
+1.4 Checking Table Data...
+Checking critical tables...
+[1;33m⚠ Users table is empty or error[0m
+[1;33m⚠ Products table is empty[0m
+[1;33m⚠ Orders table check failed[0m
+
+==========================================
+PART 2: API SERVER DIAGNOSTIC
+==========================================
+
+2.1 Checking if API is running...
+[0;32m✓ API server is running (health check: 200)[0m
+
+2.2 Testing Authentication...
+[0;32m✓ Authentication working[0m
+
+==========================================
+PART 3: API ENDPOINT TESTS
+==========================================
+
+3.1 Kitchen Endpoints...
+[0;31m✗[0m Kitchen Queue - 500 (Internal Server Error)
+  → Error: Internal server error
+[0;31m✗[0m Kitchen Summary - 500 (Internal Server Error)
+  → Error: Internal server error
+[0;32m✓[0m Kitchen Activity - 200
+
+3.2 Bar Endpoints...
+[0;31m✗[0m Bar Queue - 500 (Internal Server Error)
+  → Error: Internal server error
+[0;32m✓[0m Bar Summary - 200
+
+3.3 Product Endpoints...
+[0;32m✓[0m Get Products - 200
+[1;33m⚠[0m Get Categories - Expected: 200, Got: 400
+
+3.4 Order Endpoints...
+[0;32m✓[0m Get Orders - 200
+[0;31m✗[0m Get Active Orders - 500 (Internal Server Error)
+  → Error: Internal server error
+
+3.5 Stock Endpoints...
+[0;32m✓[0m Get Stock - 200
+
+3.6 Supplier Endpoints...
+[0;32m✓[0m Get Suppliers - 200
+
+==========================================
+PART 4: FRONTEND DIAGNOSTIC
+==========================================
+
+4.1 Checking if Frontend is running...
+[0;32m✓ Frontend server is running[0m
+
+4.2 Testing Frontend Routes...
+[0;32m✓[0m Homepage - 200
+[0;32m✓[0m Login Page - 200
+[0;32m✓[0m Admin Dashboard - 200
+[0;32m✓[0m Manager Dashboard - 200
+[0;32m✓[0m Kitchen Dashboard - 200
+[0;32m✓[0m Bar Dashboard - 200
+
+==========================================
+PART 5: CRITICAL ERROR CHECK
+==========================================
+
+5.1 Checking for 500 errors...
+[0;31m✗ Kitchen Queue returns 500[0m
+[0;31m✗ Bar Queue returns 500[0m
+[0;31mFound 2 critical 500 errors[0m
+
+==========================================
+DIAGNOSTIC SUMMARY
+==========================================
+
+Total Checks: 29
+[0;32mPassed: 19[0m
+[0;31mFailed: 6[0m
+[1;33mWarnings: 4[0m
+
+[0;31m✗ System has 6 critical issues[0m
+
+Common fixes:
+1. Make sure both servers are running:
+   - API: cd api && npm run start:dev
+   - UI: cd ui && npm run dev
+2. Check database connection in api/.env
+3. Run: cd api && npx prisma generate
+4. Restart API server after Prisma changes

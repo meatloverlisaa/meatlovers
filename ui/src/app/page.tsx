@@ -118,7 +118,7 @@ function ContactForm({ initialSource }: { initialSource: LeadSource }) {
       setName(""); setPhone(""); setEmail(""); setMessage("");
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        err instanceof Error ? _err.message : "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -294,6 +294,20 @@ export default function Home() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/58 to-zinc-950/20" />
+        
+        {/* Staff Login Button - Floating in top-right */}
+        <div className="absolute top-6 right-6 z-10">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-md border border-white/40 bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white/60"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Staff Login
+          </Link>
+        </div>
+
         <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-red-200">

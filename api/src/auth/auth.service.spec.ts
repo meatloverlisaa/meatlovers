@@ -11,6 +11,9 @@ jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
+  let prismaService: PrismaService;
+  let jwtService: JwtService;
+  let auditLogService: AuditLogService;
 
   const mockUser = {
     id: '1',

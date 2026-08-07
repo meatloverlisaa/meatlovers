@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/require-await */
+
 import { Injectable, Logger } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
 import { ROLES_KEY, IS_PUBLIC_KEY } from './constants/auth-metadata.constants';

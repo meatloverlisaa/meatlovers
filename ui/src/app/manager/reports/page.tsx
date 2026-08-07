@@ -167,9 +167,9 @@ export default function ReportsPage() {
       console.log('Report data:', data);
       alert('Report generated! Check console for data. Download feature coming soon.');
 
-    } catch (err) {
+    } catch (_err) {
       console.error('Report generation error:', err);
-      alert(err instanceof Error ? err.message : 'Failed to generate report');
+      alert(err instanceof Error ? _err.message : 'Failed to generate report');
     } finally {
       setLoading(false);
     }

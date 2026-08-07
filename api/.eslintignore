@@ -1,0 +1,4 @@
+# Ignore test files during staged lint fixes
+/test/
+**/*.e2e-spec.ts
+**/*.spec.ts

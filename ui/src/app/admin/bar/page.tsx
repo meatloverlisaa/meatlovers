@@ -6,6 +6,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { BarSalesSummary } from '@/components/admin/bar/BarSalesSummary';
 import { PendingDrinkList } from '@/components/admin/bar/PendingDrinkList';
 import { BarStockMovementTable } from '@/components/admin/bar/BarStockMovementTable';
+import { DrinkOrder } from '@/types/bar';
+import { BarSalesData, StockMovement } from '@/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -17,9 +19,9 @@ function getToken(): string {
 }
 
 export default function BarOversightPage() {
-  const [salesData, setSalesData] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [movements, setMovements] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState<BarSalesData | null>(null);
+  const [orders, setOrders] = useState<DrinkOrder[]>([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
   const [isLoadingSales, setIsLoadingSales] = useState(true);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingMovements, setIsLoadingMovements] = useState(true);

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { revalidatePath } from "next/cache";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -308,17 +307,6 @@ export default function ProductionPlansPage() {
     } catch (error) {
       alert(error instanceof Error ? error.message : "Failed to load production plan details");
     }
-  };
-
-  const calculateIngredientConsumption = (plan: ProductionPlan) => {
-    if (!plan.recipe?.ingredients) return [];
-    
-    return plan.recipe.ingredients.map((ingredient) => ({
-      ingredientName: ingredient.stock_item.product?.product_name || "Unknown",
-      quantityPerUnit: ingredient.quantity,
-      unit: ingredient.unit,
-      totalConsumed: ingredient.quantity * plan.produced_quantity,
-    }));
   };
 
   const getStatusColor = (status: string) => {

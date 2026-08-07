@@ -6,7 +6,6 @@ import {
   XCircleIcon,
   ClockIcon,
   ArrowPathIcon,
-  ExclamationTriangleIcon,
   DocumentTextIcon,
   ShoppingCartIcon,
   UserIcon,
@@ -87,8 +86,8 @@ export default function ApprovalsPage() {
       if (approvalsRes.ok) setApprovals(await approvalsRes.json());
 
       setLastUpdated(new Date());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load approvals');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load approvals');
     } finally {
       setLoading(false);
     }
@@ -120,8 +119,8 @@ export default function ApprovalsPage() {
       } else {
         alert('Failed to approve request');
       }
-    } catch (err) {
-      alert('Error approving request');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error approving request');
     }
   };
 
@@ -142,8 +141,8 @@ export default function ApprovalsPage() {
       } else {
         alert('Failed to reject request');
       }
-    } catch (err) {
-      alert('Error rejecting request');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error rejecting request');
     }
   };
 

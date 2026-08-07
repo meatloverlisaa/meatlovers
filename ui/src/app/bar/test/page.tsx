@@ -46,8 +46,8 @@ export default function BarTestPage() {
               const errorText = await ordersRes.text();
               errs.push(`❌ Orders API failed: ${ordersRes.status} - ${errorText}`);
             }
-          } catch (err) {
-            errs.push(`❌ Orders API error: ${err instanceof Error ? err.message : String(err)}`);
+          } catch (_err) {
+            errs.push(`❌ Orders API error: ${err instanceof Error ? _err.message : String(err)}`);
           }
           
           // Step 3: Test bar summary API
@@ -70,12 +70,12 @@ export default function BarTestPage() {
               const errorText = await summaryRes.text();
               errs.push(`❌ Summary API failed: ${summaryRes.status} - ${errorText}`);
             }
-          } catch (err) {
-            errs.push(`❌ Summary API error: ${err instanceof Error ? err.message : String(err)}`);
+          } catch (_err) {
+            errs.push(`❌ Summary API error: ${err instanceof Error ? _err.message : String(err)}`);
           }
         }
-      } catch (err) {
-        errs.push(`❌ General error: ${err instanceof Error ? err.message : String(err)}`);
+      } catch (_err) {
+        errs.push(`❌ General error: ${err instanceof Error ? _err.message : String(err)}`);
       }
       
       setStatus(steps.join('\n'));

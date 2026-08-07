@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type NavItem = {
@@ -26,9 +27,15 @@ export default function KitchenLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
-  // Mock user role - in production, get from auth context
-  const userRole = "CHEF";
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
+
+  const userRole = user?.role || "CHEF";
 
   const isActive = (href: string) => {
     if (href === "/kitchen") return pathname === "/kitchen";
@@ -77,22 +84,34 @@ export default function KitchenLayout({
         <div className="border-t border-zinc-200 p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-800">
-              C
+              {user?.full_name?.charAt(0) || 'C'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-zinc-950">Head Chef</p>
+              <p className="text-sm font-bold text-zinc-950">{user?.full_name || 'Head Chef'}</p>
               <p className="text-xs text-zinc-500">{userRole}</p>
             </div>
           </div>
-          <Link
-            href="/kitchen/profile"
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 rounded-lg transition"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            My Profile
-          </Link>
+          <div className="space-y-1">
+            <Link
+              href="/kitchen/profile"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 rounded-lg transition"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition"
+              title="Logout"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
         </div>
       </aside>
 

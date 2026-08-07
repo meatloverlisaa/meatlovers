@@ -49,8 +49,8 @@ export default function SuperAdminLogin() {
         await login(email, password);
         // AuthContext handles redirect to appropriate dashboard
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Login failed");
     } finally {
       setLoading(false);
     }

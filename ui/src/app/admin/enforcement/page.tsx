@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   ShieldExclamationIcon,
   UserIcon,
@@ -70,7 +70,7 @@ export default function EnforcementDashboardPage() {
   const [filter, setFilter] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
       const [summaryRes, scoresRes, actionsRes] = await Promise.all([
@@ -84,16 +84,16 @@ export default function EnforcementDashboardPage() {
       if (actionsRes.ok) setActions(await actionsRes.json());
 
       setLastUpdated(new Date());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load enforcement data');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load enforcement data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     fetchData();
-  }, [filter]);
+  }, [fetchData]);
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { getAuthHeader } from "@/lib/auth";
 
@@ -74,9 +75,9 @@ export default function ProfilePage() {
       setFullName(data.full_name);
       setEmail(data.email);
       setPhone(data.phone);
-    } catch (err) {
-      console.error("Profile fetch error:", err);
-      setError(err instanceof Error ? err.message : "Failed to load profile");
+    } catch (_err) {
+      console.error("Profile fetch error:", _err);
+      setError(_err instanceof Error ? _err.message : "Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -117,8 +118,8 @@ export default function ProfilePage() {
       setEditing(false);
       setSuccess("Profile updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update profile");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -166,8 +167,8 @@ export default function ProfilePage() {
       setConfirmPassword("");
       setSuccess("Password changed successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to change password");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to change password");
     } finally {
       setLoading(false);
     }
@@ -211,8 +212,8 @@ export default function ProfilePage() {
 
       setSuccess("Profile photo updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload photo");
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to upload photo");
       setProfilePhoto(null);
     } finally {
       setUploadingPhoto(false);
@@ -313,9 +314,12 @@ export default function ProfilePage() {
               <div className="absolute -bottom-12 left-8">
                 <div className="relative group">
                   {profilePhoto ? (
-                    <img 
-                      src={profilePhoto} 
+                    <Image
+                      src={profilePhoto}
                       alt={profile.full_name}
+                      width={96}
+                      height={96}
+                      unoptimized
                       className="w-24 h-24 rounded-2xl border-4 border-white dark:border-slate-950 shadow-xl object-cover"
                     />
                   ) : (

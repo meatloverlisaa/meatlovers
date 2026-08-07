@@ -1,13 +1,993 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                         BigInt                  @id @default(autoincrement())
+  full_name                  String                  @db.VarChar(255)
+  email                      String?                 @unique @db.VarChar(255)
+  phone                      String?                 @unique @db.VarChar(50)
+  password_hash              String
+  role                       Role
+  is_active                  Boolean                 @default(true)
+  failed_login_attempts      Int                     @default(0)
+  account_locked_until       DateTime?
+  last_login_at              DateTime?
+  last_login_ip              String?                 @db.VarChar(45)
+  password_changed_at        DateTime                @default(now())
+  created_at                 DateTime                @default(now())
+  updated_at                 DateTime                @updatedAt
+  approval_requests_made     ApprovalRequest[]       @relation("ApprovalRequester")
+  approval_requests_reviewed ApprovalRequest[]       @relation("ApprovalReviewer")
+  assigned_assets            Asset[]
+  audit_logs                 AuditLog[]
+  disciplinary_reports       DisciplinaryAction[]    @relation("DisciplinaryReports")
+  disciplinary_actions       DisciplinaryAction[]    @relation("DisciplinaryActions")
+  duty_rosters               DutyRoster[]
+  documents_uploaded         EmployeeDocument[]      @relation("DocumentsUploaded")
+  employee_documents         EmployeeDocument[]      @relation("EmployeeDocuments")
+  documents_verified         EmployeeDocument[]      @relation("DocumentsVerified")
+  employee_profile           EmployeeProfile?
+  enforcement_actions_taken  EnforcementAction[]
+  risk_scores                EnforcementRiskScore[]
+  finance_transactions       FinanceTransaction[]
+  grievances_assigned        Grievance[]             @relation("GrievancesAssigned")
+  grievances_submitted       Grievance[]             @relation("GrievancesSubmitted")
+  leave_approvals            LeaveRequest[]          @relation("LeaveApprovals")
+  leave_requests             LeaveRequest[]          @relation("LeaveRequests")
+  orders                     Order[]
+  payroll_records            Payroll[]
+  reviews_conducted          PerformanceReview[]     @relation("ReviewsConducted")
+  performance_reviews        PerformanceReview[]     @relation("PerformanceReviews")
+  price_change_audits        PriceChangeAuditTrail[]
+  refresh_tokens             RefreshToken[]
+  rider                      Rider?
+  attendance_records         StaffAttendance[]
+  training_enrollments       TrainingEnrollment[]
+  waste_declarations         WasteDeclaration[]
+
+  @@map("users")
+}
+
+model EmployeeProfile {
+  id                             BigInt           @id @default(autoincrement())
+  user_id                        BigInt           @unique
+  date_of_birth                  DateTime?        @db.Date
+  gender                         String?          @db.VarChar(20)
+  nationality                    String?          @db.VarChar(100)
+  national_id                    String?          @db.VarChar(50)
+  tax_id                         String?          @db.VarChar(50)
+  passport_number                String?          @db.VarChar(50)
+  alternative_phone              String?          @db.VarChar(50)
+  personal_email                 String?          @db.VarChar(255)
+  physical_address               String?
+  postal_address                 String?          @db.VarChar(255)
+  city                           String?          @db.VarChar(100)
+  country                        String?          @db.VarChar(100)
+  emergency_contact_name         String?          @db.VarChar(255)
+  emergency_contact_phone        String?          @db.VarChar(50)
+  emergency_contact_relationship String?          @db.VarChar(100)
+  employment_start_date          DateTime         @db.Date
+  employment_end_date            DateTime?        @db.Date
+  employment_type                EmploymentType   @default(PERMANENT)
+  employment_status              EmploymentStatus @default(ACTIVE)
+  probation_end_date             DateTime?        @db.Date
+  contract_end_date              DateTime?        @db.Date
+  department                     String?          @db.VarChar(100)
+  position_title                 String?          @db.VarChar(255)
+  reports_to_user_id             BigInt?
+  bank_name                      String?          @db.VarChar(255)
+  bank_account_number            String?          @db.VarChar(100)
+  bank_account_name              String?          @db.VarChar(255)
+  bank_branch                    String?          @db.VarChar(255)
+  bank_swift_code                String?          @db.VarChar(50)
+  education_level                String?          @db.VarChar(100)
+  certifications                 String?
+  skills                         String?
+  notes                          String?
+  profile_photo_url              String?          @db.VarChar(500)
+  created_at                     DateTime         @default(now())
+  updated_at                     DateTime         @updatedAt
+  user                           User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([employment_status])
+  @@index([employment_type])
+  @@index([department])
+  @@map("employee_profiles")
+}
+
+model PricingRule {
+  id                  BigInt                  @id @default(autoincrement())
+  name                String                  @db.VarChar(255)
+  rule_type           PricingRuleType
+  value               Decimal                 @db.Decimal(12, 2)
+  product_category    ProductCategory?
+  min_selling_price   Decimal?
+  max_selling_price   Decimal?
+  is_active           Boolean                 @default(true)
+  created_at          DateTime                @default(now())
+  updated_at          DateTime                @updatedAt
+  price_change_audits PriceChangeAuditTrail[]
+
+  @@map("pricing_rules")
+}
+
+model PriceChangeAuditTrail {
+  id                BigInt       @id @default(autoincrement())
+  product_id        BigInt
+  pricing_rule_id   BigInt?
+  actor_user_id     BigInt
+  old_selling_price Decimal      @db.Decimal(12, 2)
+  new_selling_price Decimal      @db.Decimal(12, 2)
+  note              String?
+  created_at        DateTime     @default(now())
+  actor             User         @relation(fields: [actor_user_id], references: [id])
+  pricing_rule      PricingRule? @relation(fields: [pricing_rule_id], references: [id])
+  product           Product      @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([pricing_rule_id])
+  @@index([actor_user_id])
+  @@map("price_change_audit_trails")
+}
+
+model Supplier {
+  id               BigInt         @id @default(autoincrement())
+  supplier_name    String         @db.VarChar(255)
+  contact_person   String?        @db.VarChar(255)
+  phone            String?        @db.VarChar(50)
+  email            String?        @db.VarChar(255)
+  physical_address String?
+  supplier_type    SupplierType
+  status           SupplierStatus @default(ACTIVE)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  @@map("suppliers")
+}
+
+model Product {
+  id                  BigInt                  @id @default(autoincrement())
+  product_name        String                  @db.VarChar(255)
+  product_category    ProductCategory
+  selling_price       Decimal                 @db.Decimal(12, 2)
+  cost_price          Decimal                 @db.Decimal(12, 2)
+  barcode             String?                 @db.VarChar(255)
+  is_active           Boolean                 @default(true)
+  created_at          DateTime                @default(now())
+  updated_at          DateTime                @updatedAt
+  order_items         OrderItem[]
+  price_change_audits PriceChangeAuditTrail[]
+  recipe              Recipe?
+  stock_items         StockItem[]
+  waste_declarations  WasteDeclaration[]
+
+  @@map("products")
+}
+
+model Customer {
+  id         BigInt   @id @default(autoincrement())
+  name       String?  @db.VarChar(255)
+  phone      String?  @db.VarChar(50)
+  email      String?  @db.VarChar(255)
+  notes      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  orders     Order[]
+
+  @@index([phone])
+  @@map("customers")
+}
+
+model Table {
+  id         BigInt   @id @default(autoincrement())
+  table_name String?  @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  orders     Order[]
+
+  @@map("tables")
+}
+
+model Order {
+  id                BigInt            @id @default(autoincrement())
+  table_id          BigInt
+  customer_id       BigInt?
+  waiter_id         BigInt
+  status            OrderStatus       @default(PENDING)
+  total_amount      Float
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  approval_requests ApprovalRequest[]
+  delivery          Delivery?
+  items             OrderItem[]
+  customer          Customer?         @relation(fields: [customer_id], references: [id])
+  table             Table             @relation(fields: [table_id], references: [id])
+  waiter            User              @relation(fields: [waiter_id], references: [id])
+  payments          Payment[]
+
+  @@index([table_id])
+  @@index([customer_id])
+  @@index([waiter_id])
+  @@index([status])
+  @@index([created_at])
+  @@index([status, created_at])
+  @@index([status, updated_at])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           BigInt   @id @default(autoincrement())
+  order_id     BigInt
+  product_id   BigInt?
+  product_name String   @db.VarChar(255)
+  quantity     Int
+  unit_price   Float
+  line_total   Float
+  order        Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product      Product? @relation(fields: [product_id], references: [id])
+
+  @@index([order_id])
+  @@index([product_id])
+  @@map("order_items")
+}
+
+model StockItem {
+  id                 BigInt             @id @default(autoincrement())
+  product_id         BigInt
+  quantity           Int                @default(0)
+  location           String             @default("MAIN_STORE") @db.VarChar(100)
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+  recipe_ingredients RecipeIngredient[]
+  product            Product            @relation(fields: [product_id], references: [id])
+  movements          StockMovement[]
+
+  @@unique([product_id, location])
+  @@index([product_id])
+  @@map("stock_items")
+}
+
+model StockMovement {
+  id            BigInt       @id @default(autoincrement())
+  stock_item_id BigInt
+  movement_type MovementType
+  quantity      Int
+  reference     String?      @db.VarChar(255)
+  notes         String?
+  created_at    DateTime     @default(now())
+  stock_item    StockItem    @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
+
+  @@index([stock_item_id])
+  @@map("stock_movements")
+}
+
+model Payment {
+  id                    BigInt        @id @default(autoincrement())
+  order_id              BigInt
+  payment_method        PaymentMethod
+  amount                Decimal       @db.Decimal(12, 2)
+  transaction_reference String?       @db.VarChar(255)
+  payment_status        PaymentStatus @default(PENDING)
+  created_at            DateTime      @default(now())
+  updated_at            DateTime      @updatedAt
+  order                 Order         @relation(fields: [order_id], references: [id])
+
+  @@index([order_id])
+  @@map("payments")
+}
+
+model MarginAlert {
+  id           BigInt            @id @default(autoincrement())
+  alert_status MarginAlertStatus @default(OPEN)
+  notes        String?
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+
+  @@map("margin_alerts")
+}
+
+model Recipe {
+  id               BigInt             @id @default(autoincrement())
+  product_id       BigInt             @unique
+  name             String             @db.VarChar(255)
+  instructions     String?
+  is_active        Boolean            @default(true)
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  production_plans ProductionPlan[]
+  ingredients      RecipeIngredient[]
+  product          Product            @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  id            BigInt    @id @default(autoincrement())
+  recipe_id     BigInt
+  stock_item_id BigInt
+  quantity      Decimal   @db.Decimal(10, 3)
+  unit          String    @default("units") @db.VarChar(50)
+  recipe        Recipe    @relation(fields: [recipe_id], references: [id], onDelete: Cascade)
+  stock_item    StockItem @relation(fields: [stock_item_id], references: [id])
+
+  @@index([recipe_id])
+  @@index([stock_item_id])
+  @@map("recipe_ingredients")
+}
+
+model ProductionPlan {
+  id                BigInt               @id @default(autoincrement())
+  recipe_id         BigInt
+  planned_quantity  Int
+  produced_quantity Int                  @default(0)
+  status            ProductionPlanStatus @default(PLANNED)
+  planned_date      DateTime
+  completed_date    DateTime?
+  notes             String?
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
+  recipe            Recipe               @relation(fields: [recipe_id], references: [id])
+
+  @@index([recipe_id])
+  @@index([status])
+  @@index([planned_date])
+  @@map("production_plans")
+}
+
+model Rider {
+  id               BigInt     @id @default(autoincrement())
+  user_id          BigInt     @unique
+  phone            String     @db.VarChar(50)
+  license_number   String?    @db.VarChar(100)
+  vehicle_type     String?    @db.VarChar(50)
+  vehicle_plate    String?    @db.VarChar(50)
+  is_available     Boolean    @default(true)
+  current_location String?
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  deliveries       Delivery[]
+  user             User       @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@map("riders")
+}
+
+model Delivery {
+  id                  BigInt         @id @default(autoincrement())
+  order_id            BigInt         @unique
+  rider_id            BigInt
+  status              DeliveryStatus @default(ASSIGNED)
+  pickup_address      String?
+  delivery_address    String
+  delivery_notes      String?
+  assigned_at         DateTime       @default(now())
+  picked_up_at        DateTime?
+  delivered_at        DateTime?
+  cancelled_at        DateTime?
+  cancellation_reason String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  order               Order          @relation(fields: [order_id], references: [id])
+  rider               Rider          @relation(fields: [rider_id], references: [id])
+
+  @@index([order_id])
+  @@index([rider_id])
+  @@index([status])
+  @@map("deliveries")
+}
+
+model WasteDeclaration {
+  id          BigInt      @id @default(autoincrement())
+  product_id  BigInt
+  quantity    Int
+  reason      WasteReason
+  notes       String?
+  declared_by BigInt
+  cost_value  Decimal     @db.Decimal(12, 2)
+  declared_at DateTime    @default(now())
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  declarer    User        @relation(fields: [declared_by], references: [id])
+  product     Product     @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([declared_by])
+  @@index([reason])
+  @@index([declared_at])
+  @@map("waste_declarations")
+}
+
+model FinanceTransaction {
+  id               BigInt              @id @default(autoincrement())
+  type             TransactionType
+  category         TransactionCategory
+  amount           Decimal             @db.Decimal(12, 2)
+  description      String?
+  reference        String?             @db.VarChar(255)
+  recorded_by      BigInt
+  transaction_date DateTime            @default(now())
+  created_at       DateTime            @default(now())
+  updated_at       DateTime            @updatedAt
+  recorder         User                @relation(fields: [recorded_by], references: [id])
+
+  @@index([type])
+  @@index([category])
+  @@index([recorded_by])
+  @@index([transaction_date])
+  @@map("finance_transactions")
+}
+
+model ContentPage {
+  id               BigInt   @id @default(autoincrement())
+  title            String   @db.VarChar(255)
+  slug             String   @unique @db.VarChar(255)
+  page_type        PageType @default(CUSTOM)
+  content          String
+  is_published     Boolean  @default(false)
+  meta_title       String?  @db.VarChar(255)
+  meta_description String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@index([slug])
+  @@index([is_published])
+  @@map("content_pages")
+}
+
+model WebsiteLead {
+  id           BigInt     @id @default(autoincrement())
+  name         String     @db.VarChar(255)
+  email        String?    @db.VarChar(255)
+  phone        String?    @db.VarChar(50)
+  source       LeadSource
+  status       LeadStatus @default(NEW)
+  enquiry_type String?    @db.VarChar(100)
+  message      String?
+  event_date   DateTime?
+  guest_count  Int?
+  notes        String?
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+
+  @@index([source])
+  @@index([status])
+  @@index([created_at])
+  @@map("website_leads")
+}
+
+model ApprovalRequest {
+  id           BigInt                @id @default(autoincrement())
+  order_id     BigInt
+  request_type ApprovalRequestType
+  status       ApprovalRequestStatus @default(PENDING)
+  requested_by BigInt
+  reviewed_by  BigInt?
+  reason       String?
+  metadata     String?
+  created_at   DateTime              @default(now())
+  updated_at   DateTime              @updatedAt
+  order        Order                 @relation(fields: [order_id], references: [id])
+  requester    User                  @relation("ApprovalRequester", fields: [requested_by], references: [id])
+  reviewer     User?                 @relation("ApprovalReviewer", fields: [reviewed_by], references: [id])
+
+  @@index([order_id])
+  @@index([status])
+  @@index([requested_by])
+  @@index([reviewed_by])
+  @@map("approval_requests")
+}
+
+model AuditLog {
+  id            BigInt      @id @default(autoincrement())
+  user_id       BigInt?
+  action        AuditAction
+  resource      String?     @db.VarChar(255)
+  resource_id   String?     @db.VarChar(255)
+  ip_address    String?     @db.VarChar(45)
+  user_agent    String?
+  metadata      String?
+  success       Boolean     @default(true)
+  error_message String?
+  created_at    DateTime    @default(now())
+  user          User?       @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([action])
+  @@index([created_at])
+  @@index([user_id, created_at])
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt
+  token_hash String    @unique @db.VarChar(255)
+  expires_at DateTime
+  is_revoked Boolean   @default(false)
+  revoked_at DateTime?
+  ip_address String?   @db.VarChar(45)
+  user_agent String?
+  created_at DateTime  @default(now())
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([token_hash])
+  @@index([expires_at])
+  @@index([is_revoked])
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id         BigInt    @id @default(autoincrement())
+  email      String    @db.VarChar(255)
+  token_hash String    @unique @db.VarChar(255)
+  expires_at DateTime
+  is_used    Boolean   @default(false)
+  used_at    DateTime?
+  ip_address String?   @db.VarChar(45)
+  created_at DateTime  @default(now())
+
+  @@index([email])
+  @@index([token_hash])
+  @@index([expires_at])
+  @@map("password_reset_tokens")
+}
+
+model EnforcementRiskScore {
+  id                BigInt              @id @default(autoincrement())
+  user_id           BigInt
+  risk_level        RiskLevel
+  risk_score        Int                 @default(0)
+  violation_count   Int                 @default(0)
+  last_violation_at DateTime?
+  notes             String?
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  actions           EnforcementAction[]
+  user              User                @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([risk_level])
+  @@map("enforcement_risk_scores")
+}
+
+model EnforcementAction {
+  id            BigInt               @id @default(autoincrement())
+  risk_score_id BigInt
+  action_type   ActionType
+  description   String
+  taken_by      BigInt
+  severity      RiskLevel
+  resolution    String?
+  resolved_at   DateTime?
+  created_at    DateTime             @default(now())
+  risk_score    EnforcementRiskScore @relation(fields: [risk_score_id], references: [id])
+  taken_by_user User                 @relation(fields: [taken_by], references: [id])
+
+  @@index([risk_score_id])
+  @@index([action_type])
+  @@index([created_at])
+  @@map("enforcement_actions")
+}
+
+model Asset {
+  id                BigInt           @id @default(autoincrement())
+  asset_name        String           @db.VarChar(255)
+  asset_code        String           @unique @db.VarChar(100)
+  category          AssetCategory
+  description       String?
+  purchase_date     DateTime
+  purchase_cost     Decimal          @db.Decimal(12, 2)
+  current_value     Decimal          @db.Decimal(12, 2)
+  depreciation_rate Decimal?         @db.Decimal(5, 2)
+  location          String           @db.VarChar(255)
+  assigned_to       BigInt?
+  status            AssetStatus      @default(ACTIVE)
+  condition         AssetCondition   @default(GOOD)
+  warranty_expiry   DateTime?
+  last_maintenance  DateTime?
+  next_maintenance  DateTime?
+  notes             String?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  assigned_user     User?            @relation(fields: [assigned_to], references: [id])
+  maintenance_logs  MaintenanceLog[]
+
+  @@index([asset_code])
+  @@index([category])
+  @@index([status])
+  @@index([assigned_to])
+  @@map("assets")
+}
+
+model MaintenanceLog {
+  id               BigInt            @id @default(autoincrement())
+  asset_id         BigInt
+  maintenance_type String            @db.VarChar(100)
+  description      String
+  cost             Decimal           @db.Decimal(12, 2)
+  status           MaintenanceStatus @default(SCHEDULED)
+  scheduled_date   DateTime
+  completed_date   DateTime?
+  performed_by     String?           @db.VarChar(255)
+  notes            String?
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  asset            Asset             @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@index([asset_id])
+  @@index([status])
+  @@index([scheduled_date])
+  @@map("maintenance_logs")
+}
+
+model StaffAttendance {
+  id           BigInt           @id @default(autoincrement())
+  user_id      BigInt
+  date         DateTime         @db.Date
+  check_in     DateTime?
+  check_out    DateTime?
+  status       AttendanceStatus @default(PRESENT)
+  hours_worked Decimal?         @db.Decimal(5, 2)
+  notes        String?
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+  user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+  @@index([user_id])
+  @@index([date])
+  @@index([status])
+  @@map("staff_attendance")
+}
+
+model DutyRoster {
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt
+  shift_date DateTime  @db.Date
+  shift_type ShiftType
+  start_time String    @db.VarChar(10)
+  end_time   String    @db.VarChar(10)
+  notes      String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([shift_date])
+  @@index([shift_type])
+  @@map("duty_rosters")
+}
+
+model LeaveRequest {
+  id                      BigInt      @id @default(autoincrement())
+  user_id                 BigInt
+  leave_type              LeaveType
+  start_date              DateTime    @db.Date
+  end_date                DateTime    @db.Date
+  days_count              Int
+  reason                  String
+  status                  LeaveStatus @default(PENDING)
+  approved_by             BigInt?
+  approved_at             DateTime?
+  notes                   String?
+  current_approval_step   Int         @default(1)
+  required_approval_steps Int         @default(1)
+  overridden_by           BigInt?
+  override_reason         String?
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+  approver                User?       @relation("LeaveApprovals", fields: [approved_by], references: [id])
+  user                    User        @relation("LeaveRequests", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([status])
+  @@index([start_date])
+  @@index([approved_by])
+  @@map("leave_requests")
+}
+
+model LeaveApproval {
+  id               BigInt    @id @default(autoincrement())
+  leave_request_id BigInt
+  approver_id      BigInt
+  sequence         Int
+  status           String    @default("PENDING") @db.VarChar(20)
+  acted_at         DateTime?
+  created_at       DateTime  @default(now())
+
+  @@unique([leave_request_id, sequence])
+  @@map("leave_approvals")
+}
+
+model LeaveCalendarEvent {
+  id               BigInt   @id @default(autoincrement())
+  leave_request_id BigInt   @unique
+  user_id          BigInt
+  start_date       DateTime @db.Date
+  end_date         DateTime @db.Date
+  created_at       DateTime @default(now())
+
+  @@map("leave_calendar_events")
+}
+
+model Payroll {
+  id                BigInt    @id @default(autoincrement())
+  user_id           BigInt
+  period_start      DateTime  @db.Date
+  period_end        DateTime  @db.Date
+  basic_salary      Decimal   @db.Decimal(12, 2)
+  allowances        Decimal   @default(0) @db.Decimal(12, 2)
+  deductions        Decimal   @default(0) @db.Decimal(12, 2)
+  overtime_pay      Decimal   @default(0) @db.Decimal(12, 2)
+  net_salary        Decimal   @db.Decimal(12, 2)
+  payment_date      DateTime?
+  payment_method    String?   @db.VarChar(50)
+  payment_reference String?   @db.VarChar(255)
+  notes             String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([period_start])
+  @@index([period_end])
+  @@map("payroll")
+}
+
+model PerformanceReview {
+  id                BigInt              @id @default(autoincrement())
+  user_id           BigInt
+  reviewer_id       BigInt
+  review_period     ReviewPeriod
+  review_date       DateTime
+  period_start      DateTime            @db.Date
+  period_end        DateTime            @db.Date
+  overall_score     Decimal             @db.Decimal(3, 2)
+  status            ReviewStatus        @default(DRAFT)
+  strengths         String?
+  weaknesses        String?
+  goals_achieved    String?
+  goals_next        String?
+  comments          String?
+  employee_comments String?
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  metrics           PerformanceMetric[]
+  reviewer          User                @relation("ReviewsConducted", fields: [reviewer_id], references: [id])
+  user              User                @relation("PerformanceReviews", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([reviewer_id])
+  @@index([review_date])
+  @@index([status])
+  @@map("performance_reviews")
+}
+
+model PerformanceMetric {
+  id          BigInt            @id @default(autoincrement())
+  review_id   BigInt
+  metric_name String            @db.VarChar(255)
+  target      Decimal?          @db.Decimal(10, 2)
+  achieved    Decimal?          @db.Decimal(10, 2)
+  score       Decimal           @db.Decimal(3, 2)
+  weight      Decimal           @default(1) @db.Decimal(3, 2)
+  comments    String?
+  created_at  DateTime          @default(now())
+  review      PerformanceReview @relation(fields: [review_id], references: [id], onDelete: Cascade)
+
+  @@index([review_id])
+  @@map("performance_metrics")
+}
+
+model TrainingProgram {
+  id              BigInt               @id @default(autoincrement())
+  program_name    String               @db.VarChar(255)
+  training_type   TrainingType
+  description     String?
+  duration_hours  Int
+  is_mandatory    Boolean              @default(false)
+  validity_months Int?
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @updatedAt
+  enrollments     TrainingEnrollment[]
+
+  @@index([training_type])
+  @@index([is_mandatory])
+  @@map("training_programs")
+}
+
+model TrainingEnrollment {
+  id              BigInt          @id @default(autoincrement())
+  user_id         BigInt
+  program_id      BigInt
+  trainer_name    String?         @db.VarChar(255)
+  scheduled_date  DateTime
+  completion_date DateTime?
+  status          TrainingStatus  @default(SCHEDULED)
+  score           Decimal?        @db.Decimal(5, 2)
+  certificate_url String?         @db.VarChar(500)
+  feedback        String?
+  notes           String?
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  program         TrainingProgram @relation(fields: [program_id], references: [id])
+  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([program_id])
+  @@index([status])
+  @@index([scheduled_date])
+  @@map("training_enrollments")
+}
+
+model DisciplinaryAction {
+  id                   BigInt             @id @default(autoincrement())
+  user_id              BigInt
+  reported_by          BigInt
+  incident_date        DateTime
+  report_date          DateTime           @default(now())
+  type                 DisciplinaryType
+  status               DisciplinaryStatus @default(REPORTED)
+  incident_description String
+  action_taken         String?
+  resolution           String?
+  appeal_notes         String?
+  resolved_date        DateTime?
+  documents            String?
+  created_at           DateTime           @default(now())
+  updated_at           DateTime           @updatedAt
+  reporter             User               @relation("DisciplinaryReports", fields: [reported_by], references: [id])
+  user                 User               @relation("DisciplinaryActions", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([reported_by])
+  @@index([incident_date])
+  @@index([status])
+  @@index([type])
+  @@map("disciplinary_actions")
+}
+
+model Grievance {
+  id                BigInt            @id @default(autoincrement())
+  user_id           BigInt
+  category          GrievanceCategory
+  status            GrievanceStatus   @default(SUBMITTED)
+  subject           String            @db.VarChar(255)
+  description       String
+  submitted_date    DateTime          @default(now())
+  acknowledged_date DateTime?
+  resolved_date     DateTime?
+  assigned_to       BigInt?
+  resolution        String?
+  is_confidential   Boolean           @default(true)
+  notes             String?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  assigned_user     User?             @relation("GrievancesAssigned", fields: [assigned_to], references: [id])
+  user              User              @relation("GrievancesSubmitted", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([assigned_to])
+  @@index([status])
+  @@index([category])
+  @@index([submitted_date])
+  @@map("grievances")
+}
+
+model EmployeeDocument {
+  id            BigInt       @id @default(autoincrement())
+  user_id       BigInt
+  document_type DocumentType
+  document_name String       @db.VarChar(255)
+  document_url  String       @db.VarChar(500)
+  file_size     Int?
+  uploaded_by   BigInt
+  issue_date    DateTime?    @db.Date
+  expiry_date   DateTime?    @db.Date
+  is_verified   Boolean      @default(false)
+  verified_by   BigInt?
+  verified_at   DateTime?
+  notes         String?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  uploader      User         @relation("DocumentsUploaded", fields: [uploaded_by], references: [id])
+  user          User         @relation("EmployeeDocuments", fields: [user_id], references: [id], onDelete: Cascade)
+  verifier      User?        @relation("DocumentsVerified", fields: [verified_by], references: [id])
+
+  @@index([user_id])
+  @@index([document_type])
+  @@index([expiry_date])
+  @@index([is_verified])
+  @@map("employee_documents")
+}
+
+model LeaveTypePolicy {
+  id                        BigInt   @id @default(autoincrement())
+  code                      String   @unique @db.VarChar(50)
+  name                      String   @db.VarChar(120)
+  is_paid                   Boolean  @default(true)
+  requires_document         Boolean  @default(false)
+  max_days_per_year         Int?
+  eligible_employment_types String?
+  is_active                 Boolean  @default(true)
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+
+  @@map("leave_type_policies")
+}
+
+model LeaveApprovalRule {
+  id              BigInt   @id @default(autoincrement())
+  min_days        Int
+  max_days        Int?
+  approval_levels Int      @default(1)
+  approver_roles  String
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("leave_approval_rules")
+}
+
+model LeaveBalancePolicy {
+  id                     BigInt         @id @default(autoincrement())
+  employment_type        EmploymentType @unique
+  annual_entitlement     Int            @default(0)
+  carry_forward_cap      Int            @default(0)
+  encashment_enabled     Boolean        @default(false)
+  encashment_payout_rate Decimal?       @db.Decimal(12, 2)
+  created_at             DateTime       @default(now())
+  updated_at             DateTime       @updatedAt
+
+  @@map("leave_balance_policies")
+}
+
+model LeaveBalanceAdjustment {
+  id          BigInt    @id @default(autoincrement())
+  user_id     BigInt
+  leave_type  LeaveType
+  days_delta  Decimal   @db.Decimal(8, 2)
+  reason      String
+  adjusted_by BigInt
+  created_at  DateTime  @default(now())
+
+  @@index([user_id])
+  @@map("leave_balance_adjustments")
+}
+
+model PublicHoliday {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  holiday_date DateTime @unique @db.Date
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("public_holidays")
+}
+
+model LeaveReportRule {
+  id               BigInt     @id @default(autoincrement())
+  name             String     @db.VarChar(150)
+  leave_type       LeaveType?
+  department       String?    @db.VarChar(255)
+  period_days      Int        @default(90)
+  occurrence_limit Int        @default(3)
+  weekday          Int?
+  is_active        Boolean    @default(true)
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+
+  @@map("leave_report_rules")
 }
 
 enum Role {
@@ -38,127 +1018,6 @@ enum EmploymentStatus {
   ON_LEAVE
   SUSPENDED
   TERMINATED
-}
-
-model User {
-  id            BigInt   @id @default(autoincrement())
-  full_name     String   @db.VarChar(255)
-  email         String?  @unique @db.VarChar(255)
-  phone         String?  @unique @db.VarChar(50)
-  password_hash String   @db.Text
-  role          Role
-  is_active     Boolean  @default(true)
-  
-  // Security fields
-  failed_login_attempts Int      @default(0)
-  account_locked_until  DateTime?
-  last_login_at         DateTime?
-  last_login_ip         String?  @db.VarChar(45)
-  password_changed_at   DateTime @default(now())
-  
-  // HR/Employee fields
-  employee_profile EmployeeProfile?
-  
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  price_change_audits PriceChangeAuditTrail[]
-  orders Order[]
-  rider Rider?
-  waste_declarations WasteDeclaration[]
-  finance_transactions FinanceTransaction[]
-  approval_requests_made ApprovalRequest[] @relation("ApprovalRequester")
-  approval_requests_reviewed ApprovalRequest[] @relation("ApprovalReviewer")
-  refresh_tokens RefreshToken[]
-  audit_logs AuditLog[]
-  risk_scores EnforcementRiskScore[]
-  enforcement_actions_taken EnforcementAction[]
-  assigned_assets Asset[]
-  attendance_records StaffAttendance[]
-  duty_rosters DutyRoster[]
-  leave_requests LeaveRequest[] @relation("LeaveRequests")
-  leave_approvals LeaveRequest[] @relation("LeaveApprovals")
-  payroll_records Payroll[]
-  performance_reviews PerformanceReview[] @relation("PerformanceReviews")
-  reviews_conducted PerformanceReview[] @relation("ReviewsConducted")
-  training_enrollments TrainingEnrollment[]
-  disciplinary_actions DisciplinaryAction[] @relation("DisciplinaryActions")
-  disciplinary_reports DisciplinaryAction[] @relation("DisciplinaryReports")
-  grievances_submitted Grievance[] @relation("GrievancesSubmitted")
-  grievances_assigned Grievance[] @relation("GrievancesAssigned")
-  employee_documents EmployeeDocument[] @relation("EmployeeDocuments")
-  documents_uploaded EmployeeDocument[] @relation("DocumentsUploaded")
-  documents_verified EmployeeDocument[] @relation("DocumentsVerified")
-
-  @@map("users")
-}
-
-model EmployeeProfile {
-  id                    BigInt           @id @default(autoincrement())
-  user_id               BigInt           @unique
-  
-  // Personal Details
-  date_of_birth         DateTime?        @db.Date
-  gender                String?          @db.VarChar(20)
-  nationality           String?          @db.VarChar(100)
-  
-  // Identification Documents
-  national_id           String?          @db.VarChar(50)
-  tax_id                String?          @db.VarChar(50)
-  passport_number       String?          @db.VarChar(50)
-  
-  // Contact Information
-  alternative_phone     String?          @db.VarChar(50)
-  personal_email        String?          @db.VarChar(255)
-  physical_address      String?          @db.Text
-  postal_address        String?          @db.VarChar(255)
-  city                  String?          @db.VarChar(100)
-  country               String?          @db.VarChar(100)
-  
-  // Emergency Contact
-  emergency_contact_name  String?        @db.VarChar(255)
-  emergency_contact_phone String?        @db.VarChar(50)
-  emergency_contact_relationship String? @db.VarChar(100)
-  
-  // Employment Details
-  employment_start_date DateTime         @db.Date
-  employment_end_date   DateTime?        @db.Date
-  employment_type       EmploymentType   @default(PERMANENT)
-  employment_status     EmploymentStatus @default(ACTIVE)
-  probation_end_date    DateTime?        @db.Date
-  contract_end_date     DateTime?        @db.Date
-  
-  // Department & Position
-  department            String?          @db.VarChar(100)
-  position_title        String?          @db.VarChar(255)
-  reports_to_user_id    BigInt?
-  
-  // Banking Details
-  bank_name             String?          @db.VarChar(255)
-  bank_account_number   String?          @db.VarChar(100)
-  bank_account_name     String?          @db.VarChar(255)
-  bank_branch           String?          @db.VarChar(255)
-  bank_swift_code       String?          @db.VarChar(50)
-  
-  // Qualifications
-  education_level       String?          @db.VarChar(100)
-  certifications        String?          @db.Text
-  skills                String?          @db.Text
-  
-  // Additional Information
-  notes                 String?          @db.Text
-  profile_photo_url     String?          @db.VarChar(500)
-  
-  created_at            DateTime         @default(now())
-  updated_at            DateTime         @updatedAt
-  
-  user                  User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  
-  @@map("employee_profiles")
-  @@index([user_id])
-  @@index([employment_status])
-  @@index([employment_type])
-  @@index([department])
 }
 
 enum SupplierType {
@@ -207,156 +1066,6 @@ enum PaymentStatus {
   REFUNDED
 }
 
-model PricingRule {
-  id                BigInt           @id @default(autoincrement())
-  name              String          @db.VarChar(255)
-  rule_type         PricingRuleType
-  value             Decimal         @db.Decimal(12, 2)
-  product_category  ProductCategory?
-  min_selling_price Decimal?
-  max_selling_price Decimal?
-
-  is_active        Boolean         @default(true)
-  created_at       DateTime        @default(now())
-  updated_at       DateTime        @updatedAt
-
-  price_change_audits PriceChangeAuditTrail[]
-
-  @@map("pricing_rules")
-}
-
-model PriceChangeAuditTrail {
-  id BigInt @id @default(autoincrement())
-
-  product_id          BigInt
-  pricing_rule_id     BigInt?
-  actor_user_id       BigInt
-
-  old_selling_price   Decimal @db.Decimal(12, 2)
-  new_selling_price   Decimal @db.Decimal(12, 2)
-
-  note String? @db.Text
-  created_at DateTime @default(now())
-
-  product Product @relation(fields: [product_id], references: [id])
-  pricing_rule PricingRule? @relation(fields: [pricing_rule_id], references: [id])
-  actor User @relation(fields: [actor_user_id], references: [id])
-
-  @@index([product_id])
-  @@index([pricing_rule_id])
-  @@index([actor_user_id])
-
-  @@map("price_change_audit_trails")
-}
-
-model Supplier {
-
-  id               BigInt         @id @default(autoincrement())
-  supplier_name    String         @db.VarChar(255)
-  contact_person   String?        @db.VarChar(255)
-  phone            String?        @db.VarChar(50)
-  email            String?        @db.VarChar(255)
-  physical_address String?        @db.Text
-  supplier_type    SupplierType
-  status           SupplierStatus @default(ACTIVE)
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-
-  @@map("suppliers")
-}
-
-model Product {
-  id               BigInt          @id @default(autoincrement())
-  product_name    String          @db.VarChar(255)
-  product_category ProductCategory
-  selling_price   Decimal         @db.Decimal(12, 2)
-  cost_price      Decimal         @db.Decimal(12, 2)
-  barcode          String?         @db.VarChar(255)
-  is_active        Boolean         @default(true)
-  created_at       DateTime        @default(now())
-  updated_at       DateTime        @updatedAt
-
-  price_change_audits PriceChangeAuditTrail[]
-  stock_items        StockItem[]
-  recipe             Recipe?
-  waste_declarations WasteDeclaration[]
-
-  @@map("products")
-}
-
-model Customer {
-  id           BigInt   @id @default(autoincrement())
-  name         String?  @db.VarChar(255)
-  phone        String?  @db.VarChar(50)
-  email        String?  @db.VarChar(255)
-  notes        String?  @db.Text
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  orders       Order[]
-
-  @@map("customers")
-  @@index([phone])
-}
-
-model Table {
-  id         BigInt   @id @default(autoincrement())
-  table_name String?  @db.VarChar(255)
-
-  orders     Order[]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@map("tables")
-}
-
-model Order {
-  id            BigInt       @id @default(autoincrement())
-  table_id      BigInt
-  customer_id   BigInt?
-  waiter_id     BigInt
-  status        OrderStatus @default(PENDING)
-  total_amount  Float
-
-  items         OrderItem[]
-  payments      Payment[]
-  delivery      Delivery?
-  approval_requests ApprovalRequest[]
-
-  waiter        User         @relation(fields: [waiter_id], references: [id])
-  table         Table        @relation(fields: [table_id], references: [id])
-  customer      Customer?    @relation(fields: [customer_id], references: [id])
-
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-
-  @@map("orders")
-  @@index([table_id])
-  @@index([customer_id])
-  @@index([waiter_id])
-  @@index([status])
-  @@index([created_at])
-  @@index([status, created_at])
-  @@index([status, updated_at])
-}
-
-model OrderItem {
-  id           BigInt  @id @default(autoincrement())
-  order_id     BigInt
-  product_id   BigInt?
-  product_name String  @db.VarChar(255)
-
-  quantity     Int
-  unit_price   Float
-  line_total   Float
-
-  order        Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
-
-  @@map("order_items")
-  @@index([order_id])
-}
-
 enum MovementType {
   PURCHASE
   ADJUSTMENT
@@ -371,125 +1080,11 @@ enum MarginAlertStatus {
   RESOLVED
 }
 
-model StockItem {
-  id          BigInt   @id @default(autoincrement())
-  product_id  BigInt
-  quantity    Int      @default(0)
-  location    String   @default("MAIN_STORE") @db.VarChar(100)
-
-  product     Product            @relation(fields: [product_id], references: [id])
-  movements   StockMovement[]
-  recipe_ingredients RecipeIngredient[]
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@unique([product_id, location])
-  @@map("stock_items")
-  @@index([product_id])
-}
-
-model StockMovement {
-  id            BigInt       @id @default(autoincrement())
-  stock_item_id BigInt
-  movement_type MovementType
-  quantity      Int
-  reference     String?      @db.VarChar(255)
-  notes         String?      @db.Text
-
-  stock_item    StockItem    @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
-
-  created_at    DateTime     @default(now())
-
-  @@map("stock_movements")
-  @@index([stock_item_id])
-}
-
-model Payment {
-  id                   BigInt         @id @default(autoincrement())
-  order_id             BigInt
-  payment_method       PaymentMethod
-  amount               Decimal        @db.Decimal(12, 2)
-  transaction_reference String?        @db.VarChar(255)
-  payment_status       PaymentStatus  @default(PENDING)
-
-  order                Order          @relation(fields: [order_id], references: [id])
-
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @updatedAt
-
-  @@map("payments")
-  @@index([order_id])
-}
-
-model MarginAlert {
-  id           BigInt           @id @default(autoincrement())
-  alert_status MarginAlertStatus @default(OPEN)
-  notes        String?          @db.Text
-  created_at   DateTime         @default(now())
-  updated_at   DateTime         @updatedAt
-
-  @@map("margin_alerts")
-}
-
-model Recipe {
-  id          BigInt             @id @default(autoincrement())
-  product_id  BigInt             @unique
-  name        String             @db.VarChar(255)
-  instructions String?          @db.Text
-  is_active   Boolean            @default(true)
-  created_at  DateTime           @default(now())
-  updated_at  DateTime           @updatedAt
-
-  product     Product            @relation(fields: [product_id], references: [id])
-  ingredients RecipeIngredient[]
-  production_plans ProductionPlan[]
-
-  @@map("recipes")
-  @@index([product_id])
-}
-
-model RecipeIngredient {
-  id              BigInt   @id @default(autoincrement())
-  recipe_id       BigInt
-  stock_item_id   BigInt
-  quantity        Decimal  @db.Decimal(10, 3)
-  unit            String   @default("units") @db.VarChar(50)
-
-  recipe          Recipe   @relation(fields: [recipe_id], references: [id], onDelete: Cascade)
-  stock_item      StockItem @relation(fields: [stock_item_id], references: [id])
-
-  @@map("recipe_ingredients")
-  @@index([recipe_id])
-  @@index([stock_item_id])
-}
-
 enum ProductionPlanStatus {
   PLANNED
   IN_PROGRESS
   COMPLETED
   CANCELLED
-}
-
-model ProductionPlan {
-  id                BigInt                @id @default(autoincrement())
-  recipe_id         BigInt
-  planned_quantity  Int
-  produced_quantity Int                   @default(0)
-  status            ProductionPlanStatus   @default(PLANNED)
-  planned_date      DateTime
-  completed_date    DateTime?
-  notes             String?               @db.Text
-
-  recipe            Recipe                @relation(fields: [recipe_id], references: [id])
-
-  created_at        DateTime              @default(now())
-  updated_at        DateTime              @updatedAt
-
-  @@map("production_plans")
-  @@index([recipe_id])
-  @@index([status])
-  @@index([planned_date])
 }
 
 enum DeliveryStatus {
@@ -500,51 +1095,6 @@ enum DeliveryStatus {
   CANCELLED
 }
 
-model Rider {
-  id          BigInt   @id @default(autoincrement())
-  user_id     BigInt   @unique
-  phone       String   @db.VarChar(50)
-  license_number String? @db.VarChar(100)
-  vehicle_type String? @db.VarChar(50)
-  vehicle_plate String? @db.VarChar(50)
-  is_available Boolean  @default(true)
-  current_location String? @db.Text
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  user        User     @relation(fields: [user_id], references: [id])
-  deliveries  Delivery[]
-
-  @@map("riders")
-  @@index([user_id])
-}
-
-model Delivery {
-  id          BigInt         @id @default(autoincrement())
-  order_id    BigInt         @unique
-  rider_id    BigInt
-  status      DeliveryStatus @default(ASSIGNED)
-  pickup_address String?     @db.Text
-  delivery_address String    @db.Text
-  delivery_notes String?     @db.Text
-  assigned_at DateTime       @default(now())
-  picked_up_at DateTime?
-  delivered_at DateTime?
-  cancelled_at DateTime?
-  cancellation_reason String? @db.Text
-
-  order       Order          @relation(fields: [order_id], references: [id])
-  rider       Rider          @relation(fields: [rider_id], references: [id])
-
-  created_at  DateTime       @default(now())
-  updated_at  DateTime       @updatedAt
-
-  @@map("deliveries")
-  @@index([order_id])
-  @@index([rider_id])
-  @@index([status])
-}
-
 enum WasteReason {
   EXPIRED
   SPOILED
@@ -553,29 +1103,6 @@ enum WasteReason {
   CUSTOMER_RETURN
   THEFT
   OTHER
-}
-
-model WasteDeclaration {
-  id          BigInt       @id @default(autoincrement())
-  product_id  BigInt
-  quantity    Int
-  reason      WasteReason
-  notes       String?      @db.Text
-  declared_by BigInt
-  cost_value  Decimal      @db.Decimal(12, 2)
-  declared_at DateTime     @default(now())
-
-  product     Product      @relation(fields: [product_id], references: [id])
-  declarer    User         @relation(fields: [declared_by], references: [id])
-
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-
-  @@map("waste_declarations")
-  @@index([product_id])
-  @@index([declared_by])
-  @@index([reason])
-  @@index([declared_at])
 }
 
 enum TransactionType {
@@ -597,51 +1124,12 @@ enum TransactionCategory {
   OTHER
 }
 
-model FinanceTransaction {
-  id          BigInt             @id @default(autoincrement())
-  type        TransactionType
-  category    TransactionCategory
-  amount      Decimal            @db.Decimal(12, 2)
-  description String?            @db.Text
-  reference   String?            @db.VarChar(255)
-  recorded_by BigInt
-  transaction_date DateTime      @default(now())
-
-  recorder    User               @relation(fields: [recorded_by], references: [id])
-
-  created_at  DateTime           @default(now())
-  updated_at  DateTime           @updatedAt
-
-  @@map("finance_transactions")
-  @@index([type])
-  @@index([category])
-  @@index([recorded_by])
-  @@index([transaction_date])
-}
-
 enum PageType {
   HOMEPAGE
   ABOUT
   MENU
   CONTACT
   CUSTOM
-}
-
-model ContentPage {
-  id          BigInt   @id @default(autoincrement())
-  title       String   @db.VarChar(255)
-  slug        String   @unique @db.VarChar(255)
-  page_type   PageType @default(CUSTOM)
-  content     String   @db.Text
-  is_published Boolean @default(false)
-  meta_title  String?  @db.VarChar(255)
-  meta_description String? @db.Text
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  @@map("content_pages")
-  @@index([slug])
-  @@index([is_published])
 }
 
 enum LeadSource {
@@ -662,27 +1150,6 @@ enum LeadStatus {
   LOST
 }
 
-model WebsiteLead {
-  id          BigInt     @id @default(autoincrement())
-  name        String     @db.VarChar(255)
-  email       String?    @db.VarChar(255)
-  phone       String?    @db.VarChar(50)
-  source      LeadSource
-  status      LeadStatus @default(NEW)
-  enquiry_type String?   @db.VarChar(100)
-  message     String?    @db.Text
-  event_date  DateTime?
-  guest_count Int?
-  notes       String?    @db.Text
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-
-  @@map("website_leads")
-  @@index([source])
-  @@index([status])
-  @@index([created_at])
-}
-
 enum ApprovalRequestType {
   ITEM_REMOVAL
   DISCOUNT
@@ -695,31 +1162,6 @@ enum ApprovalRequestStatus {
   APPROVED
   REJECTED
 }
-
-model ApprovalRequest {
-  id          BigInt                @id @default(autoincrement())
-  order_id    BigInt
-  request_type ApprovalRequestType
-  status      ApprovalRequestStatus @default(PENDING)
-  requested_by BigInt
-  reviewed_by BigInt?
-  reason      String?               @db.Text
-  metadata    String?               @db.Text
-  created_at  DateTime              @default(now())
-  updated_at  DateTime              @updatedAt
-
-  order       Order                 @relation(fields: [order_id], references: [id])
-  requester   User                  @relation("ApprovalRequester", fields: [requested_by], references: [id])
-  reviewer    User?                 @relation("ApprovalReviewer", fields: [reviewed_by], references: [id])
-
-  @@map("approval_requests")
-  @@index([order_id])
-  @@index([status])
-  @@index([requested_by])
-  @@index([reviewed_by])
-}
-
-// ==================== SECURITY MODELS ====================
 
 enum AuditAction {
   LOGIN_SUCCESS
@@ -742,104 +1184,6 @@ enum AuditAction {
   SECURITY_SETTING_CHANGED
 }
 
-model AuditLog {
-  id          BigInt      @id @default(autoincrement())
-  user_id     BigInt?
-  action      AuditAction
-  resource    String?     @db.VarChar(255)
-  resource_id String?     @db.VarChar(255)
-  ip_address  String?     @db.VarChar(45)
-  user_agent  String?     @db.Text
-  metadata    String?     @db.Text
-  success     Boolean     @default(true)
-  error_message String?   @db.Text
-  created_at  DateTime    @default(now())
-
-  user        User?       @relation(fields: [user_id], references: [id], onDelete: SetNull)
-
-  @@map("audit_logs")
-  @@index([user_id])
-  @@index([action])
-  @@index([created_at])
-  @@index([user_id, created_at])
-}
-
-model RefreshToken {
-  id          BigInt   @id @default(autoincrement())
-  user_id     BigInt
-  token_hash  String   @unique @db.VarChar(255)
-  expires_at  DateTime
-  is_revoked  Boolean  @default(false)
-  revoked_at  DateTime?
-  ip_address  String?  @db.VarChar(45)
-  user_agent  String?  @db.Text
-  created_at  DateTime @default(now())
-
-  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("refresh_tokens")
-  @@index([user_id])
-  @@index([token_hash])
-  @@index([expires_at])
-  @@index([is_revoked])
-}
-
-model PasswordResetToken {
-  id          BigInt   @id @default(autoincrement())
-  email       String   @db.VarChar(255)
-  token_hash  String   @unique @db.VarChar(255)
-  expires_at  DateTime
-  is_used     Boolean  @default(false)
-  used_at     DateTime?
-  ip_address  String?  @db.VarChar(45)
-  created_at  DateTime @default(now())
-
-  @@map("password_reset_tokens")
-  @@index([email])
-  @@index([token_hash])
-  @@index([expires_at])
-}
-
-// Enforcement & Risk Management
-model EnforcementRiskScore {
-  id                BigInt   @id @default(autoincrement())
-  user_id           BigInt
-  risk_level        RiskLevel
-  risk_score        Int      @default(0)
-  violation_count   Int      @default(0)
-  last_violation_at DateTime?
-  notes             String?  @db.Text
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  user              User     @relation(fields: [user_id], references: [id])
-  actions           EnforcementAction[]
-
-  @@index([user_id])
-  @@index([risk_level])
-  @@map("enforcement_risk_scores")
-}
-
-model EnforcementAction {
-  id              BigInt       @id @default(autoincrement())
-  risk_score_id   BigInt
-  action_type     ActionType
-  description     String       @db.Text
-  taken_by        BigInt
-  severity        RiskLevel
-  resolution      String?      @db.Text
-  resolved_at     DateTime?
-  created_at      DateTime     @default(now())
-
-  risk_score      EnforcementRiskScore @relation(fields: [risk_score_id], references: [id])
-  taken_by_user   User                 @relation(fields: [taken_by], references: [id])
-
-  @@index([risk_score_id])
-  @@index([action_type])
-  @@index([created_at])
-  @@map("enforcement_actions")
-}
-
 enum RiskLevel {
   LOW
   MEDIUM
@@ -855,8 +1199,6 @@ enum ActionType {
   TERMINATION
   RESOLVED
 }
-
-// ==================== ASSET MANAGEMENT ====================
 
 enum AssetCategory {
   EQUIPMENT
@@ -890,61 +1232,6 @@ enum MaintenanceStatus {
   CANCELLED
 }
 
-model Asset {
-  id                BigInt          @id @default(autoincrement())
-  asset_name        String          @db.VarChar(255)
-  asset_code        String          @unique @db.VarChar(100)
-  category          AssetCategory
-  description       String?         @db.Text
-  purchase_date     DateTime
-  purchase_cost     Decimal         @db.Decimal(12, 2)
-  current_value     Decimal         @db.Decimal(12, 2)
-  depreciation_rate Decimal?        @db.Decimal(5, 2)
-  location          String          @db.VarChar(255)
-  assigned_to       BigInt?
-  status            AssetStatus     @default(ACTIVE)
-  condition         AssetCondition  @default(GOOD)
-  warranty_expiry   DateTime?
-  last_maintenance  DateTime?
-  next_maintenance  DateTime?
-  notes             String?         @db.Text
-  created_at        DateTime        @default(now())
-  updated_at        DateTime        @updatedAt
-
-  assigned_user     User?           @relation(fields: [assigned_to], references: [id], onDelete: SetNull)
-  maintenance_logs  MaintenanceLog[]
-
-  @@map("assets")
-  @@index([asset_code])
-  @@index([category])
-  @@index([status])
-  @@index([assigned_to])
-}
-
-model MaintenanceLog {
-  id              BigInt            @id @default(autoincrement())
-  asset_id        BigInt
-  maintenance_type String           @db.VarChar(100)
-  description     String            @db.Text
-  cost            Decimal           @db.Decimal(12, 2)
-  status          MaintenanceStatus @default(SCHEDULED)
-  scheduled_date  DateTime
-  completed_date  DateTime?
-  performed_by    String?           @db.VarChar(255)
-  notes           String?           @db.Text
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-
-  asset           Asset             @relation(fields: [asset_id], references: [id], onDelete: Cascade)
-
-  @@map("maintenance_logs")
-  @@index([asset_id])
-  @@index([status])
-  @@index([scheduled_date])
-}
-
-// ==================== HRM (HUMAN RESOURCE MANAGEMENT) ====================
-
 enum AttendanceStatus {
   PRESENT
   ABSENT
@@ -977,124 +1264,6 @@ enum ShiftType {
   FULL_DAY
 }
 
-model StaffAttendance {
-  id          BigInt           @id @default(autoincrement())
-  user_id     BigInt
-  date        DateTime         @db.Date
-  check_in    DateTime?
-  check_out   DateTime?
-  status      AttendanceStatus @default(PRESENT)
-  hours_worked Decimal?        @db.Decimal(5, 2)
-  notes       String?          @db.Text
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
-
-  user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([user_id, date])
-  @@map("staff_attendance")
-  @@index([user_id])
-  @@index([date])
-  @@index([status])
-}
-
-model DutyRoster {
-  id          BigInt    @id @default(autoincrement())
-  user_id     BigInt
-  shift_date  DateTime  @db.Date
-  shift_type  ShiftType
-  start_time  String    @db.VarChar(10)
-  end_time    String    @db.VarChar(10)
-  notes       String?   @db.Text
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-
-  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("duty_rosters")
-  @@index([user_id])
-  @@index([shift_date])
-  @@index([shift_type])
-}
-
-model LeaveRequest {
-  id          BigInt      @id @default(autoincrement())
-  user_id     BigInt
-  leave_type  LeaveType
-  start_date  DateTime    @db.Date
-  end_date    DateTime    @db.Date
-  days_count  Int
-  reason      String      @db.Text
-  status      LeaveStatus @default(PENDING)
-  approved_by BigInt?
-  approved_at DateTime?
-  notes       String?     @db.Text
-  current_approval_step Int @default(1)
-  required_approval_steps Int @default(1)
-  overridden_by BigInt?
-  override_reason String? @db.Text
-  created_at  DateTime    @default(now())
-  updated_at  DateTime    @updatedAt
-
-  user        User        @relation("LeaveRequests", fields: [user_id], references: [id], onDelete: Cascade)
-  approver    User?       @relation("LeaveApprovals", fields: [approved_by], references: [id], onDelete: SetNull)
-
-  @@map("leave_requests")
-  @@index([user_id])
-  @@index([status])
-  @@index([start_date])
-  @@index([approved_by])
-}
-
-model LeaveApproval {
-  id               BigInt   @id @default(autoincrement())
-  leave_request_id BigInt
-  approver_id      BigInt
-  sequence         Int
-  status           String   @default("PENDING") @db.VarChar(20)
-  acted_at         DateTime?
-  created_at       DateTime @default(now())
-  @@unique([leave_request_id, sequence])
-  @@map("leave_approvals")
-}
-
-model LeaveCalendarEvent {
-  id               BigInt   @id @default(autoincrement())
-  leave_request_id BigInt   @unique
-  user_id          BigInt
-  start_date       DateTime @db.Date
-  end_date         DateTime @db.Date
-  created_at       DateTime @default(now())
-  @@map("leave_calendar_events")
-}
-
-model Payroll {
-  id              BigInt   @id @default(autoincrement())
-  user_id         BigInt
-  period_start    DateTime @db.Date
-  period_end      DateTime @db.Date
-  basic_salary    Decimal  @db.Decimal(12, 2)
-  allowances      Decimal  @default(0) @db.Decimal(12, 2)
-  deductions      Decimal  @default(0) @db.Decimal(12, 2)
-  overtime_pay    Decimal  @default(0) @db.Decimal(12, 2)
-  net_salary      Decimal  @db.Decimal(12, 2)
-  payment_date    DateTime?
-  payment_method  String?  @db.VarChar(50)
-  payment_reference String? @db.VarChar(255)
-  notes           String?  @db.Text
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("payroll")
-  @@index([user_id])
-  @@index([period_start])
-  @@index([period_end])
-}
-
-// ==================== PERFORMANCE MANAGEMENT ====================
-
 enum ReviewPeriod {
   QUARTERLY
   SEMI_ANNUAL
@@ -1107,55 +1276,6 @@ enum ReviewStatus {
   COMPLETED
   ARCHIVED
 }
-
-model PerformanceReview {
-  id              BigInt       @id @default(autoincrement())
-  user_id         BigInt
-  reviewer_id     BigInt
-  review_period   ReviewPeriod
-  review_date     DateTime
-  period_start    DateTime     @db.Date
-  period_end      DateTime     @db.Date
-  overall_score   Decimal      @db.Decimal(3, 2)
-  status          ReviewStatus @default(DRAFT)
-  strengths       String?      @db.Text
-  weaknesses      String?      @db.Text
-  goals_achieved  String?      @db.Text
-  goals_next      String?      @db.Text
-  comments        String?      @db.Text
-  employee_comments String?    @db.Text
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-
-  user            User         @relation("PerformanceReviews", fields: [user_id], references: [id], onDelete: Cascade)
-  reviewer        User         @relation("ReviewsConducted", fields: [reviewer_id], references: [id])
-  metrics         PerformanceMetric[]
-
-  @@map("performance_reviews")
-  @@index([user_id])
-  @@index([reviewer_id])
-  @@index([review_date])
-  @@index([status])
-}
-
-model PerformanceMetric {
-  id          BigInt             @id @default(autoincrement())
-  review_id   BigInt
-  metric_name String             @db.VarChar(255)
-  target      Decimal?           @db.Decimal(10, 2)
-  achieved    Decimal?           @db.Decimal(10, 2)
-  score       Decimal            @db.Decimal(3, 2)
-  weight      Decimal            @default(1) @db.Decimal(3, 2)
-  comments    String?            @db.Text
-  created_at  DateTime           @default(now())
-
-  review      PerformanceReview  @relation(fields: [review_id], references: [id], onDelete: Cascade)
-
-  @@map("performance_metrics")
-  @@index([review_id])
-}
-
-// ==================== TRAINING & DEVELOPMENT ====================
 
 enum TrainingType {
   ONBOARDING
@@ -1176,51 +1296,6 @@ enum TrainingStatus {
   FAILED
 }
 
-model TrainingProgram {
-  id              BigInt   @id @default(autoincrement())
-  program_name    String   @db.VarChar(255)
-  training_type   TrainingType
-  description     String?  @db.Text
-  duration_hours  Int
-  is_mandatory    Boolean  @default(false)
-  validity_months Int?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  enrollments     TrainingEnrollment[]
-
-  @@map("training_programs")
-  @@index([training_type])
-  @@index([is_mandatory])
-}
-
-model TrainingEnrollment {
-  id              BigInt         @id @default(autoincrement())
-  user_id         BigInt
-  program_id      BigInt
-  trainer_name    String?        @db.VarChar(255)
-  scheduled_date  DateTime
-  completion_date DateTime?
-  status          TrainingStatus @default(SCHEDULED)
-  score           Decimal?       @db.Decimal(5, 2)
-  certificate_url String?        @db.VarChar(500)
-  feedback        String?        @db.Text
-  notes           String?        @db.Text
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-
-  user            User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  program         TrainingProgram @relation(fields: [program_id], references: [id])
-
-  @@map("training_enrollments")
-  @@index([user_id])
-  @@index([program_id])
-  @@index([status])
-  @@index([scheduled_date])
-}
-
-// ==================== DISCIPLINARY & GRIEVANCE ====================
-
 enum DisciplinaryType {
   VERBAL_WARNING
   WRITTEN_WARNING
@@ -1237,34 +1312,6 @@ enum DisciplinaryStatus {
   APPEALED
   RESOLVED
   CLOSED
-}
-
-model DisciplinaryAction {
-  id              BigInt             @id @default(autoincrement())
-  user_id         BigInt
-  reported_by     BigInt
-  incident_date   DateTime
-  report_date     DateTime           @default(now())
-  type            DisciplinaryType
-  status          DisciplinaryStatus @default(REPORTED)
-  incident_description String         @db.Text
-  action_taken    String?            @db.Text
-  resolution      String?            @db.Text
-  appeal_notes    String?            @db.Text
-  resolved_date   DateTime?
-  documents       String?            @db.Text
-  created_at      DateTime           @default(now())
-  updated_at      DateTime           @updatedAt
-
-  user            User               @relation("DisciplinaryActions", fields: [user_id], references: [id], onDelete: Cascade)
-  reporter        User               @relation("DisciplinaryReports", fields: [reported_by], references: [id])
-
-  @@map("disciplinary_actions")
-  @@index([user_id])
-  @@index([reported_by])
-  @@index([incident_date])
-  @@index([status])
-  @@index([type])
 }
 
 enum GrievanceCategory {
@@ -1287,36 +1334,6 @@ enum GrievanceStatus {
   CLOSED
 }
 
-model Grievance {
-  id              BigInt            @id @default(autoincrement())
-  user_id         BigInt
-  category        GrievanceCategory
-  status          GrievanceStatus   @default(SUBMITTED)
-  subject         String            @db.VarChar(255)
-  description     String            @db.Text
-  submitted_date  DateTime          @default(now())
-  acknowledged_date DateTime?
-  resolved_date   DateTime?
-  assigned_to     BigInt?
-  resolution      String?           @db.Text
-  is_confidential Boolean           @default(true)
-  notes           String?           @db.Text
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-
-  user            User              @relation("GrievancesSubmitted", fields: [user_id], references: [id], onDelete: Cascade)
-  assigned_user   User?             @relation("GrievancesAssigned", fields: [assigned_to], references: [id])
-
-  @@map("grievances")
-  @@index([user_id])
-  @@index([assigned_to])
-  @@index([status])
-  @@index([category])
-  @@index([submitted_date])
-}
-
-// ==================== DOCUMENTS & CERTIFICATES ====================
-
 enum DocumentType {
   CONTRACT
   ID_COPY
@@ -1327,109 +1344,4 @@ enum DocumentType {
   MEDICAL
   POLICE_CLEARANCE
   OTHER
-}
-
-model EmployeeDocument {
-  id              BigInt       @id @default(autoincrement())
-  user_id         BigInt
-  document_type   DocumentType
-  document_name   String       @db.VarChar(255)
-  document_url    String       @db.VarChar(500)
-  file_size       Int?
-  uploaded_by     BigInt
-  issue_date      DateTime?    @db.Date
-  expiry_date     DateTime?    @db.Date
-  is_verified     Boolean      @default(false)
-  verified_by     BigInt?
-  verified_at     DateTime?
-  notes           String?      @db.Text
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-
-  user            User         @relation("EmployeeDocuments", fields: [user_id], references: [id], onDelete: Cascade)
-  uploader        User         @relation("DocumentsUploaded", fields: [uploaded_by], references: [id])
-  verifier        User?        @relation("DocumentsVerified", fields: [verified_by], references: [id])
-
-  @@map("employee_documents")
-  @@index([user_id])
-  @@index([document_type])
-  @@index([expiry_date])
-  @@index([is_verified])
-}
-
-// ==================== CONFIGURABLE LEAVE MANAGEMENT ====================
-
-model LeaveTypePolicy {
-  id                       BigInt   @id @default(autoincrement())
-  code                     String   @unique @db.VarChar(50)
-  name                     String   @db.VarChar(120)
-  is_paid                  Boolean  @default(true)
-  requires_document        Boolean  @default(false)
-  max_days_per_year        Int?
-  eligible_employment_types String? @db.Text
-  is_active                Boolean  @default(true)
-  created_at               DateTime @default(now())
-  updated_at               DateTime @updatedAt
-  @@map("leave_type_policies")
-}
-
-model LeaveApprovalRule {
-  id              BigInt   @id @default(autoincrement())
-  min_days        Int
-  max_days        Int?
-  approval_levels Int      @default(1)
-  approver_roles  String   @db.Text
-  is_active       Boolean  @default(true)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  @@map("leave_approval_rules")
-}
-
-model LeaveBalancePolicy {
-  id                    BigInt   @id @default(autoincrement())
-  employment_type       EmploymentType @unique
-  annual_entitlement    Int      @default(0)
-  carry_forward_cap     Int      @default(0)
-  encashment_enabled    Boolean  @default(false)
-  encashment_payout_rate Decimal? @db.Decimal(12, 2)
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
-  @@map("leave_balance_policies")
-}
-
-model LeaveBalanceAdjustment {
-  id          BigInt   @id @default(autoincrement())
-  user_id     BigInt
-  leave_type  LeaveType
-  days_delta  Decimal  @db.Decimal(8, 2)
-  reason      String   @db.Text
-  adjusted_by BigInt
-  created_at  DateTime @default(now())
-  @@map("leave_balance_adjustments")
-  @@index([user_id])
-}
-
-model PublicHoliday {
-  id          BigInt   @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  holiday_date DateTime @db.Date
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  @@unique([holiday_date])
-  @@map("public_holidays")
-}
-
-model LeaveReportRule {
-  id                BigInt   @id @default(autoincrement())
-  name              String   @db.VarChar(150)
-  leave_type        LeaveType?
-  department        String?  @db.VarChar(255)
-  period_days       Int      @default(90)
-  occurrence_limit  Int      @default(3)
-  weekday           Int?
-  is_active         Boolean  @default(true)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-  @@map("leave_report_rules")
 }
