@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { getAuthHeader } from "@/lib/auth";
 
@@ -313,9 +314,12 @@ export default function ProfilePage() {
               <div className="absolute -bottom-12 left-8">
                 <div className="relative group">
                   {profilePhoto ? (
-                    <img 
-                      src={profilePhoto} 
+                    <Image
+                      src={profilePhoto}
                       alt={profile.full_name}
+                      width={96}
+                      height={96}
+                      unoptimized
                       className="w-24 h-24 rounded-2xl border-4 border-white dark:border-slate-950 shadow-xl object-cover"
                     />
                   ) : (
