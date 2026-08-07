@@ -98,7 +98,7 @@ export default function AssetsPage() {
       if (assetsRes.ok) setAssets(await assetsRes.json());
 
       setLastUpdated(new Date());
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : 'Failed to load assets');
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ export default function AssetsPage() {
       } else {
         alert('Failed to delete asset');
       }
-    } catch (err) {
+    } catch (_err) {
       alert('Error deleting asset');
     }
   };

@@ -31,7 +31,7 @@ export default function HRDashboard() {
       if (summaryResponse.status === 429) throw new Error("The dashboard is refreshing too quickly. Please wait a moment, then try again.");
       if (!summaryResponse.ok) throw new Error("Unable to load the HR dashboard.");
       setSummary(await summaryResponse.json());
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Unable to load the HR dashboard.");
     } finally {
       setLoading(false);

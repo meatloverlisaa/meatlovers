@@ -358,7 +358,7 @@ export default function ManagerCMS() {
       if (!res.ok) return;
       const data = await res.json();
       setPages(data.data || data || []);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error fetching pages:", err);
     }
   }, []);
@@ -371,7 +371,7 @@ export default function ManagerCMS() {
       const leadsData = data.data || data || [];
       setLeads(leadsData);
       setNewLeadsCount(leadsData.filter((l: WebsiteLead) => l.status === "NEW").length);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error fetching leads:", err);
     }
   }, []);
@@ -382,7 +382,7 @@ export default function ManagerCMS() {
       if (!res.ok) return;
       const data = await res.json();
       setAnalytics(data.data || data);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error fetching analytics:", err);
     } finally {
       setLoading(false);

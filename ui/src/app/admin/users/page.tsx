@@ -61,7 +61,7 @@ export default function UsersPage() {
       const usersData = data.data || data || [];
       setUsers(usersData);
       setFilteredUsers(usersData);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : 'Failed to load users');
     } finally {
       setLoading(false);

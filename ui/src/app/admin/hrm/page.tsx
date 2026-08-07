@@ -1131,7 +1131,7 @@ function MarkPaidModal({
       });
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch (_err) {
       alert("Failed to mark as paid");
     } finally {
       setLoading(false);
@@ -1245,7 +1245,7 @@ function BulkPayModal({
       });
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch (_err) {
       alert("Failed bulk payment execution");
     } finally {
       setLoading(false);
@@ -1363,7 +1363,7 @@ function EditPayrollModal({
       });
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch (_err) {
       alert("Failed to update payroll record");
     } finally {
       setLoading(false);
@@ -1536,7 +1536,7 @@ function PayrollManagementSection({
     try {
       const slip = await fetchPayslipApi(id);
       setActivePayslip(slip);
-    } catch (err) {
+    } catch (_err) {
       alert("Failed to load payslip data");
     }
   };
@@ -1553,7 +1553,7 @@ function PayrollManagementSection({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch (_err) {
       alert("Failed to export bank file");
     }
   };

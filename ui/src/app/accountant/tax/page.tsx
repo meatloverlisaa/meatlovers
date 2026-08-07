@@ -130,7 +130,7 @@ export default function AccountantTax() {
       }
 
       await fetchTaxRecords();
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to update tax record");
     }
   };

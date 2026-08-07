@@ -184,7 +184,7 @@ export default function SuperAdminDashboard() {
       }
 
       setLastUpdate(new Date());
-    } catch (err) {
+    } catch (_err) {
       console.error("Error fetching monitoring data:", err);
       setError("Failed to load monitoring data");
     } finally {

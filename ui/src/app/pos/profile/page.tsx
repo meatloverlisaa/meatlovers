@@ -74,7 +74,7 @@ export default function ProfilePage() {
       setFullName(data.full_name);
       setEmail(data.email);
       setPhone(data.phone);
-    } catch (err) {
+    } catch (_err) {
       console.error("Profile fetch error:", err);
       setError(err instanceof Error ? err.message : "Failed to load profile");
     } finally {
@@ -117,7 +117,7 @@ export default function ProfilePage() {
       setEditing(false);
       setSuccess("Profile updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to update profile");
     } finally {
       setLoading(false);
@@ -166,7 +166,7 @@ export default function ProfilePage() {
       setConfirmPassword("");
       setSuccess("Password changed successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to change password");
     } finally {
       setLoading(false);
@@ -211,7 +211,7 @@ export default function ProfilePage() {
 
       setSuccess("Profile photo updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to upload photo");
       setProfilePhoto(null);
     } finally {

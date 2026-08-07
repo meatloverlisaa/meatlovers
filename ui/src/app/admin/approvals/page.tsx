@@ -87,7 +87,7 @@ export default function ApprovalsPage() {
       if (approvalsRes.ok) setApprovals(await approvalsRes.json());
 
       setLastUpdated(new Date());
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : 'Failed to load approvals');
     } finally {
       setLoading(false);
@@ -120,7 +120,7 @@ export default function ApprovalsPage() {
       } else {
         alert('Failed to approve request');
       }
-    } catch (err) {
+    } catch (_err) {
       alert('Error approving request');
     }
   };
@@ -142,7 +142,7 @@ export default function ApprovalsPage() {
       } else {
         alert('Failed to reject request');
       }
-    } catch (err) {
+    } catch (_err) {
       alert('Error rejecting request');
     }
   };

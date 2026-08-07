@@ -22,7 +22,7 @@ export default function ManagerLogin() {
     try {
       await login(email, password);
       // AuthContext handles redirect to appropriate dashboard
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);

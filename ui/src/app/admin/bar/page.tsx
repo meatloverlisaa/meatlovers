@@ -16,10 +16,12 @@ function getToken(): string {
   return '';
 }
 
+import { DrinkSalesData, DrinkOrder, StockMovement } from '@/types';
+
 export default function BarOversightPage() {
-  const [salesData, setSalesData] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [movements, setMovements] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState<DrinkSalesData | null>(null);
+  const [orders, setOrders] = useState<DrinkOrder[]>([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
   const [isLoadingSales, setIsLoadingSales] = useState(true);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingMovements, setIsLoadingMovements] = useState(true);

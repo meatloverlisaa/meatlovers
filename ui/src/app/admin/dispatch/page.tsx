@@ -186,7 +186,7 @@ export default function DispatchPage() {
       setAvailableRiders(availableRidersData);
       setDeliveries(deliveriesData);
       setSummary(summaryData);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
       setLoading(false);
@@ -214,7 +214,7 @@ export default function DispatchPage() {
       setDeliveryAddress("");
       setDeliveryNotes("");
       loadData();
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to assign delivery");
     }
   };
@@ -223,7 +223,7 @@ export default function DispatchPage() {
     try {
       await updateDeliveryStatus(deliveryId, newStatus);
       loadData();
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to update status");
     }
   };

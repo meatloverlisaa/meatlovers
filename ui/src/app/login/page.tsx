@@ -48,7 +48,7 @@ export default function UnifiedLoginPage() {
       } else {
         localStorage.removeItem('remember_login');
       }
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
     } finally {
       setIsSubmitting(false);

@@ -145,7 +145,7 @@ export default function DeliveryTrackingPage() {
       ]);
       setDeliveries(deliveriesData);
       setSummary(summaryData);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
       setLoading(false);
@@ -162,7 +162,7 @@ export default function DeliveryTrackingPage() {
     try {
       await updateDeliveryStatus(deliveryId, newStatus);
       loadData();
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : "Failed to update status");
     }
   };
