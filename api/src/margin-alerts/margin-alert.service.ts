@@ -1,5 +1,3 @@
-// @ts-nocheck — Module disabled in AppModule, Prisma model not yet in schema
-
 import {
   BadRequestException,
   Injectable,
