@@ -61,7 +61,7 @@ type DutyRoster = {
   };
 };
 
-type LeaveRequest = {
+type HrmLeaveRequest = {
   id: string | number;
   leave_type: string;
   start_date: string;
@@ -144,6 +144,34 @@ type Payslip = {
   generated_at: string;
   slip_number?: string;
   comments?: string | null;
+};
+
+type PerformanceReview = {
+  id: string | number;
+  review_period: string;
+  review_date: string;
+  period_start: string;
+  period_end: string;
+  overall_score: number;
+  status: string;
+  strengths?: string | null;
+  weaknesses?: string | null;
+  goals_achieved?: string | null;
+  goals_next?: string | null;
+  comments?: string | null;
+  employee_comments?: string | null;
+  created_at: string;
+  user: {
+    id: string | number;
+    full_name: string;
+    role: string;
+    email: string;
+  };
+  reviewer: {
+    id: string | number;
+    full_name: string;
+    role: string;
+  };
 };
 
 type ProcessBulkPayrollPayload = {
@@ -299,7 +327,7 @@ async function getDutyRoster(): Promise<DutyRoster[]> {
   return res.json();
 }
 
-async function getLeaveRequests(): Promise<LeaveRequest[]> {
+async function getLeaveRequests(): Promise<HrmLeaveRequest[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/leave`, { cache: "no-store" });
 
@@ -698,7 +726,7 @@ function AttendanceTable({ attendance }: { attendance: Attendance[] }) {
 }
 
 function LeaveRequestsTable({ leaveRequests, onApprove, onReject }: { 
-  leaveRequests: LeaveRequest[];
+  leaveRequests: HrmLeaveRequest[];
   onApprove: (id: string, approvedBy: string) => Promise<void>;
   onReject: (id: string, approvedBy: string, notes: string) => Promise<void>;
 }) {
@@ -972,12 +1000,12 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
               {Number(payslip.deductions?.other_deductions) > 0 && (
                 <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
                   <span>Voluntary / Other Deductions</span>
-                  <span className="font-semibold">KSh {Number(payslip.deductions.other_deductions).toLocaleString()}</span>
+                  <span className="font-semibold">KSh {Number(payslip.deductions?.other_deductions || 0).toLocaleString()}</span>
                 </div>
               )}
               <div className="flex justify-between border-t border-zinc-200 pt-2 font-bold text-zinc-900 dark:border-zinc-800 dark:text-white">
                 <span>Total Deductions</span>
-                <span className="text-red-600">KSh {Number(payslip.deductions.total).toLocaleString()}</span>
+                <span className="text-red-600">KSh {Number(payslip.deductions?.total || 0).toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -2107,7 +2135,7 @@ export default function HrmDashboard() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [roster, setRoster] = useState<DutyRoster[]>([]);
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<HrmLeaveRequest[]>([]);
   const [payroll, setPayroll] = useState<Payroll[]>([]);
   const [performance, setPerformance] = useState<PerformanceReview[]>([]);
   const [training, setTraining] = useState<TrainingProgram[]>([]);
