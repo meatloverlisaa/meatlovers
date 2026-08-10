@@ -7,9 +7,13 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as helmet from 'helmet';
+import { AllExceptionsFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Global exception filter for better error handling
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Security: Helmet middleware for security headers
   app.use(helmet.default());
@@ -58,3 +62,24 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+  console.error('🚨 Unhandled Promise Rejection:', reason);
+  console.error('Promise:', promise);
+  // Don't exit the process in production, just log
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Stack:', reason?.stack);
+  }
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error: Error) => {
+  console.error('🚨 Uncaught Exception:', error.message);
+  console.error('Stack:', error.stack);
+  // In production, we might want to gracefully shutdown
+  if (process.env.NODE_ENV === 'production') {
+    console.error('Shutting down gracefully...');
+    process.exit(1);
+  }
+});

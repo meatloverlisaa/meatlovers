@@ -110,6 +110,7 @@ export class HrmService {
 
     // Separate user and profile data
     const {
+      password,
       date_of_birth,
       gender,
       nationality,
@@ -150,7 +151,10 @@ export class HrmService {
     // Create user with employee profile
     const user = await this.prisma.user.create({
       data: {
-        ...userData,
+        full_name: userData.full_name,
+        email: userData.email,
+        phone: userData.phone,
+        role: userData.role,
         password_hash: hashedPassword,
         employee_profile: {
           create: {
