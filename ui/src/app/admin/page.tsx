@@ -491,6 +491,7 @@ export default function AdminDashboard() {
                 style={{ backgroundColor: '#3B82F6' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                onClick={() => document.getElementById('quick-actions')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Quick Actions
               </button>
@@ -545,7 +546,7 @@ export default function AdminDashboard() {
           <ActivityTimeline activities={activities} />
 
           {/* Module Grid */}
-          <div>
+          <div id="quick-actions">
             <h2 className="mb-4 text-lg font-black" style={{ color: '#F8FAFC' }}>Quick Access</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {adminModules.map((mod) => (
