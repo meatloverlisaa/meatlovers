@@ -26,12 +26,14 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ListOrdersQueryDto } from './dto/list-orders-query.dto';
 import { ApplyDiscountDto } from './dto/apply-discount.dto';
 import { RecipesService } from '../recipes/recipes.service';
+import { AuditLogService } from '../auth/audit-log.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly recipesService: RecipesService,
+    private readonly auditLog: AuditLogService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -134,6 +136,19 @@ export class OrdersService {
           items: true,
           waiter: true,
           table: true,
+        },
+      });
+
+      // Log order creation
+      await this.auditLog.log({
+        userId: waiter.id,
+        action: 'ORDER_CREATED',
+        resource: 'order',
+        resourceId: order.id.toString(),
+        metadata: {
+          tableId: tableId,
+          totalAmount: orderTotal,
+          itemCount: items.length,
         },
       });
 

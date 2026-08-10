@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,
   @typescript-eslint/no-unsafe-assignment */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApprovalRequestStatus, ApprovalRequestType } from '@prisma/client';
 
@@ -184,6 +184,77 @@ export class ApprovalsService {
         requester: true,
         reviewer: true,
       },
+    });
+  }
+
+  async approveStockAdjustment(id: string, reviewedBy: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const approval = await tx.approvalRequest.findUnique({
+        where: { id: BigInt(id) },
+      });
+
+      if (!approval) {
+        throw new NotFoundException('Approval request not found');
+      }
+
+      if (approval.status !== 'PENDING') {
+        throw new BadRequestException('Approval request is not pending');
+      }
+
+      // Parse metadata to get inventory count details
+      const metadata = JSON.parse(approval.metadata || '{}');
+      const { inventoryCountId, productId, location, variance } = metadata;
+
+      // Update approval status
+      const updatedApproval = await tx.approvalRequest.update({
+        where: { id: BigInt(id) },
+        data: {
+          status: 'APPROVED',
+          reviewed_by: BigInt(reviewedBy),
+          updated_at: new Date(),
+        },
+      });
+
+      // Update inventory count approval status
+      if (inventoryCountId) {
+        await (tx as any).inventoryCount.update({
+          where: { id: BigInt(inventoryCountId) },
+          data: {
+            approved_by: BigInt(reviewedBy),
+            approved_at: new Date(),
+          },
+        });
+      }
+
+      // Apply the stock adjustment
+      if (productId && location && variance) {
+        const stockItem = await tx.stockItem.findFirst({
+          where: {
+            product_id: BigInt(productId),
+            location: location,
+          },
+        });
+
+        if (stockItem) {
+          const newQuantity = stockItem.quantity + variance;
+          await tx.stockItem.update({
+            where: { id: stockItem.id },
+            data: { quantity: newQuantity },
+          });
+
+          await tx.stockMovement.create({
+            data: {
+              stock_item_id: stockItem.id,
+              movement_type: 'ADJUSTMENT',
+              quantity: variance,
+              reference: `Approved Inventory Count ${inventoryCountId}`,
+              notes: 'Stock adjustment approved through inventory count variance',
+            },
+          });
+        }
+      }
+
+      return updatedApproval;
     });
   }
 }

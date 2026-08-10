@@ -48,6 +48,8 @@ model User {
   refresh_tokens             RefreshToken[]
   rider                      Rider?
   attendance_records         StaffAttendance[]
+  inventory_counts_approved  InventoryCount[]        @relation("InventoryApprover")
+  inventory_counts           InventoryCount[]
   training_enrollments       TrainingEnrollment[]
   waste_declarations         WasteDeclaration[]
 
@@ -248,6 +250,7 @@ model StockItem {
   recipe_ingredients RecipeIngredient[]
   product            Product            @relation(fields: [product_id], references: [id])
   movements          StockMovement[]
+  inventory_counts   InventoryCount[]
 
   @@unique([product_id, location])
   @@index([product_id])
@@ -255,17 +258,45 @@ model StockItem {
 }
 
 model StockMovement {
-  id            BigInt       @id @default(autoincrement())
+  id            BigInt      @id @default(autoincrement())
   stock_item_id BigInt
   movement_type MovementType
   quantity      Int
-  reference     String?      @db.VarChar(255)
+  reference     String?
   notes         String?
-  created_at    DateTime     @default(now())
-  stock_item    StockItem    @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
+  created_at    DateTime    @default(now())
+  stock_item    StockItem   @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
 
   @@index([stock_item_id])
+  @@index([movement_type])
+  @@index([created_at])
   @@map("stock_movements")
+}
+
+model InventoryCount {
+  id                  BigInt   @id @default(autoincrement())
+  stock_item_id       BigInt
+  expected_quantity   Int
+  counted_quantity    Int
+  variance            Int
+  variance_percentage  Decimal  @db.Decimal(10, 2)
+  counted_by          BigInt
+  location            String   @db.VarChar(100)
+  notes               String?
+  needs_approval      Boolean  @default(false)
+  approved_by         BigInt?
+  approved_at         DateTime?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  stock_item          StockItem @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
+  counter             User     @relation(fields: [counted_by], references: [id])
+  approver            User?    @relation("InventoryApprover", fields: [approved_by], references: [id])
+
+  @@index([stock_item_id])
+  @@index([counted_by])
+  @@index([needs_approval])
+  @@index([created_at])
+  @@map("inventory_counts")
 }
 
 model Payment {

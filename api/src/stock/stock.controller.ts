@@ -81,6 +81,12 @@ export class StockController {
     return this.stockService.createAdjustment(body);
   }
 
+  @Post('inventory-count')
+  @Roles(...STOCK_OPERATION_ROLES)
+  async inventoryCount(@Body(ValidationPipe) body: any) {
+    return this.stockService.performInventoryCount(body);
+  }
+
   @Post('adjustment-requests/:id/approve')
   @Roles(...APPROVER_ROLES)
   async approveAdjustment(@Param('id', ParseIntPipe) id: number) {

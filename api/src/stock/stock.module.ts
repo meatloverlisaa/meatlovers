@@ -6,10 +6,12 @@ import {
   LegacyBarStockController,
 } from './stock.controller';
 import { StockService } from './stock.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { FinanceModule } from '../finance/finance.module';
+import { AuthModule } from '../auth/auth.module';
+import { EnforcementModule } from '../enforcement/enforcement.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [FinanceModule, AuthModule, EnforcementModule],
   controllers: [
     StockController,
     KitchenStockController,
