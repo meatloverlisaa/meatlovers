@@ -6,9 +6,10 @@ import {
   LegacyBarStockController,
 } from './stock.controller';
 import { StockService } from './stock.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [],
+  imports: [PrismaModule],
   controllers: [
     StockController,
     KitchenStockController,
@@ -16,5 +17,6 @@ import { StockService } from './stock.service';
     LegacyBarStockController,
   ],
   providers: [StockService],
+  exports: [StockService],
 })
 export class StockModule {}
