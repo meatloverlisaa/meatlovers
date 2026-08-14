@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "install": "npm install --prefix api",
-    "build": "npm run build --prefix api",
-    "start": "npm run start:prod --prefix api",
-    "dev": "npm run start:dev --prefix api"
+    "build": "cd api && npm run build",
+    "start": "cd api && npm run start:prod",
+    "dev": "cd api && npm run start:dev"
   }
 }
