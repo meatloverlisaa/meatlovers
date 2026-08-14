@@ -63,9 +63,29 @@ export function dateValue(value?: string | null) {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  // Get auth token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Merge existing headers
+  if (options?.headers) {
+    const existingHeaders = new Headers(options.headers);
+    existingHeaders.forEach((value, key) => {
+      headers[key] = value;
+    });
+  }
+
+  // Add authorization header if token exists
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${HR_API_BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...options?.headers },
     ...options,
+    headers,
   });
 
   if (!response.ok) {

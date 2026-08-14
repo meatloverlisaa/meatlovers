@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {
   Controller,
@@ -15,6 +15,7 @@ import {
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { UpdateSupplierStatusDto } from './dto/update-supplier-status.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import {
   SUPPLIER_READ_ROLES,
@@ -78,7 +79,7 @@ export class SupplierController {
   @Permission(Resource.SUPPLIERS, Action.UPDATE)
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateStatusDto: any,
+    @Body() updateStatusDto: UpdateSupplierStatusDto,
   ) {
     return this.supplierService.updateStatus(
       id,

@@ -118,7 +118,7 @@ function ContactForm({ initialSource }: { initialSource: LeadSource }) {
       setName(""); setPhone(""); setEmail(""); setMessage("");
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? _err.message : "Something went wrong. Please try again.",
+        err instanceof Error ? err.message : "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);

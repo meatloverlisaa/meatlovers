@@ -32,10 +32,14 @@ describe('Bar Operations (e2e)', () => {
   });
 
   beforeEach(async () => {
-    // Clean up database before each test
+    // Clean up database before each test (respecting foreign key constraints)
     await prisma.$transaction([
       prisma.$executeRawUnsafe('DELETE FROM order_items'),
+      prisma.$executeRawUnsafe('DELETE FROM payments'),
       prisma.$executeRawUnsafe('DELETE FROM orders'),
+      prisma.$executeRawUnsafe('DELETE FROM stock_movements'),
+      prisma.$executeRawUnsafe('DELETE FROM stock_items'),
+      prisma.$executeRawUnsafe('DELETE FROM finance_transactions'),
       prisma.$executeRawUnsafe('DELETE FROM tables'),
       prisma.$executeRawUnsafe('DELETE FROM users'),
       prisma.$executeRawUnsafe('DELETE FROM products'),
@@ -46,13 +50,13 @@ describe('Bar Operations (e2e)', () => {
     it('should get bar orders with drink orders only', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW()), (2, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW()), (3, "Beer", "ALCOHOLIC_DRINK", 5.00, 2.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Burger', 'FOOD', 15.00, 8.00, true, NOW(), NOW()), (2, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW()), (3, 'Beer', 'ALCOHOLIC_DRINK', 5.00, 2.00, true, NOW(), NOW())",
       );
 
       // Create a drink order (soft drink)
@@ -98,13 +102,13 @@ describe('Bar Operations (e2e)', () => {
     it('should get bar orders filtered by status', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW()), (2, "Beer", "ALCOHOLIC_DRINK", 5.00, 2.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW()), (2, 'Beer', 'ALCOHOLIC_DRINK', 5.00, 2.00, true, NOW(), NOW())",
       );
 
       // Create first drink order
@@ -150,13 +154,13 @@ describe('Bar Operations (e2e)', () => {
     it('should get bar summary', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW()), (2, "Beer", "ALCOHOLIC_DRINK", 5.00, 2.00, 1, NOW(), NOW()), (3, "Wine", "ALCOHOLIC_DRINK", 10.00, 5.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW()), (2, 'Beer', 'ALCOHOLIC_DRINK', 5.00, 2.00, true, NOW(), NOW()), (3, 'Wine', 'ALCOHOLIC_DRINK', 10.00, 5.00, true, NOW(), NOW())",
       );
 
       // Create three drink orders
@@ -210,13 +214,13 @@ describe('Bar Operations (e2e)', () => {
     beforeEach(async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW())",
       );
 
       // Create a drink order
@@ -277,7 +281,7 @@ describe('Bar Operations (e2e)', () => {
     it('should reject status update for non-drink order', async () => {
       // Create a food order
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (2, "Burger", "FOOD", 15.00, 8.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (2, 'Burger', 'FOOD', 15.00, 8.00, true, NOW(), NOW())",
       );
 
       const foodOrder = await request(app.getHttpServer())
@@ -308,13 +312,13 @@ describe('Bar Operations (e2e)', () => {
     it('should get bar sales data', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW()), (2, "Beer", "ALCOHOLIC_DRINK", 5.00, 2.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW()), (2, 'Beer', 'ALCOHOLIC_DRINK', 5.00, 2.00, true, NOW(), NOW())",
       );
 
       // Create drink orders and mark as served
@@ -373,13 +377,13 @@ describe('Bar Operations (e2e)', () => {
     it('should get bar sales filtered by date range', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW())",
       );
 
       // Create drink order
@@ -418,13 +422,13 @@ describe('Bar Operations (e2e)', () => {
     it('should reflect status changes across POS and Bar endpoints', async () => {
       // Setup: Create test data
       await prisma.$executeRawUnsafe(
-        'INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, "Table 1", NOW(), NOW())',
+        "INSERT INTO tables (id, table_name, created_at, updated_at) VALUES (1, 'Table 1', NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, "John Waiter", "john@test.com", "1234567890", "hashed_password", "WAITER", 1, NOW(), NOW())',
+        "INSERT INTO users (id, full_name, email, phone, password_hash, role, is_active, created_at, updated_at) VALUES (1, 'John Waiter', 'john@test.com', '1234567890', 'hashed_password', 'WAITER', true, NOW(), NOW())",
       );
       await prisma.$executeRawUnsafe(
-        'INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, "Soda", "SOFT_DRINK", 3.00, 1.00, 1, NOW(), NOW())',
+        "INSERT INTO products (id, product_name, product_category, selling_price, cost_price, is_active, created_at, updated_at) VALUES (1, 'Soda', 'SOFT_DRINK', 3.00, 1.00, true, NOW(), NOW())",
       );
 
       // Create order via POS (orders endpoint)

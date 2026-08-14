@@ -16,10 +16,14 @@ import {
   RefundPaymentDto,
   SettlementSummaryDto,
 } from './dto/create-payment.dto';
+import { AuditLogService } from '../auth/audit-log.service';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLog: AuditLogService,
+  ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
     const { order_id, payments } = createPaymentDto;
@@ -78,6 +82,20 @@ export class PaymentsService {
         where: { id: BigInt(order_id) },
         data: { status: 'PAID' },
       });
+
+      // Log payment creation
+      for (const payment of createdPayments) {
+        await this.auditLog.log({
+          action: 'PAYMENT_PROCESSED',
+          resource: 'payment',
+          resourceId: payment.id.toString(),
+          metadata: {
+            orderId: order_id,
+            paymentMethod: payment.payment_method,
+            amount: payment.amount,
+          },
+        });
+      }
 
       return createdPayments;
     });

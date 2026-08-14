@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import { getAuthHeader } from "@/lib/auth";
 import {
   ShieldExclamationIcon,
   UserIcon,
@@ -73,10 +74,11 @@ export default function EnforcementDashboardPage() {
   const fetchData = useCallback(async () => {
     try {
       setError(null);
+      const authHeaders = getAuthHeader();
       const [summaryRes, scoresRes, actionsRes] = await Promise.all([
-        fetch(`${API_BASE}/enforcement/risk-scores/summary`),
-        fetch(`${API_BASE}/enforcement/risk-scores${filter ? `?level=${filter}` : ''}`),
-        fetch(`${API_BASE}/enforcement/actions/recent?limit=20`),
+        fetch(`${API_BASE}/enforcement/risk-scores/summary`, { headers: authHeaders }),
+        fetch(`${API_BASE}/enforcement/risk-scores${filter ? `?level=${filter}` : ''}`, { headers: authHeaders }),
+        fetch(`${API_BASE}/enforcement/actions/recent?limit=20`, { headers: authHeaders }),
       ]);
 
       if (summaryRes.ok) setSummary(await summaryRes.json());

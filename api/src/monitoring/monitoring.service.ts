@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -57,7 +57,7 @@ export class MonitoringService {
       activeDeliveries = await this.prisma.delivery.count({
         where: { status: 'IN_TRANSIT' },
       });
-    } catch (error) {
+    } catch {
       // Delivery table might not exist
     }
 
@@ -433,7 +433,7 @@ export class MonitoringService {
         failed: cancelled,
         avgDeliveryTime,
       };
-    } catch (error) {
+    } catch {
       // If delivery table doesn't exist or query fails, return zeros
       return {
         active: 0,

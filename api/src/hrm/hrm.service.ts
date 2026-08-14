@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import {
   AttendanceStatus,
@@ -152,7 +151,10 @@ export class HrmService {
     // Create user with employee profile
     const user = await this.prisma.user.create({
       data: {
-        ...userData,
+        full_name: userData.full_name,
+        email: userData.email,
+        phone: userData.phone,
+        role: userData.role,
         password_hash: hashedPassword,
         employee_profile: {
           create: {
@@ -208,6 +210,7 @@ export class HrmService {
 
     // Remove password_hash from response
     const { password_hash, ...userWithoutPassword } = user;
+    void password_hash;
     return userWithoutPassword;
   }
 
@@ -222,7 +225,7 @@ export class HrmService {
     department?: string;
     search?: string;
   }) {
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     // Filter by role
     if (filters.role) {
@@ -237,7 +240,7 @@ export class HrmService {
     }
 
     // Filter by employee profile fields
-    const employeeProfileWhere: any = {};
+    const employeeProfileWhere: Prisma.EmployeeProfileWhereInput = {};
 
     if (filters.employmentType) {
       employeeProfileWhere.employment_type =
@@ -278,7 +281,10 @@ export class HrmService {
     });
 
     // Remove password_hash from response
-    return employees.map(({ password_hash, ...employee }) => employee);
+    return employees.map(({ password_hash, ...employee }) => {
+      void password_hash;
+      return employee;
+    });
   }
 
   /**
@@ -366,6 +372,7 @@ export class HrmService {
 
     // Remove password_hash from response
     const { password_hash, ...employeeWithoutPassword } = employee;
+    void password_hash;
     return employeeWithoutPassword;
   }
 
@@ -438,11 +445,12 @@ export class HrmService {
       skills,
       notes,
       profile_photo_url,
-      ...userData
+      ...rawUserData
     } = updateEmployeeDto;
+    const userData: Prisma.UserUpdateInput = { ...rawUserData };
 
     // Prepare profile update data
-    const profileUpdateData: any = {};
+    const profileUpdateData: Prisma.EmployeeProfileUpdateInput = {};
     if (date_of_birth !== undefined)
       profileUpdateData.date_of_birth = date_of_birth
         ? new Date(date_of_birth)
@@ -514,8 +522,8 @@ export class HrmService {
 
     // Hash password if provided
     if (password) {
-      userData['password_hash'] = await bcrypt.hash(password, 10);
-      userData['password_changed_at'] = new Date();
+      userData.password_hash = await bcrypt.hash(password, 10);
+      userData.password_changed_at = new Date();
     }
 
     // Update user and profile
@@ -537,6 +545,7 @@ export class HrmService {
 
     // Remove password_hash from response
     const { password_hash, ...employeeWithoutPassword } = updatedEmployee;
+    void password_hash;
     return employeeWithoutPassword;
   }
 
@@ -574,6 +583,7 @@ export class HrmService {
     });
 
     const { password_hash, ...employeeWithoutPassword } = updatedEmployee;
+    void password_hash;
     return {
       message: 'Employee deactivated successfully',
       employee: employeeWithoutPassword,
@@ -610,6 +620,7 @@ export class HrmService {
     });
 
     const { password_hash, ...employeeWithoutPassword } = updatedEmployee;
+    void password_hash;
     return {
       message: 'Employee reactivated successfully',
       employee: employeeWithoutPassword,
@@ -645,6 +656,7 @@ export class HrmService {
 
     // Remove password_hash from response
     const { password_hash, ...employeeData } = employee;
+    void password_hash;
 
     // Calculate summary statistics
     const totalAttendance = employee.attendance_records.length;
@@ -690,7 +702,7 @@ export class HrmService {
   }
 
   async getAllStaff(filters: { role?: string; status?: string }) {
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (filters.role) {
       where.role = filters.role as Role;
@@ -752,7 +764,7 @@ export class HrmService {
     userId?: string;
     status?: string;
   }) {
-    const where: any = {};
+    const where: Prisma.StaffAttendanceWhereInput = {};
 
     if (filters.date) {
       where.date = new Date(filters.date);
@@ -837,8 +849,18 @@ export class HrmService {
     });
   }
 
-  async updateAttendance(id: string, data: any) {
-    const updateData: any = { ...data };
+  async updateAttendance(
+    id: string,
+    data: {
+      check_in?: string;
+      check_out?: string;
+      date?: string;
+      status?: AttendanceStatus;
+      hours_worked?: number;
+      notes?: string | null;
+    },
+  ) {
+    const updateData: Prisma.StaffAttendanceUpdateInput = {};
 
     if (data.check_in) {
       updateData.check_in = new Date(data.check_in);
@@ -852,6 +874,18 @@ export class HrmService {
       updateData.date = new Date(data.date);
     }
 
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+    }
+
+    if (data.hours_worked !== undefined) {
+      updateData.hours_worked = data.hours_worked;
+    }
+
+    if (data.notes !== undefined) {
+      updateData.notes = data.notes;
+    }
+
     return this.prisma.staffAttendance.update({
       where: { id: BigInt(id) },
       data: updateData,
@@ -861,7 +895,7 @@ export class HrmService {
 
   // Duty Roster Methods
   async getDutyRoster(filters: { date?: string; userId?: string }) {
-    const where: any = {};
+    const where: Prisma.DutyRosterWhereInput = {};
 
     if (filters.date) {
       where.shift_date = new Date(filters.date);
@@ -908,15 +942,43 @@ export class HrmService {
     });
   }
 
-  async updateRoster(id: string, data: any) {
-    const updateData: any = { ...data };
+  async updateRoster(
+    id: string,
+    data: {
+      user_id?: string;
+      shift_date?: string;
+      shift_type?: ShiftType;
+      start_time?: string;
+      end_time?: string;
+      notes?: string | null;
+    },
+  ) {
+    const updateData: Prisma.DutyRosterUpdateInput = {};
 
     if (data.shift_date) {
       updateData.shift_date = new Date(data.shift_date);
     }
 
     if (data.user_id) {
-      updateData.user_id = BigInt(data.user_id);
+      updateData.user = {
+        connect: { id: BigInt(data.user_id) },
+      };
+    }
+
+    if (data.shift_type !== undefined) {
+      updateData.shift_type = data.shift_type;
+    }
+
+    if (data.start_time !== undefined) {
+      updateData.start_time = data.start_time;
+    }
+
+    if (data.end_time !== undefined) {
+      updateData.end_time = data.end_time;
+    }
+
+    if (data.notes !== undefined) {
+      updateData.notes = data.notes;
     }
 
     return this.prisma.dutyRoster.update({
@@ -1114,7 +1176,7 @@ export class HrmService {
 
   // Payroll Methods
   async getPayroll(filters: { userId?: string; periodStart?: string }) {
-    const where: any = {};
+    const where: Prisma.PayrollWhereInput = {};
 
     if (filters.userId) {
       where.user_id = BigInt(filters.userId);
@@ -1141,7 +1203,7 @@ export class HrmService {
   }
 
   async getPayrollSummary(period?: string) {
-    const where: any = {};
+    const where: Prisma.PayrollWhereInput = {};
 
     if (period) {
       where.period_start = new Date(period);
@@ -1214,8 +1276,23 @@ export class HrmService {
     });
   }
 
-  async updatePayroll(id: string, data: any) {
-    const updateData: any = { ...data };
+  async updatePayroll(
+    id: string,
+    data: {
+      period_start?: string;
+      period_end?: string;
+      payment_date?: string;
+      payment_method?: string;
+      payment_reference?: string;
+      basic_salary?: number;
+      allowances?: number;
+      deductions?: number;
+      overtime_pay?: number;
+      net_salary?: number;
+      notes?: string | null;
+    },
+  ) {
+    const updateData: Prisma.PayrollUpdateInput = {};
 
     if (data.period_start) {
       updateData.period_start = new Date(data.period_start);
@@ -1227,6 +1304,38 @@ export class HrmService {
 
     if (data.payment_date) {
       updateData.payment_date = new Date(data.payment_date);
+    }
+
+    if (data.payment_method !== undefined) {
+      updateData.payment_method = data.payment_method;
+    }
+
+    if (data.payment_reference !== undefined) {
+      updateData.payment_reference = data.payment_reference;
+    }
+
+    if (data.basic_salary !== undefined) {
+      updateData.basic_salary = data.basic_salary;
+    }
+
+    if (data.allowances !== undefined) {
+      updateData.allowances = data.allowances;
+    }
+
+    if (data.deductions !== undefined) {
+      updateData.deductions = data.deductions;
+    }
+
+    if (data.overtime_pay !== undefined) {
+      updateData.overtime_pay = data.overtime_pay;
+    }
+
+    if (data.net_salary !== undefined) {
+      updateData.net_salary = data.net_salary;
+    }
+
+    if (data.notes !== undefined) {
+      updateData.notes = data.notes;
     }
 
     return this.prisma.payroll.update({
@@ -1396,7 +1505,7 @@ export class HrmService {
     const periodStart = new Date(data.period_start);
     const periodEnd = new Date(data.period_end);
 
-    const whereUser: any = { is_active: true };
+    const whereUser: Prisma.UserWhereInput = { is_active: true };
     if (data.department) {
       whereUser.employee_profile = {
         department: { contains: data.department, mode: 'insensitive' },
@@ -1422,7 +1531,9 @@ export class HrmService {
       DISPATCHER: 35000,
     };
 
-    const results: any[] = [];
+    const results: Prisma.PayrollGetPayload<{
+      include: { user: true };
+    }> [] = [];
 
     for (const emp of employees) {
       const basicSalary = defaultRoleSalaries[emp.role] || 40000;
