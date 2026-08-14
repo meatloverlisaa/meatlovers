@@ -47,7 +47,7 @@ export default function BarTestPage() {
               errs.push(`❌ Orders API failed: ${ordersRes.status} - ${errorText}`);
             }
           } catch (_err) {
-            errs.push(`❌ Orders API error: ${err instanceof Error ? _err.message : String(err)}`);
+            errs.push(`❌ Orders API error: ${_err instanceof Error ? _err.message : String(_err)}`);
           }
           
           // Step 3: Test bar summary API
@@ -71,11 +71,11 @@ export default function BarTestPage() {
               errs.push(`❌ Summary API failed: ${summaryRes.status} - ${errorText}`);
             }
           } catch (_err) {
-            errs.push(`❌ Summary API error: ${err instanceof Error ? _err.message : String(err)}`);
+            errs.push(`❌ Summary API error: ${_err instanceof Error ? _err.message : String(_err)}`);
           }
         }
       } catch (_err) {
-        errs.push(`❌ General error: ${err instanceof Error ? _err.message : String(err)}`);
+        errs.push(`❌ General error: ${_err instanceof Error ? _err.message : String(_err)}`);
       }
       
       setStatus(steps.join('\n'));

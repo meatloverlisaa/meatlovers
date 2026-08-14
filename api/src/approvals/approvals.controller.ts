@@ -70,4 +70,10 @@ export class ApprovalsController {
       data.reason,
     );
   }
+
+  @Patch(':id/approve-stock-adjustment')
+  @Roles(...APPROVER_ROLES)
+  approveStockAdjustment(@Param('id') id: string, @Body() data: any) {
+    return this.approvalsService.approveStockAdjustment(id, data.reviewed_by);
+  }
 }

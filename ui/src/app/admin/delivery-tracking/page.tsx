@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getAuthHeader } from "@/lib/auth";
 
 
 type Rider = {
@@ -51,7 +52,7 @@ type Delivery = {
   rider?: Rider;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 async function getDeliveries(status?: string): Promise<Delivery[]> {
   const params = new URLSearchParams();
@@ -59,6 +60,7 @@ async function getDeliveries(status?: string): Promise<Delivery[]> {
 
   const res = await fetch(`${baseUrl}/deliveries?${params.toString()}`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -79,6 +81,7 @@ async function getDeliverySummary(): Promise<{
 }> {
   const res = await fetch(`${baseUrl}/deliveries/summary`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -95,7 +98,10 @@ async function updateDeliveryStatus(
 ): Promise<Delivery> {
   const res = await fetch(`${baseUrl}/deliveries/${id}/status`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ status, cancellation_reason }),
   });
 

@@ -6,9 +6,12 @@ import {
   LegacyBarStockController,
 } from './stock.controller';
 import { StockService } from './stock.service';
+import { FinanceModule } from '../finance/finance.module';
+import { AuthModule } from '../auth/auth.module';
+import { EnforcementModule } from '../enforcement/enforcement.module';
 
 @Module({
-  imports: [],
+  imports: [FinanceModule, AuthModule, EnforcementModule],
   controllers: [
     StockController,
     KitchenStockController,
@@ -16,5 +19,6 @@ import { StockService } from './stock.service';
     LegacyBarStockController,
   ],
   providers: [StockService],
+  exports: [StockService],
 })
 export class StockModule {}

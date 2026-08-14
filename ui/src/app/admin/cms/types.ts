@@ -35,7 +35,7 @@ export interface Analytics {
   leads_by_source: Array<{ source: string; count: number }>;
 }
 
-export const API_BASE = "http://localhost:3001";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 export const PAGE_TYPES = ["HOMEPAGE", "ABOUT", "MENU", "CONTACT", "CUSTOM"] as const;
 export const LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "LOST"] as const;

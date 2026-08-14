@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type SummaryCard = {
@@ -341,6 +342,7 @@ const adminModules = [
 // ─── Main Dashboard Component ─────────────────────────────────────────────────
 export default function AdminDashboard() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER']);
+  const { logout } = useAuth();
   
   const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([
     { label: "Today's Revenue", value: "KSh 0", icon: "💰", color: "bg-emerald-100", trend: "neutral" },
@@ -491,8 +493,19 @@ export default function AdminDashboard() {
                 style={{ backgroundColor: '#3B82F6' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                onClick={() => document.getElementById('quick-actions')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Quick Actions
+              </button>
+              <button
+                onClick={logout}
+                className="rounded-lg px-4 py-2 text-sm font-semibold transition hover:bg-[#334155]"
+                style={{ 
+                  border: '1px solid #EF4444',
+                  color: '#EF4444'
+                }}
+              >
+                Logout
               </button>
             </div>
           </div>
@@ -545,7 +558,7 @@ export default function AdminDashboard() {
           <ActivityTimeline activities={activities} />
 
           {/* Module Grid */}
-          <div>
+          <div id="quick-actions">
             <h2 className="mb-4 text-lg font-black" style={{ color: '#F8FAFC' }}>Quick Access</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {adminModules.map((mod) => (

@@ -160,7 +160,7 @@ export default function NewEmployeePage() {
 
       router.push("/hr?success=employee-created");
     } catch (err: unknown) {
-      const message = err instanceof Error ? _err.message : "Unknown error";
+      const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       setSubmitting(false);
     }

@@ -1,17 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateWasteDeclarationDto,
-  WasteReason,
-} from './dto/create-waste-declaration.dto';
+import { Prisma } from '@prisma/client';
+import { CreateWasteDeclarationDto } from './dto/create-waste-declaration.dto';
 import { UpdateWasteDeclarationDto } from './dto/update-waste-declaration.dto';
-import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class WasteService {
@@ -108,14 +103,14 @@ export class WasteService {
     startDate?: string,
     endDate?: string,
   ) {
-    const where: any = {};
+    const where: Prisma.WasteDeclarationWhereInput = {};
 
     if (productId) {
       where.product_id = BigInt(productId);
     }
 
     if (reason) {
-      where.reason = reason;
+      where.reason = reason as any; // Type assertion for enum filter
     }
 
     if (startDate || endDate) {
@@ -145,7 +140,7 @@ export class WasteService {
   }
 
   async getWasteSummary(startDate?: string, endDate?: string) {
-    const where: any = {};
+    const where: Prisma.WasteDeclarationWhereInput = {};
 
     if (startDate || endDate) {
       where.declared_at = {};
@@ -268,7 +263,7 @@ export class WasteService {
       throw new NotFoundException('Waste declaration not found');
     }
 
-    const updateData: any = {};
+    const updateData: Prisma.WasteDeclarationUpdateInput = {};
     if (updateWasteDeclarationDto.quantity !== undefined) {
       updateData.quantity = updateWasteDeclarationDto.quantity;
     }

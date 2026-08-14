@@ -246,4 +246,63 @@ export class EnforcementService {
       },
     });
   }
+
+  async updateRiskFromInventoryVariance(userId: string, variance: number, variancePercentage: number) {
+    // Get or create risk score for user
+    let riskScore = await this.prisma.enforcementRiskScore.findFirst({
+      where: { user_id: BigInt(userId) },
+    });
+
+    if (!riskScore) {
+      riskScore = await this.prisma.enforcementRiskScore.create({
+        data: {
+          user_id: BigInt(userId),
+          risk_level: 'LOW',
+          risk_score: 0,
+          violation_count: 0,
+        },
+      });
+    }
+
+    // Calculate risk impact based on variance
+    const varianceImpact = Math.abs(variance);
+    let riskIncrease = 0;
+    let newRiskLevel = riskScore.risk_level;
+
+    if (variancePercentage > 20 || varianceImpact > 10) {
+      riskIncrease = 15;
+      newRiskLevel = 'HIGH';
+    } else if (variancePercentage > 10 || varianceImpact > 5) {
+      riskIncrease = 10;
+      newRiskLevel = 'MEDIUM';
+    } else if (variancePercentage > 5 || varianceImpact > 2) {
+      riskIncrease = 5;
+      newRiskLevel = 'LOW';
+    }
+
+    // Update risk score
+    const updatedRiskScore = await this.prisma.enforcementRiskScore.update({
+      where: { id: riskScore.id },
+      data: {
+        risk_score: Math.min(100, riskScore.risk_score + riskIncrease),
+        risk_level: newRiskLevel,
+        violation_count: { increment: 1 },
+        last_violation_at: new Date(),
+      },
+      include: { user: true },
+    });
+
+    // Create enforcement action for the variance
+    await this.prisma.enforcementAction.create({
+      data: {
+        risk_score_id: riskScore.id,
+        action_type: 'VIOLATION' as any,
+        description: `Inventory count variance detected: ${variance > 0 ? '+' : ''}${variance} (${variancePercentage.toFixed(2)}%)`,
+        taken_by: BigInt(userId),
+        severity: newRiskLevel,
+      },
+    });
+
+    return updatedRiskScore;
+  }
 }

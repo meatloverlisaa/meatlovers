@@ -8,18 +8,32 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MovementType } from '@prisma/client';
+import { FinanceService } from '../finance/finance.service';
+import { AuditLogService } from '../auth/audit-log.service';
+import { EnforcementService } from '../enforcement/enforcement.service';
 
 interface CreatePurchaseDto {
   productId: number;
   quantity: number;
+  supplierId?: number;
   reference?: string;
   notes?: string;
+  recordedBy?: string;
 }
 
 interface CreateAdjustmentDto {
   productId: number;
   quantity: number;
   reference?: string;
+  notes?: string;
+  recordedBy?: string;
+}
+
+interface InventoryCountDto {
+  productId: number;
+  location: string;
+  countedQuantity: number;
+  countedBy: string;
   notes?: string;
 }
 
@@ -34,7 +48,12 @@ interface CreateTransferDto {
 
 @Injectable()
 export class StockService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private financeService: FinanceService,
+    private auditLogService: AuditLogService,
+    private enforcementService: EnforcementService,
+  ) {}
 
   async createPurchase(dto: CreatePurchaseDto) {
     return this.prisma.$transaction(async (tx) => {
@@ -83,6 +102,56 @@ export class StockService {
           notes: dto.notes,
         },
       });
+
+      // Create finance payable transaction (expense)
+      if (dto.recordedBy) {
+        try {
+          const costPrice = Number(product.cost_price || 0);
+          const totalCost = costPrice * dto.quantity;
+          
+          if (totalCost > 0) {
+            await (tx as any).financeTransaction.create({
+              data: {
+                type: 'EXPENSE',
+                category: 'SUPPLIER_PAYMENT',
+                amount: totalCost,
+                description: `Purchase of ${dto.quantity} x ${product.product_name}`,
+                reference: dto.reference || `Purchase-${movement.id}`,
+                recorded_by: BigInt(dto.recordedBy),
+                transaction_date: new Date(),
+              },
+            });
+          }
+        } catch (error) {
+          console.error('Failed to create finance transaction:', error);
+          // Don't fail the purchase if finance transaction fails
+        }
+      }
+
+      // Log audit entry
+      if (dto.recordedBy) {
+        try {
+          await (tx as any).auditLog.create({
+            data: {
+              user_id: BigInt(dto.recordedBy),
+              action: 'STOCK_PURCHASE',
+              resource: 'stock',
+              resource_id: stockItem.id.toString(),
+              metadata: JSON.stringify({
+                productId: dto.productId,
+                productName: product.product_name,
+                quantity: dto.quantity,
+                supplierId: dto.supplierId,
+                movementId: movement.id,
+              }),
+              success: true,
+            },
+          });
+        } catch (error) {
+          console.error('Failed to create audit log:', error);
+          // Don't fail the purchase if audit log fails
+        }
+      }
 
       return {
         stockItem: {
@@ -155,6 +224,30 @@ export class StockService {
         },
       });
 
+      // Log audit entry
+      if (dto.recordedBy) {
+        try {
+          await (tx as any).auditLog.create({
+            data: {
+              user_id: BigInt(dto.recordedBy),
+              action: 'STOCK_ADJUSTMENT',
+              resource: 'stock',
+              resource_id: stockItem.id.toString(),
+              metadata: JSON.stringify({
+                productId: dto.productId,
+                productName: product.product_name,
+                adjustment: dto.quantity,
+                newQuantity: stockItem.quantity,
+                movementId: movement.id,
+              }),
+              success: true,
+            },
+          });
+        } catch (error) {
+          console.error('Failed to create audit log:', error);
+        }
+      }
+
       return {
         stockItem: {
           id: stockItem.id,
@@ -167,6 +260,149 @@ export class StockService {
           type: movement.movement_type,
           quantity: movement.quantity,
         },
+      };
+    });
+  }
+
+  async performInventoryCount(dto: InventoryCountDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: BigInt(dto.productId) },
+      });
+
+      if (!product) {
+        throw new NotFoundException(
+          `Product with ID ${dto.productId} not found`,
+        );
+      }
+
+      const stockItem = await tx.stockItem.findFirst({
+        where: {
+          product_id: BigInt(dto.productId),
+          location: dto.location,
+        },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(
+          `Stock item not found for product ${dto.productId} at location ${dto.location}`,
+        );
+      }
+
+      const expectedQuantity = stockItem.quantity;
+      const countedQuantity = dto.countedQuantity;
+      const variance = countedQuantity - expectedQuantity;
+      const variancePercentage = expectedQuantity > 0 
+        ? (Math.abs(variance) / expectedQuantity) * 100 
+        : 0;
+
+      // Determine if approval is needed (variance > 10% or absolute variance > 5)
+      const needsApproval = variancePercentage > 10 || Math.abs(variance) > 5;
+
+      // Create inventory count record
+      const inventoryCount = await (tx as any).inventoryCount.create({
+        data: {
+          stock_item_id: stockItem.id,
+          expected_quantity: expectedQuantity,
+          counted_quantity: countedQuantity,
+          variance: variance,
+          variance_percentage: variancePercentage,
+          counted_by: BigInt(dto.countedBy),
+          location: dto.location,
+          notes: dto.notes,
+          needs_approval: needsApproval,
+        },
+      });
+
+      // If variance is significant, create approval request
+      if (needsApproval && variance !== 0) {
+        await (tx as any).approvalRequest.create({
+          data: {
+            request_type: 'STOCK_ADJUSTMENT',
+            requested_by: BigInt(dto.countedBy),
+            metadata: JSON.stringify({
+              inventoryCountId: inventoryCount.id,
+              productId: dto.productId,
+              productName: product.product_name,
+              location: dto.location,
+              expectedQuantity,
+              countedQuantity,
+              variance,
+              variancePercentage,
+            }),
+            reason: `Inventory count variance: ${variance > 0 ? '+' : ''}${variance} (${variancePercentage.toFixed(2)}%)`,
+          },
+        });
+      }
+
+      // If variance is small and doesn't need approval, auto-adjust
+      if (!needsApproval && variance !== 0) {
+        const newQuantity = stockItem.quantity + variance;
+        await tx.stockItem.update({
+          where: { id: stockItem.id },
+          data: { quantity: newQuantity },
+        });
+
+        await tx.stockMovement.create({
+          data: {
+            stock_item_id: stockItem.id,
+            movement_type: MovementType.ADJUSTMENT,
+            quantity: variance,
+            reference: `Inventory Count ${inventoryCount.id}`,
+            notes: dto.notes || 'Auto-adjusted from inventory count',
+          },
+        });
+      }
+
+      // Log audit entry
+      try {
+        await (tx as any).auditLog.create({
+          data: {
+            user_id: BigInt(dto.countedBy),
+            action: 'INVENTORY_COUNT',
+            resource: 'stock',
+            resource_id: stockItem.id.toString(),
+            metadata: JSON.stringify({
+              productId: dto.productId,
+              productName: product.product_name,
+              location: dto.location,
+              expectedQuantity,
+              countedQuantity,
+              variance,
+              variancePercentage,
+              needsApproval,
+            }),
+            success: true,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to create audit log:', error);
+      }
+
+      // Update risk score if variance is significant
+      if (needsApproval && variance !== 0) {
+        try {
+          await this.enforcementService.updateRiskFromInventoryVariance(
+            dto.countedBy,
+            variance,
+            variancePercentage,
+          );
+        } catch (error) {
+          console.error('Failed to update risk score:', error);
+          // Don't fail the inventory count if risk update fails
+        }
+      }
+
+      return {
+        inventoryCount: {
+          id: inventoryCount.id,
+          expectedQuantity,
+          countedQuantity,
+          variance,
+          variancePercentage: Number(variancePercentage.toFixed(2)),
+          needsApproval,
+        },
+        autoAdjusted: !needsApproval && variance !== 0,
       };
     });
   }

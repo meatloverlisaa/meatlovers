@@ -6,10 +6,10 @@
  * and optimize font loading
  */
 
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
 /**
- * Geist Sans Font Configuration
+ * Inter Font Configuration
  * 
  * Optimizations:
  * - Preload for better performance
@@ -17,7 +17,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
  * - Latin subset only (reduces bundle size)
  * - CSS variable for easy theming
  */
-export const geistSans = Geist({
+export const geistSans = Inter({
   variable: '--font-geist-sans',
   subsets: ['latin'],
   display: 'swap',
@@ -35,7 +35,7 @@ export const geistSans = Geist({
 });
 
 /**
- * Geist Mono Font Configuration
+ * JetBrains Mono Font Configuration
  * 
  * Optimizations:
  * - Preload for better performance  
@@ -43,7 +43,7 @@ export const geistSans = Geist({
  * - Latin subset only
  * - CSS variable for code blocks
  */
-export const geistMono = Geist_Mono({
+export const geistMono = JetBrains_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
   display: 'swap',

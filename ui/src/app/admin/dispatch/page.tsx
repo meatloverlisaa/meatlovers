@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getAuthHeader } from "@/lib/auth";
 
 
 type Rider = {
@@ -61,11 +62,12 @@ type DeliverySummary = {
   activeRiders: number;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 async function getAvailableRiders(): Promise<Rider[]> {
   const res = await fetch(`${baseUrl}/riders/available`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -81,6 +83,7 @@ async function getDeliveries(status?: string): Promise<Delivery[]> {
 
   const res = await fetch(`${baseUrl}/deliveries?${params.toString()}`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {
@@ -93,6 +96,7 @@ async function getDeliveries(status?: string): Promise<Delivery[]> {
 async function getDeliverySummary(): Promise<DeliverySummary> {
   const res = await fetch(`${baseUrl}/deliveries/summary`, {
     cache: "no-store",
+    headers: getAuthHeader(),
   });
 
   if (!res.ok) {

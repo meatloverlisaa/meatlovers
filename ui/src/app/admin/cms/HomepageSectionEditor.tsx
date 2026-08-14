@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { API_BASE } from "./types";
+import { getAuthHeader } from "@/lib/auth";
 
 interface HomepageSection {
   id: string;
@@ -46,7 +47,10 @@ export function HomepageSectionEditor({
     try {
       await fetch(`${API_BASE}/cms/pages/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify({ title: editTitle, content: editContent }),
       });
       setEditing(null);
@@ -65,7 +69,10 @@ export function HomepageSectionEditor({
       const slug = `homepage-${newSection.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       await fetch(`${API_BASE}/cms/pages`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify({
           title: newSection.title,
           slug,
@@ -85,7 +92,10 @@ export function HomepageSectionEditor({
   };
 
   const togglePublish = async (id: string) => {
-    await fetch(`${API_BASE}/cms/pages/${id}/publish`, { method: "PATCH" });
+    await fetch(`${API_BASE}/cms/pages/${id}/publish`, { 
+      method: "PATCH",
+      ...getAuthHeader(),
+    });
     onRefresh();
   };
 

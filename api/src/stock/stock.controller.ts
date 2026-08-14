@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/require-await */
 
 import {
   Body,
@@ -79,6 +79,12 @@ export class StockController {
   @Roles(...STOCK_OPERATION_ROLES)
   async adjustment(@Body(ValidationPipe) body: any) {
     return this.stockService.createAdjustment(body);
+  }
+
+  @Post('inventory-count')
+  @Roles(...STOCK_OPERATION_ROLES)
+  async inventoryCount(@Body(ValidationPipe) body: any) {
+    return this.stockService.performInventoryCount(body);
   }
 
   @Post('adjustment-requests/:id/approve')

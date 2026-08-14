@@ -12,10 +12,16 @@ import { UpdateRiderDto } from './dto/update-rider.dto';
 import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
+import { FinanceService } from '../finance/finance.service';
+import { AuditLogService } from '../auth/audit-log.service';
 
 @Injectable()
 export class DeliveriesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private financeService: FinanceService,
+    private auditLogService: AuditLogService,
+  ) {}
 
   // Rider Management
   async createRider(createRiderDto: CreateRiderDto) {
@@ -367,6 +373,18 @@ export class DeliveriesService {
   ) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
+      include: {
+        order: {
+          include: {
+            items: true,
+          },
+        },
+        rider: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
 
     if (!delivery) {
@@ -417,6 +435,48 @@ export class DeliveriesService {
         },
       },
     });
+
+    // Create rider settlement when delivery is completed
+    if (updateDeliveryStatusDto.status === 'DELIVERED' && delivery.status !== 'DELIVERED') {
+      try {
+        // Calculate delivery fee (e.g., 10% of order total or fixed fee)
+        const orderTotal = delivery.order.items.reduce(
+          (sum, item) => sum + Number(item.unit_price) * item.quantity,
+          0,
+        );
+        const deliveryFee = orderTotal * 0.1; // 10% of order total as delivery fee
+
+        // Create finance transaction for rider settlement
+        await this.financeService.createFinanceTransaction({
+          type: 'EXPENSE' as any,
+          category: 'DELIVERY' as any,
+          amount: deliveryFee,
+          description: `Rider settlement for delivery ${id}`,
+          reference: `Delivery-${id}`,
+          recorded_by: delivery.rider.user_id.toString(),
+          transaction_date: new Date().toISOString(),
+        });
+
+        // Log audit entry
+        await this.auditLogService.log({
+          userId: delivery.rider.user_id,
+          action: 'STOCK_MOVEMENT' as any,
+          resource: 'delivery',
+          resourceId: id,
+          metadata: {
+            deliveryId: id,
+            orderId: delivery.order_id.toString(),
+            riderId: delivery.rider_id.toString(),
+            deliveryFee,
+            orderTotal,
+          },
+          success: true,
+        });
+      } catch (error) {
+        console.error('Failed to create rider settlement:', error);
+        // Don't fail the delivery update if settlement fails
+      }
+    }
 
     return updatedDelivery;
   }

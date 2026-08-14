@@ -4,13 +4,17 @@
   @typescript-eslint/no-unsafe-return,
   @typescript-eslint/no-unsafe-argument */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateOrderStatusDto } from '../orders/dto/update-order-status.dto';
+import { StockService } from '../stock/stock.service';
 
 @Injectable()
 export class BarService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly stockService: StockService,
+  ) {}
 
   async getBarOrders(status?: string) {
     const where: any = {
@@ -92,6 +96,11 @@ export class BarService {
       throw new Error(
         `Invalid status transition from ${order.status} to ${status}. Allowed: ${validTransitions.join(', ')}`,
       );
+    }
+
+    // Automatic stock deduction when drinks are served
+    if (status === 'SERVED' && order.status !== 'SERVED') {
+      await this.deductBarStock(order);
     }
 
     return (this.prisma as any).order.update({
@@ -246,6 +255,31 @@ export class BarService {
     });
 
     return product?.product_category || null;
+  }
+
+  private async deductBarStock(order: any) {
+    // Deduct stock for each drink item in the order
+    for (const item of order.items) {
+      if (item.product_id) {
+        const isDrink = await this.isDrinkItem(item.product_id);
+        if (isDrink) {
+          try {
+            await this.stockService.createBarSale({
+              productId: item.product_id.toString(),
+              quantity: item.quantity,
+              reference: `Order ${order.id}`,
+              notes: `Automatic stock deduction for served drink order`,
+            });
+          } catch (error) {
+            // Log error but don't fail the status update
+            console.error(
+              `Failed to deduct bar stock for product ${item.product_id}:`,
+              error,
+            );
+          }
+        }
+      }
+    }
   }
 
   async getBarTransfers(params?: {

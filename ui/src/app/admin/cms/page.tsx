@@ -6,6 +6,7 @@ import { LeadTable, LeadStatusBadge } from "./LeadTable";
 import { HomepageSectionEditor } from "./HomepageSectionEditor";
 import type { ContentPage, WebsiteLead, Analytics } from "./types";
 import { API_BASE } from "./types";
+import { getAuthHeader } from "@/lib/auth";
 
 // ─── Conversion Analytics ─────────────────────────────────────────────────────
 function ConversionAnalytics({ analytics }: { analytics: Analytics }) {
@@ -230,7 +231,9 @@ export default function AdminCMS() {
 
   const fetchPages = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/cms/pages`);
+      const res = await fetch(`${API_BASE}/cms/pages`, {
+        headers: getAuthHeader(),
+      });
       if (!res.ok) return;
       const data = await res.json();
       setPages(data);
@@ -241,7 +244,9 @@ export default function AdminCMS() {
 
   const fetchLeads = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/crm/leads`);
+      const res = await fetch(`${API_BASE}/crm/leads`, {
+        headers: getAuthHeader(),
+      });
       if (!res.ok) return;
       const data = await res.json();
       setLeads(data);
@@ -253,7 +258,9 @@ export default function AdminCMS() {
 
   const fetchAnalytics = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/crm/leads/analytics`);
+      const res = await fetch(`${API_BASE}/crm/leads/analytics`, {
+        headers: getAuthHeader(),
+      });
       if (!res.ok) return;
       const data = await res.json();
       setAnalytics(data);
@@ -276,14 +283,20 @@ export default function AdminCMS() {
   }, [fetchPages, fetchLeads, fetchAnalytics]);
 
   const handleTogglePublish = async (id: string) => {
-    await fetch(`${API_BASE}/cms/pages/${id}/publish`, { method: "PATCH" });
+    await fetch(`${API_BASE}/cms/pages/${id}/publish`, { 
+      method: "PATCH",
+      ...getAuthHeader(),
+    });
     fetchPages();
   };
 
   const handleUpdateLeadStatus = async (id: string, newStatus: string) => {
     await fetch(`${API_BASE}/crm/leads/${id}/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
       body: JSON.stringify({ status: newStatus }),
     });
     fetchLeads();
@@ -294,13 +307,19 @@ export default function AdminCMS() {
     if (editingPage) {
       await fetch(`${API_BASE}/cms/pages/${editingPage.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify(pageData),
       });
     } else {
       await fetch(`${API_BASE}/cms/pages`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify(pageData),
       });
     }
