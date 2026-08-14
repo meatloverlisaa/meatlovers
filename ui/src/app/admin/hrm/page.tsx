@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getAuthHeader } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type HrmSummary = {
@@ -283,7 +284,10 @@ type EmployeeDocument = {
 // ─── API Functions ─────────────────────────────────────────────────────────────
 async function getHrmSummary(): Promise<HrmSummary> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/summary`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/summary`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load HRM summary: ${res.status}`);
@@ -294,7 +298,10 @@ async function getHrmSummary(): Promise<HrmSummary> {
 
 async function getAllStaff(): Promise<Staff[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/employees`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/employees`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load staff: ${res.status}`);
@@ -306,7 +313,10 @@ async function getAllStaff(): Promise<Staff[]> {
 async function getAttendance(): Promise<Attendance[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const today = new Date().toISOString().split('T')[0];
-  const res = await fetch(`${baseUrl}/hrm/attendance?date=${today}`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/attendance?date=${today}`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load attendance: ${res.status}`);
@@ -318,7 +328,10 @@ async function getAttendance(): Promise<Attendance[]> {
 async function getDutyRoster(): Promise<DutyRoster[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const today = new Date().toISOString().split('T')[0];
-  const res = await fetch(`${baseUrl}/hrm/roster?date=${today}`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/roster?date=${today}`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load duty roster: ${res.status}`);
@@ -329,7 +342,10 @@ async function getDutyRoster(): Promise<DutyRoster[]> {
 
 async function getLeaveRequests(): Promise<HrmLeaveRequest[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/leave`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/leave`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load leave requests: ${res.status}`);
@@ -340,7 +356,10 @@ async function getLeaveRequests(): Promise<HrmLeaveRequest[]> {
 
 async function getPayroll(): Promise<Payroll[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/payroll`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/payroll`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load payroll: ${res.status}`);
@@ -351,7 +370,10 @@ async function getPayroll(): Promise<Payroll[]> {
 
 async function getPerformanceReviews(): Promise<PerformanceReview[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/performance/reviews`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/performance/reviews`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load performance reviews: ${res.status}`);
@@ -362,7 +384,10 @@ async function getPerformanceReviews(): Promise<PerformanceReview[]> {
 
 async function getTrainingPrograms(): Promise<TrainingProgram[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/training/programs`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/training/programs`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load training programs: ${res.status}`);
@@ -373,7 +398,10 @@ async function getTrainingPrograms(): Promise<TrainingProgram[]> {
 
 async function getDisciplinaryActions(): Promise<DisciplinaryAction[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/disciplinary/actions`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/disciplinary/actions`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load disciplinary actions: ${res.status}`);
@@ -384,7 +412,10 @@ async function getDisciplinaryActions(): Promise<DisciplinaryAction[]> {
 
 async function getEmployeeDocuments(): Promise<EmployeeDocument[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/documents`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/documents`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load employee documents: ${res.status}`);
@@ -398,7 +429,10 @@ async function approveLeaveRequest(leaveId: string, approvedBy: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/leave/${leaveId}/approve`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ approved_by: approvedBy }),
   });
 
@@ -413,7 +447,10 @@ async function rejectLeaveRequest(leaveId: string, approvedBy: string, notes: st
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/leave/${leaveId}/reject`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify({ approved_by: approvedBy, notes }),
   });
 
@@ -428,7 +465,10 @@ async function processBulkPayrollApi(payload: ProcessBulkPayrollPayload) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/process-bulk`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -447,7 +487,10 @@ async function markPayrollPaidApi(
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/${id}/pay`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -462,7 +505,10 @@ async function bulkPayPayrollApi(payload: BulkPayPayload) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/bulk-pay`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -477,7 +523,10 @@ async function updatePayrollRecordApi(id: string | number, payload: UpdatePayrol
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
   const res = await fetch(`${baseUrl}/hrm/payroll/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -490,7 +539,10 @@ async function updatePayrollRecordApi(id: string | number, payload: UpdatePayrol
 
 async function fetchPayslipApi(id: string | number) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/payroll/${id}/slip`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/payroll/${id}/slip`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to load payslip: ${res.status}`);
@@ -501,7 +553,10 @@ async function fetchPayslipApi(id: string | number) {
 
 async function fetchBankExportApi() {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const res = await fetch(`${baseUrl}/hrm/payroll/bank-export`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/hrm/payroll/bank-export`, { 
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to export bank file: ${res.status}`);
