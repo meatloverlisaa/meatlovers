@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: meatlovers-api
+    env: node
+    rootDir: api
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    autoDeploy: true
