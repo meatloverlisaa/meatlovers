@@ -580,17 +580,7 @@ export class OrdersService {
   /**
    * Helper: Serialize order for response
    */
-  private serializeOrder(
-    order: Order & {
-      items?: OrderItem[];
-      payments?: Payment[];
-      approval_requests?: ApprovalRequest[];
-      delivery?: Delivery | null;
-      waiter?: User | null;
-      table?: Table | null;
-      customer?: Customer | null;
-    },
-  ) {
+  private serializeOrder(order: any) {
     return {
       id: order.id.toString(),
       tableId: order.table_id?.toString(),
