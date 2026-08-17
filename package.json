@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npx prisma generate && nest build",
+    "build": "npx prisma generate --schema=./prisma/schema.prisma && nest build",
     "start": "node dist/src/main",
     "start:prod": "node dist/src/main",
     "dev": "nest start --watch"
