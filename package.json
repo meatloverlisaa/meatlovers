@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npx prisma generate --schema=./prisma/schema.prisma && nest build",
-    "start": "node dist/src/main",
-    "start:prod": "node dist/src/main",
-    "dev": "nest start --watch"
+    "install": "npm install --prefix ./ui",
+    "build": "npm run build --prefix ./ui",
+    "start": "npm run start --prefix ./ui",
+    "dev": "npm run dev --prefix ./ui"
   }
 }
