@@ -3,7 +3,7 @@
 # Security Testing Script for Meat Lovers CIMS
 # Date: August 6, 2026
 
-API_URL="http://localhost:3000"
+API_URL="http://localhost:3001"
 RESULTS_FILE="security-test-results.txt"
 
 echo "====================================" | tee $RESULTS_FILE
