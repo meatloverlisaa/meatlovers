@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install": "npm install --prefix api",
-    "build": "cd api && npm run build",
-    "start": "cd api && npm run start:prod",
-    "dev": "cd api && npm run start:dev"
+    "build": "npx prisma generate && nest build",
+    "start": "node dist/src/main",
+    "start:prod": "node dist/src/main",
+    "dev": "nest start --watch"
   }
 }
