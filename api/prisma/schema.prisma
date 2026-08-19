@@ -20,6 +20,7 @@ model User {
   last_login_at              DateTime?
   last_login_ip              String?                 @db.VarChar(45)
   password_changed_at        DateTime                @default(now())
+  deleted_at                 DateTime?
   created_at                 DateTime                @default(now())
   updated_at                 DateTime                @updatedAt
   approval_requests_made     ApprovalRequest[]       @relation("ApprovalRequester")
@@ -53,6 +54,8 @@ model User {
   training_enrollments       TrainingEnrollment[]
   waste_declarations         WasteDeclaration[]
 
+  @@index([is_active])
+  @@index([deleted_at])
   @@map("users")
 }
 
@@ -146,11 +149,21 @@ model Supplier {
   phone            String?        @db.VarChar(50)
   email            String?        @db.VarChar(255)
   physical_address String?
+  city             String?        @db.VarChar(100)
+  country          String?        @db.VarChar(100)
   supplier_type    SupplierType
   status           SupplierStatus @default(ACTIVE)
+  payment_terms    String?        @db.VarChar(100)
+  credit_limit     Decimal?       @db.Decimal(12, 2)
+  rating           Int?           @default(0)
+  notes            String?
+  deleted_at       DateTime?
   created_at       DateTime       @default(now())
   updated_at       DateTime       @updatedAt
 
+  @@index([supplier_type])
+  @@index([status])
+  @@index([deleted_at])
   @@map("suppliers")
 }
 
@@ -161,7 +174,15 @@ model Product {
   selling_price       Decimal                 @db.Decimal(12, 2)
   cost_price          Decimal                 @db.Decimal(12, 2)
   barcode             String?                 @db.VarChar(255)
+  sku                 String?                 @unique @db.VarChar(100)
+  description         String?
+  image_url           String?                 @db.VarChar(500)
   is_active           Boolean                 @default(true)
+  is_available        Boolean                 @default(true)
+  preparation_time    Int?
+  calories            Int?
+  allergens           String?
+  deleted_at          DateTime?
   created_at          DateTime                @default(now())
   updated_at          DateTime                @updatedAt
   order_items         OrderItem[]
@@ -170,6 +191,10 @@ model Product {
   stock_items         StockItem[]
   waste_declarations  WasteDeclaration[]
 
+  @@index([product_category])
+  @@index([is_active])
+  @@index([is_available])
+  @@index([deleted_at])
   @@map("products")
 }
 
@@ -178,22 +203,39 @@ model Customer {
   name       String?  @db.VarChar(255)
   phone      String?  @db.VarChar(50)
   email      String?  @db.VarChar(255)
+  address    String?
+  city       String?  @db.VarChar(100)
   notes      String?
+  loyalty_points Int? @default(0)
+  total_orders    Int? @default(0)
+  total_spent     Decimal? @db.Decimal(12, 2)
+  last_visit     DateTime?
+  deleted_at     DateTime?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   orders     Order[]
 
   @@index([phone])
+  @@index([email])
+  @@index([deleted_at])
   @@map("customers")
 }
 
 model Table {
   id         BigInt   @id @default(autoincrement())
   table_name String?  @db.VarChar(255)
+  capacity   Int?     @default(4)
+  location   String?  @db.VarChar(100)
+  is_active  Boolean  @default(true)
+  notes      String?
+  deleted_at DateTime?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   orders     Order[]
 
+  @@index([is_active])
+  @@index([location])
+  @@index([deleted_at])
   @@map("tables")
 }
 
@@ -204,6 +246,14 @@ model Order {
   waiter_id         BigInt
   status            OrderStatus       @default(PENDING)
   total_amount      Float
+  subtotal          Float?
+  tax_amount        Float?
+  discount_amount   Float?
+  tip_amount        Float?
+  special_requests  String?
+  estimated_time    Int?
+  actual_time       Int?
+  deleted_at        DateTime?
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
   approval_requests ApprovalRequest[]
@@ -219,6 +269,7 @@ model Order {
   @@index([waiter_id])
   @@index([status])
   @@index([created_at])
+  @@index([deleted_at])
   @@index([status, created_at])
   @@index([status, updated_at])
   @@map("orders")
@@ -244,7 +295,13 @@ model StockItem {
   id                 BigInt             @id @default(autoincrement())
   product_id         BigInt
   quantity           Int                @default(0)
+  min_stock_level    Int?               @default(10)
+  max_stock_level    Int?
   location           String             @default("MAIN_STORE") @db.VarChar(100)
+  unit_of_measure    String?            @db.VarChar(50)
+  cost_per_unit      Decimal?           @db.Decimal(12, 2)
+  last_restocked_at  DateTime?
+  deleted_at         DateTime?
   created_at         DateTime           @default(now())
   updated_at         DateTime           @updatedAt
   recipe_ingredients RecipeIngredient[]
@@ -254,6 +311,8 @@ model StockItem {
 
   @@unique([product_id, location])
   @@index([product_id])
+  @@index([location])
+  @@index([deleted_at])
   @@map("stock_items")
 }
 
@@ -264,12 +323,16 @@ model StockMovement {
   quantity      Int
   reference     String?
   notes         String?
+  performed_by  BigInt?
+  cost_value    Decimal?    @db.Decimal(12, 2)
+  deleted_at    DateTime?
   created_at    DateTime    @default(now())
   stock_item    StockItem   @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
 
   @@index([stock_item_id])
   @@index([movement_type])
   @@index([created_at])
+  @@index([deleted_at])
   @@map("stock_movements")
 }
 
@@ -306,11 +369,19 @@ model Payment {
   amount                Decimal       @db.Decimal(12, 2)
   transaction_reference String?       @db.VarChar(255)
   payment_status        PaymentStatus @default(PENDING)
+  mpesa_receipt_number  String?       @db.VarChar(100)
+  card_last_four        String?       @db.VarChar(4)
+  processed_by         BigInt?
+  failure_reason        String?
+  refunded_amount       Decimal?      @db.Decimal(12, 2)
+  refunded_at           DateTime?
   created_at            DateTime      @default(now())
   updated_at            DateTime      @updatedAt
   order                 Order         @relation(fields: [order_id], references: [id])
 
   @@index([order_id])
+  @@index([payment_status])
+  @@index([transaction_reference])
   @@map("payments")
 }
 
@@ -380,14 +451,21 @@ model Rider {
   license_number   String?    @db.VarChar(100)
   vehicle_type     String?    @db.VarChar(50)
   vehicle_plate    String?    @db.VarChar(50)
+  vehicle_model    String?    @db.VarChar(100)
   is_available     Boolean    @default(true)
   current_location String?
+  total_deliveries Int        @default(0)
+  total_earnings   Decimal?   @db.Decimal(12, 2)
+  rating           Decimal?   @db.Decimal(3, 2)
+  deleted_at       DateTime?
   created_at       DateTime   @default(now())
   updated_at       DateTime   @updatedAt
   deliveries       Delivery[]
   user             User       @relation(fields: [user_id], references: [id])
 
   @@index([user_id])
+  @@index([is_available])
+  @@index([deleted_at])
   @@map("riders")
 }
 
@@ -399,11 +477,19 @@ model Delivery {
   pickup_address      String?
   delivery_address    String
   delivery_notes      String?
+  customer_name       String?
+  customer_phone      String?        @db.VarChar(50)
+  distance_km         Float?
+  delivery_fee        Decimal?       @db.Decimal(12, 2)
   assigned_at         DateTime       @default(now())
   picked_up_at        DateTime?
+  in_transit_at       DateTime?
   delivered_at        DateTime?
   cancelled_at        DateTime?
   cancellation_reason String?
+  rating              Int?
+  feedback            String?
+  deleted_at          DateTime?
   created_at          DateTime       @default(now())
   updated_at          DateTime       @updatedAt
   order               Order          @relation(fields: [order_id], references: [id])
@@ -412,6 +498,7 @@ model Delivery {
   @@index([order_id])
   @@index([rider_id])
   @@index([status])
+  @@index([deleted_at])
   @@map("deliveries")
 }
 
@@ -445,6 +532,12 @@ model FinanceTransaction {
   reference        String?             @db.VarChar(255)
   recorded_by      BigInt
   transaction_date DateTime            @default(now())
+  attachment_url   String?             @db.VarChar(500)
+  approved_by      BigInt?
+  approved_at      DateTime?
+  is_reconciled    Boolean             @default(false)
+  reconciled_at    DateTime?
+  deleted_at       DateTime?
   created_at       DateTime            @default(now())
   updated_at       DateTime            @updatedAt
   recorder         User                @relation(fields: [recorded_by], references: [id])
@@ -453,6 +546,8 @@ model FinanceTransaction {
   @@index([category])
   @@index([recorded_by])
   @@index([transaction_date])
+  @@index([is_reconciled])
+  @@index([deleted_at])
   @@map("finance_transactions")
 }
 
@@ -465,11 +560,16 @@ model ContentPage {
   is_published     Boolean  @default(false)
   meta_title       String?  @db.VarChar(255)
   meta_description String?
+  featured_image   String?  @db.VarChar(500)
+  author_id        BigInt?
+  published_at     DateTime?
+  deleted_at       DateTime?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
   @@index([slug])
   @@index([is_published])
+  @@index([deleted_at])
   @@map("content_pages")
 }
 
@@ -484,13 +584,19 @@ model WebsiteLead {
   message      String?
   event_date   DateTime?
   guest_count  Int?
-  notes        String?
+  budget       Decimal?   @db.Decimal(12, 2)
+  assigned_to  BigInt?
+  converted_at DateTime?
+  lost_reason  String?
+  deleted_at   DateTime?
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
 
   @@index([source])
   @@index([status])
   @@index([created_at])
+  @@index([assigned_to])
+  @@index([deleted_at])
   @@map("website_leads")
 }
 
@@ -759,11 +865,16 @@ model Payroll {
   allowances        Decimal   @default(0) @db.Decimal(12, 2)
   deductions        Decimal   @default(0) @db.Decimal(12, 2)
   overtime_pay      Decimal   @default(0) @db.Decimal(12, 2)
+  bonus             Decimal?  @db.Decimal(12, 2)
   net_salary        Decimal   @db.Decimal(12, 2)
   payment_date      DateTime?
   payment_method    String?   @db.VarChar(50)
   payment_reference String?   @db.VarChar(255)
+  status            String    @default("PENDING") @db.VarChar(20)
+  approved_by       BigInt?
+  approved_at       DateTime?
   notes             String?
+  deleted_at        DateTime?
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
   user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -771,6 +882,8 @@ model Payroll {
   @@index([user_id])
   @@index([period_start])
   @@index([period_end])
+  @@index([status])
+  @@index([deleted_at])
   @@map("payroll")
 }
 
