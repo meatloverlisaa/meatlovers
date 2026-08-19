@@ -1,3 +1,5 @@
+export {};
+
 declare module '@heroicons/react/24/outline' {
   import { SVGProps } from 'react';
   export const ChartBarIcon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
