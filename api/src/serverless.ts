@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
 import express from 'express';
 import helmet from 'helmet';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const expressApp = express();
 const adapter = new ExpressAdapter(expressApp);
@@ -16,7 +17,9 @@ async function createNestServer() {
     return cachedApp;
   }
 
-  const app = await NestFactory.create(AppModule, adapter);
+  const app = await NestFactory.create(AppModule, adapter, {
+    logger: ['error', 'warn', 'log'],
+  });
 
   // Global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -58,7 +61,17 @@ async function createNestServer() {
   return app;
 }
 
-export default async (req: any, res: any) => {
-  const app = await createNestServer();
-  return app.getHttpAdapter().getInstance()(req, res);
-};
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    const app = await createNestServer();
+    const expressInstance = app.getHttpAdapter().getInstance();
+    return expressInstance(req, res);
+  } catch (error) {
+    console.error('Serverless function error:', error);
+    res.status(500).json({
+      statusCode: 500,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+}

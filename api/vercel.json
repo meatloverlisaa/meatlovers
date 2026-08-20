@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "src/serverless.ts"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
