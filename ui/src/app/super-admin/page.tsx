@@ -4,6 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:3001";
+
 interface MonitoringSummary {
   currentSales: number;
   openOrders: number;
@@ -139,13 +144,13 @@ export default function SuperAdminDashboard() {
         stockRes,
         deliveryRes,
       ] = await Promise.all([
-        fetch("http://localhost:3001/monitoring/summary", { headers }),
-        fetch("http://localhost:3001/monitoring/pl-today", { headers }),
-        fetch("http://localhost:3001/monitoring/orders", { headers }),
-        fetch("http://localhost:3001/monitoring/kitchen-bar", { headers }),
-        fetch("http://localhost:3001/monitoring/risk-alerts", { headers }),
-        fetch("http://localhost:3001/monitoring/stock-alerts", { headers }),
-        fetch("http://localhost:3001/monitoring/delivery", { headers }),
+        fetch(`${API_BASE_URL}/monitoring/summary`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/pl-today`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/orders`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/kitchen-bar`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/risk-alerts`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/stock-alerts`, { headers }),
+        fetch(`${API_BASE_URL}/monitoring/delivery`, { headers }),
       ]);
 
       if (summaryRes.ok) {

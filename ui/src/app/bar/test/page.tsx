@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://localhost:3001';
+
 export default function BarTestPage() {
   const [status, setStatus] = useState('Initializing...');
   const [token, setToken] = useState<string | null>(null);
@@ -29,7 +34,7 @@ export default function BarTestPage() {
           // Step 2: Test bar orders API
           steps.push('Fetching bar orders...');
           try {
-            const ordersRes = await fetch('http://localhost:3001/bar/orders', {
+            const ordersRes = await fetch(`${API_BASE_URL}/bar/orders`, {
               headers: {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json',
@@ -53,7 +58,7 @@ export default function BarTestPage() {
           // Step 3: Test bar summary API
           steps.push('Fetching bar summary...');
           try {
-            const summaryRes = await fetch('http://localhost:3001/bar/summary', {
+            const summaryRes = await fetch(`${API_BASE_URL}/bar/summary`, {
               headers: {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json',

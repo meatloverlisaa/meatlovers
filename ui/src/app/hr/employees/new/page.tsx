@@ -147,7 +147,11 @@ export default function NewEmployeePage() {
         if (v !== "") payload[k] = v;
       }
 
-      const res = await fetch("http://localhost:3001/hrm/employees", {
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        process.env.NEXT_PUBLIC_API_BASE_URL ||
+        "http://localhost:3001";
+      const res = await fetch(`${apiBaseUrl}/hrm/employees`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://localhost:3001';
+
 export default function BarDebugPage() {
   const [debug, setDebug] = useState<Record<string, any>>({});
 
@@ -21,7 +26,7 @@ export default function BarDebugPage() {
 
     // Test API call
     if (authToken) {
-      fetch('http://localhost:3001/bar/orders', {
+      fetch(`${API_BASE_URL}/bar/orders`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },

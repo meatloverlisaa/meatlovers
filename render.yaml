@@ -5,5 +5,5 @@ services:
     rootDir: api
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: cd api && npm run start:prod
+    startCommand: npm run start:prod
     autoDeploy: true
