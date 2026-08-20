@@ -8,7 +8,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
+  getHello() {
     return this.appService.getHello();
   }
 
@@ -18,6 +18,11 @@ export class AppController {
       status: 'ok',
       timestamp: new Date().toISOString(),
       service: 'Meat Lovers CIMS API',
+      uptime: process.uptime(),
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + 'MB',
+      },
     };
   }
 }
