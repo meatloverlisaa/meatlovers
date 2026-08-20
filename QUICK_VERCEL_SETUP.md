@@ -10,10 +10,14 @@ Deploy **2 separate Vercel projects** from the same GitHub repo:
 
 ### Vercel Settings:
 ```
-Root Directory: api
-Framework: Other
-Build Command: npm run vercel-build
+Framework: Other                ⚠️ CRITICAL! Select "Other" NOT "Next.js"!
+Root Directory: api             ⚠️ CRITICAL! Click "Edit" to set this!
+Build Command: npm run vercel-build  (Click "Override" to set this)
 ```
+
+**⚠️ IMPORTANT**: 
+- Framework MUST be "Other" (your API is NestJS, not Next.js)
+- Root Directory MUST be "api"
 
 ### Environment Variables:
 ```env
