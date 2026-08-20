@@ -69,4 +69,4 @@ vendor/
 zips/
 *.pid
 *.seed
-*.pid.lock
+*.pid.lockPRODUCTION_SECRETS.txt
