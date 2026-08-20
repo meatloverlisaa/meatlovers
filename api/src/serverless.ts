@@ -3,8 +3,8 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
-import * as express from 'express';
-import * as helmet from 'helmet';
+import express from 'express';
+import helmet from 'helmet';
 
 const expressApp = express();
 const adapter = new ExpressAdapter(expressApp);
@@ -22,7 +22,7 @@ async function createNestServer() {
   app.useGlobalFilters(new AllExceptionsFilter());
   
   // Security
-  app.use(helmet.default());
+  app.use(helmet());
 
   // BigInt serialization
   (BigInt.prototype as any).toJSON = function () {
