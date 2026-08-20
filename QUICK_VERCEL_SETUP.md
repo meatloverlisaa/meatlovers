@@ -35,10 +35,12 @@ ALLOWED_ORIGINS=http://localhost:3000
 
 ### Vercel Settings:
 ```
-Root Directory: ui
+Root Directory: ui              ⚠️ CRITICAL! Click "Edit" to set this!
 Framework: Next.js
 Build Command: npm run build
 ```
+
+**⚠️ IMPORTANT**: You MUST set Root Directory to `ui` or you'll get "No Next.js version detected" error!
 
 ### Environment Variables:
 ```env
