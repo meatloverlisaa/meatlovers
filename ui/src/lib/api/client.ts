@@ -3,7 +3,10 @@
  * Centralized API request functions with authentication
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://localhost:3001';
 
 /**
  * Get authentication headers with JWT token

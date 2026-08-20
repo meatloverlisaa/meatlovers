@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { setAuth, getUser, clearAuth, isAuthenticated, getDashboardRoute, refreshAccessToken, touchSession, hasSessionExpired, type User } from '@/lib/auth';
+import { getApiBaseUrl } from '@/lib/api-config';
 
 interface AuthContextType {
   user: User | null;
@@ -87,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email_or_phone: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`, {
+      const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
