@@ -13,7 +13,6 @@ import {
   ClockIcon,
   UserIcon,
   MapPinIcon,
-  PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
 
@@ -452,7 +451,7 @@ export default function AssetsPage() {
                           onClick={() => alert('Edit functionality coming soon')}
                           className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
                         >
-                          <PencilIcon className="w-4 h-4" />
+                          <WrenchScrewdriverIcon className="w-4 h-4" />
                           Edit
                         </button>
                         <button

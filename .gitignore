@@ -70,3 +70,6 @@ zips/
 *.pid
 *.seed
 *.pid.lock
+
+# Production Secrets (DO NOT COMMIT)
+PRODUCTION_SECRETS.txt

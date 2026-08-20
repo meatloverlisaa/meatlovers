@@ -6,7 +6,6 @@
     "install": "npm install --prefix ./ui",
     "build": "npm run build --prefix ./ui",
     "start": "npm run start --prefix ./ui",
-    "dev": "npm run dev --prefix ./ui",
-    "prisma:migrate:deploy": "npm run prisma:migrate:deploy --prefix ./api"
+    "dev": "npm run dev --prefix ./ui"
   }
 }

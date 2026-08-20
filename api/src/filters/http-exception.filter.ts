@@ -73,6 +73,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
     };
 
+    // Add helpful message for 404s
+    if (status === 404) {
+      errorResponse.suggestion = 'Check the API documentation at the root endpoint (/)';
+      errorResponse.availableEndpoints = [
+        'GET / - API information',
+        'GET /health - Health check',
+        'POST /auth/login - Authentication',
+        'GET /products - Products list',
+        'GET /orders - Orders list',
+      ];
+    }
+
     // Include error type for non-production
     if (process.env.NODE_ENV !== 'production') {
       errorResponse.error = error;

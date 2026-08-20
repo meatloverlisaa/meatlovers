@@ -6,7 +6,6 @@ import {
   UserGroupIcon,
   MagnifyingGlassIcon,
   PlusIcon,
-  PencilIcon,
   TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -363,7 +362,7 @@ export default function UsersPage() {
                           className="text-blue-600 hover:text-blue-900 mr-3"
                           title="Edit user"
                         >
-                          <PencilIcon className="w-5 h-5" />
+                          <ArrowPathIcon className="w-5 h-5" />
                         </button>
                         <button
                           className="text-red-600 hover:text-red-900"
