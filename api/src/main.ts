@@ -39,15 +39,28 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? process.env.ALLOWED_ORIGINS?.split(',') || []
-        : [
-            'http://localhost:3000',
-            'http://127.0.0.1:3000',
-            'http://localhost:3001',
-            'http://127.0.0.1:3001',
-          ],
+    origin: (requestOrigin, callback) => {
+      const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+      const isLocalOrigin = !requestOrigin || [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:3001',
+        'http://127.0.0.1:3001',
+      ].includes(requestOrigin);
+      const isCodespaceOrigin = /^https:\/\/[a-z0-9-]+-3000\.app\.github\.dev$/i.test(
+        requestOrigin || '',
+      );
+
+      if (allowedOrigins.includes(requestOrigin || '') || (process.env.NODE_ENV !== 'production' && (isLocalOrigin || isCodespaceOrigin))) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origin not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
