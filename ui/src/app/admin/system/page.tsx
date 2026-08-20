@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import {
-  ServerIcon,
-  CircleStackIcon,
-  CpuChipIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
   UserGroupIcon,
@@ -158,8 +155,14 @@ export default function SystemDiagnosticsPage() {
     }
   };
 
+  const ServerIconSVG = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+    </svg>
+  );
+
   const getStatusIcon = (status: string | undefined) => {
-    if (!status) return <ServerIcon className="w-5 h-5" />;
+    if (!status) return <ServerIconSVG />;
     
     switch (status.toUpperCase()) {
       case 'OPERATIONAL':
@@ -172,7 +175,7 @@ export default function SystemDiagnosticsPage() {
       case 'DOWN':
         return <XCircleIcon className="w-5 h-5" />;
       default:
-        return <ServerIcon className="w-5 h-5" />;
+        return <ServerIconSVG />;
     }
   };
 
@@ -215,7 +218,9 @@ export default function SystemDiagnosticsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <ServerIcon className="w-8 h-8 mr-3 text-blue-600" />
+              <svg className="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+              </svg>
               System Diagnostics
             </h1>
             <p className="text-gray-600 mt-1">Monitor system health and performance</p>
@@ -278,7 +283,9 @@ export default function SystemDiagnosticsPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <CircleStackIcon className="w-8 h-8 text-green-600" />
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
                   <h3 className="text-lg font-semibold text-gray-900 ml-3">Inventory</h3>
                 </div>
               </div>
@@ -319,7 +326,9 @@ export default function SystemDiagnosticsPage() {
         {database && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-6">
-              <CircleStackIcon className="w-6 h-6 text-blue-600" />
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
               <h2 className="text-xl font-semibold text-gray-900 ml-3">Database Metrics</h2>
               <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(database.status)}`}>
                 {database.status || 'N/A'}
@@ -350,7 +359,9 @@ export default function SystemDiagnosticsPage() {
         {apiHealth && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-6">
-              <CpuChipIcon className="w-6 h-6 text-green-600" />
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>
               <h2 className="text-xl font-semibold text-gray-900 ml-3">API Health</h2>
               <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(apiHealth.status)}`}>
                 {apiHealth.status || 'N/A'}

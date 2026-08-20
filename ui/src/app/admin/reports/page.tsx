@@ -9,7 +9,6 @@ import {
   ShoppingCartIcon,
   UserGroupIcon,
   CubeIcon,
-  ArrowDownTrayIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline';
 
@@ -472,7 +471,9 @@ export default function ReportsPage() {
                   disabled={!dateFrom || !dateTo || loading}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
-                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
                   {loading ? 'Generating...' : 'Generate PDF'}
                 </button>
                 <button
@@ -480,7 +481,9 @@ export default function ReportsPage() {
                   disabled={!dateFrom || !dateTo || loading}
                   className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
-                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
                   Export Excel
                 </button>
                 <button
@@ -488,7 +491,9 @@ export default function ReportsPage() {
                   disabled={!dateFrom || !dateTo || loading}
                   className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
-                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
                   Export CSV
                 </button>
               </div>
