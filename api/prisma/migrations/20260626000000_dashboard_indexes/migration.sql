@@ -1,3 +1,0 @@
--- Retained for migration-history compatibility.
--- Dashboard indexes are applied by the later PostgreSQL migration:
--- 20260820000000_dashboard_indexes.
