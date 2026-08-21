@@ -1,9 +1,38 @@
 services:
+  # API Service
   - type: web
     name: meatlovers-api
     env: node
     rootDir: api
     plan: free
+    buildCommand: npm install && npm run prisma:generate && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    autoDeploy: true
+
+  # UI Service
+  - type: web
+    name: meatlovers-ui
+    env: node
+    rootDir: ui
+    plan: free
     buildCommand: npm install && npm run build
-    startCommand: cd api && npm run start:prod
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://meatlovers.onrender.com
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://meatlovers.onrender.com
+      - key: NEXT_PUBLIC_APP_NAME
+        value: Meat Lovers CIMS
+      - key: NEXT_PUBLIC_APP_VERSION
+        value: 1.0.0
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
     autoDeploy: true
