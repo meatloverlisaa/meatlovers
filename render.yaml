@@ -1,38 +1,84 @@
+# Render Blueprint Configuration for MeatLovers CIMS
+# This file defines both API and UI services for deployment on Render.com
+# Deploy via: Dashboard → New + → Blueprint → Select this repo/branch
+
 services:
-  # API Service
+  # =============================================================================
+  # API SERVICE - NestJS Backend with Prisma ORM
+  # =============================================================================
   - type: web
     name: meatlovers-api
     env: node
+    
+    # CRITICAL: rootDir ensures build runs in /api directory (not repo root)
     rootDir: api
+    
     plan: free
+    
+    # Build: Install deps → Generate Prisma Client → Compile TypeScript
     buildCommand: npm install && npm run prisma:generate && npm run build
+    
+    # Start: Run production build (dist/main.js)
     startCommand: npm run start:prod
+    
+    # Environment variables (add sensitive vars like DATABASE_URL, JWT_SECRET via Dashboard)
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000
+        value: 10000  # Render's default internal port
+    
+    # Auto-deploy on git push to production branch
     autoDeploy: true
 
-  # UI Service
+  # =============================================================================
+  # UI SERVICE - Next.js 14 Frontend
+  # =============================================================================
   - type: web
     name: meatlovers-ui
     env: node
+    
+    # CRITICAL: rootDir ensures build runs in /ui directory (not repo root)
+    # This fixes the "Module not found" errors caused by building in wrong directory
     rootDir: ui
+    
     plan: free
+    
+    # Build: Install ALL 375+ packages (not just 23) → Build Next.js production bundle
     buildCommand: npm install && npm run build
+    
+    # Start: Run Next.js production server
     startCommand: npm run start
+    
+    # Environment variables - UI connects to API via NEXT_PUBLIC_API_URL
     envVars:
+      # API endpoint URLs - points to deployed API service
       - key: NEXT_PUBLIC_API_URL
         value: https://meatlovers.onrender.com
       - key: NEXT_PUBLIC_API_BASE_URL
         value: https://meatlovers.onrender.com
+      
+      # Application metadata
       - key: NEXT_PUBLIC_APP_NAME
         value: Meat Lovers CIMS
       - key: NEXT_PUBLIC_APP_VERSION
         value: 1.0.0
+      
+      # Environment & telemetry
       - key: NODE_ENV
         value: production
       - key: NEXT_TELEMETRY_DISABLED
-        value: 1
+        value: 1  # Disable Next.js anonymous telemetry
+    
+    # Auto-deploy on git push to production branch
     autoDeploy: true
+
+# =============================================================================
+# POST-DEPLOYMENT CHECKLIST:
+# =============================================================================
+# 1. Add sensitive environment variables via Render Dashboard:
+#    API: DATABASE_URL, JWT_SECRET, ALLOWED_ORIGINS
+# 2. Update API CORS to include new UI URL in ALLOWED_ORIGINS
+# 3. Run database migrations: npm run prisma:migrate:deploy
+# 4. Test health endpoint: https://meatlovers.onrender.com/health
+# 5. Test UI-API communication: Check browser console for fetch() calls
