@@ -30,6 +30,19 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  // This is a server-side rendered app, not static export
+  // Pages need runtime API data
+  output: 'standalone',
+
+  // Skip trailing slash to avoid duplicate routes
+  trailingSlash: false,
+
+  // Handle dynamic pages gracefully during build
+  generateBuildId: async () => {
+    // Use timestamp for build ID
+    return `build-${Date.now()}`;
+  },
 };
 
 export default nextConfig;

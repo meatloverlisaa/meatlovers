@@ -55,11 +55,13 @@ import { EnforcementModule } from './enforcement/enforcement.module';
 import { ApprovalsModule } from './approvals/approvals.module';
 import { AssetsModule } from './assets/assets.module';
 import { HrmModule } from './hrm/hrm.module';
+import { InitModule } from './init/init.module';
 
 @Module({
   imports: [
     AuthModule,
     PrismaModule,
+    InitModule,
     SupplierModule,
     ProductModule,
     MarginAlertsModule,
