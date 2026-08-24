@@ -58,11 +58,11 @@ describe('ManagerCmsController', () => {
         },
       ];
 
-      mockPrismaService.content_pages.findMany.mockResolvedValue(mockPages);
+      mockPrismaService.contentPage.findMany.mockResolvedValue(mockPages);
 
       const result = await controller.getPages();
       expect(result).toEqual(mockPages);
-      expect(mockPrismaService.content_pages.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaService.contentPage.findMany).toHaveBeenCalledWith({
         where: undefined,
         orderBy: { created_at: 'desc' },
         select: expect.any(Object),
@@ -85,11 +85,11 @@ describe('ManagerCmsController', () => {
         },
       ];
 
-      mockPrismaService.content_pages.findMany.mockResolvedValue(mockPages);
+      mockPrismaService.contentPage.findMany.mockResolvedValue(mockPages);
 
       const result = await controller.getPages('true');
       expect(result).toEqual(mockPages);
-      expect(mockPrismaService.content_pages.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaService.contentPage.findMany).toHaveBeenCalledWith({
         where: { is_published: true },
         orderBy: { created_at: 'desc' },
         select: expect.any(Object),
@@ -99,12 +99,12 @@ describe('ManagerCmsController', () => {
 
   describe('getCmsStats', () => {
     it('should return CMS statistics', async () => {
-      mockPrismaService.content_pages.count
+      mockPrismaService.contentPage.count
         .mockResolvedValueOnce(15) // total
         .mockResolvedValueOnce(12) // published
         .mockResolvedValueOnce(3); // draft
 
-      mockPrismaService.content_pages.groupBy.mockResolvedValue([
+      mockPrismaService.contentPage.groupBy.mockResolvedValue([
         { page_type: 'CUSTOM', _count: { id: 10 } },
         { page_type: 'HOMEPAGE', _count: { id: 1 } },
         { page_type: 'BLOG', _count: { id: 4 } },

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { DeliveriesService } from './deliveries.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { FinanceService } from '../finance/finance.service';
+import { AuditLogService } from '../auth/audit-log.service';
 
 describe('DeliveriesService', () => {
   let service: DeliveriesService;
@@ -37,6 +39,14 @@ describe('DeliveriesService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: FinanceService,
+          useValue: { createFinanceTransaction: jest.fn() },
+        },
+        {
+          provide: AuditLogService,
+          useValue: { log: jest.fn() },
         },
       ],
     }).compile();

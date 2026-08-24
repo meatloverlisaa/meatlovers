@@ -171,7 +171,7 @@ describe('ManagerProductsController', () => {
       ];
 
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-      mockPrismaService.stock_items.findMany.mockResolvedValue(mockStockItems);
+      mockPrismaService.stockItem.findMany.mockResolvedValue(mockStockItems);
 
       const result = await controller.getInventory(1);
 
@@ -233,7 +233,7 @@ describe('ManagerProductsController', () => {
 
       expect(result.threshold).toBe(10);
       expect(result.count).toBe(1);
-      expect(result.product[0].total_quantity).toBe(3);
+      expect(result.products[0].total_quantity).toBe(3);
     });
   });
 
@@ -260,7 +260,7 @@ describe('ManagerProductsController', () => {
       ];
 
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-      mockPrismaService.price_change_audit_trails.findMany.mockResolvedValue(
+      mockPrismaService.priceChangeAuditTrail.findMany.mockResolvedValue(
         mockPriceHistory,
       );
 
