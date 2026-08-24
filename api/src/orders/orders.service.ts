@@ -617,7 +617,7 @@ export class OrdersService {
         unitPrice: item.unit_price,
         lineTotal: item.line_total,
       })),
-      payments: order.payments?.map((payment) => ({
+      payments: order.payment?.map((payment) => ({
         id: payment.id.toString(),
         method: payment.payment_method,
         amount: Number(payment.amount),
@@ -625,7 +625,7 @@ export class OrdersService {
         reference: payment.transaction_reference,
         createdAt: payment.created_at,
       })),
-      approvalRequests: order.approval_requests?.map((req) => ({
+      approvalRequests: order.approvalRequest?.map((req) => ({
         id: req.id.toString(),
         type: req.request_type,
         status: req.status,

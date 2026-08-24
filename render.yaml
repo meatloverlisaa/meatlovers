@@ -14,6 +14,10 @@ services:
     rootDir: api
     
     plan: free
+
+    # Render must probe the public health route, not protected API resources
+    # such as /products.
+    healthCheckPath: /health
     
     # Build: Install deps → Generate Prisma Client → Compile TypeScript
     buildCommand: npm install && npm run prisma:generate && npm run build
@@ -27,6 +31,10 @@ services:
         value: production
       - key: PORT
         value: 10000  # Render's default internal port
+      # The browser origin allowed to call this API. Update this if you use a
+      # custom frontend domain.
+      - key: ALLOWED_ORIGINS
+        value: https://meatlovers-ui.onrender.com
     
     # Auto-deploy on git push to production branch
     autoDeploy: true
@@ -54,9 +62,9 @@ services:
     envVars:
       # API endpoint URLs - points to deployed API service
       - key: NEXT_PUBLIC_API_URL
-        value: https://meatlovers.onrender.com
+        value: https://meatlovers-api.onrender.com
       - key: NEXT_PUBLIC_API_BASE_URL
-        value: https://meatlovers.onrender.com
+        value: https://meatlovers-api.onrender.com
       
       # Application metadata
       - key: NEXT_PUBLIC_APP_NAME
@@ -80,5 +88,5 @@ services:
 #    API: DATABASE_URL, JWT_SECRET, ALLOWED_ORIGINS
 # 2. Update API CORS to include new UI URL in ALLOWED_ORIGINS
 # 3. Run database migrations: npm run prisma:migrate:deploy
-# 4. Test health endpoint: https://meatlovers.onrender.com/health
+# 4. Test health endpoint: https://meatlovers-api.onrender.com/health
 # 5. Test UI-API communication: Check browser console for fetch() calls

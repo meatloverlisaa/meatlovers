@@ -45,12 +45,34 @@ async function createNestServer() {
     }),
   );
 
-  // CORS
+  // CORS: the browser sends an exact Origin, so wildcard strings such as
+  // "https://*.vercel.app" do not match. Allow configured origins explicitly
+  // and support Vercel preview/production UI deployments.
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
-      'http://localhost:3000',
-      'https://*.vercel.app',
-    ],
+    origin: (requestOrigin, callback) => {
+      const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+      const isLocalOrigin = !requestOrigin || [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+      ].includes(requestOrigin);
+      const isVercelOrigin = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(
+        requestOrigin || '',
+      );
+
+      if (
+        allowedOrigins.includes(requestOrigin || '') ||
+        (process.env.NODE_ENV !== 'production' && isLocalOrigin) ||
+        isVercelOrigin
+      ) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origin not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
