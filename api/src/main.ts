@@ -53,8 +53,15 @@ async function bootstrap() {
       const isCodespaceOrigin = /^https:\/\/[a-z0-9-]+-3000\.app\.github\.dev$/i.test(
         requestOrigin || '',
       );
+      const isVercelOrigin = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(
+        requestOrigin || '',
+      );
 
-      if (allowedOrigins.includes(requestOrigin || '') || (process.env.NODE_ENV !== 'production' && (isLocalOrigin || isCodespaceOrigin))) {
+      if (
+        allowedOrigins.includes(requestOrigin || '') ||
+        isVercelOrigin ||
+        (process.env.NODE_ENV !== 'production' && (isLocalOrigin || isCodespaceOrigin))
+      ) {
         callback(null, true);
         return;
       }

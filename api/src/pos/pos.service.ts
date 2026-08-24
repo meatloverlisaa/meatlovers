@@ -488,7 +488,7 @@ export class PosService {
         unitPrice: item.unit_price,
         lineTotal: item.line_total,
       })),
-      pendingApprovals: order.approval_requests?.map((req: any) => ({
+      pendingApprovals: order.approvalRequest?.map((req: any) => ({
         id: req.id.toString(),
         type: req.request_type,
         status: req.status,

@@ -584,7 +584,7 @@ export class ManagerOrdersService {
         unitPrice: item.unit_price,
         lineTotal: item.line_total,
       })),
-      payments: order.payments?.map((payment: any) => ({
+      payments: order.payment?.map((payment: any) => ({
         id: payment.id.toString(),
         method: payment.payment_method,
         amount: Number(payment.amount),
@@ -593,7 +593,7 @@ export class ManagerOrdersService {
         createdAt: payment.created_at,
         updatedAt: payment.updated_at,
       })),
-      approvalRequests: order.approval_requests?.map((req: any) => ({
+      approvalRequests: order.approvalRequest?.map((req: any) => ({
         id: req.id.toString(),
         type: req.request_type,
         status: req.status,
