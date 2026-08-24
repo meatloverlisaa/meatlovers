@@ -120,7 +120,7 @@ describe('AuthService', () => {
       mockPrismaService.user.findFirst.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       mockJwtService.sign.mockReturnValue('mock_token');
-      mockPrismaService.refreshToken.create.mockResolvedValue({
+      mockPrismaService.refresh_tokens.create.mockResolvedValue({
         token: 'mock_refresh_token',
       });
       mockPrismaService.user.update.mockResolvedValue(mockUser);
@@ -186,7 +186,7 @@ describe('AuthService', () => {
     it('should successfully logout', async () => {
       const userId = '1';
 
-      mockPrismaService.refreshToken.updateMany.mockResolvedValue({
+      mockPrismaService.refresh_tokens.updateMany.mockResolvedValue({
         count: 1,
       });
 
@@ -210,15 +210,15 @@ describe('AuthService', () => {
         user: mockUser,
       };
 
-      mockPrismaService.refreshToken.findUnique.mockResolvedValue(
+      mockPrismaService.refresh_tokens.findUnique.mockResolvedValue(
         refreshTokenRecord,
       );
       mockJwtService.sign.mockReturnValue('new_access_token');
-      mockPrismaService.refreshToken.create.mockResolvedValue({
+      mockPrismaService.refresh_tokens.create.mockResolvedValue({
         token: 'new_refresh_token',
         token_hash: 'new_hash',
       });
-      mockPrismaService.refreshToken.update.mockResolvedValue({
+      mockPrismaService.refresh_tokens.update.mockResolvedValue({
         ...refreshTokenRecord,
         is_revoked: true,
       });
@@ -232,7 +232,7 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for invalid refresh token', async () => {
       const refreshTokenDto = { refresh_token: 'invalid_token' };
-      mockPrismaService.refreshToken.findUnique.mockResolvedValue(null);
+      mockPrismaService.refresh_tokens.findUnique.mockResolvedValue(null);
 
       await expect(
         service.refreshToken(refreshTokenDto as any),

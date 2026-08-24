@@ -1,0 +1,375 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,
+  @typescript-eslint/no-unsafe-assignment */
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateProductionPlanDto } from './dto/create-production-plan.dto';
+import { UpdateProductionPlanDto } from './dto/update-production-plan.dto';
+
+@Injectable()
+export class ProductionPlansService {
+  constructor(private prisma: PrismaService) {}
+
+  async create(createProductionPlanDto: CreateProductionPlanDto) {
+    const { recipe_id, planned_quantity, planned_date, notes } =
+      createProductionPlanDto;
+
+    // Check if recipe exists
+    const recipe = await this.prisma.recipes.findUnique({
+      where: { id: BigInt(recipe_id) },
+      include: { product: true },
+    });
+
+    if (!recipe) {
+      throw new NotFoundException('Recipe not found');
+    }
+
+    if (!recipe.is_active) {
+      throw new BadRequestException('Recipe is not active');
+    }
+
+    // Create production plan
+    const productionPlan = await this.prisma.production_plans.create({
+      data: {
+        recipe_id: BigInt(recipe_id),
+        planned_quantity,
+        planned_date: new Date(planned_date),
+        notes,
+      },
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return productionPlan;
+  }
+
+  async findAll(status?: string, startDate?: string, endDate?: string) {
+    const where: any = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (startDate || endDate) {
+      where.planned_date = {};
+      if (startDate) {
+        where.planned_date.gte = new Date(startDate);
+      }
+      if (endDate) {
+        where.planned_date.lte = new Date(endDate);
+      }
+    }
+
+    return this.prisma.production_plans.findMany({
+      where,
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        planned_date: 'asc',
+      },
+    });
+  }
+
+  async findOne(id: string) {
+    const productionPlan = await this.prisma.production_plans.findUnique({
+      where: { id: BigInt(id) },
+      include: {
+        recipe: {
+          include: {
+            product: true,
+            ingredients: {
+              include: {
+                stock_item: {
+                  include: {
+                    product: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!productionPlan) {
+      throw new NotFoundException('Production plan not found');
+    }
+
+    return productionPlan;
+  }
+
+  async findByRecipeId(recipeId: string) {
+    return this.prisma.production_plans.findMany({
+      where: { recipe_id: BigInt(recipeId) },
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        planned_date: 'desc',
+      },
+    });
+  }
+
+  async update(id: string, updateProductionPlanDto: UpdateProductionPlanDto) {
+    const {
+      recipe_id,
+      planned_quantity,
+      produced_quantity,
+      planned_date,
+      notes,
+      status,
+    } = updateProductionPlanDto;
+
+    // Check if production plan exists
+    const existingPlan = await this.prisma.production_plans.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!existingPlan) {
+      throw new NotFoundException('Production plan not found');
+    }
+
+    // If updating recipe_id, check if recipe exists
+    if (recipe_id) {
+      const recipe = await this.prisma.recipes.findUnique({
+        where: { id: BigInt(recipe_id) },
+      });
+
+      if (!recipe) {
+        throw new NotFoundException('Recipe not found');
+      }
+    }
+
+    // If updating produced_quantity, validate it doesn't exceed planned_quantity
+    if (produced_quantity !== undefined && planned_quantity !== undefined) {
+      if (produced_quantity > planned_quantity) {
+        throw new BadRequestException(
+          'Produced quantity cannot exceed planned quantity',
+        );
+      }
+    }
+
+    // If status is being updated to COMPLETED, set completed_date
+    const updateData: any = {};
+    if (recipe_id) updateData.recipe_id = BigInt(recipe_id);
+    if (planned_quantity !== undefined)
+      updateData.planned_quantity = planned_quantity;
+    if (produced_quantity !== undefined)
+      updateData.produced_quantity = produced_quantity;
+    if (planned_date) updateData.planned_date = new Date(planned_date);
+    if (notes !== undefined) updateData.notes = notes;
+    if (status) {
+      updateData.status = status;
+      if (status === 'COMPLETED') {
+        updateData.completed_date = new Date();
+      }
+    }
+
+    const updatedPlan = await this.prisma.production_plans.update({
+      where: { id: BigInt(id) },
+      data: updateData,
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return updatedPlan;
+  }
+
+  async updateProducedQuantity(id: string, producedQuantity: number) {
+    const productionPlan = await this.prisma.production_plans.findUnique({
+      where: { id: BigInt(id) },
+      include: {
+        recipe: {
+          include: {
+            ingredients: {
+              include: {
+                stock_item: {
+                  include: {
+                    product: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!productionPlan) {
+      throw new NotFoundException('Production plan not found');
+    }
+
+    if (producedQuantity > productionPlan.planned_quantity) {
+      throw new BadRequestException(
+        'Produced quantity cannot exceed planned quantity',
+      );
+    }
+
+    // Calculate the additional quantity being produced
+    const additionalQuantity =
+      producedQuantity - productionPlan.produced_quantity;
+
+    // If we're increasing production, consume ingredients
+    if (
+      additionalQuantity > 0 &&
+      productionPlan.recipe?.ingredients &&
+      productionPlan.recipes.ingredients.length > 0
+    ) {
+      await this.prisma.$transaction(async (tx) => {
+        for (const ingredient of productionPlan.recipes.ingredients) {
+          const requiredQuantity =
+            Number(ingredient.quantity) * additionalQuantity;
+          const stockItem = ingredient.stock_item;
+
+          // Check if sufficient stock exists
+          const currentStockItem = await tx.stock_items.findUnique({
+            where: { id: stockItem.id },
+          });
+
+          if (!currentStockItem) {
+            throw new NotFoundException(
+              `Stock item not found for ${stockItem.product?.product_name}`,
+            );
+          }
+
+          if (currentStockItem.quantity < requiredQuantity) {
+            throw new BadRequestException(
+              `Insufficient stock for ${stockItem.product?.product_name}. Required: ${requiredQuantity}, Available: ${currentStockItem.quantity}`,
+            );
+          }
+
+          // Update stock quantity
+          await tx.stock_items.update({
+            where: { id: stockItem.id },
+            data: {
+              quantity: currentStockItem.quantity - requiredQuantity,
+            },
+          });
+
+          // Create stock movement record for production consumption
+          await tx.stock_movements.create({
+            data: {
+              stock_item_id: stockItem.id,
+              movement_type: 'WASTE',
+              quantity: -requiredQuantity,
+              reference: `Production Plan #${productionPlan.id}`,
+              notes: `Consumed ${requiredQuantity} ${ingredient.unit} for ${additionalQuantity} unit(s) of ${productionPlan.recipe?.name}`,
+            },
+          });
+        }
+      });
+    }
+
+    const updatedPlan = await this.prisma.production_plans.update({
+      where: { id: BigInt(id) },
+      data: {
+        produced_quantity: producedQuantity,
+        status:
+          producedQuantity >= productionPlan.planned_quantity
+            ? 'COMPLETED'
+            : 'IN_PROGRESS',
+        completed_date:
+          producedQuantity >= productionPlan.planned_quantity
+            ? new Date()
+            : null,
+      },
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return updatedPlan;
+  }
+
+  async remove(id: string) {
+    const productionPlan = await this.prisma.production_plans.findUnique({
+      where: { id: BigInt(id) },
+    });
+
+    if (!productionPlan) {
+      throw new NotFoundException('Production plan not found');
+    }
+
+    await this.prisma.production_plans.delete({
+      where: { id: BigInt(id) },
+    });
+
+    return { message: 'Production plan deleted successfully' };
+  }
+
+  async getProductionSummary(startDate?: string, endDate?: string) {
+    const where: any = {};
+
+    if (startDate || endDate) {
+      where.planned_date = {};
+      if (startDate) {
+        where.planned_date.gte = new Date(startDate);
+      }
+      if (endDate) {
+        where.planned_date.lte = new Date(endDate);
+      }
+    }
+
+    const plans = await this.prisma.production_plans.findMany({
+      where,
+      include: {
+        recipe: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    const summary = {
+      totalPlans: plans.length,
+      planned: plans.filter((p) => p.status === 'PLANNED').length,
+      inProgress: plans.filter((p) => p.status === 'IN_PROGRESS').length,
+      completed: plans.filter((p) => p.status === 'COMPLETED').length,
+      cancelled: plans.filter((p) => p.status === 'CANCELLED').length,
+      totalPlannedQuantity: plans.reduce(
+        (sum, p) => sum + p.planned_quantity,
+        0,
+      ),
+      totalProducedQuantity: plans.reduce(
+        (sum, p) => sum + p.produced_quantity,
+        0,
+      ),
+      completionRate:
+        plans.reduce((sum, p) => sum + p.planned_quantity, 0) > 0
+          ? (plans.reduce((sum, p) => sum + p.produced_quantity, 0) /
+              plans.reduce((sum, p) => sum + p.planned_quantity, 0)) *
+            100
+          : 0,
+      plans,
+    };
+
+    return summary;
+  }
+}
