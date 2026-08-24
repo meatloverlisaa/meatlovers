@@ -66,7 +66,10 @@ async function bootstrap() {
         return;
       }
 
-      callback(new Error('Origin not allowed by CORS'));
+      // Do not turn a rejected browser origin into a 500 response. Returning
+      // false omits CORS headers, so the browser blocks the request while the
+      // API remains healthy for allowed origins.
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
