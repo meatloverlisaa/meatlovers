@@ -1,16 +1,16 @@
 export function getApiBaseUrl(): string {
+  // Browser authentication requests are proxied by Next.js. This keeps login
+  // same-origin in production and avoids a browser-level "Failed to fetch"
+  // when the API's CORS configuration or domain is temporarily incorrect.
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+
   const configuredUrl =
     process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
   if (configuredUrl) {
     return configuredUrl.replace(/\/$/, '');
-  }
-
-  if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    if (hostname.includes('-3000.')) {
-      return `${protocol}//${hostname.replace('-3000.', '-3001.')}`;
-    }
   }
 
   return 'http://localhost:3001';
