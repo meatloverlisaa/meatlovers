@@ -27,7 +27,11 @@ async function proxy(request: NextRequest, path: string[]) {
   const backendBaseUrl = getBackendBaseUrl();
   if (!backendBaseUrl) {
     return Response.json(
-      { message: 'Backend API URL is not configured.' },
+      { 
+        error: 'Configuration Error',
+        message: 'Backend API URL is not configured. Please contact system administrator.',
+        code: 'BACKEND_NOT_CONFIGURED'
+      },
       { status: 503 },
     );
   }
@@ -36,7 +40,7 @@ async function proxy(request: NextRequest, path: string[]) {
   target.search = request.nextUrl.search;
 
   const headers = new Headers();
-  for (const header of ['authorization', 'content-type']) {
+  for (const header of ['authorization', 'content-type', 'user-agent']) {
     const value = request.headers.get(header);
     if (value) headers.set(header, value);
   }
@@ -49,6 +53,7 @@ async function proxy(request: NextRequest, path: string[]) {
         ? undefined
         : await request.arrayBuffer(),
       cache: 'no-store',
+      signal: AbortSignal.timeout(30000), // 30 second timeout
     });
 
     const responseHeaders = new Headers();
@@ -56,15 +61,69 @@ async function proxy(request: NextRequest, path: string[]) {
     if (contentType) responseHeaders.set('content-type', contentType);
     responseHeaders.set('cache-control', 'no-store');
 
+    // Handle specific error statuses with better messages
+    if (upstream.status === 401) {
+      const errorData = await upstream.clone().json().catch(() => ({}));
+      return Response.json(
+        {
+          error: 'Authentication Failed',
+          message: errorData.message || 'Invalid credentials or session expired',
+          code: 'AUTH_FAILED'
+        },
+        { status: 401, headers: responseHeaders },
+      );
+    }
+
+    if (upstream.status === 400) {
+      const errorData = await upstream.clone().json().catch(() => ({}));
+      return Response.json(
+        {
+          error: 'Bad Request',
+          message: errorData.message || 'Invalid request data',
+          code: 'BAD_REQUEST'
+        },
+        { status: 400, headers: responseHeaders },
+      );
+    }
+
+    if (!upstream.ok) {
+      const errorData = await upstream.clone().json().catch(() => ({}));
+      return Response.json(
+        {
+          error: 'Backend Error',
+          message: errorData.message || `Backend returned status ${upstream.status}`,
+          code: 'BACKEND_ERROR',
+          status: upstream.status
+        },
+        { status: upstream.status, headers: responseHeaders },
+      );
+    }
+
     return new Response(await upstream.arrayBuffer(), {
       status: upstream.status,
       headers: responseHeaders,
     });
-  } catch {
+  } catch (error) {
+    console.error('Proxy error:', error);
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return Response.json(
+          {
+            error: 'Timeout',
+            message: 'Authentication service timed out. Please try again.',
+            code: 'TIMEOUT'
+          },
+          { status: 504 },
+        );
+      }
+    }
+
     return Response.json(
       {
-        message:
-          'The authentication service is temporarily unavailable. Please try again shortly.',
+        error: 'Service Unavailable',
+        message: 'The authentication service is temporarily unavailable. Please try again shortly.',
+        code: 'SERVICE_UNAVAILABLE'
       },
       { status: 502 },
     );
