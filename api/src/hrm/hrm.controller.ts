@@ -11,7 +11,14 @@ import {
   HttpCode,
   UsePipes,
   ValidationPipe,
+  BadRequestException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as fs from 'fs';
+import * as path from 'path';
 import { HrmService } from './hrm.service';
 import { PerformanceService } from './performance.service';
 import { TrainingService } from './training.service';
@@ -545,8 +552,63 @@ export class HrmController {
 
   @Post('documents')
   @HttpCode(HttpStatus.CREATED)
-  uploadDocument(@Body() data: any) {
-    return this.documentsService.uploadDocument(data);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (_req, _file, cb) => {
+          const uploadDir = path.join(process.cwd(), 'uploads', 'hr-documents');
+          fs.mkdirSync(uploadDir, { recursive: true });
+          cb(null, uploadDir);
+        },
+        filename: (_req, file, cb) => {
+          const safeName = (file.originalname || 'document').replace(/[^a-zA-Z0-9._-]/g, '-');
+          cb(null, `${Date.now()}-${safeName}`);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        const allowed = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'image/jpeg',
+          'image/png',
+          'image/jpg',
+        ];
+        const isAllowed =
+          allowed.includes(file.mimetype) ||
+          /\.(pdf|doc|docx|png|jpg|jpeg)$/i.test(file.originalname || '');
+
+        if (!isAllowed) {
+          cb(new Error('Unsupported file type'), false);
+          return;
+        }
+
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+    }),
+  )
+  uploadDocument(@UploadedFile() file: any, @Body() data: any) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const documentUrl = `/uploads/hr-documents/${file.filename}`;
+
+    return this.documentsService.uploadDocument({
+      ...data,
+      user_id: data.user_id,
+      uploaded_by: data.uploaded_by || data.user_id,
+      document_type: data.document_type || 'OTHER',
+      document_name: data.document_name || file.originalname,
+      document_url: data.document_url || documentUrl,
+      file_size: file.size,
+      issue_date: data.issue_date,
+      expiry_date: data.expiry_date,
+      notes: data.notes,
+    });
   }
 
   @Get('documents')

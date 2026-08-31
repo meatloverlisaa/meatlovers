@@ -7,6 +7,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as helmet from 'helmet';
+import * as express from 'express';
+import { join } from 'path';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
@@ -17,6 +19,9 @@ async function bootstrap() {
 
   // Security: Helmet middleware for security headers
   app.use(helmet.default());
+
+  // Serve uploaded HR documents for local development and testing
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   // BigInt serialization fix
   (BigInt.prototype as any).toJSON = function () {

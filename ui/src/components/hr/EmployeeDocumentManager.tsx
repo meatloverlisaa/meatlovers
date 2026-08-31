@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { getUser } from "@/lib/auth";
 import { deleteDocument, EmployeeDocument, uploadDocument, verifyDocument } from "@/lib/hr";
 
 export function EmployeeDocumentManager({
@@ -47,12 +48,13 @@ export function EmployeeDocumentManager({
     setUploadError("");
 
     try {
+      const currentUser = getUser();
       const form = new FormData();
       form.append("user_id", employeeId);
-      form.append("uploaded_by", localStorage.getItem("user_id") || "");
+      form.append("uploaded_by", currentUser?.id || "");
       form.append("document_type", formData.document_type);
       form.append("document_name", formData.document_name || file.name);
-      form.append("document_url", file.name); // Will be replaced by backend with actual URL
+      form.append("document_url", `/uploads/hr-documents/${file.name}`);
       form.append("file_size", String(file.size));
 
       if (formData.issue_date) form.append("issue_date", formData.issue_date);
@@ -85,7 +87,7 @@ export function EmployeeDocumentManager({
   const handleVerify = async (docId: string | number) => {
     setIsVerifying(String(docId));
     try {
-      const userId = localStorage.getItem("user_id") || "";
+      const userId = getUser()?.id || "";
       await verifyDocument(docId, userId, "Document verified by HR");
       onDocumentUpdated();
     } catch (err) {
