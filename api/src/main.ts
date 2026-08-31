@@ -56,21 +56,43 @@ async function bootstrap() {
       const isVercelOrigin = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(
         requestOrigin || '',
       );
+      const isRenderOrigin = /^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(
+        requestOrigin || '',
+      );
 
+      // In production, be more permissive to avoid CORS issues
+      if (process.env.NODE_ENV === 'production') {
+        if (
+          allowedOrigins.includes(requestOrigin || '') ||
+          isVercelOrigin ||
+          isRenderOrigin ||
+          !requestOrigin // Allow same-origin and server-to-server requests
+        ) {
+          callback(null, true);
+          return;
+        }
+      }
+
+      // In development, allow local origins
       if (
         allowedOrigins.includes(requestOrigin || '') ||
         isVercelOrigin ||
+        isRenderOrigin ||
         (process.env.NODE_ENV !== 'production' && (isLocalOrigin || isCodespaceOrigin))
       ) {
         callback(null, true);
         return;
       }
 
-      callback(new Error('Origin not allowed by CORS'));
+      // Do not turn a rejected browser origin into a 500 response. Returning
+      // false omits CORS headers, so the browser blocks the request while the
+      // API remains healthy for allowed origins.
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    maxAge: 86400, // 24 hours
   });
 
   const port = process.env.PORT ?? 3001;

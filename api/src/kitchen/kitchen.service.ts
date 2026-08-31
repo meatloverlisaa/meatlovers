@@ -131,6 +131,105 @@ export class KitchenService {
     });
   }
 
+  /**
+   * Check if all ingredients are available for an order
+   * Useful for validating stock before moving order to PREPARING
+   */
+  async checkOrderIngredientsAvailable(
+    orderId: string,
+  ): Promise<{
+    available: boolean;
+    issues?: Array<{
+      productId: string;
+      productName: string;
+      shortages?: Array<{
+        ingredient: string;
+        required: number;
+        available: number;
+      }>;
+    }>;
+  }> {
+    const order = await (this.prisma as any).order.findUnique({
+      where: { id: BigInt(orderId) },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${orderId} not found`);
+    }
+
+    const issues: Array<{
+      productId: string;
+      productName: string;
+      shortages: Array<{
+        ingredient: string;
+        required: number;
+        available: number;
+      }>;
+    }> = [];
+
+    for (const item of order.items) {
+      if (!item.product_id) continue;
+
+      const recipe = await this.prisma.recipe.findUnique({
+        where: { product_id: item.product_id },
+        include: {
+          ingredients: {
+            include: {
+              stock_item: {
+                include: {
+                  product: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!recipe || !recipe.is_active) {
+        continue; // Skip if no recipe
+      }
+
+      const shortages: Array<{
+        ingredient: string;
+        required: number;
+        available: number;
+      }> = [];
+      for (const ingredient of recipe.ingredients) {
+        const requiredQuantity =
+          Number(ingredient.quantity) * item.quantity;
+        const stockItem = ingredient.stock_item;
+
+        if (stockItem.quantity < requiredQuantity) {
+          shortages.push({
+            ingredient: stockItem.product.product_name,
+            required: requiredQuantity,
+            available: stockItem.quantity,
+          });
+        }
+      }
+
+      if (shortages.length > 0) {
+        issues.push({
+          productId: item.product_id.toString(),
+          productName: item.product_name,
+          shortages,
+        });
+      }
+    }
+
+    return {
+      available: issues.length === 0,
+      issues: issues.length > 0 ? issues : undefined,
+    };
+  }
+
   async getKitchenSummary() {
     const orders = await (this.prisma as any).order.findMany({
       where: {

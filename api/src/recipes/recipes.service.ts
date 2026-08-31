@@ -242,6 +242,77 @@ export class RecipesService {
     return { message: 'Recipe deleted successfully' };
   }
 
+  /**
+   * Verify all ingredients have sufficient stock before consumption
+   * @param productId Product ID to check
+   * @param quantity Number of units to produce
+   * @returns Object with availability status and any shortage details
+   */
+  async verifyIngredientsAvailable(
+    productId: string,
+    quantity: number,
+  ): Promise<{
+    available: boolean;
+    shortages?: Array<{
+      ingredient: string;
+      required: number;
+      available: number;
+      unit: string;
+    }>;
+  }> {
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { product_id: BigInt(productId) },
+      include: {
+        ingredients: {
+          include: {
+            stock_item: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!recipe || !recipe.is_active) {
+      return { available: true }; // No recipe = no consumption needed
+    }
+
+    const shortages: Array<{
+      ingredient: string;
+      required: number;
+      available: number;
+      unit: string;
+    }> = [];
+
+    for (const ingredient of recipe.ingredients) {
+      const requiredQuantity = Number(ingredient.quantity) * quantity;
+      const stockItem = ingredient.stock_item;
+
+      if (stockItem.quantity < requiredQuantity) {
+        shortages.push({
+          ingredient: stockItem.product.product_name,
+          required: requiredQuantity,
+          available: stockItem.quantity,
+          unit: ingredient.unit,
+        });
+      }
+    }
+
+    return {
+      available: shortages.length === 0,
+      shortages: shortages.length > 0 ? shortages : undefined,
+    };
+  }
+
+  /**
+   * Consume ingredients for a product based on its recipe
+   * Automatically reduces stock and creates audit trail
+   * @param productId Product ID to consume ingredients for
+   * @param quantity Number of units to produce
+   * @throws BadRequestException if insufficient stock available
+   */
   async consumeIngredients(productId: string, quantity: number): Promise<void> {
     // Find recipe for the product
     const recipe = await this.prisma.recipe.findUnique({
@@ -284,13 +355,13 @@ export class RecipesService {
         },
       });
 
-      // Create stock movement record
+      // Create stock movement record for audit trail
       await this.prisma.stockMovement.create({
         data: {
           stock_item_id: stockItem.id,
-          movement_type: 'WASTE',
+          movement_type: 'USAGE',
           quantity: -requiredQuantity,
-          reference: `Recipe consumption for order - Product: ${recipe.product.product_name}`,
+          reference: `Auto-consumed for ${recipe.product.product_name} (Recipe: ${recipe.name})`,
           notes: `Consumed ${requiredQuantity} ${ingredient.unit} for ${quantity} unit(s) of ${recipe.name}`,
         },
       });

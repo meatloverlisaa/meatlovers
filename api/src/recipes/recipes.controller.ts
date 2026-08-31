@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
@@ -28,16 +30,29 @@ export class RecipesController {
     return this.recipesService.findAll();
   }
 
-  @Get(':id')
-  @Public()
-  findOne(@Param('id') id: string) {
-    return this.recipesService.findOne(id);
-  }
-
   @Get('product/:productId')
   @Public()
   findByProductId(@Param('productId') productId: string) {
     return this.recipesService.findByProductId(productId);
+  }
+
+  @Get('verify-ingredients/:productId')
+  @Public()
+  async verifyIngredientsAvailable(
+    @Param('productId') productId: string,
+    @Query('quantity') quantity?: string,
+  ) {
+    const qty = quantity ? parseInt(quantity, 10) : 1;
+    if (isNaN(qty) || qty <= 0) {
+      throw new BadRequestException('Quantity must be a positive number');
+    }
+    return this.recipesService.verifyIngredientsAvailable(productId, qty);
+  }
+
+  @Get(':id')
+  @Public()
+  findOne(@Param('id') id: string) {
+    return this.recipesService.findOne(id);
   }
 
   @Patch(':id')

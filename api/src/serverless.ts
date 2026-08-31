@@ -71,7 +71,9 @@ async function createNestServer() {
         return;
       }
 
-      callback(new Error('Origin not allowed by CORS'));
+      // Omit CORS headers for untrusted origins instead of raising a 500.
+      // Browsers reject such requests, while allowed origins continue to work.
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

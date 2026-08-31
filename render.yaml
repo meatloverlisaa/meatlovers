@@ -65,6 +65,10 @@ services:
         value: https://meatlovers-api.onrender.com
       - key: NEXT_PUBLIC_API_BASE_URL
         value: https://meatlovers-api.onrender.com
+      # Used only by the Next.js server-side auth proxy. Set this to the exact
+      # public URL of the deployed API service in the Render dashboard.
+      - key: BACKEND_API_URL
+        value: https://meatlovers-api.onrender.com
       
       # Application metadata
       - key: NEXT_PUBLIC_APP_NAME

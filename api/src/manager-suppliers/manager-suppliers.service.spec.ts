@@ -55,7 +55,7 @@ describe('ManagerSuppliersService', () => {
   describe('findAll', () => {
     it('should return all suppliers', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       expect(await service.findAll()).toBe(result);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -66,7 +66,7 @@ describe('ManagerSuppliersService', () => {
 
     it('should filter by type', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       await service.findAll(SupplierType.FOOD);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -77,7 +77,7 @@ describe('ManagerSuppliersService', () => {
 
     it('should filter by status', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       await service.findAll(undefined, SupplierStatus.ACTIVE);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -89,7 +89,7 @@ describe('ManagerSuppliersService', () => {
 
   describe('findOne', () => {
     it('should return a supplier by id', async () => {
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.findUnique.mockResolvedValue(mockSupplier);
 
       expect(await service.findOne(1)).toBe(mockSupplier);
       expect(prisma.supplier.findUnique).toHaveBeenCalledWith({
@@ -98,7 +98,7 @@ describe('ManagerSuppliersService', () => {
     });
 
     it('should throw NotFoundException when supplier not found', async () => {
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(null);
+      mockPrismaService.supplier.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
     });
@@ -110,7 +110,7 @@ describe('ManagerSuppliersService', () => {
         supplier_name: 'New Supplier',
         supplier_type: SupplierType.FOOD,
       };
-      mockPrismaService.suppliers.create.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.create.mockResolvedValue(mockSupplier);
 
       expect(await service.create(createDto as any)).toBe(mockSupplier);
       expect(prisma.supplier.create).toHaveBeenCalledWith({ data: createDto });
@@ -120,8 +120,8 @@ describe('ManagerSuppliersService', () => {
   describe('update', () => {
     it('should update a supplier', async () => {
       const updateDto = { supplier_name: 'Updated Name' };
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(mockSupplier);
-      mockPrismaService.suppliers.update.mockResolvedValue({
+      mockPrismaService.supplier.findUnique.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.update.mockResolvedValue({
         ...mockSupplier,
         ...updateDto,
       });
@@ -135,7 +135,7 @@ describe('ManagerSuppliersService', () => {
     });
 
     it('should throw NotFoundException when updating non-existent supplier', async () => {
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(null);
+      mockPrismaService.supplier.findUnique.mockResolvedValue(null);
 
       await expect(service.update(999, {} as any)).rejects.toThrow(
         NotFoundException,
@@ -145,8 +145,8 @@ describe('ManagerSuppliersService', () => {
 
   describe('updateStatus', () => {
     it('should update supplier status', async () => {
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(mockSupplier);
-      mockPrismaService.suppliers.update.mockResolvedValue({
+      mockPrismaService.supplier.findUnique.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.update.mockResolvedValue({
         ...mockSupplier,
         status: SupplierStatus.SUSPENDED,
       });
@@ -161,8 +161,8 @@ describe('ManagerSuppliersService', () => {
 
   describe('remove', () => {
     it('should remove a supplier', async () => {
-      mockPrismaService.suppliers.findUnique.mockResolvedValue(mockSupplier);
-      mockPrismaService.suppliers.delete.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.findUnique.mockResolvedValue(mockSupplier);
+      mockPrismaService.supplier.delete.mockResolvedValue(mockSupplier);
 
       expect(await service.remove(1)).toBe(mockSupplier);
       expect(prisma.supplier.delete).toHaveBeenCalledWith({
@@ -173,12 +173,12 @@ describe('ManagerSuppliersService', () => {
 
   describe('getStats', () => {
     it('should return supplier statistics', async () => {
-      mockPrismaService.suppliers.count
+      mockPrismaService.supplier.count
         .mockResolvedValueOnce(10)
         .mockResolvedValueOnce(8)
         .mockResolvedValueOnce(2);
 
-      mockPrismaService.suppliers.groupBy.mockResolvedValue([
+      mockPrismaService.supplier.groupBy.mockResolvedValue([
         { supplier_type: SupplierType.FOOD, _count: { id: 5 } },
         { supplier_type: SupplierType.ALCOHOL, _count: { id: 3 } },
       ]);
@@ -195,7 +195,7 @@ describe('ManagerSuppliersService', () => {
   describe('getRecent', () => {
     it('should return recent suppliers', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       expect(await service.getRecent(5)).toBe(result);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -208,7 +208,7 @@ describe('ManagerSuppliersService', () => {
   describe('search', () => {
     it('should search suppliers', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       expect(await service.search('test')).toBe(result);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -228,7 +228,7 @@ describe('ManagerSuppliersService', () => {
   describe('getByType', () => {
     it('should return suppliers by type', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       expect(await service.getByType(SupplierType.FOOD)).toBe(result);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({
@@ -241,7 +241,7 @@ describe('ManagerSuppliersService', () => {
   describe('getActive', () => {
     it('should return active suppliers', async () => {
       const result = [mockSupplier];
-      mockPrismaService.suppliers.findMany.mockResolvedValue(result);
+      mockPrismaService.supplier.findMany.mockResolvedValue(result);
 
       expect(await service.getActive()).toBe(result);
       expect(prisma.supplier.findMany).toHaveBeenCalledWith({

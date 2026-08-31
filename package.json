@@ -1,0 +1,11 @@
+{
+  "name": "meatlovers",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install": "npm install --prefix ./ui",
+    "build": "npm run build --prefix ./ui",
+    "start": "npm run start --prefix ./ui",
+    "dev": "npm run dev --prefix ./ui"
+  }
+}

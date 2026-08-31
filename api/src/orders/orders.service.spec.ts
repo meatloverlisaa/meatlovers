@@ -3,6 +3,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { RecipesService } from '../recipes/recipes.service';
+import { AuditLogService } from '../auth/audit-log.service';
 
 describe('OrdersService - Order Life-cycle Tests', () => {
   let service: OrdersService;
@@ -40,6 +41,10 @@ describe('OrdersService - Order Life-cycle Tests', () => {
         {
           provide: RecipesService,
           useValue: mockRecipesService,
+        },
+        {
+          provide: AuditLogService,
+          useValue: { log: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

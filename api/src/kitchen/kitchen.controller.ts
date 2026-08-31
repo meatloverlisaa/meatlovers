@@ -36,6 +36,12 @@ export class KitchenController {
     return this.kitchenService.getOrderById(id);
   }
 
+  @Get('queue/:id/check-ingredients')
+  @Roles(...KITCHEN_ROLES)
+  checkOrderIngredientsAvailable(@Param('id') id: string) {
+    return this.kitchenService.checkOrderIngredientsAvailable(id);
+  }
+
   @Patch('queue/:id/status')
   @Roles(...KITCHEN_ROLES)
   updateOrderStatus(

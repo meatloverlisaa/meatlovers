@@ -3,6 +3,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto, PaymentStatus } from './dto/create-payment.dto';
+import { AuditLogService } from '../auth/audit-log.service';
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
@@ -28,6 +29,10 @@ describe('PaymentsService', () => {
         {
           provide: PrismaService,
           useValue: mockPrisma,
+        },
+        {
+          provide: AuditLogService,
+          useValue: { log: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

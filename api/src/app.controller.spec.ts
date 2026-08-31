@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return API service information', () => {
+      expect(appController.getHello()).toMatchObject({
+        message: 'Welcome to Meat Lovers Restaurant Management API',
+        status: 'operational',
+        endpoints: { health: '/health' },
+      });
     });
   });
 });
