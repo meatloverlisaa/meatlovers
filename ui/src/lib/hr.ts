@@ -46,6 +46,22 @@ export type Employee = {
   employee_profile?: EmployeeProfile | null;
 };
 
+export type EmployeeDocument = {
+  id: string | number;
+  user_id?: string | number;
+  document_type?: string | null;
+  document_name?: string | null;
+  document_url?: string | null;
+  issue_date?: string | null;
+  expiry_date?: string | null;
+  is_verified?: boolean;
+  notes?: string | null;
+  created_at?: string | null;
+  user?: Pick<Employee, "id" | "full_name" | "role">;
+  uploader?: Pick<Employee, "id" | "full_name">;
+  verifier?: Pick<Employee, "id" | "full_name">;
+};
+
 export type EmployeeStatistics = {
   totalEmployees: number;
   activeEmployees: number;
@@ -112,6 +128,11 @@ export function getStaffDirectory(status = "active") {
 
 export function getEmployee(id: string) {
   return request<Employee>(`/hrm/employees/${id}`);
+}
+
+export function getEmployeeDocuments(filters: Record<string, string> = {}) {
+  const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
+  return request<EmployeeDocument[]>(`/hrm/documents${query.size ? `?${query}` : ""}`);
 }
 
 export function getEmployeeStatistics() {
