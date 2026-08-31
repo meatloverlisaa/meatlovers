@@ -279,7 +279,12 @@ export class RecipesService {
       return { available: true }; // No recipe = no consumption needed
     }
 
-    const shortages = [];
+    const shortages: Array<{
+      ingredient: string;
+      required: number;
+      available: number;
+      unit: string;
+    }> = [];
 
     for (const ingredient of recipe.ingredients) {
       const requiredQuantity = Number(ingredient.quantity) * quantity;

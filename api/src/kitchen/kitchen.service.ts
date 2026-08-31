@@ -164,7 +164,15 @@ export class KitchenService {
       throw new NotFoundException(`Order with ID ${orderId} not found`);
     }
 
-    const issues = [];
+    const issues: Array<{
+      productId: string;
+      productName: string;
+      shortages: Array<{
+        ingredient: string;
+        required: number;
+        available: number;
+      }>;
+    }> = [];
 
     for (const item of order.items) {
       if (!item.product_id) continue;
@@ -188,7 +196,11 @@ export class KitchenService {
         continue; // Skip if no recipe
       }
 
-      const shortages = [];
+      const shortages: Array<{
+        ingredient: string;
+        required: number;
+        available: number;
+      }> = [];
       for (const ingredient of recipe.ingredients) {
         const requiredQuantity =
           Number(ingredient.quantity) * item.quantity;
