@@ -263,6 +263,25 @@ export default function AdminLayout({
           </div>
         </header>
 
+        {/* Desktop header with profile */}
+        <header className="hidden h-16 items-center justify-between gap-4 border-b px-6 lg:flex" style={{ 
+          borderColor: '#334155',
+          backgroundColor: '#0B0F19'
+        }}>
+          <div></div>
+          <Link
+            href="/admin/profile"
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition hover:bg-[#1E293B]"
+            style={{ color: '#94A3B8' }}
+            title="Admin Profile"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span className="hidden sm:inline">My Profile</span>
+          </Link>
+        </header>
+
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

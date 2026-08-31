@@ -312,3 +312,39 @@ export function exportBankPaymentFile() {
   return request<{ filename: string; contentType: string; content: string }>("/hrm/payroll/bank-export");
 }
 
+// ─── Document Management ──────────────────────────────────────────────────────
+export function uploadDocument(data: FormData) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return fetch(`${HR_API_BASE_URL}/hrm/documents`, {
+    method: "POST",
+    headers,
+    body: data,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const message = Array.isArray(body?.message) ? body.message.join(", ") : body?.message;
+      throw new Error(message || "Failed to upload document");
+    }
+    return res.json() as Promise<EmployeeDocument>;
+  });
+}
+
+export function verifyDocument(id: string | number, verified_by: string, notes?: string) {
+  return request<EmployeeDocument>(`/hrm/documents/${id}/verify`, {
+    method: "PATCH",
+    body: JSON.stringify({ verified_by, notes }),
+  });
+}
+
+export function deleteDocument(id: string | number) {
+  return request<{ message: string }>(`/hrm/documents/${id}`, {
+    method: "DELETE",
+  });
+}
+

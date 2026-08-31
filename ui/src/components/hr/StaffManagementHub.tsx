@@ -3,6 +3,7 @@ import Link from "next/link";
 const actions = [
   { title: "Employee records", detail: "View individual staff profiles, employment information, contacts, and role assignments.", href: "/hr/staff/directory", icon: "📁" },
   { title: "Staff directory", detail: "Search and filter all staff by name, role, department, and employment status.", href: "/hr/staff/directory", icon: "👥" },
+  { title: "Employee documents", detail: "Upload, verify, and manage employee documents and compliance files.", href: "/hr/staff/documents", icon: "📄" },
   { title: "Onboarding", detail: "Create a new employee record, assign a role, and capture employment details.", href: "/hr/staff/new", icon: "➕" },
   { title: "Offboarding", detail: "Select an active employee, record the exit reason, and deactivate system access.", href: "/hr/staff/directory?status=active&mode=offboarding", icon: "↗" },
 ];

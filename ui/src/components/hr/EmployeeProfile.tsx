@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { deactivateEmployee, Employee, EmployeeDocument, getEmployee, getEmployeeDocuments, reactivateEmployee, readable } from "@/lib/hr";
+import { EmployeeDocumentManager } from "./EmployeeDocumentManager";
 
 export function EmployeeProfile({ id }: { id: string }) {
   const [employee, setEmployee] = useState<Employee | null>(null);
@@ -25,6 +26,15 @@ export function EmployeeProfile({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  const handleDocumentAdded = (doc: EmployeeDocument) => {
+    setDocuments([doc, ...documents]);
+  };
+
+  const handleDocumentsUpdated = () => {
+    load();
+  };
+
   const changeStatus = async () => {
     if (!employee) return;
     const reason = employee.is_active ? window.prompt("Reason for offboarding (optional):") ?? undefined : undefined;
@@ -48,52 +58,13 @@ export function EmployeeProfile({ id }: { id: string }) {
     {profile?.notes && <section className="mt-5 rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm"><h2 className="font-black text-white">HR notes</h2><p className="mt-3 whitespace-pre-wrap text-sm text-zinc-400">{profile.notes}</p></section>}
 
     <section className="mt-5 rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-xl font-black text-white">Employee files</h2>
-        <span className="rounded-full border border-zinc-700 bg-zinc-800 px-2.5 py-1 text-xs font-bold text-zinc-300">{documents.length} file{documents.length === 1 ? "" : "s"}</span>
-      </div>
-
-      {documents.length === 0 ? (
-        <p className="text-sm text-zinc-500">No uploaded files have been linked to this employee yet.</p>
-      ) : (
-        <div className="space-y-3">
-          {documents.map((doc) => (
-            <div key={String(doc.id)} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="font-semibold text-white">{doc.document_name || "Unnamed document"}</p>
-                  <p className="mt-1 text-xs uppercase tracking-wide text-zinc-500">{doc.document_type || "Document"}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {doc.is_verified ? (
-                    <span className="rounded-full bg-emerald-900 px-2.5 py-1 text-xs font-bold text-emerald-400">Verified</span>
-                  ) : (
-                    <span className="rounded-full bg-amber-900 px-2.5 py-1 text-xs font-bold text-amber-400">Pending verification</span>
-                  )}
-                  {doc.document_url ? (
-                    <a href={doc.document_url} target="_blank" rel="noreferrer" className="rounded-md border border-blue-700 px-3 py-1.5 text-xs font-bold text-blue-400 hover:bg-blue-900">Open file</a>
-                  ) : null}
-                </div>
-              </div>
-
-              <dl className="mt-3 grid gap-2 text-sm text-zinc-400 sm:grid-cols-3">
-                <div>
-                  <dt className="text-zinc-500">Issued</dt>
-                  <dd>{doc.issue_date ? new Date(doc.issue_date).toLocaleDateString() : "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-zinc-500">Expiry</dt>
-                  <dd>{doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-zinc-500">Notes</dt>
-                  <dd>{doc.notes ? doc.notes : "No notes"}</dd>
-                </div>
-              </dl>
-            </div>
-          ))}
-        </div>
-      )}
+      <h2 className="text-xl font-black text-white mb-4">Document management</h2>
+      <EmployeeDocumentManager
+        employeeId={id}
+        documents={documents}
+        onDocumentAdded={handleDocumentAdded}
+        onDocumentUpdated={handleDocumentsUpdated}
+      />
     </section>
   </main>;
 }
