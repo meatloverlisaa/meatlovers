@@ -129,7 +129,9 @@ function PageList({ pages }: { pages: ContentPage[] }) {
   if (pages.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-        <p className="text-4xl mb-3">�</p>
+        <div className="mb-4 flex justify-center">
+          <IconRenderer icon="document" className="h-12 w-12 text-zinc-400" />
+        </div>
         <p className="font-semibold text-zinc-700 dark:text-zinc-300">No pages found</p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Pages will appear here once created
@@ -222,7 +224,9 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
   if (leads.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-        <p className="text-4xl mb-3">📬</p>
+        <div className="mb-4 flex justify-center">
+          <IconRenderer icon="inbox" className="h-12 w-12 text-zinc-400" />
+        </div>
         <p className="font-semibold text-zinc-700 dark:text-zinc-300">No leads captured yet</p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Leads will appear here once submitted through the website
