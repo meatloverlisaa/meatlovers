@@ -123,7 +123,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Recruitment Pipeline</p>
-            <span className="text-2xl">📊</span>
+            <span className="text-2xl">Chart</span>
           </div>
           <p className="mt-2 text-3xl font-black text-blue-400">{metrics.recruitmentPipeline}</p>
           <p className="mt-1 text-xs text-zinc-400">Candidates in process</p>

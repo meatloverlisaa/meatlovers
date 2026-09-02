@@ -34,7 +34,7 @@ export function PrepTimeMetrics({ metrics }: PrepTimeMetricsProps) {
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-2xl">
-              ⏱️
+              Timer
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">

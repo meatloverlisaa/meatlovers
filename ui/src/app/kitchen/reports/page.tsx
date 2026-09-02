@@ -345,7 +345,7 @@ export default function KitchenReportsPage() {
             {/* Order Metrics */}
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                📋 Order Performance
+                Order Performance
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
@@ -396,7 +396,7 @@ export default function KitchenReportsPage() {
             {/* Waste Analytics */}
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                ♻️ Waste Analytics
+                Waste Analytics
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
@@ -536,7 +536,7 @@ export default function KitchenReportsPage() {
             {/* Stock Overview */}
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                📦 Stock Status
+                Stock Status
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 p-6">
@@ -548,7 +548,7 @@ export default function KitchenReportsPage() {
                   </div>
                   {reportData.stock.lowStockItems > 0 && (
                     <div className="mt-2 text-xs text-red-700 dark:text-red-300">
-                      ⚠️ Requires attention
+                      Requires attention
                     </div>
                   )}
                 </div>

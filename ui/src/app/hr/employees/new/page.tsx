@@ -247,7 +247,7 @@ export default function NewEmployeePage() {
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
           {error && (
             <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-              <span className="text-red-400 text-xl">❌</span>
+              <span className="text-red-400 text-xl">Error</span>
               <div>
                 <p className="text-red-300 font-semibold text-sm">Failed to create employee</p>
                 <p className="text-red-400 text-sm mt-1">{error}</p>
@@ -259,7 +259,7 @@ export default function NewEmployeePage() {
           {step === 1 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>👤</span> Basic Information
+                <span>Person</span> Basic Information
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -312,7 +312,7 @@ export default function NewEmployeePage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                     >
-                      {showPassword ? "🙈" : "👁️"}
+                      {showPassword ? "Hide" : "Show"}
                     </button>
                   </div>
                 </div>
@@ -397,7 +397,7 @@ export default function NewEmployeePage() {
           {step === 2 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>💼</span> Employment Details
+                <span>Briefcase</span> Employment Details
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -527,7 +527,7 @@ export default function NewEmployeePage() {
           {step === 3 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>🚨</span> Emergency Contact
+                <span>Alert</span> Emergency Contact
               </h2>
               <p className="text-slate-400 text-sm">
                 This information will be used in case of emergency. It is optional but highly
@@ -565,7 +565,7 @@ export default function NewEmployeePage() {
               </div>
 
               <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                <p className="text-amber-300 text-sm font-semibold mb-1">📋 Review before next step</p>
+                <p className="text-amber-300 text-sm font-semibold mb-1">Review before next step</p>
                 <div className="text-slate-400 text-sm space-y-1">
                   <p>
                     <span className="text-slate-300 font-medium">Name:</span> {form.full_name}
@@ -594,7 +594,7 @@ export default function NewEmployeePage() {
           {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>🏦</span> Banking Details
+                <span>Bank</span> Banking Details
               </h2>
               <p className="text-slate-400 text-sm">
                 Banking information is required for payroll processing. All fields are optional at
@@ -650,7 +650,7 @@ export default function NewEmployeePage() {
 
               {/* Final summary */}
               <div className="mt-6 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                <p className="text-emerald-300 font-semibold mb-3">✅ Ready to create employee</p>
+                <p className="text-emerald-300 font-semibold mb-3">Ready to create employee</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {[
                     ["Full Name", form.full_name],
@@ -711,7 +711,7 @@ export default function NewEmployeePage() {
                     Creating...
                   </>
                 ) : (
-                  "✅ Create Employee"
+                  "Create Employee"
                 )}
               </button>
             )}

@@ -377,9 +377,9 @@ export default function UploadRecipesPage() {
                     ? 'text-green-700 dark:text-green-200'
                     : 'text-amber-700 dark:text-amber-200'
                 }`}>
-                  <p>✅ {result.success} recipe{result.success !== 1 ? 's' : ''} uploaded successfully</p>
+                  <p>{result.success} recipe{result.success !== 1 ? 's' : ''} uploaded successfully</p>
                   {result.failed > 0 && (
-                    <p>❌ {result.failed} recipe{result.failed !== 1 ? 's' : ''} failed</p>
+                    <p>{result.failed} recipe{result.failed !== 1 ? 's' : ''} failed</p>
                   )}
                   {result.failed === 0 && (
                     <p className="mt-2 font-medium">Redirecting to recipes list...</p>

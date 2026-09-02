@@ -164,7 +164,7 @@ function ProductionPlanCard({ plan, onUpdate }: { plan: ProductionPlan; onUpdate
                 : 'text-zinc-900 dark:text-zinc-50'
             }`}>
               {formatDate(plan.planned_date)}
-              {overdue && <span className="ml-2">⚠️ Overdue</span>}
+              {overdue && <span className="ml-2">Overdue</span>}
             </div>
           </div>
           <div>
@@ -390,7 +390,7 @@ export default function ProductionPlansPage() {
         {overduePlans.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
-              ⚠️ Overdue ({overduePlans.length})
+              Overdue ({overduePlans.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {overduePlans.map((plan) => (

@@ -249,7 +249,7 @@ export default function DispatchPage() {
                     </div>
                   )}
                   {rider.current_location && (
-                    <div className="text-sm text-gray-600 mt-1">📍 {rider.current_location}</div>
+                    <div className="text-sm text-gray-600 mt-1">Location: {rider.current_location}</div>
                   )}
                 </div>
               ))}
