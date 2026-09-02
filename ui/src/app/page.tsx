@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { getDashboardRoute } from "@/lib/auth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type LeadSource =

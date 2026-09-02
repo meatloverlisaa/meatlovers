@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getAuthHeader } from "@/lib/auth";

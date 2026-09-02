@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // Import shared CMS components from admin
 import { PageEditor } from "../../admin/cms/PageEditor";

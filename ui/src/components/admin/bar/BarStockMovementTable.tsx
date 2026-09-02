@@ -2,6 +2,9 @@
 
 'use client';
 
+import { useState } from 'react';
+import { IconRenderer } from '@/components/ui/IconRenderer';
+
 interface StockMovement {
   id: string;
   productName: string;

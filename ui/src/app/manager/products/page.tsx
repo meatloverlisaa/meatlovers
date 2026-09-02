@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 

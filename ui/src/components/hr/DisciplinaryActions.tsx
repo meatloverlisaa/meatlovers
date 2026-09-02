@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import { getStaffDirectory, Employee } from "@/lib/hr";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 const warningTypes = ["Verbal Warning", "Written Warning", "Final Warning"];
 const actionTypes = ["Warning", "Suspension", "Termination", "Disciplinary Hearing"];

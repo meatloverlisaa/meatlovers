@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // Import shared types from admin CMS
 import type { ContentPage, WebsiteLead, Analytics } from "../../admin/cms/types";

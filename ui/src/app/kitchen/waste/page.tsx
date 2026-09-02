@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type WasteDeclaration = {

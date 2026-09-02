@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { getStaffDirectory, Employee } from "@/lib/hr";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 export function DashboardMetrics() {
   const [staff, setStaff] = useState<Employee[]>([]);

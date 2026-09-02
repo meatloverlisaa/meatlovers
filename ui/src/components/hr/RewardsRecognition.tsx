@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import { getStaffDirectory, Employee, readable } from "@/lib/hr";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 const awardTypes = ["Employee of the Month", "Employee of the Quarter", "Performance Bonus", "Achievement Badge", "Certificate of Excellence", "Special Recognition"];
 const badgeTypes = ["Team Player", "Customer Service Star", "Innovation Award", "Safety Champion", "Leadership Award", "Mentor of the Year"];

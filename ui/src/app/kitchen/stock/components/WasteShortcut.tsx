@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 type Product = {
   id: bigint | number;

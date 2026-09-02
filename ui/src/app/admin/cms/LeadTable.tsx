@@ -2,6 +2,7 @@
 
 import type { WebsiteLead } from "./types";
 import { LEAD_STATUSES } from "./types";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 export function LeadStatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
