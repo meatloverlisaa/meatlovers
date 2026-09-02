@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { getAuthHeader } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/api-config";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -34,23 +36,15 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  const baseUrl = getApiBaseUrl();
   const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-  
-  // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
+
   const res = await fetch(url, { 
     cache: "no-store",
-    headers 
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
   });
   
   if (!res.ok) {
@@ -60,7 +54,21 @@ async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
   
-  return res.json();
+  const payload: unknown = await res.json();
+  if (Array.isArray(payload)) {
+    return payload as Order[];
+  }
+
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "data" in payload &&
+    Array.isArray(payload.data)
+  ) {
+    return payload.data as Order[];
+  }
+
+  throw new Error("Orders response has an invalid format");
 }
 
 // Order Detail Modal (View-Only)
