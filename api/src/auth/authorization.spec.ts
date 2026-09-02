@@ -237,6 +237,10 @@ describe('Authorization System - Part C', () => {
         expect(hasPermission('CHEF', Resource.RECIPES, Action.READ)).toBe(true);
       });
 
+      it('should be able to read products for kitchen stock', () => {
+        expect(hasPermission('CHEF', Resource.PRODUCTS, Action.READ)).toBe(true);
+      });
+
       it('should NOT be able to modify recipes', () => {
         expect(hasPermission('CHEF', Resource.RECIPES, Action.UPDATE)).toBe(
           false,

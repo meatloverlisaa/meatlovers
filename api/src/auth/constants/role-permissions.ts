@@ -552,6 +552,9 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   // CHEF - Food Preparation
   // ====================
   CHEF: [
+    // Products (view ingredients for kitchen stock and recipes)
+    { resource: Resource.PRODUCTS, actions: [Action.READ] },
+
     // Kitchen Queue
     { resource: Resource.KITCHEN_QUEUE, actions: [Action.READ, Action.UPDATE] },
 
