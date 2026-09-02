@@ -345,6 +345,15 @@ describe('Authorization System - Part C', () => {
         ).toBe(false);
       });
 
+      it('should be able to read suppliers', () => {
+        expect(
+          hasPermission('ACCOUNTANT', Resource.SUPPLIERS, Action.READ),
+        ).toBe(true);
+        expect(
+          hasPermission('ACCOUNTANT', Resource.SUPPLIERS, Action.UPDATE),
+        ).toBe(false);
+      });
+
       it('should NOT be able to create orders', () => {
         expect(
           hasPermission('ACCOUNTANT', Resource.ORDERS, Action.CREATE),

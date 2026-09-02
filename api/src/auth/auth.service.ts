@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -43,11 +44,27 @@ export class AuthService {
     const sanitizedInput = this.sanitizeInput(emailOrPhone);
 
     // Find user by email or phone
-    const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: sanitizedInput }, { phone: sanitizedInput }],
-      },
-    });
+    let user;
+    try {
+      user = await this.prisma.user.findFirst({
+        where: {
+          OR: [{ email: sanitizedInput }, { phone: sanitizedInput }],
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? String(error.code)
+        : '';
+
+      if (code === 'P1001' || message.includes("Can't reach database server")) {
+        throw new ServiceUnavailableException(
+          'Authentication service is temporarily unavailable because the database cannot be reached. Please try again shortly.',
+        );
+      }
+
+      throw error;
+    }
 
     if (!user) {
       await this.auditLog.logLoginFailed(
@@ -127,11 +144,27 @@ export class AuthService {
     const sanitizedInput = this.sanitizeInput(email_or_phone);
 
     // Find user by email or phone
-    const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: sanitizedInput }, { phone: sanitizedInput }],
-      },
-    });
+    let user;
+    try {
+      user = await this.prisma.user.findFirst({
+        where: {
+          OR: [{ email: sanitizedInput }, { phone: sanitizedInput }],
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const code = typeof error === 'object' && error !== null && 'code' in error
+        ? String(error.code)
+        : '';
+
+      if (code === 'P1001' || message.includes("Can't reach database server")) {
+        throw new ServiceUnavailableException(
+          'Authentication service is temporarily unavailable because the database cannot be reached. Please try again shortly.',
+        );
+      }
+
+      throw error;
+    }
 
     if (!user) {
       await this.auditLog.logLoginFailed(
