@@ -475,7 +475,7 @@ export default function AdminDashboard() {
                   color: '#94A3B8'
                 }}
               >
-                <IconRenderer icon=\"clipboard\" className=\"inline w-4 h-4 mr-1\" />\n                Orders
+                <IconRenderer icon="clipboard" className="inline w-4 h-4 mr-1" /> Orders
               </Link>
               <Link
                 href="/"
