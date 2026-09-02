@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { PageEditor } from "./PageEditor";
 import { LeadTable, LeadStatusBadge } from "./LeadTable";
 import { HomepageSectionEditor } from "./HomepageSectionEditor";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import type { ContentPage, WebsiteLead, Analytics } from "./types";
 import { API_BASE } from "./types";
 import { getAuthHeader } from "@/lib/auth";
@@ -213,10 +214,10 @@ function PageList({
 type Tab = "pages" | "homepage" | "leads" | "analytics";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "pages", label: "Pages", icon: "📄" },
-  { id: "homepage", label: "Homepage Sections", icon: "🏠" },
-  { id: "leads", label: "Leads", icon: "📬" },
-  { id: "analytics", label: "Analytics", icon: "📊" },
+  { id: "pages", label: "Pages", icon: "document" },
+  { id: "homepage", label: "Homepage Sections", icon: "globe" },
+  { id: "leads", label: "Leads", icon: "inbox" },
+  { id: "analytics", label: "Analytics", icon: "chart" },
 ];
 
 export default function AdminCMS() {
@@ -379,7 +380,7 @@ export default function AdminCMS() {
                     : "border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-800"
                 }`}
               >
-                <span className="text-xs">{tab.icon}</span>
+                <IconRenderer icon={tab.icon} className="w-4 h-4" />
                 {tab.label}
                 {tab.id === "leads" && newLeadsCount > 0 && (
                   <span className="ml-1 rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-bold text-red-700">
@@ -440,7 +441,7 @@ export default function AdminCMS() {
             <ConversionAnalytics analytics={analytics} />
           ) : (
             <div className="rounded-xl border border-dashed border-zinc-300 bg-white py-16 text-center">
-              <p className="text-4xl mb-3">📊</p>
+              <IconRenderer icon="chart" className="text-4xl w-12 h-12 mx-auto mb-3" />
               <p className="font-semibold text-zinc-700">No analytics data yet</p>
               <p className="text-sm text-zinc-400 mt-1">
                 Analytics will appear once leads are captured

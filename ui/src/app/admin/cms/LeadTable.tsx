@@ -12,7 +12,7 @@ export function LeadStatusBadge({ status }: { status: string }) {
     LOST: "bg-red-100 text-red-800 border-red-200",
   };
   const icons: Record<string, string> = {
-    NEW: "✨", CONTACTED: "📞", QUALIFIED: "✅", CONVERTED: "🎉", LOST: "❌",
+    NEW: "sparkles", CONTACTED: "phone", QUALIFIED: "check", CONVERTED: "sparkles", LOST: "error",
   };
 
   return (

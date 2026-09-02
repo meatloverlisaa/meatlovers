@@ -117,8 +117,8 @@ function OpenOrdersWidget({ count }: { count: number }) {
           <h3 className="font-black" style={{ color: '#F8FAFC' }}>Open Orders</h3>
           <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Pending & in progress</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#EAB30820' }}>
-          📋
+        <span className="flex h-14 w-14 items-center justify-center rounded-full" style={{ backgroundColor: '#EAB30820' }}>
+          <IconRenderer icon="clipboard" className="w-8 h-8" />
         </span>
       </div>
       <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
@@ -142,8 +142,8 @@ function StockAlertWidget({ alerts }: { alerts: { low: number; out: number } }) 
           <h3 className="font-black" style={{ color: '#F8FAFC' }}>Stock Alerts</h3>
           <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Low stock warnings</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#EF444420' }}>
-          ⚠️
+        <span className="flex h-14 w-14 items-center justify-center rounded-full" style={{ backgroundColor: '#EF444420' }}>
+          <IconRenderer icon="warning" className="w-8 h-8" />
         </span>
       </div>
       <div className="mt-4 flex gap-4">
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
   const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([
     { label: "Today's Revenue", value: "KSh 0", icon: "money", color: "bg-emerald-100", trend: "neutral" },
     { label: "Open Orders", value: "0", icon: "clipboard", color: "bg-blue-100", trend: "neutral" },
-    { label: "New Leads", value: "0", icon: "📬", color: "bg-purple-100", trend: "neutral" },
+    { label: "New Leads", value: "0", icon: "inbox", color: "bg-purple-100", trend: "neutral" },
     { label: "Stock Alerts", value: "0", icon: "warning", color: "bg-red-100", trend: "neutral" },
   ]);
 
@@ -475,7 +475,7 @@ export default function AdminDashboard() {
                   color: '#94A3B8'
                 }}
               >
-                📋 Orders
+                <IconRenderer icon=\"clipboard\" className=\"inline w-4 h-4 mr-1\" />\n                Orders
               </Link>
               <Link
                 href="/"

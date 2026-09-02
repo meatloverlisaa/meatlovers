@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import {
   ChartBarIcon,
   GlobeAltIcon,
@@ -107,7 +108,7 @@ export default function SuperAdminLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #1F2937' }}>
-          <span className="text-2xl">🔐</span>
+          <IconRenderer icon="lock" className="w-8 h-8" />
           <div>
             <p className="font-black" style={{ color: '#F9FAFB' }}>Meat Lovers</p>
             <p className="text-xs" style={{ color: '#818CF8' }}>Super Admin</p>
@@ -224,7 +225,7 @@ export default function SuperAdminLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">🔐</span>
+            <IconRenderer icon="lock" className="w-6 h-6" />
             <span className="font-black" style={{ color: '#F9FAFB' }}>Meat Lovers</span>
           </div>
         </header>

@@ -27,13 +27,13 @@ export function HomepageSectionEditor({
   const [newSection, setNewSection] = useState({ title: "", content: "" });
 
   const sectionIcons: Record<string, string> = {
-    hero: "🏠",
-    menu: "🍽️",
-    catering: "🎉",
-    about: "📖",
-    contact: "📞",
-    specials: "⭐",
-    testimonials: "💬",
+    hero: "home",
+    menu: "serve",
+    catering: "sparkles",
+    about: "document",
+    contact: "phone",
+    specials: "star",
+    testimonials: "chat",
   };
 
   const startEdit = (s: HomepageSection) => {
@@ -101,7 +101,7 @@ export function HomepageSectionEditor({
 
   const getIcon = (slug: string) => {
     const key = Object.keys(sectionIcons).find((k) => slug.includes(k));
-    return key ? sectionIcons[key] : "📄";
+    return key ? sectionIcons[key] : "document";
   };
 
   return (

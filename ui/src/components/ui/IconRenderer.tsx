@@ -25,6 +25,13 @@ import {
   BellIcon,
   CheckIcon,
   SparklesIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  PhoneIcon,
+  TrashIcon,
+  LockClosedIcon,
+  PencilIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 
 // Mapping of emoji/icon types to Heroicons components
@@ -42,6 +49,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   '⚠️': ExclamationTriangleIcon,
   'warning': ExclamationTriangleIcon,
   'alert': ExclamationTriangleIcon,
+  '❌': ExclamationTriangleIcon,
+  'error': ExclamationTriangleIcon,
   '🚨': BellIcon,
   'siren': BellIcon,
 
@@ -82,6 +91,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'leave': CalendarIcon,
   'vacation': CalendarIcon,
   'calendar': CalendarIcon,
+  '⏱️': CalendarIcon,
+  'clock': CalendarIcon,
 
   // Work
   '💼': BriefcaseIcon,
@@ -136,6 +147,25 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'serve': SparklesIcon,
   'plate': SparklesIcon,
   'ready': CheckIcon,
+
+  // Info/Actions
+  'ℹ️': BellIcon,
+  'info': BellIcon,
+  '👁️': EyeIcon,
+  'eye': EyeIcon,
+  '🙈': EyeSlashIcon,
+  'hide': EyeSlashIcon,
+  '📞': PhoneIcon,
+  'phone': PhoneIcon,
+  '🗑️': TrashIcon,
+  'trash': TrashIcon,
+  '🔐': LockClosedIcon,
+  'lock': LockClosedIcon,
+  'key': LockClosedIcon,
+  '✏️': PencilIcon,
+  'edit': PencilIcon,
+  '⚙️': Cog6ToothIcon,
+  'settings': Cog6ToothIcon,
 };
 
 interface IconRendererProps {

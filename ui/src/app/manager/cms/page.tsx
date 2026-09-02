@@ -339,9 +339,9 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
 type Tab = "pages" | "leads" | "analytics";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "pages", label: "Pages", icon: "📄" },
-  { id: "leads", label: "Leads", icon: "📬" },
-  { id: "analytics", label: "Analytics", icon: "📊" },
+  { id: "pages", label: "Pages", icon: "document" },
+  { id: "leads", label: "Leads", icon: "inbox" },
+  { id: "analytics", label: "Analytics", icon: "chart" },
 ];
 
 export default function ManagerCMS() {
@@ -451,7 +451,7 @@ export default function ManagerCMS() {
                   : "border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
               }`}
             >
-              <span className="text-base">{tab.icon}</span>
+              <IconRenderer icon={tab.icon} className="w-5 h-5" />
               {tab.label}
               {tab.id === "leads" && newLeadsCount > 0 && (
                 <span className="ml-1 rounded-full bg-zinc-900 dark:bg-zinc-50 px-1.5 py-0.5 text-xs font-semibold text-white dark:text-black">

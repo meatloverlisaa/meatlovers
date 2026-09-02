@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -316,9 +317,7 @@ export default function SuperAdminDashboard() {
                   {formatCurrency(summary.currentSales)}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#10B98120' }}>
-                💰
-              </span>
+              <IconRenderer icon="money" className="w-6 h-6" />
             </div>
           </div>
 
@@ -334,9 +333,7 @@ export default function SuperAdminDashboard() {
                   {summary.openOrders}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#6366F120' }}>
-                📋
-              </span>
+              <IconRenderer icon="clipboard" className="w-6 h-6" />
             </div>
           </div>
 
@@ -352,9 +349,7 @@ export default function SuperAdminDashboard() {
                   {summary.activeStaff}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#8B5CF620' }}>
-                👥
-              </span>
+              <IconRenderer icon="people" className="w-6 h-6" />
             </div>
           </div>
 
@@ -424,9 +419,7 @@ export default function SuperAdminDashboard() {
                   {summary.pendingApprovals}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#F59E0B20' }}>
-                ✅
-              </span>
+              <IconRenderer icon="check" className="w-6 h-6" />
             </div>
           </div>
 
@@ -442,9 +435,7 @@ export default function SuperAdminDashboard() {
                   {summary.highRiskAlerts}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#EF444420' }}>
-                ⚠️
-              </span>
+              <IconRenderer icon="warning" className="w-6 h-6" />
             </div>
           </div>
           </div>
@@ -768,9 +759,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4338CA'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3730A3'}
             >
-              <span className="text-2xl">⚙️</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Admin Panel</p>
+              <IconRenderer icon="settings" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Full admin access</p>
               </div>
             </a>
@@ -782,9 +771,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#065F46'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#064E3B'}
             >
-              <span className="text-2xl">🍽️</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Products</p>
+              <IconRenderer icon="serve" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Menu items</p>
               </div>
             </a>
@@ -796,9 +783,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#92400E'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#78350F'}
             >
-              <span className="text-2xl">📦</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Stock Control</p>
+              <IconRenderer icon="package" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Inventory</p>
               </div>
             </a>
@@ -810,7 +795,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#92400E'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7C2D12'}
             >
-              <span className="text-2xl">📖</span>
+              <IconRenderer icon="document" className="w-6 h-6" />
               <div>
                 <p className="font-semibold" style={{ color: '#F9FAFB' }}>Recipes</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Standardized recipes</p>
@@ -824,9 +809,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#047857'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#065F46'}
             >
-              <span className="text-2xl">💰</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Pricing Control</p>
+              <IconRenderer icon="money" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Rules & margins</p>
               </div>
             </a>
@@ -838,9 +821,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0E7490'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#155E75'}
             >
-              <span className="text-2xl">📋</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Orders</p>
+              <IconRenderer icon="clipboard" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Order management</p>
               </div>
             </a>
@@ -852,9 +833,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3730A3'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#312E81'}
             >
-              <span className="text-2xl">🏭</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Suppliers</p>
+              <IconRenderer icon="building" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Manage suppliers</p>
               </div>
             </a>
@@ -866,9 +845,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#9F1239'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#831843'}
             >
-              <span className="text-2xl">👥</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>HR Management</p>
+              <IconRenderer icon="people" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Staff & payroll</p>
               </div>
             </a>
@@ -880,9 +857,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0F766E'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#115E59'}
             >
-              <span className="text-2xl">💰</span>
-              <div>
-                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Finance</p>
+              <IconRenderer icon="money" className="w-6 h-6" />
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Financial reports</p>
               </div>
             </a>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getAuthHeader } from "@/lib/auth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type HrmSummary = {
@@ -572,25 +573,25 @@ function SummaryCards({ summary }: { summary: HrmSummary }) {
     {
       label: "Total Staff",
       value: summary.totalStaff,
-      icon: "👥",
+      icon: "people",
       color: "bg-blue-100",
     },
     {
       label: "Active Staff",
       value: summary.activeStaff,
-      icon: "✅",
+      icon: "check",
       color: "bg-green-100",
     },
     {
       label: "Today&apos;s Attendance",
       value: summary.todayAttendance,
-      icon: "📋",
+      icon: "clipboard",
       color: "bg-purple-100",
     },
     {
       label: "Pending Leaves",
       value: summary.pendingLeaves,
-      icon: "🏖️",
+      icon: "leave",
       color: "bg-amber-100",
     },
   ];
@@ -971,7 +972,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
               onClick={() => window.print()}
               className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700"
             >
-              🖨️ Print Payslip
+              Print Payslip
             </button>
             <button
               onClick={onClose}
@@ -1037,7 +1038,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
           {/* Deductions */}
           <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
             <h4 className="font-bold text-sm text-red-700 dark:text-red-400 border-b border-zinc-200 pb-2 dark:border-zinc-800">
-              🏛️ Deductions & Taxes
+              Deductions & Taxes
             </h4>
             <div className="mt-3 space-y-2 text-xs">
               <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
@@ -1130,7 +1131,10 @@ function ProcessPayrollModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-lg font-black">⚡ Process Monthly Payroll Batch</h3>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="trending" className="w-5 h-5" />
+            <h3 className="text-lg font-black">Process Monthly Payroll Batch</h3>
+          </div>
           <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
         </div>
 
@@ -1284,7 +1288,10 @@ function MarkPaidModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">💳 Confirm Salary Disbursement</h3>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="credit-card" className="w-5 h-5" />
+            <h3 className="text-base font-black">Confirm Salary Disbursement</h3>
+          </div>
           <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
         </div>
 
@@ -1398,7 +1405,10 @@ function BulkPayModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">💳 Bulk Salary Disbursement</h3>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="credit-card" className="w-5 h-5" />
+            <h3 className="text-base font-black">Bulk Salary Disbursement</h3>
+          </div>
           <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
         </div>
 
@@ -1516,7 +1526,10 @@ function EditPayrollModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">✏️ Edit Payroll Statement</h3>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="edit" className="w-5 h-5" />
+            <h3 className="text-base font-black">Edit Payroll Statement</h3>
+          </div>
           <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
         </div>
 
@@ -1710,8 +1723,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Total Monthly Payroll</p>
               <p className="mt-2 text-2xl font-black text-zinc-950 dark:text-white">KSh {totalGross.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-2xl text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
-              💼
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+              <IconRenderer icon="briefcase" className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1722,8 +1735,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Disbursed (Paid)</p>
               <p className="mt-2 text-2xl font-black text-green-600 dark:text-green-400">KSh {totalPaid.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-2xl text-green-600 dark:bg-green-900/40 dark:text-green-400">
-              ✅
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400">
+              <IconRenderer icon="check" className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1734,8 +1747,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Pending Disbursement</p>
               <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">KSh {totalPending.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-2xl text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
-              ⏳
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/40">
+              <IconRenderer icon="clock" className="text-amber-600 dark:text-amber-400 w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1746,8 +1759,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Statutory & Tax Deductions</p>
               <p className="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">KSh {totalDeductions.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-2xl text-purple-600 dark:bg-purple-900/40 dark:text-purple-400">
-              🏛️
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/40">
+              <IconRenderer icon="building" className="text-purple-600 dark:text-purple-400 w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1783,7 +1796,8 @@ function PayrollManagementSection({
               onClick={() => setShowBulkPayModal(true)}
               className="flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-green-700"
             >
-              <span>💳</span> Pay Selected ({selectedIds.length})
+              <IconRenderer icon="credit-card" className="w-4 h-4" />
+              <span>Pay Selected ({selectedIds.length})</span>
             </button>
           )}
 
@@ -1791,14 +1805,16 @@ function PayrollManagementSection({
             onClick={() => setShowProcessModal(true)}
             className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
           >
-            <span>⚡</span> Process Monthly Payroll
+            <IconRenderer icon="trending" className="w-4 h-4" />
+            <span>Process Monthly Payroll</span>
           </button>
 
           <button
             onClick={handleExportBankFile}
             className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-xs font-bold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
           >
-            <span>📥</span> Bank CSV File
+            <IconRenderer icon="trending" className="w-4 h-4" />
+            <span>Bank CSV File</span>
           </button>
         </div>
       </div>
@@ -1890,7 +1906,8 @@ function PayrollManagementSection({
                         {record.payment_date ? (
                           <div>
                             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                              <span>✅</span> Paid
+                              <IconRenderer icon="check" className="w-4 h-4" />
+                            <span>Paid</span>
                             </span>
                             <div className="mt-1 text-[10px] text-zinc-500">
                               {record.payment_method || "Bank"} • {record.payment_reference || "N/A"}
@@ -1898,7 +1915,8 @@ function PayrollManagementSection({
                           </div>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                            <span>⏳</span> Pending
+                            <IconRenderer icon="clock" className="w-3 h-3" />
+                            <span>Pending</span>
                           </span>
                         )}
                       </td>
@@ -1909,7 +1927,8 @@ function PayrollManagementSection({
                             className="rounded-md bg-zinc-100 px-2.5 py-1.5 font-bold text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                             title="View Payslip"
                           >
-                            📄 Slip
+                            <IconRenderer icon="document" className="w-4 h-4" />
+                            <span>Slip</span>
                           </button>
 
                           {isPending && (
@@ -1917,7 +1936,8 @@ function PayrollManagementSection({
                               onClick={() => setMarkPaidRecord(record)}
                               className="rounded-md bg-green-600 px-2.5 py-1.5 font-bold text-white transition hover:bg-green-700"
                             >
-                              ✅ Pay
+                              <IconRenderer icon="check" className="w-4 h-4" />
+                              <span>Pay</span>
                             </button>
                           )}
 
@@ -1925,7 +1945,8 @@ function PayrollManagementSection({
                             onClick={() => setEditRecord(record)}
                             className="rounded-md bg-blue-50 px-2.5 py-1.5 font-bold text-blue-700 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
                           >
-                            ✏️ Edit
+                            <IconRenderer icon="edit" className="w-4 h-4" />
+                            <span>Edit</span>
                           </button>
                         </div>
                       </td>
@@ -2238,16 +2259,16 @@ export default function HrmDashboard() {
   }, []);
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: "📊" },
-    { id: "staff", label: "Staff", icon: "👥" },
-    { id: "attendance", label: "Attendance", icon: "📋" },
-    { id: "leave", label: "Leave", icon: "🏖️" },
-    { id: "roster", label: "Roster", icon: "📅" },
-    { id: "payroll", label: "Payroll", icon: "💰" },
-    { id: "performance", label: "Performance", icon: "⭐" },
-    { id: "training", label: "Training", icon: "🎓" },
-    { id: "disciplinary", label: "Disciplinary", icon: "⚠️" },
-    { id: "documents", label: "Documents", icon: "📄" },
+    { id: "overview", label: "Overview", icon: "chart" },
+    { id: "staff", label: "Staff", icon: "people" },
+    { id: "attendance", label: "Attendance", icon: "clipboard" },
+    { id: "leave", label: "Leave", icon: "leave" },
+    { id: "roster", label: "Roster", icon: "calendar" },
+    { id: "payroll", label: "Payroll", icon: "money" },
+    { id: "performance", label: "Performance", icon: "sparkles" },
+    { id: "training", label: "Training", icon: "training" },
+    { id: "disciplinary", label: "Disciplinary", icon: "warning" },
+    { id: "documents", label: "Documents", icon: "document" },
   ];
 
   return (
@@ -2349,7 +2370,7 @@ export default function HrmDashboard() {
         {/* Info Footer */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
           <div className="flex items-start gap-3">
-            <span className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 text-xl">ℹ️</span>
+            <IconRenderer icon="info" className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 w-5 h-5" />
             <div className="text-sm text-zinc-700 dark:text-zinc-300">
               <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">HR Management Features</p>
               <ul className="space-y-1 list-disc list-inside">

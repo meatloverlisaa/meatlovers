@@ -147,7 +147,7 @@ export default function PosLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">🖥️</span>
+            <IconRenderer icon="computer" className="w-6 h-6" />
             <span className="font-black text-zinc-950">POS System</span>
           </div>
         </header>

@@ -399,7 +399,7 @@ export default function AccountantDashboard() {
             <div className="space-y-3">
               {tasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <span className="text-4xl">✅</span>
+                  <IconRenderer icon="check" className="text-4xl w-16 h-16 mx-auto" />
                   <p className="mt-2 text-sm font-semibold text-slate-300">
                     All caught up!
                   </p>

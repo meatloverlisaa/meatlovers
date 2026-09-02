@@ -450,7 +450,7 @@ export default async function FinanceDashboard() {
         {/* Info Footer */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
           <div className="flex items-start gap-3">
-            <span className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 text-xl">ℹ️</span>
+            <IconRenderer icon="info" className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 w-5 h-5" />
             <div className="text-sm text-zinc-700 dark:text-zinc-300">
               <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">Finance Dashboard Features</p>
               <ul className="space-y-1 list-disc list-inside">

@@ -65,13 +65,13 @@ function calculateRecipeCost(recipe: Recipe): number {
 function getCategoryIcon(category: string): string {
   switch (category.toUpperCase()) {
     case "FOOD":
-      return "🍽️";
+      return "serve";
     case "SOFT_DRINK":
-      return "🥤";
+      return "package";
     case "ALCOHOLIC_DRINK":
-      return "🍺";
+      return "package";
     default:
-      return "📦";
+      return "package";
   }
 }
 

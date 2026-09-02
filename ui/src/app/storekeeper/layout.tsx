@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import {
   ChartBarIcon,
   CubeIcon,
@@ -85,7 +86,7 @@ export default function StorekeeperLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6 bg-gradient-to-r from-blue-600 to-blue-800">
-          <span className="text-2xl">📦</span>
+          <IconRenderer icon="package" className="w-8 h-8" />
           <div>
             <p className="font-black text-white">Meat Lovers</p>
             <p className="text-xs text-blue-100">Storekeeper Portal</p>

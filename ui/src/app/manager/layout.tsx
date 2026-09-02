@@ -149,7 +149,7 @@ export default function ManagerLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">📊</span>
+            <IconRenderer icon="chart" className="w-6 h-6" />
             <span className="font-black text-zinc-950">Manager Portal</span>
           </div>
         </header>

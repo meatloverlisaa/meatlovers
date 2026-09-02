@@ -213,10 +213,10 @@ function PageList({
 type Tab = "pages" | "homepage" | "leads" | "analytics";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "pages", label: "Pages", icon: "📄" },
-  { id: "homepage", label: "Homepage", icon: "🏠" },
-  { id: "leads", label: "Leads", icon: "📬" },
-  { id: "analytics", label: "Analytics", icon: "📊" },
+  { id: "pages", label: "Pages", icon: "document" },
+  { id: "homepage", label: "Homepage", icon: "globe" },
+  { id: "leads", label: "Leads", icon: "inbox" },
+  { id: "analytics", label: "Analytics", icon: "chart" },
 ];
 
 export default function SuperAdminCMS() {
@@ -365,7 +365,7 @@ export default function SuperAdminCMS() {
                   : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
-              <span>{tab.icon}</span>
+              <IconRenderer icon={tab.icon} className="w-5 h-5" />
               {tab.label}
               {tab.id === "leads" && newLeadsCount > 0 && (
                 <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-xs font-bold">

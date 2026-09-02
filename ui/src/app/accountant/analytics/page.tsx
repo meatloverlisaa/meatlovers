@@ -99,7 +99,7 @@ export default function AccountantAnalytics() {
       value: analytics ? `KSh ${analytics.monthlyComparison[analytics.monthlyComparison.length - 1]?.revenue.toLocaleString() || 0}` : "KSh 0",
       change: "+12.5%",
       trend: "up",
-      icon: "💰",
+      icon: "money",
       color: "bg-green-100 dark:bg-green-900/20",
     },
     {
@@ -107,7 +107,7 @@ export default function AccountantAnalytics() {
       value: analytics ? `KSh ${analytics.monthlyComparison[analytics.monthlyComparison.length - 1]?.expenses.toLocaleString() || 0}` : "KSh 0",
       change: "+5.2%",
       trend: "up",
-      icon: "📤",
+      icon: "trending",
       color: "bg-red-100 dark:bg-red-900/20",
     },
     {
@@ -115,7 +115,7 @@ export default function AccountantAnalytics() {
       value: analytics ? `KSh ${analytics.monthlyComparison[analytics.monthlyComparison.length - 1]?.profit.toLocaleString() || 0}` : "KSh 0",
       change: "+18.3%",
       trend: "up",
-      icon: "📈",
+      icon: "chart",
       color: "bg-blue-100 dark:bg-blue-900/20",
     },
     {
@@ -123,7 +123,7 @@ export default function AccountantAnalytics() {
       value: analytics ? `${analytics.profitMargin}%` : "0%",
       change: "+2.1%",
       trend: "up",
-      icon: "📊",
+      icon: "trending",
       color: "bg-purple-100 dark:bg-purple-900/20",
     },
   ];

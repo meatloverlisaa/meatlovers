@@ -159,10 +159,10 @@ export default function AccountantReconciliation() {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "PAYMENT": return "💰";
-      case "EXPENSE": return "📤";
-      case "RECEIPT": return "📥";
-      default: return "📄";
+      case "PAYMENT": return "money";
+      case "EXPENSE": return "trending";
+      case "RECEIPT": return "trending";
+      default: return "document";
     }
   };
 

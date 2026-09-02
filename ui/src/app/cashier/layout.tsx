@@ -148,7 +148,7 @@ export default function CashierLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">💰</span>
+            <IconRenderer icon="money" className="w-6 h-6" />
             <span className="font-black text-zinc-950">Cashier Portal</span>
           </div>
         </header>

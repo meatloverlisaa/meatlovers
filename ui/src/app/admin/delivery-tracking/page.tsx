@@ -198,17 +198,17 @@ export default function DeliveryTrackingPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "📋";
+        return "clipboard";
       case "PICKED_UP":
-        return "📦";
+        return "package";
       case "IN_TRANSIT":
-        return "🚚";
+        return "package";
       case "DELIVERED":
-        return "✅";
+        return "check";
       case "CANCELLED":
-        return "❌";
+        return "error";
       default:
-        return "⏳";
+        return "clock";
     }
   };
 

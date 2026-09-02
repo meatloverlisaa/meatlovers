@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { getAuthHeader } from "@/lib/auth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 interface Rider {
   id: string;
@@ -301,7 +302,9 @@ export default function DispatcherDashboard() {
                   {summary.totalDeliveries}
                 </p>
               </div>
-              <div className="text-3xl">📦</div>
+              <div className="flex justify-center">
+                <IconRenderer icon="package" className="w-8 h-8 text-gray-600 dark:text-gray-400" />
+              </div>
             </div>
           </div>
 
@@ -313,7 +316,9 @@ export default function DispatcherDashboard() {
                   {summary.assigned}
                 </p>
               </div>
-              <div className="text-3xl">📋</div>
+              <div className="flex justify-center">
+                <IconRenderer icon="clipboard" className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              </div>
             </div>
           </div>
 
@@ -325,7 +330,9 @@ export default function DispatcherDashboard() {
                   {summary.pickedUp}
                 </p>
               </div>
-              <div className="text-3xl">📥</div>
+              <div className="flex justify-center">
+                <IconRenderer icon="trending" className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+              </div>
             </div>
           </div>
 
@@ -349,7 +356,9 @@ export default function DispatcherDashboard() {
                   {summary.delivered}
                 </p>
               </div>
-              <div className="text-3xl">✅</div>
+              <div className="flex justify-center">
+                <IconRenderer icon="check" className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+              </div>
             </div>
           </div>
 
