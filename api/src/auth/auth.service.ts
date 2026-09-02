@@ -23,8 +23,6 @@ export class AuthService {
   private readonly ACCESS_TOKEN_EXPIRY = '15m' as const;
   private readonly PRIVILEGED_SESSION_EXPIRY = '15m' as const;
   private readonly PRIVILEGED_SESSION_DURATION_MS = 15 * 60 * 1000;
-  private readonly MAX_LOGIN_ATTEMPTS = 5;
-  private readonly LOCKOUT_DURATION_MINUTES = 30;
   private readonly PASSWORD_RESET_EXPIRY_HOURS = 1;
 
   constructor(
@@ -71,22 +69,6 @@ export class AuthService {
       );
       throw new UnauthorizedException(
         'Passwordless login is only available for SUPER_ADMIN',
-      );
-    }
-
-    // Check if account is locked
-    if (user.account_locked_until && user.account_locked_until > new Date()) {
-      const lockDuration = Math.ceil(
-        (user.account_locked_until.getTime() - Date.now()) / 60000,
-      );
-      await this.auditLog.logLoginFailed(
-        sanitizedInput,
-        'Account locked',
-        ipAddress,
-        userAgent,
-      );
-      throw new UnauthorizedException(
-        `Account is locked due to multiple failed login attempts. Try again in ${lockDuration} minutes.`,
       );
     }
 
@@ -161,22 +143,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Check if account is locked
-    if (user.account_locked_until && user.account_locked_until > new Date()) {
-      const lockDuration = Math.ceil(
-        (user.account_locked_until.getTime() - Date.now()) / 60000,
-      );
-      await this.auditLog.logLoginFailed(
-        sanitizedInput,
-        'Account locked',
-        ipAddress,
-        userAgent,
-      );
-      throw new UnauthorizedException(
-        `Account is locked due to multiple failed login attempts. Try again in ${lockDuration} minutes.`,
-      );
-    }
-
     // Check if user is active
     if (!user.is_active) {
       await this.auditLog.logLoginFailed(
@@ -194,41 +160,12 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordValid) {
-      // Increment failed login attempts
-      const newFailedAttempts = user.failed_login_attempts + 1;
-
-      let accountLockedUntil: Date | null = null;
-      if (newFailedAttempts >= this.MAX_LOGIN_ATTEMPTS) {
-        accountLockedUntil = new Date(
-          Date.now() + this.LOCKOUT_DURATION_MINUTES * 60 * 1000,
-        );
-        await this.auditLog.logAccountLocked(
-          user.id,
-          `${this.MAX_LOGIN_ATTEMPTS} failed login attempts`,
-          ipAddress,
-        );
-      }
-
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          failed_login_attempts: newFailedAttempts,
-          account_locked_until: accountLockedUntil,
-        },
-      });
-
       await this.auditLog.logLoginFailed(
         sanitizedInput,
         'Invalid password',
         ipAddress,
         userAgent,
       );
-
-      if (accountLockedUntil) {
-        throw new UnauthorizedException(
-          `Account locked due to ${this.MAX_LOGIN_ATTEMPTS} failed login attempts. Try again in ${this.LOCKOUT_DURATION_MINUTES} minutes.`,
-        );
-      }
 
       throw new UnauthorizedException('Invalid credentials');
     }

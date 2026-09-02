@@ -156,93 +156,57 @@ describe('Authentication (e2e)', () => {
         .expect(400);
     });
 
-    it('should increment failed login attempts on wrong password', async () => {
+    it('should not lock or count failed attempts after wrong password attempts', async () => {
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({
           email_or_phone: testUser.email,
           password: 'WrongPassword',
-        })
-        .expect(401);
-
-      const user = await prismaService.user.findUnique({
-        where: { id: userId },
-      });
-
-      expect(user).not.toBeNull();
-      expect(user!.failed_login_attempts).toBeGreaterThan(0);
-
-      // Reset for other tests
-      await prismaService.user.update({
-        where: { id: userId },
-        data: { failed_login_attempts: 0 },
-      });
-    });
-
-    it('should lock account after 5 failed attempts', async () => {
-      // Set up user with 4 failed attempts
-      await prismaService.user.update({
-        where: { id: userId },
-        data: { failed_login_attempts: 4 },
-      });
-
-      // 5th failed attempt should lock the account
-      await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email_or_phone: testUser.email,
-          password: 'WrongPassword',
-        })
-        .expect(401);
-
-      const user = await prismaService.user.findUnique({
-        where: { id: userId },
-      });
-
-      expect(user).not.toBeNull();
-      expect(user!.failed_login_attempts).toBe(5);
-      expect(user!.account_locked_until).toBeDefined();
-      expect(user!.account_locked_until!.getTime()).toBeGreaterThan(Date.now());
-
-      // Clean up - unlock account
-      await prismaService.user.update({
-        where: { id: userId },
-        data: {
-          failed_login_attempts: 0,
-          account_locked_until: null,
-        },
-      });
-    });
-
-    it('should fail to login with locked account', async () => {
-      // Lock the account
-      const lockUntil = new Date(Date.now() + 30 * 60 * 1000);
-      await prismaService.user.update({
-        where: { id: userId },
-        data: {
-          account_locked_until: lockUntil,
-          failed_login_attempts: 5,
-        },
-      });
-
-      await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email_or_phone: testUser.email,
-          password: testUser.password,
         })
         .expect(401)
         .expect((res) => {
-          expect(res.body.message).toContain('locked');
+          expect(res.body.message).toContain('Invalid credentials');
         });
 
-      // Unlock for other tests
+      const user = await prismaService.user.findUnique({
+        where: { id: userId },
+      });
+
+      expect(user).not.toBeNull();
+      expect(user!.failed_login_attempts).toBe(0);
+      expect(user!.account_locked_until).toBeNull();
+
       await prismaService.user.update({
         where: { id: userId },
-        data: {
-          failed_login_attempts: 0,
-          account_locked_until: null,
-        },
+        data: { failed_login_attempts: 0, account_locked_until: null },
+      });
+    });
+
+    it('should not lock account after repeated failed attempts', async () => {
+      for (let attempt = 1; attempt <= 6; attempt++) {
+        await request(app.getHttpServer())
+          .post('/auth/login')
+          .send({
+            email_or_phone: testUser.email,
+            password: 'WrongPassword',
+          })
+          .expect(401)
+          .expect((res) => {
+            expect(res.body.message).toContain('Invalid credentials');
+          });
+      }
+
+      const user = await prismaService.user.findUnique({
+        where: { id: userId },
+      });
+
+      expect(user).not.toBeNull();
+      expect(user!.failed_login_attempts).toBe(0);
+      expect(user!.account_locked_until).toBeNull();
+
+      await prismaService.user.update({
+        where: { id: userId },
+        data: { failed_login_attempts: 0, account_locked_until: null },
       });
     });
 
