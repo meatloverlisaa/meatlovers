@@ -159,7 +159,7 @@ export function RewardsRecognition() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">🏆</span>
+                        <span className="text-xs font-bold uppercase tracking-wide text-amber-400">Award</span>
                         <p className="font-bold text-white">{reward.user?.full_name}</p>
                       </div>
                       <p className="mt-1 text-sm text-blue-400 font-semibold">{reward.award_type}</p>

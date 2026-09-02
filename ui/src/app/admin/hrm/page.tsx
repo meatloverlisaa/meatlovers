@@ -978,7 +978,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
               onClick={onClose}
               className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
             >
-              ✕
+              Close
             </button>
           </div>
         </div>
@@ -1013,7 +1013,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
           {/* Earnings */}
           <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
             <h4 className="font-bold text-sm text-green-700 dark:text-green-400 border-b border-zinc-200 pb-2 dark:border-zinc-800 flex items-center justify-between">
-              <span>💵 Earnings & Allowances</span>
+              <span>Earnings &amp; Allowances</span>
             </h4>
             <div className="mt-3 space-y-2 text-xs">
               <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
@@ -1135,7 +1135,7 @@ function ProcessPayrollModal({
             <IconRenderer icon="trending" className="w-5 h-5" />
             <h3 className="text-lg font-black">Process Monthly Payroll Batch</h3>
           </div>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         {error && (
@@ -1292,7 +1292,7 @@ function MarkPaidModal({
             <IconRenderer icon="credit-card" className="w-5 h-5" />
             <h3 className="text-base font-black">Confirm Salary Disbursement</h3>
           </div>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         <div className="mt-4 rounded-xl bg-green-50 p-4 border border-green-200 dark:bg-green-950/30 dark:border-green-800 text-xs">
@@ -1409,7 +1409,7 @@ function BulkPayModal({
             <IconRenderer icon="credit-card" className="w-5 h-5" />
             <h3 className="text-base font-black">Bulk Salary Disbursement</h3>
           </div>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         <div className="mt-4 rounded-xl bg-blue-50 p-4 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-800 text-xs">
@@ -1530,7 +1530,7 @@ function EditPayrollModal({
             <IconRenderer icon="edit" className="w-5 h-5" />
             <h3 className="text-base font-black">Edit Payroll Statement</h3>
           </div>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         <p className="mt-2 text-xs text-zinc-500">Employee: <strong>{record.user.full_name}</strong></p>

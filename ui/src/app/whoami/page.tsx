@@ -1,5 +1,6 @@
 "use client";
 
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -66,7 +67,10 @@ export default function WhoAmIPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-gray-800 rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🔍 Current User</h1>
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <IconRenderer icon="user" className="h-8 w-8 text-white" />
+            <h1 className="text-4xl font-bold text-white">Current User</h1>
+          </div>
           <p className="text-gray-400">Your authentication details</p>
         </div>
 
@@ -139,7 +143,10 @@ export default function WhoAmIPage() {
         </div>
 
         <div className="mt-8 p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
-          <p className="text-yellow-200 text-sm font-semibold mb-2">⚠️ Role Access Info:</p>
+          <div className="mb-2 flex items-center gap-2">
+            <IconRenderer icon="warning" className="h-4 w-4 text-yellow-200" />
+            <p className="text-yellow-200 text-sm font-semibold">Role Access Info:</p>
+          </div>
           <p className="text-yellow-100 text-xs">
             {user.role === 'STOREKEEPER' 
               ? "You have STOREKEEPER access. You can visit /storekeeper dashboard."

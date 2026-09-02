@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -229,7 +230,7 @@ export default function UploadRecipesPage() {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              <span className="text-4xl">📤</span>
+              <IconRenderer icon="document" className="h-10 w-10 text-zinc-700 dark:text-zinc-200" />
               Upload Recipes
             </h1>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">

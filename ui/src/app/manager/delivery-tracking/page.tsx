@@ -405,7 +405,7 @@ export default function ManagerDeliveryTrackingPage() {
                     onClick={() => setShowDetailsModal(false)}
                     className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                   >
-                    ✕
+                    Close
                   </button>
                 </div>
 

@@ -145,7 +145,7 @@ export default function DispatcherLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">🚚</span>
+            <IconRenderer icon="truck" className="h-5 w-5 text-zinc-950" />
             <span className="font-black text-zinc-950">Dispatcher Portal</span>
           </div>
         </header>

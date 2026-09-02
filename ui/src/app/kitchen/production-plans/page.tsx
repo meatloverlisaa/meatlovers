@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -351,7 +352,7 @@ export default function ProductionPlansPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-            <span className="text-4xl">📅</span>
+            <IconRenderer icon="calendar" className="h-8 w-8 text-zinc-900 dark:text-zinc-50" />
             Production Plans
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -443,7 +444,7 @@ export default function ProductionPlansPage() {
         {/* Empty State */}
         {filteredPlans.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📅</div>
+            <div className="mb-4 flex justify-center"><IconRenderer icon="calendar" className="h-16 w-16 text-zinc-400" /></div>
             <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
               No production plans found
             </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { API_BASE } from "./types";
 import { getAuthHeader } from "@/lib/auth";
 
@@ -152,7 +153,7 @@ export function HomepageSectionEditor({
 
       {sections.length === 0 ? (
         <div className="text-center py-12 text-zinc-500">
-          <p className="text-4xl mb-3">🏠</p>
+          <div className="mb-3 flex justify-center"><IconRenderer icon="document" className="h-10 w-10 text-zinc-400" /></div>
           <p className="font-semibold">No homepage sections yet</p>
           <p className="text-sm mt-1">Create your first homepage section above</p>
         </div>
@@ -188,7 +189,9 @@ export function HomepageSectionEditor({
                 </div>
               ) : (
                 <div className="p-4 flex items-start gap-4">
-                  <span className="text-2xl mt-0.5">{getIcon(s.slug)}</span>
+                  <div className="mt-0.5">
+                    <IconRenderer icon={getIcon(s.slug)} className="h-6 w-6 text-zinc-500" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h4 className="font-bold text-zinc-900">{s.title}</h4>

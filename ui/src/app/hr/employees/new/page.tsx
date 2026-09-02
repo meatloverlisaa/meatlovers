@@ -226,7 +226,7 @@ export default function NewEmployeePage() {
                       : "bg-slate-800 border-white/20 cursor-not-allowed"
                   }`}
                 >
-                  {s.id < step ? "✓" : s.icon}
+                  {s.id < step ? "Done" : s.icon}
                 </button>
                 <div className="text-center hidden sm:block">
                   <p

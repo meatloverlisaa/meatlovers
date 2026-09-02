@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   ChartBarIcon,
@@ -60,7 +61,7 @@ export default function AccountantLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-blue-900/50 px-6">
-          <span className="text-2xl">🍖</span>
+          <IconRenderer icon="package" className="h-6 w-6 text-white" />
           <div>
             <p className="font-black text-white">Meat Lovers</p>
             <p className="text-xs text-blue-400">Accountant Portal</p>
@@ -151,7 +152,7 @@ export default function AccountantLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">🍖</span>
+            <IconRenderer icon="package" className="h-5 w-5 text-white" />
             <span className="font-black text-white">Meat Lovers</span>
           </div>
         </header>

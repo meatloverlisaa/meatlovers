@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { PrepTimeMetrics } from "@/components/kitchen/PrepTimeMetrics";
 import { DelayedOrdersList } from "@/components/kitchen/DelayedOrdersList";
 import { ChefActivityTimeline } from "@/components/kitchen/ChefActivityTimeline";
@@ -163,7 +164,8 @@ export default function KitchenOperationsSummary() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              👨‍🍳 Kitchen Operations Summary
+              <IconRenderer icon="briefcase" className="h-7 w-7 text-zinc-900 dark:text-zinc-50" />
+              Kitchen Operations Summary
             </h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               Monitor kitchen performance, delays, and activity • Auto-refresh every 30s

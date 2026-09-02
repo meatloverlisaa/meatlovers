@@ -454,7 +454,7 @@ export default function KitchenReportsPage() {
             {/* Production Metrics */}
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                📅 Production Performance
+                Production Performance
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
@@ -495,7 +495,7 @@ export default function KitchenReportsPage() {
             {/* Recipe Metrics */}
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                📖 Recipe Performance
+                Recipe Performance
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">

@@ -139,7 +139,7 @@ export function DashboardMetrics() {
           <div className="mt-4 space-y-3">
             {recentActivity.map((activity, index) => (
               <div key={index} className="flex items-start gap-3 rounded-lg bg-zinc-950 p-3">
-                <span className="text-xl">📌</span>
+                <span className="text-xs font-bold uppercase tracking-wide text-blue-400">Note</span>
                 <div className="flex-1">
                   <p className="font-bold text-white">{activity.type}</p>
                   <p className="text-sm text-zinc-400">{activity.description}</p>

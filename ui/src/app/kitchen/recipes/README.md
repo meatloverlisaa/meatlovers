@@ -30,15 +30,15 @@ recipes/
 
 ## Features
 
-- ✅ Real-time search filtering
-- ✅ Category-based filtering
-- ✅ Expandable ingredient lists
-- ✅ Portion scaling calculator
-- ✅ Stock level warnings
-- ✅ Cost/margin calculations
-- ✅ Responsive design
-- ✅ Dark mode support
-- ✅ Authentication enforced
+- Real-time search filtering
+- Category-based filtering
+- Expandable ingredient lists
+- Portion scaling calculator
+- Stock level warnings
+- Cost/margin calculations
+- Responsive design
+- Dark mode support
+- Authentication enforced
 
 ## Access Control
 

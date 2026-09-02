@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -230,7 +231,7 @@ export default function KitchenMonitoringScreen() {
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">👨‍🍳</span>
+            <IconRenderer icon="briefcase" className="h-6 w-6 text-slate-900 dark:text-white" />
             <div>
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">Kitchen Queue</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">Auto-refresh: 30s</p>
@@ -346,7 +347,7 @@ export default function KitchenMonitoringScreen() {
                         : "bg-emerald-500 hover:bg-emerald-600"
                     }`}
                   >
-                    {nextStatus === "PREPARING" ? "▶ Start" : "✓ Ready"}
+                    {nextStatus === "PREPARING" ? "Start" : "Ready"}
                   </button>
                 )}
               </div>
@@ -355,7 +356,7 @@ export default function KitchenMonitoringScreen() {
 
           {foodOrders.length === 0 && (
             <div className="col-span-full text-center py-12">
-              <div className="text-6xl mb-4">👨‍🍳</div>
+              <div className="mb-4 flex justify-center"><IconRenderer icon="briefcase" className="h-16 w-16 text-slate-400" /></div>
               <p className="text-xl font-semibold text-slate-900 dark:text-white">
                 No orders in queue
               </p>

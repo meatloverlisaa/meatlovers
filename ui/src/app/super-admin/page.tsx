@@ -279,7 +279,7 @@ export default function SuperAdminDashboard() {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4F46E5'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6366F1'}
               >
-                🔄 Refresh Now
+                Refresh Now
               </button>
               <div className="text-right">
                 <p className="text-xs" style={{ color: '#475569' }}>
@@ -365,8 +365,8 @@ export default function SuperAdminDashboard() {
                   {summary.kitchenQueue}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#F59E0B20' }}>
-                🍳
+              <span className="rounded-lg flex h-12 w-12 items-center justify-center" style={{ backgroundColor: '#F59E0B20' }}>
+                <IconRenderer icon="briefcase" className="h-6 w-6 text-amber-400" />
               </span>
             </div>
           </div>
@@ -383,8 +383,8 @@ export default function SuperAdminDashboard() {
                   {summary.barQueue}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#06B6D420' }}>
-                🍹
+              <span className="rounded-lg flex h-12 w-12 items-center justify-center" style={{ backgroundColor: '#06B6D420' }}>
+                <IconRenderer icon="chart" className="h-6 w-6 text-cyan-400" />
               </span>
             </div>
           </div>
@@ -401,8 +401,8 @@ export default function SuperAdminDashboard() {
                   {summary.activeDeliveries}
                 </p>
               </div>
-              <span className="rounded-lg flex h-12 w-12 items-center justify-center text-2xl" style={{ backgroundColor: '#10B98120' }}>
-                🚚
+              <span className="rounded-lg flex h-12 w-12 items-center justify-center" style={{ backgroundColor: '#10B98120' }}>
+                <IconRenderer icon="truck" className="h-6 w-6 text-emerald-400" />
               </span>
             </div>
           </div>

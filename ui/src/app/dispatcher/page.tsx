@@ -344,7 +344,7 @@ export default function DispatcherDashboard() {
                   {summary.inTransit}
                 </p>
               </div>
-              <div className="text-3xl">🚚</div>
+              <div className="flex justify-center"><IconRenderer icon="truck" className="h-8 w-8 text-purple-600 dark:text-purple-400" /></div>
             </div>
           </div>
 

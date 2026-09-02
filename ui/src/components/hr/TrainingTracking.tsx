@@ -116,7 +116,7 @@ export function TrainingTracking() {
                     <td className="px-4 py-3 text-zinc-300">{record.score ? `${record.score}%` : "—"}</td>
                     <td className="px-4 py-3">
                       {record.certificate ? (
-                        <span className="text-emerald-400">✓ Issued</span>
+                        <span className="text-emerald-400">Issued</span>
                       ) : (
                         <span className="text-zinc-500">Pending</span>
                       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { IconRenderer } from '@/components/ui/IconRenderer';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -26,10 +27,10 @@ export default function BarTestPage() {
         setToken(authToken);
         
         if (!authToken) {
-          errs.push('❌ No auth_token found in localStorage');
-          steps.push('❌ Not logged in');
+          errs.push('No auth_token found in localStorage');
+          steps.push('Not logged in');
         } else {
-          steps.push(`✅ Token found: ${authToken.substring(0, 30)}...`);
+          steps.push(`Token found: ${authToken.substring(0, 30)}...`);
           
           // Step 2: Test bar orders API
           steps.push('Fetching bar orders...');
@@ -46,13 +47,13 @@ export default function BarTestPage() {
             if (ordersRes.ok) {
               const ordersData = await ordersRes.json();
               setOrders(ordersData);
-              steps.push(`✅ Orders loaded: ${Array.isArray(ordersData) ? ordersData.length : 0} orders`);
+              steps.push(`Orders loaded: ${Array.isArray(ordersData) ? ordersData.length : 0} orders`);
             } else {
               const errorText = await ordersRes.text();
-              errs.push(`❌ Orders API failed: ${ordersRes.status} - ${errorText}`);
+              errs.push(`Orders API failed: ${ordersRes.status} - ${errorText}`);
             }
           } catch (_err) {
-            errs.push(`❌ Orders API error: ${_err instanceof Error ? _err.message : String(_err)}`);
+            errs.push(`Orders API error: ${_err instanceof Error ? _err.message : String(_err)}`);
           }
           
           // Step 3: Test bar summary API
@@ -70,17 +71,17 @@ export default function BarTestPage() {
             if (summaryRes.ok) {
               const summaryData = await summaryRes.json();
               setSummary(summaryData);
-              steps.push(`✅ Summary loaded`);
+              steps.push(`Summary loaded`);
             } else {
               const errorText = await summaryRes.text();
-              errs.push(`❌ Summary API failed: ${summaryRes.status} - ${errorText}`);
+              errs.push(`Summary API failed: ${summaryRes.status} - ${errorText}`);
             }
           } catch (_err) {
-            errs.push(`❌ Summary API error: ${_err instanceof Error ? _err.message : String(_err)}`);
+            errs.push(`Summary API error: ${_err instanceof Error ? _err.message : String(_err)}`);
           }
         }
       } catch (_err) {
-        errs.push(`❌ General error: ${_err instanceof Error ? _err.message : String(_err)}`);
+        errs.push(`General error: ${_err instanceof Error ? _err.message : String(_err)}`);
       }
       
       setStatus(steps.join('\n'));
@@ -121,14 +122,20 @@ export default function BarTestPage() {
         {/* Token Info */}
         {token && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-green-800 mb-4">✅ Authentication Token</h2>
+            <div className="mb-4 flex items-center gap-2">
+              <IconRenderer icon="check" className="h-5 w-5 text-green-700" />
+              <h2 className="text-xl font-semibold text-green-800">Authentication Token</h2>
+            </div>
             <p className="text-green-700 font-mono text-xs break-all">{token}</p>
           </div>
         )}
 
         {!token && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-yellow-800 mb-4">⚠️ Not Logged In</h2>
+            <div className="mb-4 flex items-center gap-2">
+              <IconRenderer icon="warning" className="h-5 w-5 text-yellow-700" />
+              <h2 className="text-xl font-semibold text-yellow-800">Not Logged In</h2>
+            </div>
             <p className="text-yellow-700 mb-4">
               You need to set an auth token in localStorage. Run this in the browser console:
             </p>

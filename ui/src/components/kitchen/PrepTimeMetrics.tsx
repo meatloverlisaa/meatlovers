@@ -53,8 +53,8 @@ export function PrepTimeMetrics({ metrics }: PrepTimeMetricsProps) {
         {/* Average Wait Time */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-2xl">
-              ⏳
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-xs font-bold text-amber-700 dark:text-amber-300">
+              Wait
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -73,8 +73,8 @@ export function PrepTimeMetrics({ metrics }: PrepTimeMetricsProps) {
         {/* Completed Orders */}
         <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-2xl">
-              ✓
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+              Done
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
@@ -93,8 +93,8 @@ export function PrepTimeMetrics({ metrics }: PrepTimeMetricsProps) {
         {/* Active Orders */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-2xl">
-              🔥
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-xs font-bold text-red-700 dark:text-red-300">
+              Live
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">

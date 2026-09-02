@@ -51,7 +51,7 @@ export function OrderStatusTracker({
                           : "flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 dark:border-zinc-800 dark:text-zinc-400"
                     }
                   >
-                    {done ? "✓" : idx + 1}
+                    {done ? "Done" : idx + 1}
                   </div>
                   <div className="min-w-0">
                     <div className={done ? "text-xs font-semibold text-zinc-900 dark:text-zinc-50" : "text-xs font-semibold text-zinc-500 dark:text-zinc-400"}>

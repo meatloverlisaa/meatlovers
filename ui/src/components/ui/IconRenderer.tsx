@@ -34,6 +34,8 @@ import {
   Cog6ToothIcon,
   InboxIcon,
   MapPinIcon,
+  TruckIcon,
+  PlusIcon,
 } from '@heroicons/react/24/outline';
 
 // Mapping of emoji/icon types to Heroicons components
@@ -55,6 +57,11 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'error': ExclamationTriangleIcon,
   '🚨': BellIcon,
   'siren': BellIcon,
+  'truck': TruckIcon,
+  'delivery': TruckIcon,
+  'logistics': TruckIcon,
+  'add': PlusIcon,
+  'plus': PlusIcon,
 
   // Charts/Analytics
   '📊': ChartBarIcon,
@@ -149,6 +156,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   '🍽️': SparklesIcon,
   'serve': SparklesIcon,
   'plate': SparklesIcon,
+  'sparkles': SparklesIcon,
   'ready': CheckIcon,
 
   // Info/Actions

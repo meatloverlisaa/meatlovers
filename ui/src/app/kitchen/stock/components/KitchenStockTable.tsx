@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 type KitchenStock = {
   id: string | number;
@@ -46,7 +47,7 @@ export function KitchenStockTable({ stock }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <span className="text-xl">🍳</span>
+              <IconRenderer icon="check" className="h-5 w-5 text-zinc-700" />
               Kitchen Stock Inventory
             </h2>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">

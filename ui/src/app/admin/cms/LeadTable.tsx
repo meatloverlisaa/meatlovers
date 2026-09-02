@@ -114,7 +114,7 @@ export function LeadTable({
                   </td>
                   <td className="px-5 py-3.5 text-zinc-600 text-xs">
                     {lead.enquiry_type || "—"}
-                    {lead.event_date && <div className="mt-0.5">📅 {new Date(lead.event_date).toLocaleDateString()}</div>}
+                    {lead.event_date && <div className="mt-0.5 flex items-center gap-1"><IconRenderer icon="calendar" className="w-4 h-4 inline" /> {new Date(lead.event_date).toLocaleDateString()}</div>}
                     {lead.guest_count && <div><IconRenderer icon="people" className="w-4 h-4 inline" /> {lead.guest_count} guests</div>}
                   </td>
                   <td className="px-5 py-3.5"><LeadStatusBadge status={lead.status} /></td>
@@ -133,7 +133,7 @@ export function LeadTable({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-5 py-12 text-center text-zinc-500">
-                    <p className="text-3xl mb-2">📭</p>
+                    <div className="mb-2 flex justify-center"><IconRenderer icon="inbox" className="h-8 w-8 text-zinc-400" /></div>
                     <p className="font-semibold">No leads found</p>
                     <p className="text-xs mt-1">Try adjusting your filters</p>
                   </td>

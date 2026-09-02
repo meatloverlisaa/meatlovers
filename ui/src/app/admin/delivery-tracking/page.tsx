@@ -414,7 +414,7 @@ export default function DeliveryTrackingPage() {
                                 : "bg-gray-200 border-gray-300 text-gray-400"
                             }`}
                           >
-                            {event.completed ? "✓" : index + 1}
+                            {event.completed ? index + 1 : index + 1}
                           </div>
                           {index < timelineEvents.length - 1 && (
                             <div
@@ -517,7 +517,7 @@ export default function DeliveryTrackingPage() {
                     onClick={() => setShowDetailsModal(false)}
                     className="text-gray-400 hover:text-gray-600"
                   >
-                    ✕
+                    Close
                   </button>
                 </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { IconRenderer } from '@/components/ui/IconRenderer';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -71,9 +72,12 @@ export default function BarDebugPage() {
 
         {!debug.isLoggedIn && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-              ❌ Not Logged In
-            </h3>
+            <div className="mb-2 flex items-center gap-2">
+              <IconRenderer icon="warning" className="h-5 w-5 text-yellow-700" />
+              <h3 className="text-lg font-semibold text-yellow-800">
+                Not Logged In
+              </h3>
+            </div>
             <p className="text-yellow-700 mb-4">
               No auth_token found in localStorage. You need to log in first.
             </p>
@@ -90,11 +94,17 @@ export default function BarDebugPage() {
           <div className={`border rounded-lg p-6 ${
             debug.apiTest.ok ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
           }`}>
-            <h3 className={`text-lg font-semibold mb-2 ${
+            <div className={`mb-2 flex items-center gap-2 ${
               debug.apiTest.ok ? 'text-green-800' : 'text-red-800'
             }`}>
-              {debug.apiTest.ok ? '✅ API Call Success' : '❌ API Call Failed'}
-            </h3>
+              <IconRenderer
+                icon={debug.apiTest.ok ? 'check' : 'warning'}
+                className="h-5 w-5"
+              />
+              <h3 className="text-lg font-semibold">
+                {debug.apiTest.ok ? 'API Call Success' : 'API Call Failed'}
+              </h3>
+            </div>
             <p className={debug.apiTest.ok ? 'text-green-700' : 'text-red-700'}>
               Status: {debug.apiTest.status} {debug.apiTest.statusText}
             </p>

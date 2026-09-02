@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 type Product = {
   id: bigint | number;
@@ -54,7 +55,7 @@ export function UsageForm({ products, kitchenStock, onSubmit }: Props) {
         <div className="flex items-start gap-3">
           <div className="flex-1">
             <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <span className="text-xl">📝</span>
+              <IconRenderer icon="document" className="h-5 w-5 text-zinc-700" />
               Record Usage
             </h2>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">

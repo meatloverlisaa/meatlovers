@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   ChartBarIcon,
@@ -151,7 +152,7 @@ export default function AdminLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #334155' }}>
-          <span className="text-2xl">🍖</span>
+          <IconRenderer icon="package" className="h-6 w-6 text-white" />
           <div>
             <p className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</p>
             <p className="text-xs" style={{ color: '#94A3B8' }}>Admin Portal</p>
@@ -258,7 +259,7 @@ export default function AdminLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xl">🍖</span>
+            <IconRenderer icon="package" className="h-5 w-5 text-white" />
             <span className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</span>
           </div>
         </header>
