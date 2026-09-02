@@ -32,6 +32,8 @@ import {
   LockClosedIcon,
   PencilIcon,
   Cog6ToothIcon,
+  InboxIcon,
+  MapPinIcon,
 } from '@heroicons/react/24/outline';
 
 // Mapping of emoji/icon types to Heroicons components
@@ -83,6 +85,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'clipboard': ClipboardIcon,
   'list': DocumentTextIcon,
   'document': DocumentTextIcon,
+  'inbox': InboxIcon,
   '📄': DocumentIcon,
   'page': DocumentIcon,
 
@@ -166,6 +169,9 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'edit': PencilIcon,
   '⚙️': Cog6ToothIcon,
   'settings': Cog6ToothIcon,
+  '📍': MapPinIcon,
+  'location': MapPinIcon,
+  'pin': MapPinIcon,
 };
 
 interface IconRendererProps {
