@@ -2,6 +2,8 @@
 
 import React, { useMemo, useState } from "react";
 import { OrderStatusTracker } from "@/components/order-status-tracker";
+import { getAuthHeader } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/api-config";
 
 export type { OrderStatus } from "@/components/order-status-tracker";
 
@@ -26,9 +28,12 @@ function normalizeId(id: bigint | number): string {
 const categories: ProductCategory[] = ["FOOD", "SOFT_DRINK", "ALCOHOLIC_DRINK"];
 
 async function fetchProducts(): Promise<Product[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const API_BASE = getApiBaseUrl();
 
-  const res = await fetch(`${API_BASE}/products`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/products`, {
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`Failed to load products: ${res.status}${text ? ` - ${text}` : ""}`);
@@ -248,13 +253,16 @@ export default function PosMenuPage() {
       quantity: it.quantity,
     }));
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_BASE = getApiBaseUrl();
 
     try {
       setSubmitting(true);
       const res = await fetch(`${API_BASE}/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify({ tableId: coercedTableId, waiterId: coercedWaiterId, items }),
       });
 
@@ -264,7 +272,7 @@ export default function PosMenuPage() {
       }
 
       // Backend returns the created order; we don't need its shape for the UI.
-      await res.json().catch(() => null);
+      const created = await res.json().catch(() => null);
 
       // Clear cart
       setQuantities({});
@@ -274,7 +282,6 @@ export default function PosMenuPage() {
       setTableId("1");
       setWaiterId("1");
 
-      const created = await res.json().catch(() => null);
       // Try to set active status if backend returned the created order.
       if (created?.status) {
         setActiveOrderStatus(created.status as "PENDING" | "PREPARING" | "READY" | "SERVED");

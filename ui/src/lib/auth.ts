@@ -3,6 +3,8 @@
  * Handles JWT token storage, retrieval, and validation
  */
 
+import { getApiBaseUrl } from './api-config';
+
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const USER_KEY = 'user_data';
@@ -175,7 +177,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/refresh`, {
+    const response = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email_or_phone: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       // Call logout endpoint (best effort)
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/logout`, {
+      await fetch(`${getApiBaseUrl()}/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

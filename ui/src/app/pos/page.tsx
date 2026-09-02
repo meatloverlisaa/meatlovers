@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { getAuthHeader } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/api-config";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -35,10 +37,13 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 async function fetchMyOrders(): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const API_BASE = getApiBaseUrl();
   
   // For now, fetch all orders. In production, filter by waiter ID
-  const res = await fetch(`${API_BASE}/orders`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/orders`, {
+    cache: "no-store",
+    headers: getAuthHeader(),
+  });
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }

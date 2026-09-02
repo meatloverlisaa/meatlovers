@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getAuthHeader } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/api-config";
 
 type UserProfile = {
   id: string;
@@ -40,7 +41,7 @@ export default function ProfilePage() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const API_BASE = getApiBaseUrl();
       
       // Check if auth token exists
       const authHeaders = getAuthHeader();
@@ -93,7 +94,7 @@ export default function ProfilePage() {
     setLoading(true);
 
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const API_BASE = getApiBaseUrl();
       const res = await fetch(`${API_BASE}/auth/profile`, {
         method: "PATCH",
         headers: {
@@ -142,7 +143,7 @@ export default function ProfilePage() {
     setLoading(true);
 
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const API_BASE = getApiBaseUrl();
       const res = await fetch(`${API_BASE}/auth/change-password`, {
         method: "POST",
         headers: {
