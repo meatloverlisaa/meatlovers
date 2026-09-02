@@ -24,6 +24,23 @@ function getBackendBaseUrl(): string | null {
 }
 
 async function proxy(request: NextRequest, path: string[]) {
+  const method = request.method.toUpperCase();
+
+  if (method === 'GET' || method === 'HEAD') {
+    const routeName = path.join('/') || 'auth';
+    if (routeName === 'login' || routeName.startsWith('login/')) {
+      return Response.json(
+        {
+          error: 'Method Not Allowed',
+          message: 'Use POST /api/auth/login to sign in. GET is not supported for authentication.',
+          code: 'METHOD_NOT_ALLOWED',
+          allowedMethods: ['POST'],
+        },
+        { status: 405 },
+      );
+    }
+  }
+
   const backendBaseUrl = getBackendBaseUrl();
   if (!backendBaseUrl) {
     return Response.json(
