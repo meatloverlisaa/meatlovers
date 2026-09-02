@@ -288,34 +288,38 @@ export class BarService {
     limit?: number;
   }) {
     const where: any = {
-      to_location: 'BAR',
       movement_type: 'TRANSFER',
+      notes: { contains: 'Transfer to BAR' },
     };
 
     // Apply date filters
     if (params?.dateFrom || params?.dateTo) {
-      where.timestamp = {};
+      where.created_at = {};
       if (params.dateFrom) {
-        where.timestamp.gte = new Date(params.dateFrom);
+        where.created_at.gte = new Date(params.dateFrom);
       }
       if (params.dateTo) {
-        where.timestamp.lte = new Date(params.dateTo);
+        where.created_at.lte = new Date(params.dateTo);
       }
     } else {
       // Default to current day if no dates specified
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
-      where.timestamp = { gte: startOfDay };
+      where.created_at = { gte: startOfDay };
     }
 
     const movements = await (this.prisma as any).stockMovement.findMany({
       where,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: params?.limit || 20,
       include: {
-        product: {
-          select: {
-            product_name: true,
+        stock_item: {
+          include: {
+            product: {
+              select: {
+                product_name: true,
+              },
+            },
           },
         },
       },
@@ -323,12 +327,12 @@ export class BarService {
 
     return movements.map((movement) => ({
       id: movement.id.toString(),
-      productId: movement.product_id.toString(),
-      productName: movement.product.product_name,
-      quantity: movement.quantity,
-      fromLocation: movement.from_location,
-      toLocation: movement.to_location,
-      timestamp: movement.timestamp,
+      productId: movement.stock_item.product_id.toString(),
+      productName: movement.stock_item.product.product_name,
+      quantity: Math.abs(movement.quantity),
+      fromLocation: movement.stock_item.location,
+      toLocation: 'BAR',
+      timestamp: movement.created_at,
       notes: movement.notes,
     }));
   }
@@ -339,29 +343,35 @@ export class BarService {
     limit?: number;
   }) {
     const where: any = {
-      location: 'BAR',
+      stock_item: {
+        location: 'BAR',
+      },
     };
 
     // Apply date filters
     if (params?.dateFrom || params?.dateTo) {
-      where.timestamp = {};
+      where.created_at = {};
       if (params.dateFrom) {
-        where.timestamp.gte = new Date(params.dateFrom);
+        where.created_at.gte = new Date(params.dateFrom);
       }
       if (params.dateTo) {
-        where.timestamp.lte = new Date(params.dateTo);
+        where.created_at.lte = new Date(params.dateTo);
       }
     }
 
     const movements = await (this.prisma as any).stockMovement.findMany({
       where,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: params?.limit || 50,
       include: {
-        product: {
-          select: {
-            product_name: true,
-            product_category: true,
+        stock_item: {
+          include: {
+            product: {
+              select: {
+                product_name: true,
+                product_category: true,
+              },
+            },
           },
         },
       },
@@ -369,15 +379,13 @@ export class BarService {
 
     return movements.map((movement) => ({
       id: movement.id.toString(),
-      productId: movement.product_id.toString(),
-      productName: movement.product.product_name,
-      productCategory: movement.product.product_category,
+      productId: movement.stock_item.product_id.toString(),
+      productName: movement.stock_item.product.product_name,
+      productCategory: movement.stock_item.product.product_category,
       quantity: movement.quantity,
       movementType: movement.movement_type,
-      location: movement.location,
-      fromLocation: movement.from_location,
-      toLocation: movement.to_location,
-      timestamp: movement.timestamp,
+      location: movement.stock_item.location,
+      timestamp: movement.created_at,
       notes: movement.notes,
     }));
   }
