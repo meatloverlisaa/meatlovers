@@ -432,7 +432,7 @@ export default function DispatcherDashboard() {
                   )}
                   {rider.current_location && (
                     <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      📍 {rider.current_location}
+                      Location: {rider.current_location}
                     </div>
                   )}
                 </div>
@@ -622,7 +622,7 @@ export default function DispatcherDashboard() {
                             {rider.vehicle_type && ` (${rider.vehicle_type}`}
                             {rider.vehicle_plate && ` - ${rider.vehicle_plate})`}
                             {rider.vehicle_type && !rider.vehicle_plate && ')'}
-                            {rider.current_location && ` - 📍 ${rider.current_location}`}
+                            {rider.current_location && ` - Location: ${rider.current_location}`}
                           </option>
                         ))}
                       </select>
