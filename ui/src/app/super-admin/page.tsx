@@ -745,7 +745,7 @@ export default function SuperAdminDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E40AF'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1E3A8A'}
             >
-              <span className="text-2xl">📄</span>
+              <IconRenderer icon="document" className="w-6 h-6" />
               <div>
                 <p className="font-semibold" style={{ color: '#F9FAFB' }}>Website CMS</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Manage content</p>
@@ -760,6 +760,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3730A3'}
             >
               <IconRenderer icon="settings" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Full Admin Access</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Full admin access</p>
               </div>
             </a>
@@ -772,6 +774,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#064E3B'}
             >
               <IconRenderer icon="serve" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Menu Items</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Menu items</p>
               </div>
             </a>
@@ -784,6 +788,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#78350F'}
             >
               <IconRenderer icon="package" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Inventory</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Inventory</p>
               </div>
             </a>
@@ -810,6 +816,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#065F46'}
             >
               <IconRenderer icon="money" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Pricing Rules</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Rules & margins</p>
               </div>
             </a>
@@ -822,6 +830,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#155E75'}
             >
               <IconRenderer icon="clipboard" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Order Management</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Order management</p>
               </div>
             </a>
@@ -834,6 +844,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#312E81'}
             >
               <IconRenderer icon="building" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Manage Suppliers</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Manage suppliers</p>
               </div>
             </a>
@@ -846,6 +858,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#831843'}
             >
               <IconRenderer icon="people" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Staff & Payroll</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Staff & payroll</p>
               </div>
             </a>
@@ -858,6 +872,8 @@ export default function SuperAdminDashboard() {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#115E59'}
             >
               <IconRenderer icon="money" className="w-6 h-6" />
+              <div>
+                <p className="font-semibold" style={{ color: '#F9FAFB' }}>Financial Reports</p>
                 <p className="text-xs" style={{ color: '#9CA3AF' }}>Financial reports</p>
               </div>
             </a>
