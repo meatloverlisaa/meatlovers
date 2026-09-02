@@ -9,6 +9,7 @@ yarn-error.log*
 dist/
 build/
 .next/
+.next-dev/
 out/
 *.tsbuildinfo
 

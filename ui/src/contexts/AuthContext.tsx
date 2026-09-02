@@ -97,8 +97,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const error = await response.json().catch(() => null);
+          const message = Array.isArray(error?.message)
+            ? error.message.join(', ')
+            : error?.message;
+          throw new Error(message || `Login failed (${response.status})`);
+        }
+
+        throw new Error(
+          `Login service returned an unexpected response (${response.status}). Please restart the API and UI services.`,
+        );
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('Login service returned an invalid response. Please restart the API and UI services.');
       }
 
       const data = await response.json();
