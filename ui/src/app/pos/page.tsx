@@ -47,8 +47,22 @@ async function fetchMyOrders(): Promise<Order[]> {
   if (!res.ok) {
     throw new Error(`Failed to fetch orders: ${res.status}`);
   }
-  
-  return res.json();
+
+  const payload: unknown = await res.json();
+  if (Array.isArray(payload)) {
+    return payload as Order[];
+  }
+
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "data" in payload &&
+    Array.isArray(payload.data)
+  ) {
+    return payload.data as Order[];
+  }
+
+  throw new Error("Orders response has an invalid format");
 }
 
 function calculateStats(orders: Order[]): WaiterStats {
