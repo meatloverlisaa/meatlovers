@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type SummaryCard = {
@@ -62,14 +63,14 @@ function SummaryCards({ cards }: { cards: SummaryCard[] }) {
                 </p>
               )}
             </div>
-            <span
-              className={`rounded-lg flex h-12 w-12 items-center justify-center text-2xl`}
+            <div
+              className={`rounded-lg flex h-12 w-12 items-center justify-center`}
               style={{
                 backgroundColor: card.trend === "up" ? "#22C55E20" : card.trend === "down" ? "#EF444420" : "#3B82F620"
               }}
             >
-              {card.icon}
-            </span>
+              <IconRenderer icon={card.icon} className="w-6 h-6 text-gray-400" />
+            </div>
           </div>
         </div>
       ))}
@@ -175,9 +176,9 @@ function ApprovalQueueWidget({ count }: { count: number }) {
           <h3 className="font-black" style={{ color: '#F8FAFC' }}>Approval Queue</h3>
           <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Pending approvals</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#3B82F620' }}>
-          ✓
-        </span>
+        <div className="flex h-14 w-14 items-center justify-center rounded-full" style={{ backgroundColor: '#3B82F620' }}>
+          <IconRenderer icon="check" className="w-6 h-6" />
+        </div>
       </div>
       <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
       <Link
@@ -201,9 +202,9 @@ function LeadWidget({ count }: { count: number }) {
           <h3 className="font-black" style={{ color: '#F8FAFC' }}>New Leads</h3>
           <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Awaiting follow-up</p>
         </div>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#22C55E20' }}>
-          📬
-        </span>
+        <div className="flex h-14 w-14 items-center justify-center rounded-full" style={{ backgroundColor: '#22C55E20' }}>
+          <IconRenderer icon="inbox" className="w-6 h-6" />
+        </div>
       </div>
       <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>{count}</p>
       <Link
@@ -222,17 +223,17 @@ function ActivityTimeline({ activities }: { activities: Activity[] }) {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "order":
-        return "🛒";
+        return "cart";
       case "stock":
-        return "📦";
+        return "package";
       case "payment":
-        return "💳";
+        return "credit-card";
       case "lead":
-        return "📬";
+        return "inbox";
       case "user":
-        return "👤";
+        return "person";
       default:
-        return "📌";
+        return "document";
     }
   };
 
@@ -246,9 +247,9 @@ function ActivityTimeline({ activities }: { activities: Activity[] }) {
         ) : (
           activities.map((activity) => (
             <div key={activity.id} className="flex items-start gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg" style={{ backgroundColor: '#334155' }}>
-                {getActivityIcon(activity.type)}
-              </span>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: '#334155' }}>
+                <IconRenderer icon={getActivityIcon(activity.type)} className="w-4 h-4" />
+              </div>
               <div className="flex-1">
                 <p className="text-sm" style={{ color: '#F8FAFC' }}>{activity.message}</p>
                 <div className="mt-1 flex items-center gap-2 text-xs" style={{ color: '#94A3B8' }}>
@@ -294,9 +295,7 @@ function AlertBanner({ alerts }: { alerts: Alert[] }) {
             }}
           >
             <div className="flex items-center gap-3">
-              <span className="text-xl">
-                {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
-              </span>
+              <IconRenderer icon={alert.type === "error" ? "error" : alert.type === "warning" ? "warning" : "info"} className="w-5 h-5" />
               <p className="text-sm font-semibold" style={{ color: colors.text }}>{alert.message}</p>
             </div>
             {alert.action && (
@@ -321,22 +320,22 @@ function AlertBanner({ alerts }: { alerts: Alert[] }) {
 
 // ─── Quick Actions Module Grid ────────────────────────────────────────────────
 const adminModules = [
-  { href: "/admin/orders", label: "Order Management", icon: "📋", desc: "View & manage all orders" },
-  { href: "/admin/cms", label: "Website CMS", icon: "🌐", desc: "Pages, leads, analytics" },
-  { href: "/admin/products", label: "Products", icon: "🍖", desc: "Menu & product catalogue" },
-  { href: "/admin/pricing-control", label: "Pricing Control", icon: "💰", desc: "Rules & margin alerts" },
-  { href: "/admin/suppliers", label: "Suppliers", icon: "🏭", desc: "Supplier directory" },
-  { href: "/admin/stock", label: "Stock Control", icon: "📦", desc: "Inventory & movements" },
-  { href: "/admin/production-plans", label: "Production Plans", icon: "📅", desc: "Kitchen production planning" },
-  { href: "/admin/payments", label: "Payments", icon: "💳", desc: "Payment log & variance" },
-  { href: "/admin/dispatch", label: "Dispatch", icon: "🚴", desc: "Delivery operations" },
-  { href: "/admin/delivery-tracking", label: "Delivery Tracking", icon: "📍", desc: "Live delivery log" },
-  { href: "/admin/waste", label: "Waste Management", icon: "♻️", desc: "Waste declarations" },
-  { href: "/kitchen/recipes", label: "Recipes Management", icon: "📖", desc: "Standardized recipes & costs" },
-  { href: "/admin/kitchen", label: "Kitchen Oversight", icon: "👨‍🍳", desc: "Kitchen operations" },
-  { href: "/admin/bar", label: "Bar Oversight", icon: "🍺", desc: "Bar operations" },
-  { href: "/admin/reports", label: "Reports", icon: "📊", desc: "Business intelligence" },
-  { href: "/admin/users", label: "User Management", icon: "👥", desc: "Staff & permissions" },
+  { href: "/admin/orders", label: "Order Management", icon: "clipboard", desc: "View & manage all orders" },
+  { href: "/admin/cms", label: "Website CMS", icon: "globe", desc: "Pages, leads, analytics" },
+  { href: "/admin/products", label: "Products", icon: "package", desc: "Menu & product catalogue" },
+  { href: "/admin/pricing-control", label: "Pricing Control", icon: "money", desc: "Rules & margin alerts" },
+  { href: "/admin/suppliers", label: "Suppliers", icon: "building", desc: "Supplier directory" },
+  { href: "/admin/stock", label: "Stock Control", icon: "package", desc: "Inventory & movements" },
+  { href: "/admin/production-plans", label: "Production Plans", icon: "calendar", desc: "Kitchen production planning" },
+  { href: "/admin/payments", label: "Payments", icon: "credit-card", desc: "Payment log & variance" },
+  { href: "/admin/dispatch", label: "Dispatch", icon: "check", desc: "Delivery operations" },
+  { href: "/admin/delivery-tracking", label: "Delivery Tracking", icon: "location", desc: "Live delivery log" },
+  { href: "/admin/waste", label: "Waste Management", icon: "recycle", desc: "Waste declarations" },
+  { href: "/kitchen/recipes", label: "Recipes Management", icon: "document", desc: "Standardized recipes & costs" },
+  { href: "/admin/kitchen", label: "Kitchen Oversight", icon: "chart", desc: "Kitchen operations" },
+  { href: "/admin/bar", label: "Bar Oversight", icon: "chart", desc: "Bar operations" },
+  { href: "/admin/reports", label: "Reports", icon: "chart", desc: "Business intelligence" },
+  { href: "/admin/users", label: "User Management", icon: "people", desc: "Staff & permissions" },
 ];
 
 // ─── Main Dashboard Component ─────────────────────────────────────────────────
@@ -345,10 +344,10 @@ export default function AdminDashboard() {
   const { logout } = useAuth();
   
   const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([
-    { label: "Today's Revenue", value: "KSh 0", icon: "💰", color: "bg-emerald-100", trend: "neutral" },
-    { label: "Open Orders", value: "0", icon: "📋", color: "bg-blue-100", trend: "neutral" },
+    { label: "Today's Revenue", value: "KSh 0", icon: "money", color: "bg-emerald-100", trend: "neutral" },
+    { label: "Open Orders", value: "0", icon: "clipboard", color: "bg-blue-100", trend: "neutral" },
     { label: "New Leads", value: "0", icon: "📬", color: "bg-purple-100", trend: "neutral" },
-    { label: "Stock Alerts", value: "0", icon: "⚠️", color: "bg-red-100", trend: "neutral" },
+    { label: "Stock Alerts", value: "0", icon: "warning", color: "bg-red-100", trend: "neutral" },
   ]);
 
   const [revenueData, setRevenueData] = useState({ today: 0, week: 0, month: 0 });
@@ -422,7 +421,7 @@ export default function AdminDashboard() {
         value: "KSh 45K",
         change: "+12% vs yesterday",
         trend: "up",
-        icon: "💰",
+        icon: "money",
         color: "",
       },
       {
@@ -430,7 +429,7 @@ export default function AdminDashboard() {
         value: "12",
         change: "8 pending, 4 in progress",
         trend: "neutral",
-        icon: "📋",
+        icon: "clipboard",
         color: "",
       },
       {
@@ -438,7 +437,7 @@ export default function AdminDashboard() {
         value: "3",
         change: "From website forms",
         trend: "neutral",
-        icon: "📬",
+        icon: "inbox",
         color: "",
       },
       {
@@ -446,7 +445,7 @@ export default function AdminDashboard() {
         value: "7",
         change: "5 low, 2 out of stock",
         trend: "down",
-        icon: "⚠️",
+        icon: "warning",
         color: "",
       },
     ]);
@@ -539,9 +538,9 @@ export default function AdminDashboard() {
                   <h3 className="font-black" style={{ color: '#F8FAFC' }}>Active Users</h3>
                   <p className="mt-1 text-xs" style={{ color: '#94A3B8' }}>Currently online</p>
                 </div>
-                <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl" style={{ backgroundColor: '#22C55E20' }}>
-                  👥
-                </span>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full" style={{ backgroundColor: '#22C55E20' }}>
+                <IconRenderer icon="people" className="w-6 h-6" />
+              </div>
               </div>
               <p className="mt-4 text-4xl font-black" style={{ color: '#F8FAFC' }}>8</p>
               <Link
@@ -579,7 +578,9 @@ export default function AdminDashboard() {
                     e.currentTarget.style.backgroundColor = '#1E293B';
                   }}
                 >
-                  <span className="text-3xl">{mod.icon}</span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg">
+                    <IconRenderer icon={mod.icon} className="w-5 h-5" />
+                  </div>
                   <div>
                     <p className="font-bold" style={{ color: '#F8FAFC' }}>{mod.label}</p>
                     <p className="mt-0.5 text-xs" style={{ color: '#94A3B8' }}>{mod.desc}</p>

@@ -121,7 +121,7 @@ function PageList({
   if (pages.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white py-16 text-center">
-        <p className="text-4xl mb-3">📄</p>
+        <p className="text-4xl mb-3">�</p>
         <p className="font-semibold text-zinc-700">No pages yet</p>
         <p className="text-sm text-zinc-400 mt-1">
           Create your first page using the button above

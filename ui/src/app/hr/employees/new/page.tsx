@@ -120,10 +120,10 @@ const initialForm: FormData = {
 };
 
 const STEPS = [
-  { id: 1, title: "Basic Info", icon: "👤", description: "Account & personal details" },
-  { id: 2, title: "Employment", icon: "💼", description: "Role & job information" },
-  { id: 3, title: "Emergency", icon: "🚨", description: "Emergency contact" },
-  { id: 4, title: "Banking", icon: "🏦", description: "Bank & qualifications" },
+  { id: 1, title: "Basic Info", icon: "person", description: "Account & personal details" },
+  { id: 2, title: "Employment", icon: "briefcase", description: "Role & job information" },
+  { id: 3, title: "Emergency", icon: "siren", description: "Emergency contact" },
+  { id: 4, title: "Banking", icon: "bank", description: "Bank & qualifications" },
 ];
 
 export default function NewEmployeePage() {

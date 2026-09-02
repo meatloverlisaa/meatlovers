@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,11 +15,11 @@ type NavItem = {
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/manager", label: "Manager Dashboard", icon: "📊" },
-  { href: "/manager/orders", label: "Orders", icon: "📋" },
-  { href: "/manager/reports", label: "Reports", icon: "📈" },
-  { href: "/manager/stock", label: "Stock", icon: "📦" },
-  { href: "/manager/staff", label: "Staff", icon: "👥" },
+  { href: "/manager", label: "Manager Dashboard", icon: "chart" },
+  { href: "/manager/orders", label: "Orders", icon: "clipboard" },
+  { href: "/manager/reports", label: "Reports", icon: "trending" },
+  { href: "/manager/stock", label: "Stock", icon: "package" },
+  { href: "/manager/staff", label: "Staff", icon: "people" },
 ];
 
 // ─── Manager Layout Component ─────────────────────────────────────────────────
@@ -54,7 +55,7 @@ export default function ManagerLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
-          <span className="text-2xl">📊</span>
+          <IconRenderer icon="chart" className="w-6 h-6" />
           <div>
             <p className="font-black text-zinc-950">Meat Lovers</p>
             <p className="text-xs text-zinc-500">Manager Portal</p>
@@ -75,7 +76,7 @@ export default function ManagerLayout({
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <IconRenderer icon={item.icon} className="w-5 h-5" />
                 {item.label}
               </Link>
             ))}

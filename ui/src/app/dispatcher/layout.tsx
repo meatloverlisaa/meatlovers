@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,7 +15,7 @@ type NavItem = {
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/dispatcher", label: "Dispatcher Dashboard", icon: "🚚" },
+  { href: "/dispatcher", label: "Dispatcher Dashboard", icon: "chart" },
 ];
 
 // ─── Dispatcher Layout Component ─────────────────────────────────────────────────
@@ -50,7 +51,7 @@ export default function DispatcherLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
-          <span className="text-2xl">🚚</span>
+          <IconRenderer icon="chart" className="w-6 h-6" />
           <div>
             <p className="font-black text-zinc-950">Meat Lovers</p>
             <p className="text-xs text-zinc-500">Dispatcher Portal</p>
@@ -71,7 +72,7 @@ export default function DispatcherLayout({
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <IconRenderer icon={item.icon} className="w-5 h-5" />
                 {item.label}
               </Link>
             ))}

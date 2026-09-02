@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,10 +15,10 @@ type NavItem = {
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/cashier", label: "Cashier Dashboard", icon: "💰" },
-  { href: "/cashier/orders", label: "Orders", icon: "📋" },
-  { href: "/cashier/payments", label: "Payments", icon: "💵" },
-  { href: "/cashier/settle", label: "Settle Bills", icon: "💳" },
+  { href: "/cashier", label: "Cashier Dashboard", icon: "money" },
+  { href: "/cashier/orders", label: "Orders", icon: "clipboard" },
+  { href: "/cashier/payments", label: "Payments", icon: "dollar" },
+  { href: "/cashier/settle", label: "Settle Bills", icon: "credit-card" },
 ];
 
 // ─── Cashier Layout Component ─────────────────────────────────────────────────
@@ -53,7 +54,7 @@ export default function CashierLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
-          <span className="text-2xl">💰</span>
+          <IconRenderer icon="money" className="w-6 h-6" />
           <div>
             <p className="font-black text-zinc-950">Meat Lovers</p>
             <p className="text-xs text-zinc-500">Cashier Portal</p>
@@ -74,7 +75,7 @@ export default function CashierLayout({
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <IconRenderer icon={item.icon} className="w-5 h-5" />
                 {item.label}
               </Link>
             ))}

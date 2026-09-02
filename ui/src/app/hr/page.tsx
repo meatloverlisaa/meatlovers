@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type HrmSummary = {
@@ -45,11 +46,11 @@ export default function HRDashboard() {
   }, []);
 
   const cards = [
-    { label: "Total staff", value: summary?.totalStaff ?? "—", detail: "Employee records", icon: "👥", color: "bg-blue-900" },
-    { label: "Active staff", value: summary?.activeStaff ?? "—", detail: "Currently employed", icon: "✓", color: "bg-emerald-900" },
-    { label: "Attendance today", value: summary?.todayAttendance ?? "—", detail: "Recorded check-ins", icon: "◷", color: "bg-amber-900" },
-    { label: "Pending leave", value: summary?.pendingLeaves ?? "—", detail: "Requests awaiting review", icon: "◫", color: "bg-sky-900" },
-    { label: "Payroll", value: "Manage", detail: "Salary & payments", icon: "💰", color: "bg-purple-900", link: "/hr/payroll" },
+    { label: "Total staff", value: summary?.totalStaff ?? "—", detail: "Employee records", icon: "people", color: "bg-blue-900" },
+    { label: "Active staff", value: summary?.activeStaff ?? "—", detail: "Currently employed", icon: "check", color: "bg-emerald-900" },
+    { label: "Attendance today", value: summary?.todayAttendance ?? "—", detail: "Recorded check-ins", icon: "calendar", color: "bg-amber-900" },
+    { label: "Pending leave", value: summary?.pendingLeaves ?? "—", detail: "Requests awaiting review", icon: "calendar", color: "bg-sky-900" },
+    { label: "Payroll", value: "Manage", detail: "Salary & payments", icon: "money", color: "bg-purple-900", link: "/hr/payroll" },
   ];
 
   return (
@@ -73,7 +74,7 @@ export default function HRDashboard() {
                 <p className="mt-2 text-3xl font-black text-white">{loading ? "…" : card.value}</p>
                 <p className="mt-1 text-xs text-zinc-500">{card.detail}</p>
               </div>
-              <span className={`flex h-11 w-11 items-center justify-center rounded-lg text-xl font-black text-white ${card.color}`}>{card.icon}</span>
+              <span className={`flex h-11 w-11 items-center justify-center rounded-lg text-white ${card.color}`}><IconRenderer icon={card.icon} className="w-5 h-5" /></span>
             </div>
           );
           

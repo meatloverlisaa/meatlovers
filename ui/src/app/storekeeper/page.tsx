@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthHeader } from "@/lib/auth";
@@ -173,25 +174,25 @@ export default function StorekeeperDashboard() {
       value: summary.stockItems,
       change: "+8 this week",
       trend: "up",
-      icon: "📦",
+      icon: "package",
       color: "bg-blue-100 dark:bg-blue-900/20",
     },
     {
       label: "Low Stock",
       value: summary.lowStock,
-      icon: "⚠️",
+      icon: "warning",
       color: "bg-amber-100 dark:bg-amber-900/20",
     },
     {
       label: "Out of Stock",
       value: summary.outOfStock,
-      icon: "❌",
+      icon: "error",
       color: "bg-red-100 dark:bg-red-900/20",
     },
     {
       label: "Pending Orders",
       value: summary.pendingOrders,
-      icon: "📥",
+      icon: "inbox",
       color: "bg-purple-100 dark:bg-purple-900/20",
     },
   ];
@@ -199,25 +200,25 @@ export default function StorekeeperDashboard() {
   const quickActions: QuickAction[] = [
     {
       label: "Receive Delivery",
-      icon: "📥",
+      icon: "inbox",
       href: "/storekeeper/receiving/new",
       color: "bg-emerald-50 dark:bg-emerald-900/20",
     },
     {
       label: "Check Stock",
-      icon: "📦",
+      icon: "package",
       href: "/storekeeper/stock",
       color: "bg-blue-50 dark:bg-blue-900/20",
     },
     {
       label: "Order Supplies",
-      icon: "🛒",
+      icon: "cart",
       href: "/storekeeper/suppliers/order",
       color: "bg-purple-50 dark:bg-purple-900/20",
     },
     {
       label: "Stock Report",
-      icon: "📊",
+      icon: "chart",
       href: "/storekeeper/stock/report",
       color: "bg-amber-50 dark:bg-amber-900/20",
     },
@@ -311,9 +312,7 @@ export default function StorekeeperDashboard() {
                 className={`flex items-center justify-between rounded-lg border p-4 ${getAlertColor(alert.type)}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">
-                    {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
-                  </span>
+                  <IconRenderer icon={alert.type === "error" ? "error" : alert.type === "warning" ? "warning" : "info"} className="w-5 h-5" />
                   <p className="text-sm font-semibold">{alert.message}</p>
                 </div>
                 {alert.action && (
@@ -348,7 +347,7 @@ export default function StorekeeperDashboard() {
                     </p>
                   )}
                 </div>
-                <div className={`text-3xl p-3 rounded-lg ${card.color}`}>{card.icon}</div>
+                <div className={`p-3 rounded-lg ${card.color}`}><IconRenderer icon={card.icon} className="w-6 h-6" /></div>
               </div>
             </div>
           ))}
@@ -417,7 +416,7 @@ export default function StorekeeperDashboard() {
                   href={action.href}
                   className={`flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-4 transition hover:shadow-md ${action.color}`}
                 >
-                  <span className="text-2xl">{action.icon}</span>
+                  <IconRenderer icon={action.icon} className="w-6 h-6" />
                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                     {action.label}
                   </span>

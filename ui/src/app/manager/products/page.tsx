@@ -56,10 +56,10 @@ function CategoryFilter({
   onSelect: (category: ProductCategory | "ALL") => void;
 }) {
   const categories: Array<{ id: ProductCategory | "ALL"; label: string; icon: string }> = [
-    { id: "ALL", label: "All Products", icon: "🛒" },
-    { id: "FOOD", label: "Food", icon: "🍖" },
-    { id: "SOFT_DRINK", label: "Soft Drinks", icon: "🥤" },
-    { id: "ALCOHOLIC_DRINK", label: "Alcoholic Drinks", icon: "🍺" },
+    { id: "ALL", label: "All Products", icon: "cart" },
+    { id: "FOOD", label: "Food", icon: "package" },
+    { id: "SOFT_DRINK", label: "Soft Drinks", icon: "chart" },
+    { id: "ALCOHOLIC_DRINK", label: "Alcoholic Drinks", icon: "chart" },
   ];
 
   return (

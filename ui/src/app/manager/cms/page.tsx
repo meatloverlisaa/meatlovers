@@ -128,7 +128,7 @@ function PageList({ pages }: { pages: ContentPage[] }) {
   if (pages.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-        <p className="text-4xl mb-3">📄</p>
+        <p className="text-4xl mb-3">�</p>
         <p className="font-semibold text-zinc-700 dark:text-zinc-300">No pages found</p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Pages will appear here once created

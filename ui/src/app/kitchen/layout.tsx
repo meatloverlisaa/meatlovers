@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,9 +15,9 @@ type NavItem = {
 
 // ─── Navigation Configuration ─────────────────────────────────────────────────
 const navigationItems: NavItem[] = [
-  { href: "/kitchen", label: "Dashboard", icon: "📊" },
-  { href: "/kitchen/queue", label: "Order Queue", icon: "🍽️" },
-  { href: "/kitchen/stock", label: "Kitchen Stock", icon: "📦" },
+  { href: "/kitchen", label: "Dashboard", icon: "chart" },
+  { href: "/kitchen/queue", label: "Order Queue", icon: "serve" },
+  { href: "/kitchen/stock", label: "Kitchen Stock", icon: "package" },
 ];
 
 // ─── Kitchen Layout Component ─────────────────────────────────────────────────
@@ -52,7 +53,7 @@ export default function KitchenLayout({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6">
-          <span className="text-2xl">👨‍🍳</span>
+          <IconRenderer icon="chart" className="w-6 h-6" />
           <div>
             <p className="font-black text-zinc-950">Meat Lovers</p>
             <p className="text-xs text-zinc-500">Kitchen Portal</p>
@@ -73,7 +74,7 @@ export default function KitchenLayout({
                     : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <IconRenderer icon={item.icon} className="w-5 h-5" />
                 {item.label}
               </Link>
             ))}

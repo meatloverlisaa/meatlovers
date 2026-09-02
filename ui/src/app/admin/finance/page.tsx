@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FinanceTransaction = {
@@ -96,25 +97,25 @@ function SummaryCards({ summary }: { summary: FinanceSummary }) {
     {
       label: "Total Income",
       value: `KSh ${summary.totalIncome.toLocaleString()}`,
-      icon: "💰",
+      icon: "money",
       color: "bg-green-100",
     },
     {
       label: "Total Expenses",
       value: `KSh ${summary.totalExpenses.toLocaleString()}`,
-      icon: "📉",
+      icon: "trending",
       color: "bg-red-100",
     },
     {
       label: "Net Profit",
       value: `KSh ${summary.netProfit.toLocaleString()}`,
-      icon: "📊",
+      icon: "chart",
       color: summary.netProfit >= 0 ? "bg-blue-100" : "bg-red-100",
     },
     {
       label: "Transactions",
       value: summary.totalTransactions,
-      icon: "📝",
+      icon: "document",
       color: "bg-purple-100",
     },
   ];
@@ -133,11 +134,11 @@ function SummaryCards({ summary }: { summary: FinanceSummary }) {
               </p>
               <p className="mt-2 text-2xl font-black text-zinc-950">{card.value}</p>
             </div>
-            <span
-              className={`rounded-lg ${card.color} flex h-12 w-12 items-center justify-center text-2xl`}
+            <div
+              className={`rounded-lg ${card.color} flex h-12 w-12 items-center justify-center`}
             >
-              {card.icon}
-            </span>
+              <IconRenderer icon={card.icon} className="w-5 h-5" />
+            </div>
           </div>
         </div>
       ))}

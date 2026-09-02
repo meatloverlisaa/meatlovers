@@ -116,7 +116,7 @@ function PageList({
   if (pages.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-16 text-center">
-        <p className="text-4xl mb-3">📄</p>
+        <p className="text-4xl mb-3">�</p>
         <p className="font-semibold text-gray-700 dark:text-gray-300">No pages yet</p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Create your first page using the button above

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface AnalyticsData {
@@ -185,7 +186,7 @@ export default function AccountantAnalytics() {
                       )}
                     </div>
                     <div className={`rounded-xl p-3 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border border-blue-500/30`}>
-                      <span className="text-2xl">{card.icon}</span>
+                      <IconRenderer icon={card.icon} className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
