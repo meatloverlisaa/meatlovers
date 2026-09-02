@@ -114,7 +114,7 @@ export function LeadTable({
                   <td className="px-5 py-3.5 text-zinc-600 text-xs">
                     {lead.enquiry_type || "—"}
                     {lead.event_date && <div className="mt-0.5">📅 {new Date(lead.event_date).toLocaleDateString()}</div>}
-                    {lead.guest_count && <div>👥 {lead.guest_count} guests</div>}
+                    {lead.guest_count && <div><IconRenderer icon="people" className="w-4 h-4 inline" /> {lead.guest_count} guests</div>}
                   </td>
                   <td className="px-5 py-3.5"><LeadStatusBadge status={lead.status} /></td>
                   <td className="px-5 py-3.5 text-zinc-500 text-xs">{new Date(lead.created_at).toLocaleDateString()}</td>

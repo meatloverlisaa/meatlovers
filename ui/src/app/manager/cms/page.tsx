@@ -492,7 +492,7 @@ export default function ManagerCMS() {
                 <ConversionAnalytics analytics={analytics} />
               ) : (
                 <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-                  <p className="text-4xl mb-3">📊</p>
+                  <IconRenderer icon="chart" className="w-12 h-12" />
                   <p className="font-semibold text-zinc-700 dark:text-zinc-300">No analytics data yet</p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                     Analytics will appear once leads are captured

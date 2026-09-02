@@ -188,7 +188,7 @@ export function RewardsRecognition() {
         <p className="mt-1 text-sm text-zinc-400">Create and manage public recognition announcements.</p>
         <div className="mt-4 rounded-lg bg-zinc-950 p-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🎉</span>
+            <IconRenderer icon="sparkles" className="w-8 h-8 mb-2" />
             <div>
               <p className="font-bold text-white">Congratulations to our Employee of the Month!</p>
               <p className="text-sm text-zinc-400">Recognition will be displayed here when awards are granted.</p>

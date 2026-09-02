@@ -105,7 +105,7 @@ function ProductTable({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-[#0284C7]/30 bg-white p-16 text-center dark:border-[#38BDF8]/30 dark:bg-[#151F32]">
-        <p className="text-4xl mb-3">📦</p>
+        <IconRenderer icon="package" className="w-12 h-12 mb-3" />
         <p className="font-semibold text-[#0F172A] dark:text-white">No products found</p>
         <p className="text-sm text-[#0F172A]/60 dark:text-white/60 mt-1">
           Try changing the category filter

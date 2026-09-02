@@ -54,7 +54,7 @@ export function WasteShortcut({ products, kitchenStock, onSubmit }: Props) {
         <div className="flex items-start gap-3">
           <div className="flex-1">
             <h2 className="text-base font-semibold text-red-900 dark:text-red-100 flex items-center gap-2">
-              <span className="text-xl">🗑️</span>
+              <IconRenderer icon="trash" className="w-6 h-6" />
               Record Waste
             </h2>
             <p className="mt-1 text-sm text-red-700 dark:text-red-300">

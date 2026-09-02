@@ -370,7 +370,7 @@ export default function DispatcherDashboard() {
                   {summary.activeRiders}
                 </p>
               </div>
-              <div className="text-3xl">🏍️</div>
+              <IconRenderer icon="package" className="w-8 h-8" />
             </div>
           </div>
         </div>

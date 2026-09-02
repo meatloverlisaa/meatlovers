@@ -128,7 +128,7 @@ function ContactForm({ initialSource }: { initialSource: LeadSource }) {
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 p-10 text-center shadow-sm">
-        <span className="text-5xl mb-4">✅</span>
+        <IconRenderer icon="check" className="w-16 h-16 mb-4" />
         <h3 className="text-xl font-black text-zinc-950">Enquiry received!</h3>
         <p className="mt-2 text-sm text-zinc-600 max-w-xs">
           Thanks for reaching out. The Meat Lovers team will get back to you shortly.

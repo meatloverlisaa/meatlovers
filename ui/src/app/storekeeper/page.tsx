@@ -363,7 +363,7 @@ export default function StorekeeperDashboard() {
             <div className="space-y-3">
               {tasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <span className="text-4xl">✅</span>
+                  <IconRenderer icon="check" className="w-12 h-12" />
                   <p className="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     All caught up!
                   </p>

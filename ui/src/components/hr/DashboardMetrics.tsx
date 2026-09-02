@@ -63,7 +63,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Total Active Staff</p>
-            <span className="text-2xl">👥</span>
+            <IconRenderer icon="people" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-white">{metrics.totalActiveStaff}</p>
           <p className="mt-1 text-xs text-emerald-400">+2 from last month</p>
@@ -71,7 +71,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Today&apos;s Attendance</p>
-            <span className="text-2xl">◷</span>
+            <IconRenderer icon="calendar" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-emerald-400">{metrics.todayAttendance}%</p>
           <p className="mt-1 text-xs text-zinc-400">{Math.round(metrics.totalActiveStaff * metrics.todayAttendance / 100)} present</p>
@@ -79,7 +79,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Pending Leave Requests</p>
-            <span className="text-2xl">◫</span>
+            <IconRenderer icon="clipboard" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-amber-400">{metrics.pendingLeaveRequests}</p>
           <p className="mt-1 text-xs text-zinc-400">Awaiting approval</p>
@@ -87,7 +87,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Training Compliance</p>
-            <span className="text-2xl">📚</span>
+            <IconRenderer icon="training" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-blue-400">{metrics.trainingCompliance}%</p>
           <p className="mt-1 text-xs text-zinc-400">Mandatory training</p>
@@ -99,7 +99,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Upcoming Rosters</p>
-            <span className="text-2xl">📅</span>
+            <IconRenderer icon="calendar" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-white">{metrics.upcomingRosters}</p>
           <p className="mt-1 text-xs text-zinc-400">Next 7 days</p>
@@ -107,7 +107,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Payroll Status</p>
-            <span className="text-2xl">💰</span>
+            <IconRenderer icon="money" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-emerald-400">{metrics.payrollCycleStatus}</p>
           <p className="mt-1 text-xs text-zinc-400">Due in 3 days</p>
@@ -115,7 +115,7 @@ export function DashboardMetrics() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400">Open Positions</p>
-            <span className="text-2xl">🔍</span>
+            <IconRenderer icon="briefcase" className="w-6 h-6" />
           </div>
           <p className="mt-2 text-3xl font-black text-amber-400">{metrics.openPositions}</p>
           <p className="mt-1 text-xs text-zinc-400">Actively hiring</p>

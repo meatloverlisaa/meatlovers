@@ -400,7 +400,7 @@ export default function WasteTrackingPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              <span className="text-4xl">♻️</span>
+              <IconRenderer icon="recycle" className="w-12 h-12" />
               Waste Tracking
             </h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -701,7 +701,7 @@ export default function WasteTrackingPage() {
             <div className="space-y-3">
               {filteredWaste.length === 0 ? (
                 <div className="text-center py-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                  <div className="text-6xl mb-4">♻️</div>
+                  <IconRenderer icon="recycle" className="w-20 h-20 mx-auto mb-4" />
                   <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">No waste logged</p>
                   <p className="text-zinc-500 dark:text-zinc-400">
                     {reasonFilter ? "Try a different filter" : "Start logging waste to track patterns"}

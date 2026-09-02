@@ -413,7 +413,7 @@ export default function SuperAdminCMS() {
               <ConversionAnalytics analytics={analytics} />
             ) : (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-16 text-center">
-                <p className="text-4xl mb-3">📊</p>
+                <IconRenderer icon="chart" className="w-12 h-12 mb-3" />
                 <p className="font-semibold text-gray-700 dark:text-gray-300">No analytics data yet</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Analytics will appear once leads are captured

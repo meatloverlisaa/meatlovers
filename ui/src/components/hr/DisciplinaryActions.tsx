@@ -166,7 +166,7 @@ export function DisciplinaryActions() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">⚠️</span>
+                        <IconRenderer icon="warning" className="w-6 h-6" />
                         <p className="font-bold text-white">{incident.user.full_name}</p>
                         <span className={`rounded-full px-2 py-1 text-xs font-bold ${
                           incident.status === "Resolved" ? "bg-emerald-900 text-emerald-400" :

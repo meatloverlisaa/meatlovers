@@ -70,7 +70,7 @@ export function BarStockMovementTable({ movements, isLoading }: BarStockMovement
 
       {movements.length === 0 ? (
         <div className="text-center py-8">
-          <div className="text-4xl mb-2">📦</div>
+          <IconRenderer icon="package" className="w-8 h-8 mb-2" />
           <p className="text-zinc-500">No stock movements recorded</p>
         </div>
       ) : (
