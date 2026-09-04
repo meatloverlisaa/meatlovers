@@ -225,7 +225,7 @@ export default function StorekeeperLayout({
                     ))}
                   </div>
                   <div className="p-4 border-t border-zinc-200">
-                    <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    <button className="text-sm text-red-700 hover:text-red-800 font-medium">
                       View all notifications
                     </button>
                   </div>
@@ -239,7 +239,7 @@ export default function StorekeeperLayout({
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 transition"
               >
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm">
+                <div className="h-8 w-8 rounded-full bg-red-700 flex items-center justify-center text-white font-bold text-sm">
                   {userName.charAt(0)}
                 </div>
                 <div className="hidden md:block text-left">
