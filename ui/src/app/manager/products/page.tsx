@@ -26,7 +26,7 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
     : `${API_BASE_URL}/products`;
   
   // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token')) : null;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -277,7 +277,7 @@ export default function ManagerProductsPage() {
     setError(null);
     try {
       // Check if user is logged in
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
       if (!token) {
         setError('Please login to view products');
         setLoading(false);

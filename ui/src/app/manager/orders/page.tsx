@@ -201,7 +201,7 @@ export default function ManagerOrdersPage() {
       setLoading(true);
       
       // Check if user is logged in
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
       if (!token) {
         setError('Please login to view orders');
         setLoading(false);

@@ -50,7 +50,7 @@ type StockItem = {
   };
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 async function getRecipes(): Promise<Recipe[]> {
   const res = await fetch(`${baseUrl}/recipes`, {

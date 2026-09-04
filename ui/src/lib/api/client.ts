@@ -18,7 +18,10 @@ export function getAuthHeaders(): Record<string, string> {
     };
   }
 
-  const token = localStorage.getItem('auth_token');
+  const token =
+    localStorage.getItem('auth_token') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('access_token');
   
   return {
     'Content-Type': 'application/json',
@@ -31,7 +34,12 @@ export function getAuthHeaders(): Record<string, string> {
  */
 export function getToken(): string {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token') || '';
+    return (
+      localStorage.getItem('auth_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token') ||
+      ''
+    );
   }
   return '';
 }
@@ -43,7 +51,12 @@ export async function apiFetch(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+  let url = endpoint;
+  if (!endpoint.startsWith('http')) {
+    const base = API_BASE.replace(/\/$/, '');
+    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    url = `${base}${path}`;
+  }
   
   const response = await fetch(url, {
     ...options,

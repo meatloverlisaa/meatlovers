@@ -80,7 +80,12 @@ export function dateValue(value?: string | null) {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('auth_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('access_token')
+      : null;
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -314,7 +319,12 @@ export function exportBankPaymentFile() {
 
 // ─── Document Management ──────────────────────────────────────────────────────
 export function uploadDocument(data: FormData) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('auth_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('access_token')
+      : null;
   const headers: Record<string, string> = {};
   
   if (token) {

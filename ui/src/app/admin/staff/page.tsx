@@ -31,7 +31,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3
 
 async function fetchStaff(): Promise<StaffMember[]> {
   // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token')) : null;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ export default function AdminStaffPage() {
     
     try {
       // Check if user is logged in
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
       if (!token) {
         setError('Please login to view staff');
         setLoading(false);

@@ -2,24 +2,21 @@ import { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-function getBackendBaseUrl(): string | null {
+function getBackendBaseUrl(): string {
   const value =
     process.env.BACKEND_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  if (!value) {
-    return null;
-  }
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'http://localhost:3001';
 
   try {
     const url = new URL(value);
     if (!['http:', 'https:'].includes(url.protocol)) {
-      return null;
+      return 'http://localhost:3001';
     }
     return url.toString().replace(/\/$/, '');
   } catch {
-    return null;
+    return 'http://localhost:3001';
   }
 }
 

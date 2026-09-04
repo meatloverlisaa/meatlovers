@@ -33,6 +33,8 @@ export const setAuth = (tokens: AuthTokens): void => {
   if (typeof window === 'undefined') return;
 
   localStorage.setItem(TOKEN_KEY, tokens.access_token);
+  localStorage.setItem('token', tokens.access_token);
+  localStorage.setItem('access_token', tokens.access_token);
   localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refresh_token);
   localStorage.setItem(USER_KEY, JSON.stringify(tokens.user));
 };
@@ -42,7 +44,11 @@ export const setAuth = (tokens: AuthTokens): void => {
  */
 export const getToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return (
+    localStorage.getItem(TOKEN_KEY) ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('access_token')
+  );
 };
 
 /**
@@ -83,6 +89,8 @@ export const clearAuth = (): void => {
   if (typeof window === 'undefined') return;
 
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('token');
+  localStorage.removeItem('access_token');
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem(LAST_ACTIVITY_KEY);
@@ -192,6 +200,8 @@ export const refreshAccessToken = async (): Promise<boolean> => {
 
     const data = await response.json();
     localStorage.setItem(TOKEN_KEY, data.access_token);
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('access_token', data.access_token);
     localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
     return true;
   } catch (error) {

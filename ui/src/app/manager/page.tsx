@@ -24,7 +24,7 @@ async function fetchManagerStats(): Promise<DashboardStats> {
   
   try {
     // Get auth token from localStorage
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token')) : null;
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
