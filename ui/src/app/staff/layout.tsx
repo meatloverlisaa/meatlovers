@@ -39,16 +39,16 @@ export default function StaffLayout({
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-900">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 transform transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#09090B] border-r border-zinc-800 transform transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center gap-3 px-6 border-b border-slate-800">
+        <div className="flex h-16 items-center gap-3 px-6 border-b border-zinc-800">
           <div>
-            <p className="font-black text-slate-100">Meat Lovers</p>
-            <p className="text-xs text-slate-400">Staff Portal</p>
+            <p className="font-black text-white">Meat Lovers</p>
+            <p className="text-xs text-zinc-400">Staff Portal</p>
           </div>
         </div>
 
@@ -61,8 +61,8 @@ export default function StaffLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-blue-600 text-white"
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -72,19 +72,19 @@ export default function StaffLayout({
           </div>
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-bold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 text-white font-bold">
               {user?.full_name?.charAt(0) || 'S'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-slate-100">{user?.full_name || 'Staff Member'}</p>
-              <p className="text-xs text-slate-400">{user?.role || 'STAFF'}</p>
+              <p className="text-sm font-bold text-white">{user?.full_name || 'Staff Member'}</p>
+              <p className="text-xs text-zinc-400">{user?.role || 'STAFF'}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg text-red-500 hover:bg-slate-800 transition"
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg text-red-500 hover:bg-zinc-900 transition"
           >
             Logout
           </button>

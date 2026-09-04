@@ -139,23 +139,23 @@ export default function AdminLayout({
   const visibleNavItems = navigationItems.filter((item) => hasAccess(item.roles));
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#0F172A' }}>
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ 
-          backgroundColor: '#0B0F19',
-          borderRight: '1px solid #334155'
+          backgroundColor: '#09090B',
+          borderRight: '1px solid #27272A'
         }}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #334155' }}>
-          <IconRenderer icon="package" className="h-6 w-6 text-white" />
+        <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #27272A' }}>
+          <IconRenderer icon="package" className="h-6 w-6 text-red-500" />
           <div>
-            <p className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</p>
-            <p className="text-xs" style={{ color: '#94A3B8' }}>Admin Portal</p>
+            <p className="font-black text-white">Meat Lovers</p>
+            <p className="text-xs text-zinc-400">Admin Portal</p>
           </div>
         </div>
 
@@ -169,13 +169,9 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "text-white"
-                    : "hover:bg-[#1E293B]"
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                 }`}
-                style={{
-                  backgroundColor: isActive(item.href) ? '#3B82F6' : 'transparent',
-                  color: isActive(item.href) ? '#FFFFFF' : '#94A3B8'
-                }}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
@@ -185,21 +181,20 @@ export default function AdminLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="p-4" style={{ borderTop: '1px solid #334155' }}>
+        <div className="p-4" style={{ borderTop: '1px solid #27272A' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold" style={{ backgroundColor: '#3B82F6', color: '#FFFFFF' }}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold bg-red-700 text-white">
               {user?.full_name?.charAt(0) || 'A'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{user?.full_name || 'Admin User'}</p>
-              <p className="text-xs" style={{ color: '#94A3B8' }}>{userRole}</p>
+              <p className="text-sm font-bold text-white">{user?.full_name || 'Admin User'}</p>
+              <p className="text-xs text-zinc-400">{userRole}</p>
             </div>
           </div>
           <div className="space-y-1">
             <Link
               href="/admin/profile"
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition hover:bg-[#1E293B]"
-              style={{ color: '#94A3B8' }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-white rounded-lg transition"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -208,8 +203,7 @@ export default function AdminLayout({
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition hover:bg-[#1E293B]"
-              style={{ color: '#EF4444' }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-950/40 rounded-lg transition"
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,17 +226,10 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 px-4 lg:hidden" style={{ 
-          borderBottom: '1px solid #334155',
-          backgroundColor: '#0B0F19'
-        }}>
+        <header className="flex h-16 items-center gap-4 border-b border-zinc-800 bg-[#09090B] px-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="rounded-lg p-2 transition hover:bg-[#1E293B]"
-            style={{ 
-              border: '1px solid #334155',
-              color: '#94A3B8'
-            }}
+            className="rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white"
           >
             <svg
               className="h-6 w-6"
@@ -259,24 +246,20 @@ export default function AdminLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <IconRenderer icon="package" className="h-5 w-5 text-white" />
-            <span className="font-black" style={{ color: '#F8FAFC' }}>Meat Lovers</span>
+            <IconRenderer icon="package" className="h-5 w-5 text-red-500" />
+            <span className="font-black text-white">Meat Lovers</span>
           </div>
         </header>
 
         {/* Desktop header with profile */}
-        <header className="hidden h-16 items-center justify-between gap-4 border-b px-6 lg:flex" style={{ 
-          borderColor: '#334155',
-          backgroundColor: '#0B0F19'
-        }}>
+        <header className="hidden h-16 items-center justify-between gap-4 border-b border-zinc-200 bg-white px-6 lg:flex">
           <div></div>
           <Link
             href="/admin/profile"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition hover:bg-[#1E293B]"
-            style={{ color: '#94A3B8' }}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-stone-100 transition"
             title="Admin Profile"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             <span className="hidden sm:inline">My Profile</span>
@@ -284,47 +267,37 @@ export default function AdminLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-stone-50">{children}</main>
       </div>
 
       {/* Security Warning Modal */}
       {showSecurityWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="rounded-xl p-6 max-w-md w-full shadow-2xl" style={{ backgroundColor: '#1E293B' }}>
+          <div className="rounded-xl bg-zinc-950 border border-zinc-800 p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: '#EAB308' }}>
-                <ExclamationTriangleIcon className="h-6 w-6" style={{ color: '#0F172A' }} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
+                <ExclamationTriangleIcon className="h-6 w-6 text-amber-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>Session Timeout Warning</h3>
-                <p className="text-sm" style={{ color: '#94A3B8' }}>Your session is about to expire</p>
+                <h3 className="text-lg font-semibold text-white">Session Timeout Warning</h3>
+                <p className="text-sm text-zinc-400">Your session is about to expire</p>
               </div>
             </div>
             
-            <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>
+            <p className="text-sm mb-6 text-zinc-400">
               You have been inactive for 15 minutes. For security purposes, your session will expire soon. Please continue your session or log out.
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={handleContinueSession}
-                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
-                style={{ backgroundColor: '#3B82F6' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                className="flex-1 rounded-lg bg-red-700 hover:bg-red-800 px-4 py-2 text-sm font-semibold text-white transition"
               >
                 Continue Session
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition"
-                style={{ 
-                  border: '1px solid #334155',
-                  backgroundColor: '#0B0F19',
-                  color: '#94A3B8'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E293B'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0B0F19'}
+                className="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-300 hover:bg-zinc-800 transition"
               >
                 Logout
               </button>

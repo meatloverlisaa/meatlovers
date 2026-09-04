@@ -98,16 +98,16 @@ function QuickActionCard({
 }) {
   const baseClasses = "flex items-center justify-between rounded-2xl border p-5 shadow-sm transition hover:shadow-md";
   const variantClasses = variant === "primary"
-    ? "border-[#0284C7]/20 bg-[#0F172A] hover:bg-[#0F172A]/90 dark:border-[#38BDF8]/20 dark:bg-[#0A0E1A]"
-    : "border-[#0284C7]/10 bg-white hover:bg-[#F8FAFC] dark:border-[#38BDF8]/10 dark:bg-[#151F32] dark:hover:bg-[#151F32]/80";
+    ? "border-red-700/20 bg-[#09090B] text-white hover:bg-zinc-900"
+    : "border-zinc-200 bg-white hover:bg-stone-50 text-zinc-950";
   
   const textClasses = variant === "primary"
-    ? "text-white dark:text-white"
-    : "text-[#0F172A] dark:text-white";
+    ? "text-white"
+    : "text-zinc-950";
   
   const subtextClasses = variant === "primary"
-    ? "text-white/70 dark:text-white/70"
-    : "text-[#0F172A]/60 dark:text-white/60";
+    ? "text-zinc-300"
+    : "text-zinc-500";
   
   return (
     <Link href={href} className={`${baseClasses} ${variantClasses}`}>
@@ -115,7 +115,7 @@ function QuickActionCard({
         <div className={`text-lg font-semibold ${textClasses}`}>{title}</div>
         <div className={`mt-1 text-sm ${subtextClasses}`}>{description}</div>
       </div>
-      <div className={textClasses}>{icon}</div>
+      <div className={variant === "primary" ? "text-red-500" : "text-zinc-700"}>{icon}</div>
     </Link>
   );
 }
@@ -136,29 +136,29 @@ function StatCard({
   href?: string;
 }) {
   const colors = {
-    zinc: "bg-[#0284C7]/10 dark:bg-[#38BDF8]/10",
-    green: "bg-[#16A34A]/10 dark:bg-[#4ADE80]/10",
-    blue: "bg-[#0284C7]/10 dark:bg-[#38BDF8]/10",
-    amber: "bg-[#EA580C]/10 dark:bg-[#FB923C]/10",
-    red: "bg-[#EA580C]/10 dark:bg-[#FB923C]/10",
+    zinc: "bg-stone-100",
+    green: "bg-emerald-50",
+    blue: "bg-red-50",
+    amber: "bg-amber-50",
+    red: "bg-red-50",
   };
 
   const iconColors = {
-    zinc: "text-[#0284C7] dark:text-[#38BDF8]",
-    green: "text-[#16A34A] dark:text-[#4ADE80]",
-    blue: "text-[#0284C7] dark:text-[#38BDF8]",
-    amber: "text-[#EA580C] dark:text-[#FB923C]",
-    red: "text-[#EA580C] dark:text-[#FB923C]",
+    zinc: "text-zinc-700",
+    green: "text-emerald-700",
+    blue: "text-red-700",
+    amber: "text-amber-700",
+    red: "text-red-700",
   };
   
   const content = (
     <>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="text-xs font-medium text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">{title}</div>
-          <div className="mt-2 text-3xl font-bold text-[#0F172A] dark:text-white">{value}</div>
+          <div className="text-xs font-medium text-zinc-500 uppercase tracking-wide">{title}</div>
+          <div className="mt-2 text-3xl font-bold text-zinc-950">{value}</div>
           {subtitle && (
-            <div className="mt-1 text-xs text-[#0F172A]/50 dark:text-white/50">{subtitle}</div>
+            <div className="mt-1 text-xs text-zinc-500">{subtitle}</div>
           )}
         </div>
         <div className={`rounded-xl p-3 ${colors[color]}`}>
@@ -168,10 +168,10 @@ function StatCard({
     </>
   );
   
-  const baseClasses = "rounded-2xl border border-[#0284C7]/10 bg-white p-5 shadow-sm dark:border-[#38BDF8]/10 dark:bg-[#151F32]";
+  const baseClasses = "rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm";
   
   return href ? (
-    <Link href={href} className={`${baseClasses} hover:shadow-md transition hover:border-[#0284C7]/30 dark:hover:border-[#38BDF8]/30`}>
+    <Link href={href} className={`${baseClasses} hover:shadow-md transition hover:border-red-700/30`}>
       {content}
     </Link>
   ) : (
@@ -224,19 +224,19 @@ export default function ManagerDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17]">
+    <div className="min-h-screen bg-stone-50">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-[#0F172A] dark:text-white">Manager Dashboard</h1>
-            <p className="mt-2 text-sm text-[#0F172A]/70 dark:text-white/70">
+            <h1 className="text-3xl font-bold text-zinc-950">Manager Dashboard</h1>
+            <p className="mt-2 text-sm text-zinc-600">
               Oversee operations, manage staff, and monitor performance
             </p>
           </div>
           <Link
             href="/manager/profile"
-            className="flex items-center gap-2 rounded-lg border border-[#0284C7]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0F172A] hover:bg-[#0284C7]/10 dark:border-[#38BDF8]/20 dark:bg-[#151F32] dark:text-white dark:hover:bg-[#151F32]/80"
+            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:border-red-700/40 hover:text-red-700 transition shadow-sm"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

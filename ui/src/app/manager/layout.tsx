@@ -72,8 +72,8 @@ export default function ManagerLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-blue-50 text-blue-800"
-                    : "text-zinc-700 hover:bg-zinc-100"
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-700 hover:bg-stone-100"
                 }`}
               >
                 <IconRenderer icon={item.icon} className="w-5 h-5" />
@@ -86,7 +86,7 @@ export default function ManagerLayout({
         {/* User Profile */}
         <div className="border-t border-zinc-200 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-800">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
               {user?.full_name?.charAt(0) || 'M'}
             </div>
             <div className="flex-1">

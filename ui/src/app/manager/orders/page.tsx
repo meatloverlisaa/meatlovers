@@ -252,31 +252,31 @@ export default function ManagerOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] p-6">
+    <div className="min-h-screen bg-stone-50 p-6">
       <div className="mx-auto max-w-7xl">
         {/* Breadcrumb */}
-        <div className="mb-4 flex items-center gap-2 text-sm text-[#0F172A]/60 dark:text-white/60">
-          <Link href="/manager" className="hover:text-[#0F172A] dark:hover:text-white">
+        <div className="mb-4 flex items-center gap-2 text-sm text-zinc-500">
+          <Link href="/manager" className="hover:text-zinc-950">
             Manager Dashboard
           </Link>
           <span>/</span>
-          <span className="text-[#0F172A] dark:text-white">Orders</span>
+          <span className="text-zinc-950">Orders</span>
         </div>
 
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">
+              <h1 className="text-2xl font-bold text-zinc-950">
                 Order Management (View Only)
               </h1>
-              <p className="mt-1 text-sm text-[#0F172A]/60 dark:text-white/60">
+              <p className="mt-1 text-sm text-zinc-600">
                 Monitor all restaurant orders and track status
               </p>
             </div>
             <button
               onClick={() => loadOrders()}
-              className="rounded-xl border border-[#0284C7]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0F172A] hover:bg-[#0284C7]/5 hover:border-[#0284C7]/30 dark:border-[#38BDF8]/20 dark:bg-[#151F32] dark:text-white dark:hover:bg-[#0A0E1A]"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:border-red-700/40 hover:text-red-700 shadow-sm transition"
             >
               Refresh
             </button>
@@ -285,19 +285,19 @@ export default function ManagerOrdersPage() {
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
-            <div className="text-xs font-medium text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Total Orders</div>
-            <div className="mt-2 text-2xl font-bold text-[#0F172A] dark:text-white">{stats.total}</div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <div className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Total Orders</div>
+            <div className="mt-2 text-2xl font-bold text-zinc-950">{stats.total}</div>
           </div>
-          <div className="rounded-xl border border-[#EA580C]/20 bg-[#EA580C]/10 p-4 dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10">
-            <div className="text-xs font-medium text-[#EA580C] dark:text-[#FB923C] uppercase tracking-wide">Pending</div>
-            <div className="mt-2 text-2xl font-bold text-[#EA580C] dark:text-[#FB923C]">{stats.pending}</div>
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="text-xs font-medium text-amber-800 uppercase tracking-wide">Pending</div>
+            <div className="mt-2 text-2xl font-bold text-amber-900">{stats.pending}</div>
           </div>
-          <div className="rounded-xl border border-[#0284C7]/20 bg-[#0284C7]/10 p-4 dark:border-[#38BDF8]/20 dark:bg-[#38BDF8]/10">
-            <div className="text-xs font-medium text-[#0284C7] dark:text-[#38BDF8] uppercase tracking-wide">Preparing</div>
-            <div className="mt-2 text-2xl font-bold text-[#0284C7] dark:text-[#38BDF8]">{stats.preparing}</div>
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+            <div className="text-xs font-medium text-red-800 uppercase tracking-wide">Preparing</div>
+            <div className="mt-2 text-2xl font-bold text-red-900">{stats.preparing}</div>
           </div>
-          <div className="rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/10 p-4 dark:border-[#4ADE80]/20 dark:bg-[#4ADE80]/10">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
             <div className="text-xs font-medium text-[#16A34A] dark:text-[#4ADE80] uppercase tracking-wide">Ready</div>
             <div className="mt-2 text-2xl font-bold text-[#16A34A] dark:text-[#4ADE80]">{stats.ready}</div>
           </div>
