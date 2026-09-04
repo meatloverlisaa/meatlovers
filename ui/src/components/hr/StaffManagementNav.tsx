@@ -26,7 +26,7 @@ export function StaffManagementNav() {
     <header className="border-b border-zinc-800 bg-zinc-950">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Link href="/hr" className="text-lg font-black text-blue-400">HR Management</Link>
+          <Link href="/hr" className="text-lg font-black text-red-500">HR Management</Link>
           {user && (
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <span className="hidden sm:inline">•</span>
@@ -38,12 +38,12 @@ export function StaffManagementNav() {
           {links.map((link) => {
             const active = link.href === "/hr" ? pathname === link.href : pathname.startsWith(link.href);
             return (
-              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${active ? "bg-blue-600 text-white" : "text-zinc-400 hover:bg-zinc-800"}`}>
+              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${active ? "bg-red-700 text-white" : "text-zinc-400 hover:bg-zinc-800"}`}>
                 {link.label}
               </Link>
             );
           })}
-          <Link href="/hr/staff/new" className="ml-1 rounded-md bg-blue-600 px-3 py-2 text-sm font-bold text-white hover:bg-blue-700">
+          <Link href="/hr/staff/new" className="ml-1 rounded-md bg-red-700 px-3 py-2 text-sm font-bold text-white hover:bg-red-800">
             Add employee
           </Link>
           <Link href="/hr/profile" className="ml-1 rounded-md px-3 py-2 text-sm font-semibold text-zinc-400 hover:bg-zinc-800 flex items-center gap-2" title="My Profile">
@@ -54,7 +54,7 @@ export function StaffManagementNav() {
           </Link>
           <button
             onClick={handleLogout}
-            className="ml-1 rounded-md px-3 py-2 text-sm font-semibold text-red-400 hover:bg-zinc-800 flex items-center gap-2"
+            className="ml-1 rounded-md px-3 py-2 text-sm font-semibold text-red-500 hover:bg-zinc-800 flex items-center gap-2"
             title="Logout"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
