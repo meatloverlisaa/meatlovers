@@ -95,23 +95,19 @@ export default function SuperAdminLayout({
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#090D16' }}>
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-800 bg-[#09090B] transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{ 
-          backgroundColor: '#030712',
-          borderRight: '1px solid #1F2937'
-        }}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 px-6" style={{ borderBottom: '1px solid #1F2937' }}>
-          <IconRenderer icon="lock" className="w-8 h-8" />
+        <div className="flex h-16 items-center gap-3 border-b border-zinc-800 px-6">
+          <IconRenderer icon="lock" className="w-6 h-6 text-red-500" />
           <div>
-            <p className="font-black" style={{ color: '#F9FAFB' }}>Meat Lovers</p>
-            <p className="text-xs" style={{ color: '#818CF8' }}>Super Admin</p>
+            <p className="font-black text-white">Meat Lovers</p>
+            <p className="text-xs text-zinc-400">Super Admin</p>
           </div>
         </div>
 
@@ -123,21 +119,11 @@ export default function SuperAdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition"
-                style={{
-                  backgroundColor: isActive(item.href) ? '#6366F1' : 'transparent',
-                  color: isActive(item.href) ? '#FFFFFF' : '#9CA3AF'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive(item.href)) {
-                    e.currentTarget.style.backgroundColor = '#1F2937';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive(item.href)) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                  isActive(item.href)
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                }`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
@@ -147,23 +133,20 @@ export default function SuperAdminLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="p-4" style={{ borderTop: '1px solid #1F2937' }}>
+        <div className="border-t border-zinc-800 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold" style={{ backgroundColor: '#6366F1', color: '#FFFFFF' }}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
               {user?.full_name?.charAt(0) || 'S'}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold" style={{ color: '#F9FAFB' }}>{user?.full_name || 'Super Admin'}</p>
-              <p className="text-xs" style={{ color: '#818CF8' }}>SUPER ADMIN</p>
+              <p className="text-sm font-bold text-white">{user?.full_name || 'Super Admin'}</p>
+              <p className="text-xs text-zinc-400">SUPER ADMIN</p>
             </div>
           </div>
           <div className="space-y-1">
             <Link
               href="/super-admin/profile"
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition"
-              style={{ color: '#9CA3AF' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1F2937'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-white rounded-lg transition"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -172,10 +155,7 @@ export default function SuperAdminLayout({
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold rounded-lg transition"
-              style={{ color: '#EF4444' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1F2937'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-950/40 rounded-lg transition"
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +170,7 @@ export default function SuperAdminLayout({
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-zinc-950/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -198,17 +178,10 @@ export default function SuperAdminLayout({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 px-4 lg:hidden" style={{ 
-          borderBottom: '1px solid #1F2937',
-          backgroundColor: '#030712'
-        }}>
+        <header className="flex h-16 items-center gap-4 border-b border-zinc-800 bg-[#09090B] px-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="rounded-lg p-2 transition hover:bg-[#111827]"
-            style={{ 
-              border: '1px solid #1F2937',
-              color: '#9CA3AF'
-            }}
+            className="rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white"
           >
             <svg
               className="h-6 w-6"
@@ -225,8 +198,8 @@ export default function SuperAdminLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <IconRenderer icon="lock" className="w-6 h-6" />
-            <span className="font-black" style={{ color: '#F9FAFB' }}>Meat Lovers</span>
+            <IconRenderer icon="lock" className="w-5 h-5 text-red-500" />
+            <span className="font-black text-white">Meat Lovers</span>
           </div>
         </header>
 
@@ -237,41 +210,31 @@ export default function SuperAdminLayout({
       {/* Security Warning Modal */}
       {showSecurityWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="rounded-xl p-6 max-w-md w-full shadow-2xl" style={{ backgroundColor: '#111827' }}>
+          <div className="rounded-xl border border-zinc-800 bg-[#09090B] p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: '#DC2626' }}>
-                <ExclamationTriangleIcon className="h-6 w-6" style={{ color: '#FFFFFF' }} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-950/50 text-red-500">
+                <ExclamationTriangleIcon className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold" style={{ color: '#F9FAFB' }}>Security Alert</h3>
-                <p className="text-sm" style={{ color: '#9CA3AF' }}>Session timeout warning</p>
+                <h3 className="text-lg font-semibold text-white">Security Alert</h3>
+                <p className="text-sm text-zinc-400">Session timeout warning</p>
               </div>
             </div>
             
-            <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
+            <p className="text-sm mb-6 text-zinc-400">
               You have been inactive for 15 minutes. For security purposes, your super admin session will expire soon. Please continue your session or log out.
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={handleContinueSession}
-                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
-                style={{ backgroundColor: '#6366F1' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4F46E5'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6366F1'}
+                className="flex-1 rounded-lg bg-red-700 hover:bg-red-800 px-4 py-2 text-sm font-semibold text-white transition"
               >
                 Continue Session
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition"
-                style={{ 
-                  border: '1px solid #DC2626',
-                  backgroundColor: '#7F1D1D',
-                  color: '#FEE2E2'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#991B1B'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#7F1D1D'}
+                className="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-300 hover:bg-zinc-800 transition"
               >
                 Logout
               </button>

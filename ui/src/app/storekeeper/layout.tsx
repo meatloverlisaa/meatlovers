@@ -80,16 +80,16 @@ export default function StorekeeperLayout({
     <div className="flex h-screen overflow-hidden bg-stone-50">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-200 bg-white transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-800 bg-[#09090B] transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-6 bg-gradient-to-r from-blue-600 to-blue-800">
-          <IconRenderer icon="package" className="w-8 h-8" />
+        <div className="flex h-16 items-center gap-3 border-b border-zinc-800 px-6">
+          <IconRenderer icon="package" className="w-6 h-6 text-red-500" />
           <div>
             <p className="font-black text-white">Meat Lovers</p>
-            <p className="text-xs text-blue-100">Storekeeper Portal</p>
+            <p className="text-xs text-zinc-400">Storekeeper Portal</p>
           </div>
         </div>
 
@@ -103,8 +103,8 @@ export default function StorekeeperLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-blue-50 text-blue-800 border-l-4 border-blue-600"
-                    : "text-zinc-700 hover:bg-zinc-100 border-l-4 border-transparent"
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -122,15 +122,15 @@ export default function StorekeeperLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="border-t border-zinc-200 p-4 bg-zinc-50">
+        <div className="border-t border-zinc-800 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 font-bold text-white text-lg shadow-lg">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
               {userName.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-zinc-950 truncate">{userName}</p>
-              <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
-              <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+              <p className="text-sm font-bold text-white truncate">{userName}</p>
+              <p className="text-xs text-zinc-400 truncate">{userEmail}</p>
+              <span className="inline-block mt-1 px-2 py-0.5 bg-red-950 text-red-300 border border-red-800 text-xs font-medium rounded-full">
                 {userRole}
               </span>
             </div>
@@ -138,7 +138,7 @@ export default function StorekeeperLayout({
           <div className="space-y-1">
             <Link
               href="/storekeeper/profile"
-              className="flex items-center gap-2 text-sm text-zinc-700 hover:text-blue-600 transition py-2 px-3 rounded-lg hover:bg-blue-50"
+              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition py-2 px-3 rounded-lg hover:bg-zinc-900"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -147,7 +147,7 @@ export default function StorekeeperLayout({
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full text-sm text-red-600 hover:text-red-800 transition py-2 px-3 rounded-lg hover:bg-red-50"
+              className="flex items-center gap-2 w-full text-sm text-red-500 hover:text-red-400 transition py-2 px-3 rounded-lg hover:bg-red-950/40"
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
               Logout
