@@ -71,7 +71,7 @@ function getStatusColor(status: string): string {
     case "PENDING":
       return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
     case "IN_PROGRESS":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     case "COMPLETED":
       return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
     case "CANCELLED":
@@ -190,7 +190,7 @@ function ProductionPlanCard({ plan, onUpdate }: { plan: ProductionPlan; onUpdate
                 progress >= 100 
                   ? 'bg-green-500' 
                   : progress >= 50 
-                  ? 'bg-blue-500' 
+                  ? 'bg-red-500' 
                   : 'bg-amber-500'
               }`}
               style={{ width: `${Math.min(progress, 100)}%` }}
@@ -455,13 +455,13 @@ export default function ProductionPlansPage() {
         )}
 
         {/* Info Footer */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-4">
+        <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">
+            <div className="text-sm text-red-700 dark:text-red-300">
+              <p className="font-medium text-red-900 dark:text-zinc-100 mb-1">
                 Production Plans Guide
               </p>
               <ul className="space-y-1 list-disc list-inside">

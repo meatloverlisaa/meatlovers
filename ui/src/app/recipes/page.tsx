@@ -440,7 +440,7 @@ export default function RecipesPage() {
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    className="text-sm text-red-700 hover:text-red-800 dark:text-red-500"
                   >
                     + Add Ingredient
                   </button>
@@ -573,7 +573,7 @@ export default function RecipesPage() {
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    className="text-sm text-red-700 hover:text-red-800 dark:text-red-500"
                   >
                     + Add Ingredient
                   </button>

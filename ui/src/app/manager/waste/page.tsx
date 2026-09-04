@@ -129,9 +129,9 @@ export default function ManagerWastePage() {
       case "OVERPRODUCTION":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200";
       case "QUALITY_ISSUE":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200";
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
       case "CUSTOMER_RETURN":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200";
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
       case "THEFT":
         return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
       default:

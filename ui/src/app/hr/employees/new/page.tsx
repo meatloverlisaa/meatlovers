@@ -211,7 +211,7 @@ export default function NewEmployeePage() {
           <div className="flex items-center justify-between relative">
             <div className="absolute inset-x-0 top-5 h-0.5 bg-white/10" />
             <div
-              className="absolute top-5 h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500"
+              className="absolute top-5 h-0.5 bg-gradient-to-r from-emerald-500 to-red-500 transition-all duration-500"
               style={{ width: `${((step - 1) / 3) * 100}%` }}
             />
             {STEPS.map((s) => (
@@ -222,7 +222,7 @@ export default function NewEmployeePage() {
                     s.id < step
                       ? "bg-emerald-500 border-emerald-500 cursor-pointer"
                       : s.id === step
-                      ? "bg-slate-800 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                      ? "bg-slate-800 border-red-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                       : "bg-slate-800 border-white/20 cursor-not-allowed"
                   }`}
                 >
@@ -231,7 +231,7 @@ export default function NewEmployeePage() {
                 <div className="text-center hidden sm:block">
                   <p
                     className={`text-xs font-semibold ${
-                      s.id === step ? "text-cyan-400" : s.id < step ? "text-emerald-400" : "text-slate-500"
+                      s.id === step ? "text-zinc-400" : s.id < step ? "text-emerald-400" : "text-slate-500"
                     }`}
                   >
                     {s.title}
@@ -304,7 +304,7 @@ export default function NewEmployeePage() {
                       type={showPassword ? "text" : "password"}
                       value={form.password}
                       onChange={(e) => set("password", e.target.value)}
-                      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all pr-12"
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all pr-12"
                       placeholder="Min. 8 characters"
                     />
                     <button
@@ -493,7 +493,7 @@ export default function NewEmployeePage() {
                     value={form.skills}
                     onChange={(e) => set("skills", e.target.value)}
                     rows={2}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="e.g. Customer service, Inventory management, Barista"
                   />
                 </div>
@@ -504,7 +504,7 @@ export default function NewEmployeePage() {
                     value={form.certifications}
                     onChange={(e) => set("certifications", e.target.value)}
                     rows={2}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="e.g. Food Handler Certificate, First Aid"
                   />
                 </div>
@@ -515,7 +515,7 @@ export default function NewEmployeePage() {
                     value={form.notes}
                     onChange={(e) => set("notes", e.target.value)}
                     rows={3}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="Any additional notes about this employee..."
                   />
                 </div>
@@ -695,7 +695,7 @@ export default function NewEmployeePage() {
               <button
                 onClick={() => setStep((step + 1) as Step)}
                 disabled={!canProceed()}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:from-cyan-400 hover:to-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-cyan-500/25"
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-red-500 to-emerald-500 text-white font-semibold hover:from-red-400 hover:to-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-red-500/25"
               >
                 Next →
               </button>
@@ -747,7 +747,7 @@ function Input({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all"
     />
   );
 }
@@ -767,7 +767,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-slate-800 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+      className="w-full bg-slate-800 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all"
     >
       {placeholder && (
         <option value="" disabled>

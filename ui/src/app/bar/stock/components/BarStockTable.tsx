@@ -84,7 +84,7 @@ export function BarStockTable({ balance }: Props) {
               onClick={() => setCategoryFilter("ALL")}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 categoryFilter === "ALL"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
             >
@@ -94,7 +94,7 @@ export function BarStockTable({ balance }: Props) {
               onClick={() => setCategoryFilter("SOFT_DRINK")}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 categoryFilter === "SOFT_DRINK"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
             >
@@ -104,7 +104,7 @@ export function BarStockTable({ balance }: Props) {
               onClick={() => setCategoryFilter("ALCOHOLIC_DRINK")}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 categoryFilter === "ALCOHOLIC_DRINK"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
             >

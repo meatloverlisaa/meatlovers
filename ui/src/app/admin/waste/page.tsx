@@ -319,9 +319,9 @@ export default function AdminWastePage() {
     const colors: Record<WasteReason, string> = {
       EXPIRED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
       SPOILED: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
-      OVERPRODUCTION: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+      OVERPRODUCTION: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
       QUALITY_ISSUE: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
-      CUSTOMER_RETURN: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+      CUSTOMER_RETURN: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
       THEFT: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
       OTHER: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200",
     };

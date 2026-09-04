@@ -38,7 +38,7 @@ export function MovementTimeline({ movements, productName }: Props) {
         );
       case "TRANSFER":
         return (
-          <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-red-700 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
         );
@@ -68,7 +68,7 @@ export function MovementTimeline({ movements, productName }: Props) {
       case "PURCHASE":
         return "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20";
       case "TRANSFER":
-        return "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20";
+        return "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20";
       case "ADJUSTMENT":
         return "text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20";
       case "WASTE":

@@ -27,9 +27,9 @@ type Order = {
 
 const statusColors: Record<OrderStatus, string> = {
   PENDING: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-200",
-  PREPARING: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-200",
+  PREPARING: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   READY: "bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-200",
-  SERVED: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/30 dark:text-purple-200",
+  SERVED: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   PAID: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900/30 dark:text-zinc-200",
 };
 
@@ -375,9 +375,9 @@ export default function OrderManagementPage() {
             <div className="text-xs font-medium text-amber-800 dark:text-amber-200">Pending</div>
             <div className="mt-2 text-2xl font-bold text-amber-900 dark:text-amber-100">{stats.pending}</div>
           </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
-            <div className="text-xs font-medium text-blue-800 dark:text-blue-200">Preparing</div>
-            <div className="mt-2 text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.preparing}</div>
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-zinc-900/50 dark:bg-zinc-950/30">
+            <div className="text-xs font-medium text-red-800 dark:text-red-200">Preparing</div>
+            <div className="mt-2 text-2xl font-bold text-red-900 dark:text-zinc-100">{stats.preparing}</div>
           </div>
           <div className="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/50 dark:bg-green-950/30">
             <div className="text-xs font-medium text-green-800 dark:text-green-200">Ready</div>

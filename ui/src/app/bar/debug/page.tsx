@@ -114,9 +114,9 @@ export default function BarDebugPage() {
           </div>
         )}
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Test Credentials</h3>
-          <div className="text-blue-700 font-mono text-sm">
+        <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Test Credentials</h3>
+          <div className="text-red-700 font-mono text-sm">
             <p>Email: admin@test.com</p>
             <p>Password: Admin@123</p>
           </div>
@@ -125,7 +125,7 @@ export default function BarDebugPage() {
         <div className="mt-6">
           <a
             href="/bar"
-            className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="inline-block px-4 py-2 bg-red-700 text-white rounded hover:bg-red-700"
           >
             ← Back to Bar Page
           </a>

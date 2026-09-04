@@ -96,9 +96,9 @@ export function UsageForm({ products, kitchenStock, onSubmit }: Props) {
           </div>
 
           {selectedProduct && (
-            <div className="rounded-lg bg-blue-50 px-3 py-2 text-sm dark:bg-blue-900/20">
+            <div className="rounded-lg bg-red-50 px-3 py-2 text-sm dark:bg-red-900/20">
               <div className="flex items-center justify-between">
-                <span className="text-blue-700 dark:text-blue-300">Available in Kitchen:</span>
+                <span className="text-red-700 dark:text-red-300">Available in Kitchen:</span>
                 <span className={`font-bold ${
                   availableQuantity === 0
                     ? "text-red-600 dark:text-red-400"
@@ -172,7 +172,7 @@ export function UsageForm({ products, kitchenStock, onSubmit }: Props) {
           <button
             type="submit"
             disabled={products.length === 0 || isSubmitting || availableQuantity === 0}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-600 dark:hover:bg-blue-700"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-700 dark:hover:bg-red-700"
           >
             {isSubmitting ? (
               <>

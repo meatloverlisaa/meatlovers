@@ -24,9 +24,9 @@ type Order = {
 
 const statusColors: Record<OrderStatus, string> = {
   PENDING: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-200 dark:border-amber-900",
-  PREPARING: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-200 dark:border-blue-900",
+  PREPARING: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200 dark:border-zinc-900",
   READY: "bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-200 dark:border-green-900",
-  SERVED: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/30 dark:text-purple-200 dark:border-purple-900",
+  SERVED: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200 dark:border-zinc-900",
   PAID: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900/30 dark:text-zinc-200 dark:border-zinc-800",
 };
 
@@ -497,7 +497,7 @@ export default function MyOrdersPage() {
               </div>
               <div>
                 <div className="text-xs text-zinc-600 dark:text-zinc-300">Preparing</div>
-                <div className="mt-1 text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="mt-1 text-2xl font-bold text-red-700 dark:text-red-400">
                   {orders.filter(o => o.status === "PREPARING").length}
                 </div>
               </div>

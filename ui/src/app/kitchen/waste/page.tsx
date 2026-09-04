@@ -133,11 +133,11 @@ function getReasonColor(reason: string): string {
     case "BURNT":
       return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
     case "CONTAMINATED":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     case "EXPIRED":
       return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
     case "DROPPED":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     case "OVERPRODUCTION":
       return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
     default:
@@ -750,7 +750,7 @@ export default function WasteTrackingPage() {
                           <div className="flex items-center gap-1 mt-2">
                             <button
                               onClick={() => handleEdit(waste)}
-                              className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition"
+                              className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition"
                               title="Edit"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

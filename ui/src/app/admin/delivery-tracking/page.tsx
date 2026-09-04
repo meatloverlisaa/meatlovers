@@ -181,11 +181,11 @@ export default function DeliveryTrackingPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-red-100 text-red-800 border-red-200";
       case "PICKED_UP":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "IN_TRANSIT":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-red-100 text-red-800 border-red-200";
       case "DELIVERED":
         return "bg-green-100 text-green-800 border-green-200";
       case "CANCELLED":
@@ -284,7 +284,7 @@ export default function DeliveryTrackingPage() {
               <div className="text-sm text-gray-600">Total Deliveries</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-2xl font-bold text-blue-600">{summary.assigned}</div>
+              <div className="text-2xl font-bold text-red-700">{summary.assigned}</div>
               <div className="text-sm text-gray-600">Assigned</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
@@ -292,7 +292,7 @@ export default function DeliveryTrackingPage() {
               <div className="text-sm text-gray-600">Picked Up</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-2xl font-bold text-purple-600">{summary.inTransit}</div>
+              <div className="text-2xl font-bold text-red-700">{summary.inTransit}</div>
               <div className="text-sm text-gray-600">In Transit</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
@@ -394,7 +394,7 @@ export default function DeliveryTrackingPage() {
                             ? "bg-green-500"
                             : delivery.status === "CANCELLED"
                             ? "bg-red-500"
-                            : "bg-blue-500"
+                            : "bg-red-500"
                         }`}
                         style={{ width: `${progress}%` }}
                       />
@@ -459,7 +459,7 @@ export default function DeliveryTrackingPage() {
                     {delivery.status === "ASSIGNED" && (
                       <button
                         onClick={() => handleStatusUpdate(String(delivery.id), "PICKED_UP")}
-                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        className="flex-1 bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
                       >
                         Mark Picked Up
                       </button>
@@ -467,7 +467,7 @@ export default function DeliveryTrackingPage() {
                     {delivery.status === "PICKED_UP" && (
                       <button
                         onClick={() => handleStatusUpdate(String(delivery.id), "IN_TRANSIT")}
-                        className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+                        className="flex-1 bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
                       >
                         Mark In Transit
                       </button>

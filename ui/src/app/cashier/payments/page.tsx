@@ -261,8 +261,8 @@ export default function CashierPaymentsPage() {
   const getPaymentMethodColor = (method: string) => {
     switch (method) {
       case "CASH": return "bg-green-100 text-green-800 border-green-200";
-      case "M-PESA": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "CARD": return "bg-purple-100 text-purple-800 border-purple-200";
+      case "M-PESA": return "bg-red-100 text-red-800 border-red-200";
+      case "CARD": return "bg-red-100 text-red-800 border-red-200";
       case "BANK_TRANSFER": return "bg-amber-100 text-amber-800 border-amber-200";
       default: return "bg-zinc-100 text-zinc-800 border-zinc-200";
     }

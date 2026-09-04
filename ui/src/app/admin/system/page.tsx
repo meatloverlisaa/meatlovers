@@ -183,7 +183,7 @@ export default function SystemDiagnosticsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <ArrowPathIcon className="w-16 h-16 animate-spin text-blue-600 mx-auto mb-4" />
+          <ArrowPathIcon className="w-16 h-16 animate-spin text-red-700 mx-auto mb-4" />
           <p className="text-xl text-gray-900 font-semibold">Loading system diagnostics...</p>
           <p className="text-gray-600 mt-2">Fetching data from {API_BASE}</p>
         </div>
@@ -218,7 +218,7 @@ export default function SystemDiagnosticsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <svg className="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 mr-3 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
               </svg>
               System Diagnostics
@@ -228,7 +228,7 @@ export default function SystemDiagnosticsPage() {
           <div className="text-right">
             <button
               onClick={fetchData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
               <ArrowPathIcon className="w-4 h-4" />
               Refresh
@@ -264,7 +264,7 @@ export default function SystemDiagnosticsPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <ChartBarIcon className="w-8 h-8 text-blue-600" />
+                  <ChartBarIcon className="w-8 h-8 text-red-700" />
                   <h3 className="text-lg font-semibold text-gray-900 ml-3">Orders</h3>
                 </div>
               </div>
@@ -304,7 +304,7 @@ export default function SystemDiagnosticsPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <UserGroupIcon className="w-8 h-8 text-purple-600" />
+                  <UserGroupIcon className="w-8 h-8 text-red-700" />
                   <h3 className="text-lg font-semibold text-gray-900 ml-3">Users</h3>
                 </div>
               </div>
@@ -326,7 +326,7 @@ export default function SystemDiagnosticsPage() {
         {database && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-6">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
               <h2 className="text-xl font-semibold text-gray-900 ml-3">Database Metrics</h2>
@@ -426,7 +426,7 @@ export default function SystemDiagnosticsPage() {
         {activeUsers && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-6">
-              <UserGroupIcon className="w-6 h-6 text-purple-600" />
+              <UserGroupIcon className="w-6 h-6 text-red-700" />
               <h2 className="text-xl font-semibold text-gray-900 ml-3">Active Users</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">

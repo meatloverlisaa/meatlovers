@@ -116,7 +116,7 @@ export default function AccountantAnalytics() {
       change: "+18.3%",
       trend: "up",
       icon: "chart",
-      color: "bg-blue-100 dark:bg-blue-900/20",
+      color: "bg-red-100 dark:bg-zinc-900/20",
     },
     {
       label: "Profit Margin",
@@ -124,16 +124,16 @@ export default function AccountantAnalytics() {
       change: "+2.1%",
       trend: "up",
       icon: "trending",
-      color: "bg-purple-100 dark:bg-purple-900/20",
+      color: "bg-red-100 dark:bg-red-950/20",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Financial Analytics</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">Financial Analytics</h1>
           <p className="mt-2 text-sm text-slate-400">
             Track financial performance and trends
           </p>
@@ -147,7 +147,7 @@ export default function AccountantAnalytics() {
               onClick={() => setTimeRange(range)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 timeRange === range
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
               }`}
             >
@@ -167,7 +167,7 @@ export default function AccountantAnalytics() {
               {kpiCards.map((card, idx) => (
                 <div
                   key={idx}
-                  className={`rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm`}
+                  className={`rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -185,7 +185,7 @@ export default function AccountantAnalytics() {
                         </p>
                       )}
                     </div>
-                    <div className={`rounded-xl p-3 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border border-blue-500/30`}>
+                    <div className={`rounded-xl p-3 bg-gradient-to-br from-red-700/20 to-red-800/20 border border-red-700/30`}>
                       <IconRenderer icon={card.icon} className="w-5 h-5" />
                     </div>
                   </div>
@@ -194,7 +194,7 @@ export default function AccountantAnalytics() {
             </div>
 
             {/* Revenue vs Expenses Chart */}
-            <div className="mb-6 rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+            <div className="mb-6 rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-white">Revenue vs Expenses</h3>
               <div className="h-64 flex items-end gap-2">
                 {analytics.revenueTrend.map((item, idx) => {
@@ -237,7 +237,7 @@ export default function AccountantAnalytics() {
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Top Expense Categories */}
-              <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+              <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-white">Top Expense Categories</h3>
                 <div className="space-y-3">
                   {analytics.topExpenseCategories.map((category, idx) => (
@@ -248,7 +248,7 @@ export default function AccountantAnalytics() {
                       </div>
                       <div className="h-2 bg-slate-700 rounded-full">
                         <div 
-                          className="h-full bg-blue-500 rounded-full transition-all"
+                          className="h-full bg-red-500 rounded-full transition-all"
                           style={{ width: `${category.percentage}%` }}
                         />
                       </div>
@@ -261,7 +261,7 @@ export default function AccountantAnalytics() {
               </div>
 
               {/* Payment Methods */}
-              <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+              <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-white">Payment Methods</h3>
                 <div className="space-y-3">
                   {analytics.paymentMethods.map((method, idx) => (
@@ -280,7 +280,7 @@ export default function AccountantAnalytics() {
             </div>
 
             {/* Monthly Comparison */}
-            <div className="mt-6 rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+            <div className="mt-6 rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-white">Monthly Comparison</h3>
               <div className="overflow-x-auto">
                 <table className="w-full">

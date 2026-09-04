@@ -78,9 +78,9 @@ export default function KitchenDashboardPage() {
               <div className="text-sm font-medium text-amber-700 dark:text-amber-300">Pending</div>
               <div className="mt-2 text-3xl font-bold text-amber-900 dark:text-amber-50">{summary.pending}</div>
             </div>
-            <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
-              <div className="text-sm font-medium text-blue-700 dark:text-blue-300">Preparing</div>
-              <div className="mt-2 text-3xl font-bold text-blue-900 dark:text-blue-50">{summary.preparing}</div>
+            <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-zinc-900/20 p-6">
+              <div className="text-sm font-medium text-red-800 dark:text-red-300">Preparing</div>
+              <div className="mt-2 text-3xl font-bold text-red-900 dark:text-red-100">{summary.preparing}</div>
             </div>
             <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20 p-6">
               <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Ready</div>
@@ -218,10 +218,10 @@ export default function KitchenDashboardPage() {
         </div>
 
         {/* Info */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
+        <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-zinc-900/20 p-6">
           <div className="flex items-start gap-3">
             <svg
-              className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+              className="w-6 h-6 text-red-700 dark:text-red-500 flex-shrink-0 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -233,7 +233,7 @@ export default function KitchenDashboardPage() {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
+            <div className="flex-1 text-sm text-red-900 dark:text-red-100">
               <p className="font-semibold mb-2">Chef Quick Guide</p>
               <ul className="space-y-1 list-disc list-inside">
                 <li>Monitor and manage incoming orders in the Order Queue</li>

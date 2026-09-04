@@ -128,7 +128,7 @@ export default function CashierSettlePage() {
                       Table {order.table_id}
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-full border border-purple-200 bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-800 dark:border-purple-900/50 dark:bg-purple-950/30 dark:text-purple-200">
+                  <span className="shrink-0 rounded-full border border-red-200 bg-red-100 px-3 py-1 text-xs font-semibold text-red-800 dark:border-zinc-900/50 dark:bg-zinc-950/30 dark:text-red-200">
                     SERVED
                   </span>
                 </div>

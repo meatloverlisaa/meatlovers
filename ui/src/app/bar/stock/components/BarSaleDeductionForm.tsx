@@ -167,8 +167,8 @@ export function BarSaleDeductionForm({ products, balance, onSubmit, isSubmitting
         )}
 
         {selectedProduct && availableQuantity > 0 && (
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 p-3">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-zinc-900/50 p-3">
+            <p className="text-sm text-red-700 dark:text-red-300">
               Available: <strong>{availableQuantity}</strong> units
             </p>
           </div>

@@ -312,7 +312,7 @@ export default function ProductionPlansPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PLANNED":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200";
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
       case "IN_PROGRESS":
         return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200";
       case "COMPLETED":
@@ -399,7 +399,7 @@ export default function ProductionPlansPage() {
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
               <div className="text-xs text-zinc-600 dark:text-zinc-300">Planned</div>
-              <div className="mt-1 text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              <div className="mt-1 text-2xl font-semibold text-red-700 dark:text-red-400">
                 {summary.planned}
               </div>
             </div>

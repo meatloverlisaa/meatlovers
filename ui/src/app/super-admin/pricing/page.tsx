@@ -165,8 +165,8 @@ export default function SuperAdminPricingPage() {
                   {pricingRules.filter(r => r.is_active).length}
                 </p>
               </div>
-              <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3">
-                <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
+                <svg className="h-6 w-6 text-red-700 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -214,7 +214,7 @@ export default function SuperAdminPricingPage() {
               onClick={() => setActiveTab("rules")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "rules"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  ? "border-red-700 text-red-700 dark:text-red-400"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-50 dark:hover:border-gray-700"
               }`}
             >
@@ -224,7 +224,7 @@ export default function SuperAdminPricingPage() {
               onClick={() => setActiveTab("alerts")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "alerts"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  ? "border-red-700 text-red-700 dark:text-red-400"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-50 dark:hover:border-gray-700"
               }`}
             >
@@ -239,7 +239,7 @@ export default function SuperAdminPricingPage() {
               onClick={() => setActiveTab("audit")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "audit"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  ? "border-red-700 text-red-700 dark:text-red-400"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-50 dark:hover:border-gray-700"
               }`}
             >
@@ -272,7 +272,7 @@ export default function SuperAdminPricingPage() {
                       setEditingRule(null);
                       setShowRuleForm(true);
                     }}
-                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    className="inline-flex items-center justify-center rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
                   >
                     + Create Pricing Rule
                   </button>

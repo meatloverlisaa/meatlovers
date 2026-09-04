@@ -191,7 +191,7 @@ export default function ApprovalsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <ArrowPathIcon className="w-16 h-16 animate-spin text-blue-600 mx-auto mb-4" />
+          <ArrowPathIcon className="w-16 h-16 animate-spin text-red-700 mx-auto mb-4" />
           <p className="text-xl text-gray-900 font-semibold">Loading approvals...</p>
         </div>
       </div>
@@ -225,7 +225,7 @@ export default function ApprovalsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <DocumentTextIcon className="w-8 h-8 mr-3 text-blue-600" />
+              <DocumentTextIcon className="w-8 h-8 mr-3 text-red-700" />
               Approval Management
             </h1>
             <p className="text-gray-600 mt-1">Review and manage approval requests</p>
@@ -233,7 +233,7 @@ export default function ApprovalsPage() {
           <div className="text-right">
             <button
               onClick={fetchData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
               <ArrowPathIcon className="w-4 h-4" />
               Refresh
@@ -358,7 +358,7 @@ export default function ApprovalsPage() {
                             {getStatusIcon(approval.status)}
                             {approval.status}
                           </span>
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                          <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                             {getTypeLabel(approval.request_type)}
                           </span>
                           <span className="text-sm text-gray-500">
@@ -394,18 +394,18 @@ export default function ApprovalsPage() {
                         )}
 
                         {/* Order Details */}
-                        <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                          <p className="text-sm font-medium text-blue-900 mb-2">Order Details:</p>
+                        <div className="bg-red-50 border border-red-200 rounded p-3">
+                          <p className="text-sm font-medium text-red-900 mb-2">Order Details:</p>
                           <div className="space-y-1">
                             {approval.order.items.map((item, idx) => (
-                              <div key={idx} className="text-sm text-blue-800 flex justify-between">
+                              <div key={idx} className="text-sm text-red-800 flex justify-between">
                                 <span>
                                   {item.product_name} x {item.quantity}
                                 </span>
                                 <span>KSh {item.line_total.toFixed(2)}</span>
                               </div>
                             ))}
-                            <div className="border-t border-blue-300 pt-1 mt-2 flex justify-between font-semibold text-blue-900">
+                            <div className="border-t border-red-300 pt-1 mt-2 flex justify-between font-semibold text-red-900">
                               <span>Total:</span>
                               <span>KSh {approval.order.total_amount.toFixed(2)}</span>
                             </div>

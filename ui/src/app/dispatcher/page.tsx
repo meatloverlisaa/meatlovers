@@ -223,11 +223,11 @@ export default function DispatcherDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "bg-red-100 text-red-800 dark:bg-zinc-900/20 dark:text-red-200";
       case "PICKED_UP":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200";
       case "IN_TRANSIT":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-200";
+        return "bg-red-100 text-red-800 dark:bg-red-950/20 dark:text-red-200";
       case "DELIVERED":
         return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200";
       case "CANCELLED":
@@ -279,7 +279,7 @@ export default function DispatcherDashboard() {
             </Link>
             <button
               onClick={() => void fetchDashboardData()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
             >
               Refresh
             </button>
@@ -312,12 +312,12 @@ export default function DispatcherDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Assigned</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+                <p className="text-2xl font-bold text-red-700 dark:text-red-500 mt-1">
                   {summary.assigned}
                 </p>
               </div>
               <div className="flex justify-center">
-                <IconRenderer icon="clipboard" className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                <IconRenderer icon="clipboard" className="w-8 h-8 text-red-700 dark:text-red-500" />
               </div>
             </div>
           </div>
@@ -340,11 +340,11 @@ export default function DispatcherDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">In Transit</p>
-                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">
+                <p className="text-2xl font-bold text-red-700 dark:text-red-500 mt-1">
                   {summary.inTransit}
                 </p>
               </div>
-              <div className="flex justify-center"><IconRenderer icon="truck" className="h-8 w-8 text-purple-600 dark:text-purple-400" /></div>
+              <div className="flex justify-center"><IconRenderer icon="truck" className="h-8 w-8 text-red-700 dark:text-red-500" /></div>
             </div>
           </div>
 
@@ -397,7 +397,7 @@ export default function DispatcherDashboard() {
             </div>
             <button
               onClick={() => setShowAssignModal(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 transition-colors"
             >
               Assign Delivery
             </button>
@@ -502,7 +502,7 @@ export default function DispatcherDashboard() {
                           {delivery.status === "ASSIGNED" && (
                             <button
                               onClick={() => handleStatusUpdate(delivery.id, "PICKED_UP")}
-                              className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                              className="text-red-700 dark:text-red-500 hover:text-red-900 dark:hover:text-red-300"
                             >
                               Mark Picked Up
                             </button>
@@ -510,7 +510,7 @@ export default function DispatcherDashboard() {
                           {delivery.status === "PICKED_UP" && (
                             <button
                               onClick={() => handleStatusUpdate(delivery.id, "IN_TRANSIT")}
-                              className="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
+                              className="text-red-700 dark:text-red-500 hover:text-red-900 dark:hover:text-red-300"
                             >
                               Mark In Transit
                             </button>
@@ -683,7 +683,7 @@ export default function DispatcherDashboard() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="flex-1 px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800"
                     >
                       Assign
                     </button>

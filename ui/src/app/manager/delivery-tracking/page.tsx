@@ -148,11 +148,11 @@ export default function ManagerDeliveryTrackingPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-900/50";
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-zinc-900/50";
       case "PICKED_UP":
         return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-900/50";
       case "IN_TRANSIT":
-        return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-900/50";
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-zinc-900/50";
       case "DELIVERED":
         return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-900/50";
       case "CANCELLED":
@@ -275,7 +275,7 @@ export default function ManagerDeliveryTrackingPage() {
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
               <div className="text-xs text-zinc-600 dark:text-zinc-400">Assigned</div>
-              <div className="mt-2 text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              <div className="mt-2 text-2xl font-semibold text-red-700 dark:text-red-400">
                 {summary.assigned}
               </div>
             </div>
@@ -287,7 +287,7 @@ export default function ManagerDeliveryTrackingPage() {
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
               <div className="text-xs text-zinc-600 dark:text-zinc-400">In Transit</div>
-              <div className="mt-2 text-2xl font-semibold text-purple-600 dark:text-purple-400">
+              <div className="mt-2 text-2xl font-semibold text-red-700 dark:text-red-400">
                 {summary.inTransit}
               </div>
             </div>
@@ -357,7 +357,7 @@ export default function ManagerDeliveryTrackingPage() {
                       <div className="w-24">
                         <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-300"
+                            className="h-full bg-red-700 dark:bg-red-400 transition-all duration-300"
                             style={{ width: `${calculateProgress(delivery)}%` }}
                           />
                         </div>
@@ -382,7 +382,7 @@ export default function ManagerDeliveryTrackingPage() {
                           setSelectedDelivery(delivery);
                           setShowDetailsModal(true);
                         }}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                       >
                         View Details
                       </button>

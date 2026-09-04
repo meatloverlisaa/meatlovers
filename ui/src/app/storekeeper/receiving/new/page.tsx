@@ -190,7 +190,7 @@ export default function NewReceivingPage() {
                   type="text"
                   value={receiving.supplierName}
                   onChange={(e) => setReceiving(prev => ({ ...prev, supplierName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   placeholder="Enter supplier name"
                   required
                 />
@@ -203,7 +203,7 @@ export default function NewReceivingPage() {
                   type="text"
                   value={receiving.invoiceNumber}
                   onChange={(e) => setReceiving(prev => ({ ...prev, invoiceNumber: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   placeholder="INV-12345"
                 />
               </div>
@@ -215,7 +215,7 @@ export default function NewReceivingPage() {
                   type="date"
                   value={receiving.deliveryDate}
                   onChange={(e) => setReceiving(prev => ({ ...prev, deliveryDate: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   required
                 />
               </div>
@@ -232,7 +232,7 @@ export default function NewReceivingPage() {
               <button
                 type="button"
                 onClick={addItem}
-                className="px-3 py-1.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                className="px-3 py-1.5 text-sm font-semibold bg-red-700 hover:bg-red-700 text-white rounded-lg transition"
               >
                 Add Item
               </button>

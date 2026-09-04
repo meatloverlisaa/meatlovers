@@ -135,7 +135,7 @@ export default function AssetsPage() {
       case 'EXCELLENT':
         return 'bg-green-100 text-green-800';
       case 'GOOD':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-red-100 text-red-800';
       case 'FAIR':
         return 'bg-yellow-100 text-yellow-800';
       case 'POOR':
@@ -173,7 +173,7 @@ export default function AssetsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <ArrowPathIcon className="w-16 h-16 animate-spin text-blue-600 mx-auto mb-4" />
+          <ArrowPathIcon className="w-16 h-16 animate-spin text-red-700 mx-auto mb-4" />
           <p className="text-xl text-gray-900 font-semibold">Loading assets...</p>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function AssetsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <CubeIcon className="w-8 h-8 mr-3 text-blue-600" />
+              <CubeIcon className="w-8 h-8 mr-3 text-red-700" />
               Asset Management
             </h1>
             <p className="text-gray-600 mt-1">Track and manage company assets</p>
@@ -222,7 +222,7 @@ export default function AssetsPage() {
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
               <PlusIcon className="w-4 h-4" />
               Add Asset
@@ -293,10 +293,10 @@ export default function AssetsPage() {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {summary.byCategory.map((item) => (
-                <div key={item.category} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800 font-medium">{getCategoryLabel(item.category)}</p>
-                  <p className="text-2xl font-bold text-blue-900 mt-1">{item.count}</p>
-                  <p className="text-xs text-blue-700 mt-1">KSh {item.value.toLocaleString()}</p>
+                <div key={item.category} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm text-red-800 font-medium">{getCategoryLabel(item.category)}</p>
+                  <p className="text-2xl font-bold text-red-900 mt-1">{item.count}</p>
+                  <p className="text-xs text-red-700 mt-1">KSh {item.value.toLocaleString()}</p>
                 </div>
               ))}
             </div>
@@ -396,9 +396,9 @@ export default function AssetsPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
-                          <div className="bg-blue-50 rounded p-3">
-                            <p className="text-xs text-blue-700 mb-1">Purchase Cost</p>
-                            <p className="text-lg font-semibold text-blue-900">
+                          <div className="bg-red-50 rounded p-3">
+                            <p className="text-xs text-red-700 mb-1">Purchase Cost</p>
+                            <p className="text-lg font-semibold text-red-900">
                               KSh {asset.purchase_cost.toLocaleString()}
                             </p>
                           </div>
@@ -408,9 +408,9 @@ export default function AssetsPage() {
                               KSh {asset.current_value.toLocaleString()}
                             </p>
                           </div>
-                          <div className="bg-purple-50 rounded p-3">
-                            <p className="text-xs text-purple-700 mb-1">Purchase Date</p>
-                            <p className="text-sm font-semibold text-purple-900">
+                          <div className="bg-red-50 rounded p-3">
+                            <p className="text-xs text-red-700 mb-1">Purchase Date</p>
+                            <p className="text-sm font-semibold text-red-900">
                               {new Date(asset.purchase_date).toLocaleDateString()}
                             </p>
                           </div>
@@ -449,7 +449,7 @@ export default function AssetsPage() {
                       <div className="flex flex-col gap-2 ml-4">
                         <button
                           onClick={() => alert('Edit functionality coming soon')}
-                          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
+                          className="px-3 py-2 bg-red-700 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 text-sm"
                         >
                           <WrenchScrewdriverIcon className="w-4 h-4" />
                           Edit

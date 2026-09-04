@@ -224,7 +224,7 @@ export default function SuperAdminDashboard() {
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
       PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-      PREPARING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      PREPARING: "bg-red-100 text-red-800 dark:bg-zinc-900 dark:text-red-200",
       READY: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
     };
     return colors[status] || "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
@@ -384,7 +384,7 @@ export default function SuperAdminDashboard() {
                 </p>
               </div>
               <span className="rounded-lg flex h-12 w-12 items-center justify-center" style={{ backgroundColor: '#06B6D420' }}>
-                <IconRenderer icon="chart" className="h-6 w-6 text-cyan-400" />
+                <IconRenderer icon="chart" className="h-6 w-6 text-zinc-400" />
               </span>
             </div>
           </div>
