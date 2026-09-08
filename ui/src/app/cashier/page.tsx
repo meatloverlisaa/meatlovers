@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "SERVED" | "PAID";
 
@@ -25,22 +25,12 @@ type CashierStats = {
 };
 
 async function fetchCashierStats(): Promise<CashierStats> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
   try {
     // Fetch orders
-    const ordersRes = await fetch(`${API_BASE}/orders`, { 
-      cache: "no-store",
-      headers: getAuthHeader(),
-    });
-    const orders = ordersRes.ok ? await ordersRes.json() : [];
+    const orders = await apiRequest<Order[]>("/orders", { cache: "no-store" });
     
     // Fetch payments
-    const paymentsRes = await fetch(`${API_BASE}/payments`, { 
-      cache: "no-store",
-      headers: getAuthHeader(),
-    });
-    const payments = paymentsRes.ok ? await paymentsRes.json() : [];
+    const payments = await apiRequest<any[]>("/payments", { cache: "no-store" });
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -69,17 +59,7 @@ async function fetchCashierStats(): Promise<CashierStats> {
 }
 
 async function fetchPendingOrders(): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/orders?status=SERVED`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const data = await res.json();
+  const data = await apiRequest<Order[]>("/orders?status=SERVED", { cache: "no-store" });
   // Ensure we always return an array
   return Array.isArray(data) ? data : [];
 }

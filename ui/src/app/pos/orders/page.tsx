@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { getAuthHeader } from "@/lib/auth";
-import { getApiBaseUrl } from "@/lib/api-config";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -39,17 +38,7 @@ const statusLabels: Record<OrderStatus, string> = {
 };
 
 async function fetchMyOrders(): Promise<Order[]> {
-  const API_BASE = getApiBaseUrl();
-  
-  const res = await fetch(`${API_BASE}/orders`, {
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-
-  const payload: unknown = await res.json();
+  const payload = await apiRequest<unknown>("/orders", { cache: "no-store" });
   if (Array.isArray(payload)) {
     return payload as Order[];
   }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 type Order = {
   id: string;
@@ -21,28 +21,20 @@ type Order = {
 };
 
 async function fetchServedOrders(retryCount = 0): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/orders/all?status=SERVED`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
+  let data: Order[];
+  try {
+    data = await apiRequest<Order[]>("/orders/all?status=SERVED", { cache: "no-store" });
+  } catch (error) {
+    const status = error instanceof Error ? error.message : "";
 
-  // Handle rate limiting with exponential backoff
-  if (res.status === 429) {
-    if (retryCount < 5) {
-      const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
+    if (status.includes("429") && retryCount < 5) {
+      const delay = Math.pow(2, retryCount) * 2000;
       await new Promise(resolve => setTimeout(resolve, delay));
       return fetchServedOrders(retryCount + 1);
     }
-    throw new Error(`Rate limit exceeded. Please wait a moment and try again.`);
+    throw error;
   }
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const data = await res.json();
   return Array.isArray(data) ? data : [];
 }
 

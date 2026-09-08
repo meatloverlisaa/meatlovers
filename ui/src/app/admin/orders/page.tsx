@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -34,29 +35,15 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-  
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  return res.json();
+  const endpoint = status ? `/orders?status=${status}` : "/orders";
+  return apiRequest<Order[]>(endpoint, { cache: "no-store" });
 }
 
 async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<void> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  
-  const res = await fetch(`${baseUrl}/orders/${orderId}/status`, {
+  await apiRequest(`/orders/${orderId}/status`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
   });
-  
-  if (!res.ok) {
-    throw new Error(`Failed to update order status: ${res.status}`);
-  }
 }
 
 function OrderDetailDrawer({ 

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { getAuthHeader } from "@/lib/auth";
-import { getApiBaseUrl } from "@/lib/api-config";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -36,25 +35,8 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  const baseUrl = getApiBaseUrl();
-  const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-
-  const res = await fetch(url, { 
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeader(),
-    },
-  });
-  
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error(`Failed to fetch orders: 429 - Rate limit exceeded. Please wait before refreshing.`);
-    }
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const payload: unknown = await res.json();
+  const endpoint = status ? `/orders?status=${status}` : "/orders";
+  const payload = await apiRequest<unknown>(endpoint, { cache: "no-store" });
   if (Array.isArray(payload)) {
     return payload as Order[];
   }
