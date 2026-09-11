@@ -259,16 +259,16 @@ export function PricingRuleForm({ rule, onClose, onSuccess }: PricingRuleFormPro
               </div>
 
               {/* Info Box */}
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
+              <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-zinc-800 p-4">
                 <div className="flex">
-                  <svg className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 text-red-700 dark:text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
                       About Pricing Rules
                     </h3>
-                    <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                    <p className="mt-1 text-sm text-red-700 dark:text-red-300">
                       Pricing rules help maintain consistent margins and prevent unapproved discounts.
                       When applied, they automatically calculate new prices based on the rule type.
                       Min/max constraints ensure prices stay within acceptable ranges.

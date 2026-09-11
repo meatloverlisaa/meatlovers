@@ -102,14 +102,14 @@ export default function UsersPage() {
 
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
-      SUPER_ADMIN: 'bg-purple-100 text-purple-800 border-purple-200',
-      ADMIN: 'bg-blue-100 text-blue-800 border-blue-200',
-      MANAGER: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      SUPER_ADMIN: 'bg-red-100 text-red-800 border-red-200',
+      ADMIN: 'bg-red-100 text-red-800 border-red-200',
+      MANAGER: 'bg-red-100 text-red-800 border-red-200',
       ACCOUNTANT: 'bg-green-100 text-green-800 border-green-200',
       HR: 'bg-pink-100 text-pink-800 border-pink-200',
       STOREKEEPER: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       CHEF: 'bg-orange-100 text-orange-800 border-orange-200',
-      BARMAN: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      BARMAN: 'bg-zinc-100 text-zinc-800 border-zinc-200',
       WAITER: 'bg-teal-100 text-teal-800 border-teal-200',
       CASHIER: 'bg-lime-100 text-lime-800 border-lime-200',
       DISPATCHER: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -123,7 +123,7 @@ export default function UsersPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <ArrowPathIcon className="w-16 h-16 animate-spin text-blue-600 mx-auto mb-4" />
+          <ArrowPathIcon className="w-16 h-16 animate-spin text-red-700 mx-auto mb-4" />
           <p className="text-xl text-gray-900 font-semibold">Loading users...</p>
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function UsersPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <UserGroupIcon className="w-8 h-8 mr-3 text-blue-600" />
+              <UserGroupIcon className="w-8 h-8 mr-3 text-red-700" />
               User Management
             </h1>
             <p className="text-gray-600 mt-1">
@@ -173,7 +173,7 @@ export default function UsersPage() {
               Refresh
             </button>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
               <PlusIcon className="w-4 h-4" />
               Add User
@@ -201,7 +201,7 @@ export default function UsersPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600">Roles</p>
-            <p className="text-3xl font-bold text-blue-600 mt-2">
+            <p className="text-3xl font-bold text-red-700 mt-2">
               {uniqueRoles.length}
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function UsersPage() {
                 placeholder="Search by name, email, phone, or role..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
               />
             </div>
 
@@ -242,7 +242,7 @@ export default function UsersPage() {
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
                 >
                   <option value="ALL">All Roles</option>
                   {uniqueRoles.map((role) => (
@@ -260,7 +260,7 @@ export default function UsersPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
                 >
                   <option value="ALL">All Status</option>
                   <option value="ACTIVE">Active</option>
@@ -359,7 +359,7 @@ export default function UsersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          className="text-red-700 hover:text-red-900 mr-3"
                           title="Edit user"
                         >
                           <ArrowPathIcon className="w-5 h-5" />

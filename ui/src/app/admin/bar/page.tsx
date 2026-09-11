@@ -187,12 +187,12 @@ export default function BarOversightPage() {
             
             <div className="space-y-4">
               {/* Average Prep Time */}
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
                 <div>
-                  <p className="text-sm text-blue-700 font-semibold">Avg Prep Time</p>
-                  <p className="text-xs text-blue-600">For completed orders</p>
+                  <p className="text-sm text-red-700 font-semibold">Avg Prep Time</p>
+                  <p className="text-xs text-red-700">For completed orders</p>
                 </div>
-                <p className="text-2xl font-bold text-blue-900">~8 min</p>
+                <p className="text-2xl font-bold text-red-900">~8 min</p>
               </div>
 
               {/* Orders in Queue */}

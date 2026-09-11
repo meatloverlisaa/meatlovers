@@ -1,6 +1,7 @@
 // ReadyButton Component - Action button for status transitions
 
 import type { OrderStatus } from '@/types/bar';
+import { IconRenderer } from '@/components/ui/IconRenderer';
 
 interface ReadyButtonProps {
   currentStatus: OrderStatus;
@@ -17,13 +18,13 @@ interface ButtonConfig {
 const getButtonConfig = (status: OrderStatus): ButtonConfig => {
   switch (status) {
     case 'PENDING':
-      return { label: 'Start Preparing', icon: '🔥', color: 'bg-blue-600 hover:bg-blue-700' };
+      return { label: 'Start Preparing', icon: 'trending', color: 'bg-blue-600 hover:bg-blue-700' };
     case 'PREPARING':
-      return { label: 'Mark Ready', icon: '✅', color: 'bg-green-600 hover:bg-green-700' };
+      return { label: 'Mark Ready', icon: 'check', color: 'bg-green-600 hover:bg-green-700' };
     case 'READY':
-      return { label: 'Mark Served', icon: '🍽️', color: 'bg-purple-600 hover:bg-purple-700' };
+      return { label: 'Mark Served', icon: 'serve', color: 'bg-purple-600 hover:bg-purple-700' };
     default:
-      return { label: 'Update', icon: '↻', color: 'bg-zinc-600 hover:bg-zinc-700' };
+      return { label: 'Update', icon: 'recycle', color: 'bg-zinc-600 hover:bg-zinc-700' };
   }
 };
 
@@ -46,7 +47,7 @@ export function ReadyButton({ currentStatus, isUpdating, onClick }: ReadyButtonP
         </>
       ) : (
         <>
-          <span>{config.icon}</span>
+          <IconRenderer icon={config.icon} className="w-4 h-4" />
           <span>{config.label}</span>
         </>
       )}

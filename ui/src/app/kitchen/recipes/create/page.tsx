@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -217,7 +218,7 @@ export default function CreateRecipePage() {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              <span className="text-4xl">➕</span>
+              <IconRenderer icon="check" className="h-10 w-10 text-zinc-700 dark:text-zinc-200" />
               Create New Recipe
             </h1>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -433,13 +434,13 @@ export default function CreateRecipePage() {
         </form>
 
         {/* Help Info */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-4">
+        <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">Recipe Creation Tips</p>
+            <div className="text-sm text-red-700 dark:text-red-300">
+              <p className="font-medium text-red-900 dark:text-zinc-100 mb-1">Recipe Creation Tips</p>
               <ul className="space-y-1 list-disc list-inside">
                 <li>Select the final product that this recipe creates</li>
                 <li>Add all ingredients required with accurate quantities</li>

@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FinanceTransaction = {
@@ -96,26 +97,26 @@ function SummaryCards({ summary }: { summary: FinanceSummary }) {
     {
       label: "Total Income",
       value: `KSh ${summary.totalIncome.toLocaleString()}`,
-      icon: "💰",
+      icon: "money",
       color: "bg-green-100",
     },
     {
       label: "Total Expenses",
       value: `KSh ${summary.totalExpenses.toLocaleString()}`,
-      icon: "📉",
+      icon: "trending",
       color: "bg-red-100",
     },
     {
       label: "Net Profit",
       value: `KSh ${summary.netProfit.toLocaleString()}`,
-      icon: "📊",
-      color: summary.netProfit >= 0 ? "bg-blue-100" : "bg-red-100",
+      icon: "chart",
+      color: summary.netProfit >= 0 ? "bg-red-100" : "bg-red-100",
     },
     {
       label: "Transactions",
       value: summary.totalTransactions,
-      icon: "📝",
-      color: "bg-purple-100",
+      icon: "document",
+      color: "bg-red-100",
     },
   ];
 
@@ -133,11 +134,11 @@ function SummaryCards({ summary }: { summary: FinanceSummary }) {
               </p>
               <p className="mt-2 text-2xl font-black text-zinc-950">{card.value}</p>
             </div>
-            <span
-              className={`rounded-lg ${card.color} flex h-12 w-12 items-center justify-center text-2xl`}
+            <div
+              className={`rounded-lg ${card.color} flex h-12 w-12 items-center justify-center`}
             >
-              {card.icon}
-            </span>
+              <IconRenderer icon={card.icon} className="w-5 h-5" />
+            </div>
           </div>
         </div>
       ))}
@@ -206,7 +207,7 @@ function TransactionsTable({ transactions }: {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
                       {transaction.category}
                     </span>
                   </td>
@@ -449,7 +450,7 @@ export default async function FinanceDashboard() {
         {/* Info Footer */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
           <div className="flex items-start gap-3">
-            <span className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 text-xl">ℹ️</span>
+            <IconRenderer icon="info" className="text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5 w-5 h-5" />
             <div className="text-sm text-zinc-700 dark:text-zinc-300">
               <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">Finance Dashboard Features</p>
               <ul className="space-y-1 list-disc list-inside">

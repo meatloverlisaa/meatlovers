@@ -73,7 +73,7 @@ export function DelayedOrdersList({ orders }: DelayedOrdersListProps) {
       <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
         {orders.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="text-4xl mb-3">✓</div>
+            <div className="text-lg font-bold mb-3 text-emerald-600 dark:text-emerald-400">On track</div>
             <p className="text-zinc-600 dark:text-zinc-400">
               No delayed orders. Kitchen is on track!
             </p>

@@ -171,7 +171,7 @@ export function GrievanceHandling() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">📝</span>
+                        <span className="text-xs font-bold uppercase tracking-wide text-blue-400">Report</span>
                         <p className="font-bold text-white">{grievance.user.full_name}</p>
                         {grievance.confidential && <span className="rounded-full bg-purple-900 px-2 py-1 text-xs font-bold text-purple-400">Confidential</span>}
                       </div>

@@ -44,7 +44,7 @@ export function BarQueueBoard({ orders, onStatusUpdate, isLoading }: BarQueueBoa
   if (orders.length === 0) {
     return (
       <div className="bg-white rounded-xl border-2 border-dashed border-zinc-200 p-12 text-center">
-        <div className="text-6xl mb-4">🍹</div>
+        <div className="text-6xl mb-4 text-zinc-400">Bar</div>
         <h3 className="text-2xl font-bold text-zinc-900 mb-2">All caught up!</h3>
         <p className="text-zinc-600">No drink orders in queue</p>
       </div>

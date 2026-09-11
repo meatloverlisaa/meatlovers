@@ -2,28 +2,42 @@ import { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-function getBackendBaseUrl(): string | null {
+function getBackendBaseUrl(): string {
   const value =
     process.env.BACKEND_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  if (!value) {
-    return null;
-  }
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'http://localhost:3001';
 
   try {
     const url = new URL(value);
     if (!['http:', 'https:'].includes(url.protocol)) {
-      return null;
+      return 'http://localhost:3001';
     }
     return url.toString().replace(/\/$/, '');
   } catch {
-    return null;
+    return 'http://localhost:3001';
   }
 }
 
 async function proxy(request: NextRequest, path: string[]) {
+  const method = request.method.toUpperCase();
+
+  if (method === 'GET' || method === 'HEAD') {
+    const routeName = path.join('/') || 'auth';
+    if (routeName === 'login' || routeName.startsWith('login/')) {
+      return Response.json(
+        {
+          error: 'Method Not Allowed',
+          message: 'Use POST /api/auth/login to sign in. GET is not supported for authentication.',
+          code: 'METHOD_NOT_ALLOWED',
+          allowedMethods: ['POST'],
+        },
+        { status: 405 },
+      );
+    }
+  }
+
   const backendBaseUrl = getBackendBaseUrl();
   if (!backendBaseUrl) {
     return Response.json(

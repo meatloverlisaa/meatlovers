@@ -58,7 +58,7 @@ export default function ReportsPage() {
       title: 'Inventory Report',
       description: 'Stock levels, movement, and reorder requirements',
       icon: CubeIcon,
-      color: 'bg-blue-100 text-blue-600 border-blue-200',
+      color: 'bg-red-100 text-red-700 border-red-200',
       available: true,
     },
     {
@@ -66,7 +66,7 @@ export default function ReportsPage() {
       title: 'Financial Report',
       description: 'P&L statements, cash flow, and expense analysis',
       icon: DocumentTextIcon,
-      color: 'bg-purple-100 text-purple-600 border-purple-200',
+      color: 'bg-red-100 text-red-700 border-red-200',
       available: true,
     },
     {
@@ -90,7 +90,7 @@ export default function ReportsPage() {
       title: 'Customer Report',
       description: 'Customer behavior, loyalty, and satisfaction metrics',
       icon: UserGroupIcon,
-      color: 'bg-indigo-100 text-indigo-600 border-indigo-200',
+      color: 'bg-red-100 text-red-700 border-red-200',
       available: true,
     },
     {
@@ -209,7 +209,7 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <ChartBarIcon className="w-8 h-8 mr-3 text-blue-600" />
+              <ChartBarIcon className="w-8 h-8 mr-3 text-red-700" />
               Reports & Analytics
             </h1>
             <p className="text-gray-600 mt-1">
@@ -232,8 +232,8 @@ export default function ReportsPage() {
                 className={`
                   p-4 rounded-lg border-2 text-left transition-all
                   ${selectedReport === report.id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-blue-300'
+                    ? 'border-red-700 bg-red-50' 
+                    : 'border-gray-200 hover:border-red-300'
                   }
                   ${!report.available ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
@@ -261,7 +261,7 @@ export default function ReportsPage() {
         {selectedReport && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-4">
-              <CalendarIcon className="w-6 h-6 text-blue-600 mr-2" />
+              <CalendarIcon className="w-6 h-6 text-red-700 mr-2" />
               <h2 className="text-xl font-semibold text-gray-900">
                 Select Date Range
               </h2>
@@ -299,7 +299,7 @@ export default function ReportsPage() {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
                 />
               </div>
               <div>
@@ -310,7 +310,7 @@ export default function ReportsPage() {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
                 />
               </div>
             </div>
@@ -343,19 +343,19 @@ export default function ReportsPage() {
                 {selectedReport === 'sales' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Total revenue and profit margins
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Sales by category and product
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Payment method breakdown
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Daily sales trends and comparisons
                     </li>
                   </>
@@ -363,19 +363,19 @@ export default function ReportsPage() {
                 {selectedReport === 'inventory' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Current stock levels by product
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Low stock and out-of-stock items
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Stock movement and turnover rates
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Reorder recommendations
                     </li>
                   </>
@@ -383,19 +383,19 @@ export default function ReportsPage() {
                 {selectedReport === 'financial' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Income vs Expenses breakdown
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Cash flow statements
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Expense categories analysis
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Profit & Loss summary
                     </li>
                   </>
@@ -403,19 +403,19 @@ export default function ReportsPage() {
                 {selectedReport === 'orders' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Order volume and trends
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Average order value
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Order status breakdown
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Fulfillment times and efficiency
                     </li>
                   </>
@@ -423,19 +423,19 @@ export default function ReportsPage() {
                 {selectedReport === 'employees' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Attendance and punctuality records
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Department-wise headcount
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Leave requests and approvals
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Performance metrics summary
                     </li>
                   </>
@@ -443,19 +443,19 @@ export default function ReportsPage() {
                 {selectedReport === 'payroll' && (
                   <>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Total payroll by department
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Salary breakdowns and deductions
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Payment status tracking
                     </li>
                     <li className="flex items-center text-gray-700">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
                       Tax and statutory deductions
                     </li>
                   </>
@@ -472,7 +472,7 @@ export default function ReportsPage() {
                 <button
                   onClick={generateReport}
                   disabled={!dateFrom || !dateTo || loading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-red-700 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
                   <ArrowDownTrayIcon className="w-5 h-5" />
                   {loading ? 'Generating...' : 'Generate PDF'}
@@ -488,7 +488,7 @@ export default function ReportsPage() {
                 <button
                   onClick={generateReport}
                   disabled={!dateFrom || !dateTo || loading}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-red-700 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
                   <ArrowDownTrayIcon className="w-5 h-5" />
                   Export CSV
@@ -499,14 +499,14 @@ export default function ReportsPage() {
         )}
 
         {/* Help Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <div className="flex items-start">
-            <DocumentTextIcon className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" />
+            <DocumentTextIcon className="w-6 h-6 text-red-700 mr-3 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-red-900 mb-2">
                 Report Generation Tips
               </h3>
-              <ul className="text-sm text-blue-800 space-y-1">
+              <ul className="text-sm text-red-800 space-y-1">
                 <li>• Select a report type to get started</li>
                 <li>• Choose a date range for the data you want to analyze</li>
                 <li>• Use quick date buttons for common time periods</li>

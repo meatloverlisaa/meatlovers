@@ -70,13 +70,13 @@ export function PriceAuditTimeline() {
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
           Price change history will appear here when products are updated.
         </p>
-        <div className="mt-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 max-w-md mx-auto">
+        <div className="mt-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-zinc-800 p-4 max-w-md mx-auto">
           <div className="flex">
-            <svg className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="h-5 w-5 text-red-700 dark:text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
             <div className="ml-3 text-left">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+              <p className="text-sm text-red-700 dark:text-red-300">
                 <strong>Note:</strong> The price audit endpoint needs to be implemented in the backend API.
                 Add GET /price-audit to view historical price changes.
               </p>
@@ -187,7 +187,7 @@ export function PriceAuditTimeline() {
                   <div className="mt-4 space-y-2">
                     {audit.pricing_rule_id && (
                       <div className="flex items-center gap-2 text-sm">
-                        <svg className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="h-4 w-4 text-red-700 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                         </svg>
                         <span className="text-zinc-700 dark:text-zinc-300">
@@ -206,8 +206,8 @@ export function PriceAuditTimeline() {
                     </div>
 
                     {audit.note && (
-                      <div className="mt-3 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3">
-                        <p className="text-sm text-blue-900 dark:text-blue-100">
+                      <div className="mt-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-zinc-800 p-3">
+                        <p className="text-sm text-red-900 dark:text-zinc-100">
                           <span className="font-medium">Note:</span> {audit.note}
                         </p>
                       </div>

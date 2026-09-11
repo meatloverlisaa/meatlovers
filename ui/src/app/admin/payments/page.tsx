@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 
@@ -78,18 +78,7 @@ async function getPayments(): Promise<Payment[]> {
 }
 
 async function getOrders(): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${baseUrl}/orders/all?status=SERVED`, {
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to load orders: ${res.status}`);
-  }
-
-  return res.json();
+  return apiRequest<Order[]>("/orders/all?status=SERVED", { cache: "no-store" });
 }
 
 async function createPayment(payload: CreatePaymentPayload): Promise<Payment[]> {
@@ -465,7 +454,7 @@ export default function AdminPaymentsPage() {
                   onClick={() => setShowReceipt(false)}
                   className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
                 >
-                  ✕
+                  Close
                 </button>
               </div>
               

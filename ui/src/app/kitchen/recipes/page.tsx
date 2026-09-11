@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -65,13 +66,13 @@ function calculateRecipeCost(recipe: Recipe): number {
 function getCategoryIcon(category: string): string {
   switch (category.toUpperCase()) {
     case "FOOD":
-      return "🍽️";
+      return "serve";
     case "SOFT_DRINK":
-      return "🥤";
+      return "package";
     case "ALCOHOLIC_DRINK":
-      return "🍺";
+      return "package";
     default:
-      return "📦";
+      return "package";
   }
 }
 
@@ -80,9 +81,9 @@ function getCategoryColor(category: string): string {
     case "FOOD":
       return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
     case "SOFT_DRINK":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     case "ALCOHOLIC_DRINK":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     default:
       return "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/20 dark:text-zinc-300";
   }
@@ -325,7 +326,7 @@ export default function KitchenRecipesPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              <span className="text-4xl">📖</span>
+              <IconRenderer icon="document" className="h-10 w-10 text-zinc-700 dark:text-zinc-200" />
               Kitchen Recipes
             </h1>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -398,7 +399,7 @@ export default function KitchenRecipesPage() {
         {/* Recipes Grid */}
         {filteredRecipes.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
+            <div className="text-6xl mb-4 flex justify-center">Search</div>
             <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
               No recipes found
             </p>
@@ -418,10 +419,10 @@ export default function KitchenRecipesPage() {
         )}
 
         {/* Info Footer */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-4">
+        <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-4">
           <div className="flex items-start gap-3">
             <svg
-              className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+              className="w-5 h-5 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -433,8 +434,8 @@ export default function KitchenRecipesPage() {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">
+            <div className="text-sm text-red-700 dark:text-red-300">
+              <p className="font-medium text-red-900 dark:text-zinc-100 mb-1">
                 Recipe Guide
               </p>
               <ul className="space-y-1 list-disc list-inside">

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -27,40 +28,29 @@ type Order = {
 
 const statusColors: Record<OrderStatus, string> = {
   PENDING: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-200",
-  PREPARING: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-200",
+  PREPARING: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   READY: "bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-200",
-  SERVED: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/30 dark:text-purple-200",
+  SERVED: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   PAID: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900/30 dark:text-zinc-200",
 };
 
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-  
-  // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  const endpoint = status ? `/orders?status=${status}` : "/orders";
+  const payload = await apiRequest<unknown>(endpoint, { cache: "no-store" });
+  if (Array.isArray(payload)) {
+    return payload as Order[];
   }
-  
-  const res = await fetch(url, { 
-    cache: "no-store",
-    headers 
-  });
-  
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error(`Failed to fetch orders: 429 - Rate limit exceeded. Please wait before refreshing.`);
-    }
-    throw new Error(`Failed to fetch orders: ${res.status}`);
+
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "data" in payload &&
+    Array.isArray(payload.data)
+  ) {
+    return payload.data as Order[];
   }
-  
-  return res.json();
+
+  throw new Error("Orders response has an invalid format");
 }
 
 // Order Detail Modal (View-Only)
@@ -193,7 +183,7 @@ export default function ManagerOrdersPage() {
       setLoading(true);
       
       // Check if user is logged in
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
       if (!token) {
         setError('Please login to view orders');
         setLoading(false);
@@ -244,31 +234,31 @@ export default function ManagerOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] p-6">
+    <div className="min-h-screen bg-stone-50 p-6">
       <div className="mx-auto max-w-7xl">
         {/* Breadcrumb */}
-        <div className="mb-4 flex items-center gap-2 text-sm text-[#0F172A]/60 dark:text-white/60">
-          <Link href="/manager" className="hover:text-[#0F172A] dark:hover:text-white">
+        <div className="mb-4 flex items-center gap-2 text-sm text-zinc-500">
+          <Link href="/manager" className="hover:text-zinc-950">
             Manager Dashboard
           </Link>
           <span>/</span>
-          <span className="text-[#0F172A] dark:text-white">Orders</span>
+          <span className="text-zinc-950">Orders</span>
         </div>
 
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">
+              <h1 className="text-2xl font-bold text-zinc-950">
                 Order Management (View Only)
               </h1>
-              <p className="mt-1 text-sm text-[#0F172A]/60 dark:text-white/60">
+              <p className="mt-1 text-sm text-zinc-600">
                 Monitor all restaurant orders and track status
               </p>
             </div>
             <button
               onClick={() => loadOrders()}
-              className="rounded-xl border border-[#0284C7]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0F172A] hover:bg-[#0284C7]/5 hover:border-[#0284C7]/30 dark:border-[#38BDF8]/20 dark:bg-[#151F32] dark:text-white dark:hover:bg-[#0A0E1A]"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:border-red-700/40 hover:text-red-700 shadow-sm transition"
             >
               Refresh
             </button>
@@ -277,19 +267,19 @@ export default function ManagerOrdersPage() {
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="rounded-xl border border-[#0284C7]/10 bg-white p-4 dark:border-[#38BDF8]/10 dark:bg-[#151F32]">
-            <div className="text-xs font-medium text-[#0F172A]/60 dark:text-white/60 uppercase tracking-wide">Total Orders</div>
-            <div className="mt-2 text-2xl font-bold text-[#0F172A] dark:text-white">{stats.total}</div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <div className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Total Orders</div>
+            <div className="mt-2 text-2xl font-bold text-zinc-950">{stats.total}</div>
           </div>
-          <div className="rounded-xl border border-[#EA580C]/20 bg-[#EA580C]/10 p-4 dark:border-[#FB923C]/20 dark:bg-[#FB923C]/10">
-            <div className="text-xs font-medium text-[#EA580C] dark:text-[#FB923C] uppercase tracking-wide">Pending</div>
-            <div className="mt-2 text-2xl font-bold text-[#EA580C] dark:text-[#FB923C]">{stats.pending}</div>
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="text-xs font-medium text-amber-800 uppercase tracking-wide">Pending</div>
+            <div className="mt-2 text-2xl font-bold text-amber-900">{stats.pending}</div>
           </div>
-          <div className="rounded-xl border border-[#0284C7]/20 bg-[#0284C7]/10 p-4 dark:border-[#38BDF8]/20 dark:bg-[#38BDF8]/10">
-            <div className="text-xs font-medium text-[#0284C7] dark:text-[#38BDF8] uppercase tracking-wide">Preparing</div>
-            <div className="mt-2 text-2xl font-bold text-[#0284C7] dark:text-[#38BDF8]">{stats.preparing}</div>
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+            <div className="text-xs font-medium text-red-800 uppercase tracking-wide">Preparing</div>
+            <div className="mt-2 text-2xl font-bold text-red-900">{stats.preparing}</div>
           </div>
-          <div className="rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/10 p-4 dark:border-[#4ADE80]/20 dark:bg-[#4ADE80]/10">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
             <div className="text-xs font-medium text-[#16A34A] dark:text-[#4ADE80] uppercase tracking-wide">Ready</div>
             <div className="mt-2 text-2xl font-bold text-[#16A34A] dark:text-[#4ADE80]">{stats.ready}</div>
           </div>

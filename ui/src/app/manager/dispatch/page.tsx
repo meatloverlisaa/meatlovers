@@ -103,7 +103,7 @@ function getStatusClass(status: DeliveryStatus) {
   }
 
   if (status === "IN_TRANSIT") {
-    return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-200";
+    return "border-red-200 bg-red-50 text-red-800 dark:border-zinc-900/50 dark:bg-zinc-950/30 dark:text-red-200";
   }
 
   if (status === "PICKED_UP") {
@@ -252,7 +252,7 @@ export default function ManagerDispatchPage() {
         <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-5">
           <div className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="text-xs text-zinc-500 dark:text-zinc-400">Assigned</div>
-            <div className="mt-1 text-lg font-bold text-blue-700 dark:text-blue-300">{summary.assigned}</div>
+            <div className="mt-1 text-lg font-bold text-red-700 dark:text-red-300">{summary.assigned}</div>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="text-xs text-zinc-500 dark:text-zinc-400">Picked Up</div>
@@ -260,7 +260,7 @@ export default function ManagerDispatchPage() {
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="text-xs text-zinc-500 dark:text-zinc-400">In Transit</div>
-            <div className="mt-1 text-lg font-bold text-blue-700 dark:text-blue-300">{summary.inTransit}</div>
+            <div className="mt-1 text-lg font-bold text-red-700 dark:text-red-300">{summary.inTransit}</div>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="text-xs text-zinc-500 dark:text-zinc-400">Delivered</div>

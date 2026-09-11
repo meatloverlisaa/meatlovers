@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "SERVED" | "PAID";
 
@@ -25,22 +25,12 @@ type CashierStats = {
 };
 
 async function fetchCashierStats(): Promise<CashierStats> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
   try {
     // Fetch orders
-    const ordersRes = await fetch(`${API_BASE}/orders`, { 
-      cache: "no-store",
-      headers: getAuthHeader(),
-    });
-    const orders = ordersRes.ok ? await ordersRes.json() : [];
+    const orders = await apiRequest<Order[]>("/orders", { cache: "no-store" });
     
     // Fetch payments
-    const paymentsRes = await fetch(`${API_BASE}/payments`, { 
-      cache: "no-store",
-      headers: getAuthHeader(),
-    });
-    const payments = paymentsRes.ok ? await paymentsRes.json() : [];
+    const payments = await apiRequest<any[]>("/payments", { cache: "no-store" });
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -69,17 +59,7 @@ async function fetchCashierStats(): Promise<CashierStats> {
 }
 
 async function fetchPendingOrders(): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/orders?status=SERVED`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const data = await res.json();
+  const data = await apiRequest<Order[]>("/orders?status=SERVED", { cache: "no-store" });
   // Ensure we always return an array
   return Array.isArray(data) ? data : [];
 }
@@ -100,7 +80,7 @@ function StatCard({
   const colors = {
     zinc: "bg-zinc-100 dark:bg-zinc-900",
     green: "bg-green-100 dark:bg-green-950/30",
-    blue: "bg-blue-100 dark:bg-blue-950/30",
+    blue: "bg-red-100 dark:bg-red-950/30",
     amber: "bg-amber-100 dark:bg-amber-950/30",
   };
   
@@ -286,7 +266,7 @@ export default function CashierDashboard() {
             subtitle="Physical cash"
             color="blue"
             icon={
-              <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-red-700 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             }
@@ -298,7 +278,7 @@ export default function CashierDashboard() {
             subtitle="M-Pesa/Card"
             color="blue"
             icon={
-              <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-red-700 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             }
@@ -362,7 +342,7 @@ export default function CashierDashboard() {
                         Table {order.table_id}
                       </div>
                     </div>
-                    <span className="shrink-0 rounded-full border border-purple-200 bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-800 dark:border-purple-900/50 dark:bg-purple-950/30 dark:text-purple-200">
+                    <span className="shrink-0 rounded-full border border-red-200 bg-red-100 px-3 py-1 text-xs font-semibold text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
                       SERVED
                     </span>
                   </div>
@@ -379,12 +359,12 @@ export default function CashierDashboard() {
         </div>
 
         {/* Quick Tips */}
-        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-950/30">
           <div className="flex gap-3">
-            <svg className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 shrink-0 text-red-700 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="text-sm text-red-800 dark:text-red-200">
               <strong>Cashier Tip:</strong> Orders marked as <strong>SERVED</strong> are ready for payment. 
               Click on any order to process cash, M-Pesa, or card payments with optional split payment support.
             </div>

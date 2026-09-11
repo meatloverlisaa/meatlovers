@@ -1,5 +1,6 @@
 "use client";
 
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,10 +29,10 @@ export default function WhoAmIPage() {
           <h1 className="text-3xl font-bold text-red-400 mb-4">Not Logged In</h1>
           <p className="text-gray-300 mb-6">You are not currently authenticated.</p>
           <div className="space-y-3">
-            <Link href="/admin/login" className="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+            <Link href="/admin/login" className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800">
               Admin Login
             </Link>
-            <Link href="/storekeeper/login" className="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700">
+            <Link href="/storekeeper/login" className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800">
               Storekeeper Login
             </Link>
             <Link href="/hr/login" className="block w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
@@ -66,7 +67,10 @@ export default function WhoAmIPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-gray-800 rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">🔍 Current User</h1>
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <IconRenderer icon="user" className="h-8 w-8 text-white" />
+            <h1 className="text-4xl font-bold text-white">Current User</h1>
+          </div>
           <p className="text-gray-400">Your authentication details</p>
         </div>
 
@@ -95,9 +99,9 @@ export default function WhoAmIPage() {
             <div className="flex justify-between items-center border-b border-gray-700 pb-3">
               <span className="text-gray-400 font-semibold">Role:</span>
               <span className={`text-lg font-black px-4 py-2 rounded-full ${
-                user.role === 'STOREKEEPER' ? 'bg-purple-600 text-white' :
+                user.role === 'STOREKEEPER' ? 'bg-red-700 text-white' :
                 user.role === 'HR' ? 'bg-green-600 text-white' :
-                user.role === 'ADMIN' ? 'bg-blue-600 text-white' :
+                user.role === 'ADMIN' ? 'bg-red-700 text-white' :
                 'bg-gray-600 text-white'
               }`}>
                 {user.role}
@@ -118,7 +122,7 @@ export default function WhoAmIPage() {
         <div className="space-y-3">
           <Link 
             href={dashboardUrl}
-            className="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 text-center font-bold transition"
+            className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800 text-center font-bold transition"
           >
             Go to My Dashboard ({user.role})
           </Link>
@@ -139,7 +143,10 @@ export default function WhoAmIPage() {
         </div>
 
         <div className="mt-8 p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
-          <p className="text-yellow-200 text-sm font-semibold mb-2">⚠️ Role Access Info:</p>
+          <div className="mb-2 flex items-center gap-2">
+            <IconRenderer icon="warning" className="h-4 w-4 text-yellow-200" />
+            <p className="text-yellow-200 text-sm font-semibold">Role Access Info:</p>
+          </div>
           <p className="text-yellow-100 text-xs">
             {user.role === 'STOREKEEPER' 
               ? "You have STOREKEEPER access. You can visit /storekeeper dashboard."

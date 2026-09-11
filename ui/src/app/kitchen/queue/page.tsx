@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -91,7 +92,7 @@ function getStatusColor(status: OrderStatus): string {
     case "PENDING":
       return "bg-amber-500 text-white";
     case "PREPARING":
-      return "bg-blue-500 text-white";
+      return "bg-red-500 text-white";
     case "READY":
       return "bg-emerald-500 text-white";
     default:
@@ -104,7 +105,7 @@ function getStatusBg(status: OrderStatus): string {
     case "PENDING":
       return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
     case "PREPARING":
-      return "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
+      return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-zinc-800";
     case "READY":
       return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
     default:
@@ -230,7 +231,7 @@ export default function KitchenMonitoringScreen() {
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">👨‍🍳</span>
+            <IconRenderer icon="briefcase" className="h-6 w-6 text-slate-900 dark:text-white" />
             <div>
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">Kitchen Queue</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">Auto-refresh: 30s</p>
@@ -268,7 +269,7 @@ export default function KitchenMonitoringScreen() {
             <div className="text-xs text-slate-500 dark:text-slate-400">Pending</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-500">{summary.preparing}</div>
+            <div className="text-3xl font-bold text-red-500">{summary.preparing}</div>
             <div className="text-xs text-slate-500 dark:text-slate-400">Preparing</div>
           </div>
           <div className="text-center">
@@ -342,11 +343,11 @@ export default function KitchenMonitoringScreen() {
                     onClick={() => handleStatusUpdate(id, order.status)}
                     className={`w-full py-3 rounded-lg font-bold text-white transition ${
                       nextStatus === "PREPARING" 
-                        ? "bg-blue-500 hover:bg-blue-600" 
+                        ? "bg-red-500 hover:bg-red-700" 
                         : "bg-emerald-500 hover:bg-emerald-600"
                     }`}
                   >
-                    {nextStatus === "PREPARING" ? "▶ Start" : "✓ Ready"}
+                    {nextStatus === "PREPARING" ? "Start" : "Ready"}
                   </button>
                 )}
               </div>
@@ -355,7 +356,7 @@ export default function KitchenMonitoringScreen() {
 
           {foodOrders.length === 0 && (
             <div className="col-span-full text-center py-12">
-              <div className="text-6xl mb-4">👨‍🍳</div>
+              <div className="mb-4 flex justify-center"><IconRenderer icon="briefcase" className="h-16 w-16 text-slate-400" /></div>
               <p className="text-xl font-semibold text-slate-900 dark:text-white">
                 No orders in queue
               </p>

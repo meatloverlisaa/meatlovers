@@ -120,10 +120,10 @@ const initialForm: FormData = {
 };
 
 const STEPS = [
-  { id: 1, title: "Basic Info", icon: "👤", description: "Account & personal details" },
-  { id: 2, title: "Employment", icon: "💼", description: "Role & job information" },
-  { id: 3, title: "Emergency", icon: "🚨", description: "Emergency contact" },
-  { id: 4, title: "Banking", icon: "🏦", description: "Bank & qualifications" },
+  { id: 1, title: "Basic Info", icon: "person", description: "Account & personal details" },
+  { id: 2, title: "Employment", icon: "briefcase", description: "Role & job information" },
+  { id: 3, title: "Emergency", icon: "siren", description: "Emergency contact" },
+  { id: 4, title: "Banking", icon: "bank", description: "Bank & qualifications" },
 ];
 
 export default function NewEmployeePage() {
@@ -211,7 +211,7 @@ export default function NewEmployeePage() {
           <div className="flex items-center justify-between relative">
             <div className="absolute inset-x-0 top-5 h-0.5 bg-white/10" />
             <div
-              className="absolute top-5 h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500"
+              className="absolute top-5 h-0.5 bg-gradient-to-r from-emerald-500 to-red-500 transition-all duration-500"
               style={{ width: `${((step - 1) / 3) * 100}%` }}
             />
             {STEPS.map((s) => (
@@ -222,16 +222,16 @@ export default function NewEmployeePage() {
                     s.id < step
                       ? "bg-emerald-500 border-emerald-500 cursor-pointer"
                       : s.id === step
-                      ? "bg-slate-800 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                      ? "bg-slate-800 border-red-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                       : "bg-slate-800 border-white/20 cursor-not-allowed"
                   }`}
                 >
-                  {s.id < step ? "✓" : s.icon}
+                  {s.id < step ? "Done" : s.icon}
                 </button>
                 <div className="text-center hidden sm:block">
                   <p
                     className={`text-xs font-semibold ${
-                      s.id === step ? "text-cyan-400" : s.id < step ? "text-emerald-400" : "text-slate-500"
+                      s.id === step ? "text-zinc-400" : s.id < step ? "text-emerald-400" : "text-slate-500"
                     }`}
                   >
                     {s.title}
@@ -247,7 +247,7 @@ export default function NewEmployeePage() {
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
           {error && (
             <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-              <span className="text-red-400 text-xl">❌</span>
+              <span className="text-red-400 text-xl">Error</span>
               <div>
                 <p className="text-red-300 font-semibold text-sm">Failed to create employee</p>
                 <p className="text-red-400 text-sm mt-1">{error}</p>
@@ -259,7 +259,7 @@ export default function NewEmployeePage() {
           {step === 1 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>👤</span> Basic Information
+                <span>Person</span> Basic Information
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -304,7 +304,7 @@ export default function NewEmployeePage() {
                       type={showPassword ? "text" : "password"}
                       value={form.password}
                       onChange={(e) => set("password", e.target.value)}
-                      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all pr-12"
+                      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all pr-12"
                       placeholder="Min. 8 characters"
                     />
                     <button
@@ -312,7 +312,7 @@ export default function NewEmployeePage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                     >
-                      {showPassword ? "🙈" : "👁️"}
+                      {showPassword ? "Hide" : "Show"}
                     </button>
                   </div>
                 </div>
@@ -397,7 +397,7 @@ export default function NewEmployeePage() {
           {step === 2 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>💼</span> Employment Details
+                <span>Briefcase</span> Employment Details
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -493,7 +493,7 @@ export default function NewEmployeePage() {
                     value={form.skills}
                     onChange={(e) => set("skills", e.target.value)}
                     rows={2}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="e.g. Customer service, Inventory management, Barista"
                   />
                 </div>
@@ -504,7 +504,7 @@ export default function NewEmployeePage() {
                     value={form.certifications}
                     onChange={(e) => set("certifications", e.target.value)}
                     rows={2}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="e.g. Food Handler Certificate, First Aid"
                   />
                 </div>
@@ -515,7 +515,7 @@ export default function NewEmployeePage() {
                     value={form.notes}
                     onChange={(e) => set("notes", e.target.value)}
                     rows={3}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all resize-none"
                     placeholder="Any additional notes about this employee..."
                   />
                 </div>
@@ -527,7 +527,7 @@ export default function NewEmployeePage() {
           {step === 3 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>🚨</span> Emergency Contact
+                <span>Alert</span> Emergency Contact
               </h2>
               <p className="text-slate-400 text-sm">
                 This information will be used in case of emergency. It is optional but highly
@@ -565,7 +565,7 @@ export default function NewEmployeePage() {
               </div>
 
               <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                <p className="text-amber-300 text-sm font-semibold mb-1">📋 Review before next step</p>
+                <p className="text-amber-300 text-sm font-semibold mb-1">Review before next step</p>
                 <div className="text-slate-400 text-sm space-y-1">
                   <p>
                     <span className="text-slate-300 font-medium">Name:</span> {form.full_name}
@@ -594,7 +594,7 @@ export default function NewEmployeePage() {
           {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>🏦</span> Banking Details
+                <span>Bank</span> Banking Details
               </h2>
               <p className="text-slate-400 text-sm">
                 Banking information is required for payroll processing. All fields are optional at
@@ -650,7 +650,7 @@ export default function NewEmployeePage() {
 
               {/* Final summary */}
               <div className="mt-6 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                <p className="text-emerald-300 font-semibold mb-3">✅ Ready to create employee</p>
+                <p className="text-emerald-300 font-semibold mb-3">Ready to create employee</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {[
                     ["Full Name", form.full_name],
@@ -695,7 +695,7 @@ export default function NewEmployeePage() {
               <button
                 onClick={() => setStep((step + 1) as Step)}
                 disabled={!canProceed()}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:from-cyan-400 hover:to-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-cyan-500/25"
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-red-500 to-emerald-500 text-white font-semibold hover:from-red-400 hover:to-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-red-500/25"
               >
                 Next →
               </button>
@@ -711,7 +711,7 @@ export default function NewEmployeePage() {
                     Creating...
                   </>
                 ) : (
-                  "✅ Create Employee"
+                  "Create Employee"
                 )}
               </button>
             )}
@@ -747,7 +747,7 @@ function Input({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+      className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all"
     />
   );
 }
@@ -767,7 +767,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-slate-800 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+      className="w-full bg-slate-800 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/30 transition-all"
     >
       {placeholder && (
         <option value="" disabled>

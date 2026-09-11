@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 export type ProductCategory = "FOOD" | "SOFT_DRINK" | "ALCOHOLIC_DRINK";
 
@@ -25,7 +26,7 @@ async function getProducts(category?: ProductCategory): Promise<Product[]> {
     : `${API_BASE_URL}/products`;
   
   // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token')) : null;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -56,10 +57,10 @@ function CategoryFilter({
   onSelect: (category: ProductCategory | "ALL") => void;
 }) {
   const categories: Array<{ id: ProductCategory | "ALL"; label: string; icon: string }> = [
-    { id: "ALL", label: "All Products", icon: "🛒" },
-    { id: "FOOD", label: "Food", icon: "🍖" },
-    { id: "SOFT_DRINK", label: "Soft Drinks", icon: "🥤" },
-    { id: "ALCOHOLIC_DRINK", label: "Alcoholic Drinks", icon: "🍺" },
+    { id: "ALL", label: "All Products", icon: "cart" },
+    { id: "FOOD", label: "Food", icon: "package" },
+    { id: "SOFT_DRINK", label: "Soft Drinks", icon: "chart" },
+    { id: "ALCOHOLIC_DRINK", label: "Alcoholic Drinks", icon: "chart" },
   ];
 
   return (
@@ -87,8 +88,8 @@ function ProductTable({ products }: { products: Product[] }) {
   const getCategoryBadge = (category: ProductCategory) => {
     const badges = {
       FOOD: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
-      SOFT_DRINK: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
-      ALCOHOLIC_DRINK: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+      SOFT_DRINK: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
+      ALCOHOLIC_DRINK: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
     };
     return badges[category];
   };
@@ -105,7 +106,7 @@ function ProductTable({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-[#0284C7]/30 bg-white p-16 text-center dark:border-[#38BDF8]/30 dark:bg-[#151F32]">
-        <p className="text-4xl mb-3">📦</p>
+        <IconRenderer icon="package" className="w-12 h-12 mb-3" />
         <p className="font-semibold text-[#0F172A] dark:text-white">No products found</p>
         <p className="text-sm text-[#0F172A]/60 dark:text-white/60 mt-1">
           Try changing the category filter
@@ -276,7 +277,7 @@ export default function ManagerProductsPage() {
     setError(null);
     try {
       // Check if user is logged in
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
       if (!token) {
         setError('Please login to view products');
         setLoading(false);

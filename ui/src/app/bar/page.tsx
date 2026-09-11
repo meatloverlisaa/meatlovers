@@ -74,7 +74,7 @@ export default function BarQueuePage() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg border border-zinc-200 p-4">
               <p className="text-sm text-zinc-600">Pending</p>
-              <p className="text-2xl font-bold text-blue-600">{summary.pending}</p>
+              <p className="text-2xl font-bold text-red-700">{summary.pending}</p>
             </div>
             <div className="bg-white rounded-lg border border-zinc-200 p-4">
               <p className="text-sm text-zinc-600">Preparing</p>

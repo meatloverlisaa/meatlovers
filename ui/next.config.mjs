@@ -31,18 +31,17 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // This is a server-side rendered app, not static export
-  // Pages need runtime API data
-  output: 'standalone',
+  // This is a server-side rendered app, not static export. Standalone output
+  // is only needed for production packaging and should not affect next dev.
+  ...(process.env.NODE_ENV === 'production' ? { output: 'standalone' } : {}),
+
+  // Keep development output separate from production builds. Running a build
+  // while the dev server is active otherwise invalidates its generated chunks.
+  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
 
   // Skip trailing slash to avoid duplicate routes
   trailingSlash: false,
 
-  // Handle dynamic pages gracefully during build
-  generateBuildId: async () => {
-    // Use timestamp for build ID
-    return `build-${Date.now()}`;
-  },
 };
 
 export default nextConfig;

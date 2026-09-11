@@ -158,7 +158,7 @@ export function TrainingPrograms() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">📚</span>
+                        <span className="text-xs font-bold uppercase tracking-wide text-violet-400">Program</span>
                         <p className="font-bold text-white">{program.title}</p>
                         {program.mandatory && <span className="rounded-full bg-red-900 px-2 py-1 text-xs font-bold text-red-400">Mandatory</span>}
                       </div>

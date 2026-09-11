@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 type Product = {
   id: bigint | number;
@@ -156,15 +157,18 @@ export function BarSaleDeductionForm({ products, balance, onSubmit, isSubmitting
         {/* Stock Warning */}
         {selectedProduct && availableQuantity === 0 && (
           <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 p-3">
-            <p className="text-sm text-red-700 dark:text-red-300 font-medium">
-              ⚠️ This product has no stock at the bar
-            </p>
+            <div className="flex items-center gap-2">
+              <IconRenderer icon="warning" className="w-5 h-5 text-red-700 dark:text-red-300 flex-shrink-0" />
+              <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+                This product has no stock at the bar
+              </p>
+            </div>
           </div>
         )}
 
         {selectedProduct && availableQuantity > 0 && (
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 p-3">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-zinc-900/50 p-3">
+            <p className="text-sm text-red-700 dark:text-red-300">
               Available: <strong>{availableQuantity}</strong> units
             </p>
           </div>

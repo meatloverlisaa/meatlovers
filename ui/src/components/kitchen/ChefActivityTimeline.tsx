@@ -31,10 +31,10 @@ function getStatusColor(status: OrderStatus): string {
 
 export function ChefActivityTimeline({ activities }: ChefActivityTimelineProps) {
   function getActivityIcon(action: string): string {
-    if (action.includes("PREPARING")) return "🔥";
-    if (action.includes("READY")) return "✓";
-    if (action.includes("PENDING")) return "🔔";
-    return "📝";
+    if (action.includes("PREPARING")) return "Prep";
+    if (action.includes("READY")) return "Ready";
+    if (action.includes("PENDING")) return "Queued";
+    return "Note";
   }
 
   function getActivityColor(action: string): string {

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 type Order = {
   id: string;
@@ -22,33 +22,14 @@ type Order = {
 };
 
 async function fetchOrder(orderId: string): Promise<Order> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/orders/${orderId}`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch order: ${res.status}`);
-  }
-  
-  return res.json();
+  return apiRequest<Order>(`/orders/${orderId}`, { cache: "no-store" });
 }
 
 async function settleOrder(orderId: string): Promise<void> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+  await apiRequest(`/orders/${orderId}/status`, {
     method: "PATCH",
-    headers: { 
-      "Content-Type": "application/json",
-      ...getAuthHeader(),
-    },
     body: JSON.stringify({ status: "PAID" }),
   });
-
-  if (!res.ok) {
-    throw new Error(`Failed to settle order: ${res.status}`);
-  }
 }
 
 export default function CashierSettleOrderPage() {

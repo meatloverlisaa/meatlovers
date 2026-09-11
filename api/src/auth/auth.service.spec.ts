@@ -168,17 +168,21 @@ describe('AuthService', () => {
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw UnauthorizedException for locked account', async () => {
-      const lockedUntil = new Date(Date.now() + 30 * 60 * 1000);
-      mockPrismaService.user.findFirst.mockResolvedValue({
-        ...mockUser,
-        account_locked_until: lockedUntil,
-        failed_login_attempts: 5,
-      });
+    it('should reject invalid password without locking the account', async () => {
+      mockPrismaService.user.findFirst.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
         service.login(loginDto, ipAddress, userAgent),
       ).rejects.toThrow(UnauthorizedException);
+
+      expect(mockPrismaService.user.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            account_locked_until: expect.anything(),
+          }),
+        }),
+      );
     });
   });
 

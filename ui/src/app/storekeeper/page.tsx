@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthHeader } from "@/lib/auth";
@@ -173,51 +174,51 @@ export default function StorekeeperDashboard() {
       value: summary.stockItems,
       change: "+8 this week",
       trend: "up",
-      icon: "📦",
-      color: "bg-blue-100 dark:bg-blue-900/20",
+      icon: "package",
+      color: "bg-red-100 dark:bg-zinc-900/20",
     },
     {
       label: "Low Stock",
       value: summary.lowStock,
-      icon: "⚠️",
+      icon: "warning",
       color: "bg-amber-100 dark:bg-amber-900/20",
     },
     {
       label: "Out of Stock",
       value: summary.outOfStock,
-      icon: "❌",
+      icon: "error",
       color: "bg-red-100 dark:bg-red-900/20",
     },
     {
       label: "Pending Orders",
       value: summary.pendingOrders,
-      icon: "📥",
-      color: "bg-purple-100 dark:bg-purple-900/20",
+      icon: "inbox",
+      color: "bg-red-100 dark:bg-red-950/20",
     },
   ];
 
   const quickActions: QuickAction[] = [
     {
       label: "Receive Delivery",
-      icon: "📥",
+      icon: "inbox",
       href: "/storekeeper/receiving/new",
       color: "bg-emerald-50 dark:bg-emerald-900/20",
     },
     {
       label: "Check Stock",
-      icon: "📦",
+      icon: "package",
       href: "/storekeeper/stock",
-      color: "bg-blue-50 dark:bg-blue-900/20",
+      color: "bg-red-50 dark:bg-zinc-900/20",
     },
     {
       label: "Order Supplies",
-      icon: "🛒",
+      icon: "cart",
       href: "/storekeeper/suppliers/order",
-      color: "bg-purple-50 dark:bg-purple-900/20",
+      color: "bg-red-50 dark:bg-red-950/20",
     },
     {
       label: "Stock Report",
-      icon: "📊",
+      icon: "chart",
       href: "/storekeeper/stock/report",
       color: "bg-amber-50 dark:bg-amber-900/20",
     },
@@ -230,7 +231,7 @@ export default function StorekeeperDashboard() {
       case "MEDIUM":
         return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200";
       case "LOW":
-        return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "border-red-200 bg-red-50 text-red-800 dark:border-zinc-800 dark:bg-zinc-900/20 dark:text-red-200";
     }
   };
 
@@ -241,7 +242,7 @@ export default function StorekeeperDashboard() {
       case "warning":
         return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200";
       case "info":
-        return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "border-red-200 bg-red-50 text-red-800 dark:border-zinc-800 dark:bg-zinc-900/20 dark:text-red-200";
     }
   };
 
@@ -250,9 +251,9 @@ export default function StorekeeperDashboard() {
       case "PURCHASE":
         return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200";
       case "TRANSFER":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "bg-red-100 text-red-800 dark:bg-zinc-900/20 dark:text-red-200";
       case "USAGE":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-200";
+        return "bg-red-100 text-red-800 dark:bg-red-950/20 dark:text-red-200";
       case "WASTE":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200";
     }
@@ -290,7 +291,7 @@ export default function StorekeeperDashboard() {
           </div>
           <button
             onClick={fetchDashboardData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
             Refresh
           </button>
@@ -311,9 +312,7 @@ export default function StorekeeperDashboard() {
                 className={`flex items-center justify-between rounded-lg border p-4 ${getAlertColor(alert.type)}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">
-                    {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
-                  </span>
+                  <IconRenderer icon={alert.type === "error" ? "error" : alert.type === "warning" ? "warning" : "info"} className="w-5 h-5" />
                   <p className="text-sm font-semibold">{alert.message}</p>
                 </div>
                 {alert.action && (
@@ -348,7 +347,7 @@ export default function StorekeeperDashboard() {
                     </p>
                   )}
                 </div>
-                <div className={`text-3xl p-3 rounded-lg ${card.color}`}>{card.icon}</div>
+                <div className={`p-3 rounded-lg ${card.color}`}><IconRenderer icon={card.icon} className="w-6 h-6" /></div>
               </div>
             </div>
           ))}
@@ -364,7 +363,7 @@ export default function StorekeeperDashboard() {
             <div className="space-y-3">
               {tasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <span className="text-4xl">✅</span>
+                  <IconRenderer icon="check" className="w-12 h-12" />
                   <p className="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     All caught up!
                   </p>
@@ -395,7 +394,7 @@ export default function StorekeeperDashboard() {
                     </p>
                     <Link
                       href={task.action.href}
-                      className="inline-block px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      className="inline-block px-3 py-1.5 text-xs font-bold bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
                     >
                       {task.action.label}
                     </Link>
@@ -417,7 +416,7 @@ export default function StorekeeperDashboard() {
                   href={action.href}
                   className={`flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 p-4 transition hover:shadow-md ${action.color}`}
                 >
-                  <span className="text-2xl">{action.icon}</span>
+                  <IconRenderer icon={action.icon} className="w-6 h-6" />
                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                     {action.label}
                   </span>

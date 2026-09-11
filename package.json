@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install": "npm install --prefix ./ui",
-    "build": "npm run build --prefix ./ui",
-    "start": "npm run start --prefix ./ui",
+    "install": "npm install --prefix ./api && npm install --prefix ./ui",
+    "build": "npm run build --prefix ./api && npm run build --prefix ./ui",
+    "start": "npm run start --prefix ./api",
     "dev": "npm run dev --prefix ./ui"
   }
 }

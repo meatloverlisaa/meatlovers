@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface SummaryCard {
@@ -202,7 +203,7 @@ export default function AccountantDashboard() {
     {
       label: "Pending Payments",
       value: summary.pendingPayments,
-      icon: "💳",
+      icon: "credit-card",
       color: "bg-amber-100 dark:bg-amber-900/20",
     },
     {
@@ -210,47 +211,47 @@ export default function AccountantDashboard() {
       value: formatCurrency(summary.todayRevenue),
       change: "+12%",
       trend: "up",
-      icon: "💰",
+      icon: "money",
       color: "bg-emerald-100 dark:bg-emerald-900/20",
     },
     {
       label: "Unreconciled",
       value: summary.unreconciled,
-      icon: "⚠️",
+      icon: "warning",
       color: "bg-red-100 dark:bg-red-900/20",
     },
     {
       label: "Reports Due",
       value: summary.reportsDue,
-      icon: "📊",
-      color: "bg-blue-100 dark:bg-blue-900/20",
+      icon: "chart",
+      color: "bg-red-100 dark:bg-zinc-900/20",
     },
   ];
 
   const quickActions: QuickAction[] = [
     {
       label: "Finance Reports",
-      icon: "📊",
+      icon: "chart",
       href: "/accountant/reports",
-      color: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30",
+      color: "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30",
     },
     {
       label: "Reconciliation",
-      icon: "💰",
+      icon: "money",
       href: "/accountant/reconciliation",
       color: "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30",
     },
     {
       label: "Tax Management",
-      icon: "📋",
+      icon: "clipboard",
       href: "/accountant/tax",
       color: "bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30",
     },
     {
       label: "Analytics",
-      icon: "📈",
+      icon: "trending",
       href: "/accountant/analytics",
-      color: "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30",
+      color: "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30",
     },
   ];
 
@@ -261,7 +262,7 @@ export default function AccountantDashboard() {
       case "MEDIUM":
         return "border-amber-800 bg-amber-900/30 text-amber-400";
       case "LOW":
-        return "border-blue-800 bg-blue-900/30 text-blue-400";
+        return "border-red-800 bg-zinc-900/30 text-red-500";
     }
   };
 
@@ -272,7 +273,7 @@ export default function AccountantDashboard() {
       case "warning":
         return "border-amber-800 bg-amber-900/30 text-amber-400";
       case "info":
-        return "border-blue-800 bg-blue-900/30 text-blue-400";
+        return "border-red-800 bg-zinc-900/30 text-red-500";
     }
   };
 
@@ -283,12 +284,12 @@ export default function AccountantDashboard() {
     if (type.includes("EXPENSE") || type.includes("COST")) {
       return "bg-red-900/30 text-red-400 border border-red-700/50";
     }
-    return "bg-blue-900/30 text-blue-400 border border-blue-700/50";
+    return "bg-zinc-900/30 text-red-500 border border-red-800/50";
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-slate-800 rounded w-1/4"></div>
@@ -304,12 +305,12 @@ export default function AccountantDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
               Finance Management Dashboard
             </h1>
             <p className="text-sm text-slate-400 mt-2 font-medium">
@@ -318,7 +319,7 @@ export default function AccountantDashboard() {
           </div>
           <button
             onClick={fetchDashboardData}
-            className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 font-semibold text-sm"
+            className="px-5 py-2.5 bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white rounded-xl shadow-lg shadow-red-500/25 transition-all duration-200 font-semibold text-sm"
           >
             Refresh Data
           </button>
@@ -339,9 +340,7 @@ export default function AccountantDashboard() {
                 className={`flex items-center justify-between rounded-lg border p-4 ${getAlertColor(alert.type)}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">
-                    {alert.type === "error" ? "❌" : alert.type === "warning" ? "⚠️" : "ℹ️"}
-                  </span>
+                  <IconRenderer icon={alert.type === "error" ? "error" : alert.type === "warning" ? "warning" : "info"} className="w-5 h-5" />
                   <p className="text-sm font-semibold">{alert.message}</p>
                 </div>
                 {alert.action && (
@@ -360,7 +359,7 @@ export default function AccountantDashboard() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {summaryCards.map((card, idx) => (
-            <div key={idx} className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-900/50 p-6 hover:shadow-2xl hover:border-blue-600/50 transition-all duration-300">
+            <div key={idx} className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-900/50 p-6 hover:shadow-2xl hover:border-red-700/50 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{card.label}</p>
@@ -383,7 +382,7 @@ export default function AccountantDashboard() {
                     </p>
                   )}
                 </div>
-                <div className={`text-4xl p-4 rounded-2xl bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border border-blue-500/30 shadow-lg`}>{card.icon}</div>
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-red-700/20 to-red-800/20 border border-red-700/30 shadow-lg"><IconRenderer icon={card.icon} className="w-6 h-6" /></div>
               </div>
             </div>
           ))}
@@ -392,15 +391,15 @@ export default function AccountantDashboard() {
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pending Tasks */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-900/50 p-6">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-900/50 p-6">
             <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
-              <span className="text-2xl">📋</span>
+              <IconRenderer icon="clipboard" className="w-5 h-5" />
               Pending Tasks
             </h2>
             <div className="space-y-3">
               {tasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <span className="text-4xl">✅</span>
+                  <IconRenderer icon="check" className="text-4xl w-16 h-16 mx-auto" />
                   <p className="mt-2 text-sm font-semibold text-slate-300">
                     All caught up!
                   </p>
@@ -431,7 +430,7 @@ export default function AccountantDashboard() {
                     </p>
                     <Link
                       href={task.action.href}
-                      className="inline-block px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      className="inline-block px-3 py-1.5 text-xs font-bold bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
                     >
                       {task.action.label}
                     </Link>
@@ -442,9 +441,9 @@ export default function AccountantDashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-900/50 p-6">
+          <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-900/50 p-6">
             <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
-              <span className="text-2xl">⚡</span>
+              <IconRenderer icon="credit-card" className="w-5 h-5" />
               Quick Actions
             </h2>
             <div className="grid grid-cols-2 gap-4">
@@ -452,9 +451,9 @@ export default function AccountantDashboard() {
                 <Link
                   key={idx}
                   href={action.href}
-                  className="flex items-center gap-3 rounded-xl border border-blue-800/50 bg-slate-800/50 p-4 transition-all duration-200 hover:shadow-xl hover:scale-105 hover:bg-blue-900/30 hover:border-blue-600/50"
+                  className="flex items-center gap-3 rounded-xl border border-red-800/50 bg-slate-800/50 p-4 transition-all duration-200 hover:shadow-xl hover:scale-105 hover:bg-zinc-900/30 hover:border-red-700/50"
                 >
-                  <span className="text-2xl">{action.icon}</span>
+                  <IconRenderer icon={action.icon} className="w-5 h-5" />
                   <span className="text-sm font-bold text-white">
                     {action.label}
                   </span>
@@ -465,9 +464,9 @@ export default function AccountantDashboard() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-900/50 p-6">
+        <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-900/50 p-6">
           <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
-            <span className="text-2xl">💳</span>
+            <IconRenderer icon="credit-card" className="w-5 h-5" />
             Recent Transactions
           </h2>
           <div className="space-y-3">

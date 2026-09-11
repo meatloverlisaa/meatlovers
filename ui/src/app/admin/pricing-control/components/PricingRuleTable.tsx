@@ -26,7 +26,7 @@ export function PricingRuleTable({ rules, onEdit, onDelete }: PricingRuleTablePr
       case "FIXED_PRICE":
         return {
           label: "Fixed Price",
-          color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+          color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
         };
       case "PERCENT_INCREASE":
         return {
@@ -58,12 +58,12 @@ export function PricingRuleTable({ rules, onEdit, onDelete }: PricingRuleTablePr
       case "FOOD":
         return {
           label: "Food",
-          color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+          color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
         };
       case "SOFT_DRINK":
         return {
           label: "Soft Drinks",
-          color: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200",
+          color: "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-200",
         };
       case "ALCOHOLIC_DRINK":
         return {

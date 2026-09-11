@@ -65,7 +65,7 @@ export function Navigation() {
               aria-label="Toggle theme"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 transition hover:border-red-700 hover:text-red-800"
             >
-              {theme === "dark" ? "☀️" : "🌙"}
+              {theme === "dark" ? "Light" : "Dark"}
             </button>
             <Link
               href="#menu"
@@ -130,7 +130,7 @@ export function Navigation() {
               aria-label="Toggle theme"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 transition hover:border-red-700 hover:text-red-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-red-500 dark:hover:text-red-300"
             >
-              {theme === "dark" ? "☀️" : "🌙"}
+              {theme === "dark" ? "Light" : "Dark"}
             </button>
 
             {navItems.map((item) => (

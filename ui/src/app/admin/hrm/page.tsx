@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getAuthHeader } from "@/lib/auth";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type HrmSummary = {
@@ -572,25 +573,25 @@ function SummaryCards({ summary }: { summary: HrmSummary }) {
     {
       label: "Total Staff",
       value: summary.totalStaff,
-      icon: "👥",
-      color: "bg-blue-100",
+      icon: "people",
+      color: "bg-red-100",
     },
     {
       label: "Active Staff",
       value: summary.activeStaff,
-      icon: "✅",
+      icon: "check",
       color: "bg-green-100",
     },
     {
       label: "Today&apos;s Attendance",
       value: summary.todayAttendance,
-      icon: "📋",
-      color: "bg-purple-100",
+      icon: "clipboard",
+      color: "bg-red-100",
     },
     {
       label: "Pending Leaves",
       value: summary.pendingLeaves,
-      icon: "🏖️",
+      icon: "leave",
       color: "bg-amber-100",
     },
   ];
@@ -664,7 +665,7 @@ function StaffTable({ staff }: { staff: Staff[] }) {
                     <div className="text-xs text-zinc-500">{member.phone || "No phone"}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
                       {member.role}
                     </span>
                   </td>
@@ -742,7 +743,7 @@ function AttendanceTable({ attendance }: { attendance: Attendance[] }) {
                     {record.user.full_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
                       {record.user.role}
                     </span>
                   </td>
@@ -833,7 +834,7 @@ function LeaveRequestsTable({ leaveRequests, onApprove, onReject }: {
                     <div className="text-xs text-zinc-500">{request.user.role}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-purple-100 px-2 py-1 text-xs font-semibold text-purple-800">
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
                       {request.leave_type}
                     </span>
                   </td>
@@ -922,7 +923,7 @@ function DutyRosterTable({ roster }: { roster: DutyRoster[] }) {
                     {shift.user.full_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">
                       {shift.user.role}
                     </span>
                   </td>
@@ -969,15 +970,15 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700"
+              className="flex items-center gap-1.5 rounded-lg bg-red-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
             >
-              🖨️ Print Payslip
+              Print Payslip
             </button>
             <button
               onClick={onClose}
               className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
             >
-              ✕
+              Close
             </button>
           </div>
         </div>
@@ -1012,7 +1013,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
           {/* Earnings */}
           <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
             <h4 className="font-bold text-sm text-green-700 dark:text-green-400 border-b border-zinc-200 pb-2 dark:border-zinc-800 flex items-center justify-between">
-              <span>💵 Earnings & Allowances</span>
+              <span>Earnings &amp; Allowances</span>
             </h4>
             <div className="mt-3 space-y-2 text-xs">
               <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
@@ -1037,7 +1038,7 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
           {/* Deductions */}
           <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
             <h4 className="font-bold text-sm text-red-700 dark:text-red-400 border-b border-zinc-200 pb-2 dark:border-zinc-800">
-              🏛️ Deductions & Taxes
+              Deductions & Taxes
             </h4>
             <div className="mt-3 space-y-2 text-xs">
               <div className="flex justify-between text-zinc-600 dark:text-zinc-300">
@@ -1067,12 +1068,12 @@ function PayslipModal({ payslip, onClose }: { payslip: Payslip; onClose: () => v
         </div>
 
         {/* Net Salary Highlight */}
-        <div className="mt-6 flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white shadow-lg">
+        <div className="mt-6 flex items-center justify-between rounded-xl bg-gradient-to-r from-red-700 to-red-800 p-5 text-white shadow-lg">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-200">Net Payable Amount</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-red-200">Net Payable Amount</p>
             <p className="mt-1 text-3xl font-black">KSh {Number(payslip.net_salary).toLocaleString()}</p>
           </div>
-          <div className="text-right text-xs text-blue-100">
+          <div className="text-right text-xs text-zinc-100">
             <p>Generated: {new Date(payslip.generated_at).toLocaleDateString()}</p>
             <p className="font-medium mt-1">Authorized by HR Department</p>
           </div>
@@ -1130,8 +1131,11 @@ function ProcessPayrollModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-lg font-black">⚡ Process Monthly Payroll Batch</h3>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="trending" className="w-5 h-5" />
+            <h3 className="text-lg font-black">Process Monthly Payroll Batch</h3>
+          </div>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         {error && (
@@ -1210,7 +1214,7 @@ function ProcessPayrollModal({
                 type="checkbox"
                 checked={calcOvertime}
                 onChange={(e) => setCalcOvertime(e.target.checked)}
-                className="rounded text-blue-600"
+                className="rounded text-red-700"
               />
               Calculate Overtime from Staff Attendance records
             </label>
@@ -1220,7 +1224,7 @@ function ProcessPayrollModal({
                 type="checkbox"
                 checked={applyStatutory}
                 onChange={(e) => setApplyStatutory(e.target.checked)}
-                className="rounded text-blue-600"
+                className="rounded text-red-700"
               />
               Auto-calculate Kenya Statutory Taxes (PAYE, NSSF, SHIF)
             </label>
@@ -1237,7 +1241,7 @@ function ProcessPayrollModal({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-blue-600 px-5 py-2 font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-red-700 px-5 py-2 font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
             >
               {loading ? "Calculating..." : "Run Payroll Batch"}
             </button>
@@ -1284,8 +1288,11 @@ function MarkPaidModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">💳 Confirm Salary Disbursement</h3>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="credit-card" className="w-5 h-5" />
+            <h3 className="text-base font-black">Confirm Salary Disbursement</h3>
+          </div>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         <div className="mt-4 rounded-xl bg-green-50 p-4 border border-green-200 dark:bg-green-950/30 dark:border-green-800 text-xs">
@@ -1398,16 +1405,19 @@ function BulkPayModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">💳 Bulk Salary Disbursement</h3>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="credit-card" className="w-5 h-5" />
+            <h3 className="text-base font-black">Bulk Salary Disbursement</h3>
+          </div>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
-        <div className="mt-4 rounded-xl bg-blue-50 p-4 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-800 text-xs">
+        <div className="mt-4 rounded-xl bg-red-50 p-4 border border-red-200 dark:bg-zinc-950/30 dark:border-zinc-800 text-xs">
           <p className="text-zinc-500 font-bold uppercase">Selected Employees</p>
           <p className="text-base font-black text-zinc-900 dark:text-white mt-0.5">{selectedIds.length} Staff Members</p>
           <div className="mt-2 flex justify-between font-bold text-zinc-700 dark:text-zinc-300">
             <span>Total Payout:</span>
-            <span className="text-blue-600 dark:text-blue-400 text-sm">KSh {totalAmount.toLocaleString()}</span>
+            <span className="text-red-700 dark:text-red-400 text-sm">KSh {totalAmount.toLocaleString()}</span>
           </div>
         </div>
 
@@ -1516,8 +1526,11 @@ function EditPayrollModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
-          <h3 className="text-base font-black">✏️ Edit Payroll Statement</h3>
-          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">✕</button>
+          <div className="flex items-center gap-2">
+            <IconRenderer icon="edit" className="w-5 h-5" />
+            <h3 className="text-base font-black">Edit Payroll Statement</h3>
+          </div>
+          <button onClick={onClose} className="rounded-lg bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800">Close</button>
         </div>
 
         <p className="mt-2 text-xs text-zinc-500">Employee: <strong>{record.user.full_name}</strong></p>
@@ -1600,7 +1613,7 @@ function EditPayrollModal({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-blue-600 px-5 py-2 font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-red-700 px-5 py-2 font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
             >
               {loading ? "Saving..." : "Save Changes"}
             </button>
@@ -1710,8 +1723,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Total Monthly Payroll</p>
               <p className="mt-2 text-2xl font-black text-zinc-950 dark:text-white">KSh {totalGross.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-2xl text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
-              💼
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+              <IconRenderer icon="briefcase" className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1722,8 +1735,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Disbursed (Paid)</p>
               <p className="mt-2 text-2xl font-black text-green-600 dark:text-green-400">KSh {totalPaid.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-2xl text-green-600 dark:bg-green-900/40 dark:text-green-400">
-              ✅
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400">
+              <IconRenderer icon="check" className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1734,8 +1747,8 @@ function PayrollManagementSection({
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Pending Disbursement</p>
               <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">KSh {totalPending.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-2xl text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
-              ⏳
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/40">
+              <IconRenderer icon="clock" className="text-amber-600 dark:text-amber-400 w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1744,10 +1757,10 @@ function PayrollManagementSection({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Statutory & Tax Deductions</p>
-              <p className="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">KSh {totalDeductions.toLocaleString()}</p>
+              <p className="mt-2 text-2xl font-black text-red-700 dark:text-red-400">KSh {totalDeductions.toLocaleString()}</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-2xl text-purple-600 dark:bg-purple-900/40 dark:text-purple-400">
-              🏛️
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/40">
+              <IconRenderer icon="building" className="text-red-700 dark:text-red-400 w-6 h-6" />
             </div>
           </div>
         </div>
@@ -1762,14 +1775,14 @@ function PayrollManagementSection({
               placeholder="Search staff, email, ref..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-blue-600 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-red-700 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.currentTarget.value as "ALL" | "PAID" | "PENDING")}
-            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-blue-600 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-red-700 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
             <option value="ALL">All Statuses</option>
             <option value="PAID">Paid Only</option>
@@ -1783,22 +1796,25 @@ function PayrollManagementSection({
               onClick={() => setShowBulkPayModal(true)}
               className="flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-green-700"
             >
-              <span>💳</span> Pay Selected ({selectedIds.length})
+              <IconRenderer icon="credit-card" className="w-4 h-4" />
+              <span>Pay Selected ({selectedIds.length})</span>
             </button>
           )}
 
           <button
             onClick={() => setShowProcessModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
+            className="flex items-center gap-1.5 rounded-lg bg-red-700 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-red-700"
           >
-            <span>⚡</span> Process Monthly Payroll
+            <IconRenderer icon="trending" className="w-4 h-4" />
+            <span>Process Monthly Payroll</span>
           </button>
 
           <button
             onClick={handleExportBankFile}
             className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-xs font-bold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
           >
-            <span>📥</span> Bank CSV File
+            <IconRenderer icon="trending" className="w-4 h-4" />
+            <span>Bank CSV File</span>
           </button>
         </div>
       </div>
@@ -1821,7 +1837,7 @@ function PayrollManagementSection({
                       filteredPayroll.filter((r) => !r.payment_date).length > 0 &&
                       selectedIds.length === filteredPayroll.filter((r) => !r.payment_date).length
                     }
-                    className="rounded text-blue-600 focus:ring-blue-500"
+                    className="rounded text-red-700 focus:ring-red-700"
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Staff Member</th>
@@ -1853,18 +1869,18 @@ function PayrollManagementSection({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleSelectOne(String(record.id))}
-                            className="rounded text-blue-600 focus:ring-blue-500"
+                            className="rounded text-red-700 focus:ring-red-700"
                           />
                         )}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-700 text-xs font-bold text-white">
                             {record.user.full_name.charAt(0)}
                           </div>
                           <div>
                             <div className="text-sm font-bold text-zinc-900 dark:text-white">{record.user.full_name}</div>
-                            <div className="text-xs text-zinc-500">{record.user.email} • <span className="font-medium text-blue-600">{record.user.role}</span></div>
+                            <div className="text-xs text-zinc-500">{record.user.email} • <span className="font-medium text-red-700">{record.user.role}</span></div>
                           </div>
                         </div>
                       </td>
@@ -1890,7 +1906,8 @@ function PayrollManagementSection({
                         {record.payment_date ? (
                           <div>
                             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                              <span>✅</span> Paid
+                              <IconRenderer icon="check" className="w-4 h-4" />
+                            <span>Paid</span>
                             </span>
                             <div className="mt-1 text-[10px] text-zinc-500">
                               {record.payment_method || "Bank"} • {record.payment_reference || "N/A"}
@@ -1898,7 +1915,8 @@ function PayrollManagementSection({
                           </div>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                            <span>⏳</span> Pending
+                            <IconRenderer icon="clock" className="w-3 h-3" />
+                            <span>Pending</span>
                           </span>
                         )}
                       </td>
@@ -1909,7 +1927,8 @@ function PayrollManagementSection({
                             className="rounded-md bg-zinc-100 px-2.5 py-1.5 font-bold text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                             title="View Payslip"
                           >
-                            📄 Slip
+                            <IconRenderer icon="document" className="w-4 h-4" />
+                            <span>Slip</span>
                           </button>
 
                           {isPending && (
@@ -1917,15 +1936,17 @@ function PayrollManagementSection({
                               onClick={() => setMarkPaidRecord(record)}
                               className="rounded-md bg-green-600 px-2.5 py-1.5 font-bold text-white transition hover:bg-green-700"
                             >
-                              ✅ Pay
+                              <IconRenderer icon="check" className="w-4 h-4" />
+                              <span>Pay</span>
                             </button>
                           )}
 
                           <button
                             onClick={() => setEditRecord(record)}
-                            className="rounded-md bg-blue-50 px-2.5 py-1.5 font-bold text-blue-700 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
+                            className="rounded-md bg-red-50 px-2.5 py-1.5 font-bold text-red-700 transition hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300"
                           >
-                            ✏️ Edit
+                            <IconRenderer icon="edit" className="w-4 h-4" />
+                            <span>Edit</span>
                           </button>
                         </div>
                       </td>
@@ -2022,7 +2043,7 @@ function PerformanceTable({ reviews }: { reviews: PerformanceReview[] }) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                       review.status === "COMPLETED" ? "bg-green-100 text-green-800" :
-                      review.status === "SUBMITTED" ? "bg-blue-100 text-blue-800" :
+                      review.status === "SUBMITTED" ? "bg-red-100 text-red-800" :
                       "bg-gray-100 text-gray-800"
                     }`}>{review.status}</span>
                   </td>
@@ -2062,7 +2083,7 @@ function TrainingTable({ programs }: { programs: TrainingProgram[] }) {
                 <tr key={String(program.id)} className="hover:bg-zinc-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{program.program_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-purple-100 px-2 py-1 text-xs font-semibold text-purple-800">{program.training_type}</span>
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">{program.training_type}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{program.duration_hours}h</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{program.enrollments.length}</td>
@@ -2120,7 +2141,7 @@ function DisciplinaryTable({ actions }: { actions: DisciplinaryAction[] }) {
                     <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                       action.status === "RESOLVED" ? "bg-green-100 text-green-800" :
                       action.status === "CLOSED" ? "bg-gray-100 text-gray-800" :
-                      "bg-blue-100 text-blue-800"
+                      "bg-red-100 text-red-800"
                     }`}>{action.status}</span>
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 max-w-xs truncate">{action.action_taken || "-"}</td>
@@ -2161,7 +2182,7 @@ function DocumentsTable({ documents }: { documents: EmployeeDocument[] }) {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900">{doc.user.full_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">{doc.document_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">{doc.document_type}</span>
+                    <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">{doc.document_type}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600">
                     {doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : "-"}
@@ -2238,16 +2259,16 @@ export default function HrmDashboard() {
   }, []);
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: "📊" },
-    { id: "staff", label: "Staff", icon: "👥" },
-    { id: "attendance", label: "Attendance", icon: "📋" },
-    { id: "leave", label: "Leave", icon: "🏖️" },
-    { id: "roster", label: "Roster", icon: "📅" },
-    { id: "payroll", label: "Payroll", icon: "💰" },
-    { id: "performance", label: "Performance", icon: "⭐" },
-    { id: "training", label: "Training", icon: "🎓" },
-    { id: "disciplinary", label: "Disciplinary", icon: "⚠️" },
-    { id: "documents", label: "Documents", icon: "📄" },
+    { id: "overview", label: "Overview", icon: "chart" },
+    { id: "staff", label: "Staff", icon: "people" },
+    { id: "attendance", label: "Attendance", icon: "clipboard" },
+    { id: "leave", label: "Leave", icon: "leave" },
+    { id: "roster", label: "Roster", icon: "calendar" },
+    { id: "payroll", label: "Payroll", icon: "money" },
+    { id: "performance", label: "Performance", icon: "sparkles" },
+    { id: "training", label: "Training", icon: "training" },
+    { id: "disciplinary", label: "Disciplinary", icon: "warning" },
+    { id: "documents", label: "Documents", icon: "document" },
   ];
 
   return (
@@ -2266,7 +2287,7 @@ export default function HrmDashboard() {
           <div className="flex items-center gap-3">
             <button
               onClick={loadData}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700"
+              className="rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-700"
             >
               Refresh
             </button>
@@ -2289,7 +2310,7 @@ export default function HrmDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
+                    ? "border-b-2 border-red-700 text-red-700 dark:text-red-400"
                     : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                 }`}
               >
@@ -2349,7 +2370,7 @@ export default function HrmDashboard() {
         {/* Info Footer */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
           <div className="flex items-start gap-3">
-            <span className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 text-xl">ℹ️</span>
+            <IconRenderer icon="info" className="text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5 w-5 h-5" />
             <div className="text-sm text-zinc-700 dark:text-zinc-300">
               <p className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">HR Management Features</p>
               <ul className="space-y-1 list-disc list-inside">

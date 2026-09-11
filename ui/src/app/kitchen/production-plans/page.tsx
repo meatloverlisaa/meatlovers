@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
@@ -70,7 +71,7 @@ function getStatusColor(status: string): string {
     case "PENDING":
       return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300";
     case "IN_PROGRESS":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
     case "COMPLETED":
       return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
     case "CANCELLED":
@@ -164,7 +165,7 @@ function ProductionPlanCard({ plan, onUpdate }: { plan: ProductionPlan; onUpdate
                 : 'text-zinc-900 dark:text-zinc-50'
             }`}>
               {formatDate(plan.planned_date)}
-              {overdue && <span className="ml-2">⚠️ Overdue</span>}
+              {overdue && <span className="ml-2">Overdue</span>}
             </div>
           </div>
           <div>
@@ -189,7 +190,7 @@ function ProductionPlanCard({ plan, onUpdate }: { plan: ProductionPlan; onUpdate
                 progress >= 100 
                   ? 'bg-green-500' 
                   : progress >= 50 
-                  ? 'bg-blue-500' 
+                  ? 'bg-red-500' 
                   : 'bg-amber-500'
               }`}
               style={{ width: `${Math.min(progress, 100)}%` }}
@@ -351,7 +352,7 @@ export default function ProductionPlansPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-            <span className="text-4xl">📅</span>
+            <IconRenderer icon="calendar" className="h-8 w-8 text-zinc-900 dark:text-zinc-50" />
             Production Plans
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -390,7 +391,7 @@ export default function ProductionPlansPage() {
         {overduePlans.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
-              ⚠️ Overdue ({overduePlans.length})
+              Overdue ({overduePlans.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {overduePlans.map((plan) => (
@@ -443,7 +444,7 @@ export default function ProductionPlansPage() {
         {/* Empty State */}
         {filteredPlans.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📅</div>
+            <div className="mb-4 flex justify-center"><IconRenderer icon="calendar" className="h-16 w-16 text-zinc-400" /></div>
             <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
               No production plans found
             </p>
@@ -454,13 +455,13 @@ export default function ProductionPlansPage() {
         )}
 
         {/* Info Footer */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-4">
+        <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">
+            <div className="text-sm text-red-700 dark:text-red-300">
+              <p className="font-medium text-red-900 dark:text-zinc-100 mb-1">
                 Production Plans Guide
               </p>
               <ul className="space-y-1 list-disc list-inside">

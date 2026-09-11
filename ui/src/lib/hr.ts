@@ -46,6 +46,22 @@ export type Employee = {
   employee_profile?: EmployeeProfile | null;
 };
 
+export type EmployeeDocument = {
+  id: string | number;
+  user_id?: string | number;
+  document_type?: string | null;
+  document_name?: string | null;
+  document_url?: string | null;
+  issue_date?: string | null;
+  expiry_date?: string | null;
+  is_verified?: boolean;
+  notes?: string | null;
+  created_at?: string | null;
+  user?: Pick<Employee, "id" | "full_name" | "role">;
+  uploader?: Pick<Employee, "id" | "full_name">;
+  verifier?: Pick<Employee, "id" | "full_name">;
+};
+
 export type EmployeeStatistics = {
   totalEmployees: number;
   activeEmployees: number;
@@ -64,7 +80,12 @@ export function dateValue(value?: string | null) {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   // Get auth token from localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('auth_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('access_token')
+      : null;
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -112,6 +133,11 @@ export function getStaffDirectory(status = "active") {
 
 export function getEmployee(id: string) {
   return request<Employee>(`/hrm/employees/${id}`);
+}
+
+export function getEmployeeDocuments(filters: Record<string, string> = {}) {
+  const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
+  return request<EmployeeDocument[]>(`/hrm/documents${query.size ? `?${query}` : ""}`);
 }
 
 export function getEmployeeStatistics() {
@@ -289,5 +315,46 @@ export function getPayslip(id: string | number) {
 
 export function exportBankPaymentFile() {
   return request<{ filename: string; contentType: string; content: string }>("/hrm/payroll/bank-export");
+}
+
+// ─── Document Management ──────────────────────────────────────────────────────
+export function uploadDocument(data: FormData) {
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('auth_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('access_token')
+      : null;
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return fetch(`${HR_API_BASE_URL}/hrm/documents`, {
+    method: "POST",
+    headers,
+    body: data,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const message = Array.isArray(body?.message) ? body.message.join(", ") : body?.message;
+      throw new Error(message || "Failed to upload document");
+    }
+    return res.json() as Promise<EmployeeDocument>;
+  });
+}
+
+export function verifyDocument(id: string | number, verified_by: string, notes?: string) {
+  return request<EmployeeDocument>(`/hrm/documents/${id}/verify`, {
+    method: "PATCH",
+    body: JSON.stringify({ verified_by, notes }),
+  });
+}
+
+export function deleteDocument(id: string | number) {
+  return request<{ message: string }>(`/hrm/documents/${id}`, {
+    method: "DELETE",
+  });
 }
 

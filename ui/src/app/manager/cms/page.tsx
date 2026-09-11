@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 // Import shared types from admin CMS
 import type { ContentPage, WebsiteLead, Analytics } from "../../admin/cms/types";
@@ -11,8 +12,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
 // Status badge for leads
 function LeadStatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    NEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
-    CONTACTED: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+    NEW: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
+    CONTACTED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
     QUALIFIED: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
     CONVERTED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
     LOST: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
@@ -128,7 +129,9 @@ function PageList({ pages }: { pages: ContentPage[] }) {
   if (pages.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-        <p className="text-4xl mb-3">📄</p>
+        <div className="mb-4 flex justify-center">
+          <IconRenderer icon="document" className="h-12 w-12 text-zinc-400" />
+        </div>
         <p className="font-semibold text-zinc-700 dark:text-zinc-300">No pages found</p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Pages will appear here once created
@@ -221,7 +224,9 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
   if (leads.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-        <p className="text-4xl mb-3">📬</p>
+        <div className="mb-4 flex justify-center">
+          <IconRenderer icon="inbox" className="h-12 w-12 text-zinc-400" />
+        </div>
         <p className="font-semibold text-zinc-700 dark:text-zinc-300">No leads captured yet</p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Leads will appear here once submitted through the website
@@ -339,9 +344,9 @@ function LeadTable({ leads }: { leads: WebsiteLead[] }) {
 type Tab = "pages" | "leads" | "analytics";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "pages", label: "Pages", icon: "📄" },
-  { id: "leads", label: "Leads", icon: "📬" },
-  { id: "analytics", label: "Analytics", icon: "📊" },
+  { id: "pages", label: "Pages", icon: "document" },
+  { id: "leads", label: "Leads", icon: "inbox" },
+  { id: "analytics", label: "Analytics", icon: "chart" },
 ];
 
 export default function ManagerCMS() {
@@ -451,7 +456,7 @@ export default function ManagerCMS() {
                   : "border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
               }`}
             >
-              <span className="text-base">{tab.icon}</span>
+              <IconRenderer icon={tab.icon} className="w-5 h-5" />
               {tab.label}
               {tab.id === "leads" && newLeadsCount > 0 && (
                 <span className="ml-1 rounded-full bg-zinc-900 dark:bg-zinc-50 px-1.5 py-0.5 text-xs font-semibold text-white dark:text-black">
@@ -492,7 +497,7 @@ export default function ManagerCMS() {
                 <ConversionAnalytics analytics={analytics} />
               ) : (
                 <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-16 text-center dark:border-zinc-700 dark:bg-zinc-950">
-                  <p className="text-4xl mb-3">📊</p>
+                  <IconRenderer icon="chart" className="w-12 h-12" />
                   <p className="font-semibold text-zinc-700 dark:text-zinc-300">No analytics data yet</p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                     Analytics will appear once leads are captured

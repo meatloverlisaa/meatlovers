@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import { getStaffDirectory, Employee, readable } from "@/lib/hr";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 
 const awardTypes = ["Employee of the Month", "Employee of the Quarter", "Performance Bonus", "Achievement Badge", "Certificate of Excellence", "Special Recognition"];
 const badgeTypes = ["Team Player", "Customer Service Star", "Innovation Award", "Safety Champion", "Leadership Award", "Mentor of the Year"];
@@ -158,7 +159,7 @@ export function RewardsRecognition() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">🏆</span>
+                        <span className="text-xs font-bold uppercase tracking-wide text-amber-400">Award</span>
                         <p className="font-bold text-white">{reward.user?.full_name}</p>
                       </div>
                       <p className="mt-1 text-sm text-blue-400 font-semibold">{reward.award_type}</p>
@@ -188,7 +189,7 @@ export function RewardsRecognition() {
         <p className="mt-1 text-sm text-zinc-400">Create and manage public recognition announcements.</p>
         <div className="mt-4 rounded-lg bg-zinc-950 p-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🎉</span>
+            <IconRenderer icon="sparkles" className="w-8 h-8 mb-2" />
             <div>
               <p className="font-bold text-white">Congratulations to our Employee of the Month!</p>
               <p className="text-sm text-zinc-400">Recognition will be displayed here when awards are granted.</p>

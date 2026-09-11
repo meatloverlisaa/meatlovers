@@ -50,7 +50,7 @@ type StockItem = {
   };
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 async function getRecipes(): Promise<Recipe[]> {
   const res = await fetch(`${baseUrl}/recipes`, {
@@ -440,7 +440,7 @@ export default function RecipesPage() {
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    className="text-sm text-red-700 hover:text-red-800 dark:text-red-500"
                   >
                     + Add Ingredient
                   </button>
@@ -573,7 +573,7 @@ export default function RecipesPage() {
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    className="text-sm text-red-700 hover:text-red-800 dark:text-red-500"
                   >
                     + Add Ingredient
                   </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getAuthHeader } from "@/lib/auth";
@@ -278,7 +279,7 @@ export default function EditRecipePage() {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-3">
-              <span className="text-4xl">✏️</span>
+              <IconRenderer icon="document" className="w-8 h-8" />
               Edit Recipe
             </h1>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
