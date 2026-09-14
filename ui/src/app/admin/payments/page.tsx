@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/api";
+import { getAuthHeader } from "@/lib/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 

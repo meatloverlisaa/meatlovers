@@ -19,7 +19,7 @@ The system covers a wide range of business workflows, including:
 This repository contains two main applications:
 
 - UI: a React/Next.js web application for the operational dashboards and screens
-- API: a NestJS backend that exposes REST endpoints and connects to Prisma and a MySQL database
+- API: a NestJS backend that exposes REST endpoints and connects to Prisma and a PostgreSQL database
 
 The app is organized around role-specific experiences so each user sees the parts of the system relevant to their responsibilities.
 
@@ -38,7 +38,7 @@ The app is organized around role-specific experiences so each user sees the part
 - NestJS
 - TypeScript
 - Prisma ORM
-- MySQL
+- PostgreSQL
 - JWT-based auth structure
 
 ### Project tooling
@@ -74,7 +74,7 @@ Before running the app, make sure you have:
 
 - Node.js 20+ (the project has been tested with Node 20/22)
 - npm
-- MySQL running locally
+- PostgreSQL running locally
 - Git
 
 If you are using Prisma, your database should be reachable and you should have a valid database user and password.
@@ -202,7 +202,7 @@ There is also a helper script for smoke checks at the project root:
 
 A typical development loop looks like this:
 
-1. start MySQL
+1. start PostgreSQL
 2. start the API with the watch mode
 3. start the UI dev server
 4. browse to the relevant role dashboard
