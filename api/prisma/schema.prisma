@@ -48,6 +48,8 @@ model User {
   price_change_audits        PriceChangeAuditTrail[]
   refresh_tokens             RefreshToken[]
   rider                      Rider?
+  delivery_events_recorded   DeliveryEvent[]         @relation("DeliveryEventRecorder")
+  deliveries_reassigned      Delivery[]              @relation("DeliveryReassigner")
   attendance_records         StaffAttendance[]
   inventory_counts_approved  InventoryCount[]        @relation("InventoryApprover")
   inventory_counts           InventoryCount[]
@@ -202,21 +204,21 @@ model Product {
 }
 
 model Customer {
-  id         BigInt   @id @default(autoincrement())
-  name       String?  @db.VarChar(255)
-  phone      String?  @db.VarChar(50)
-  email      String?  @db.VarChar(255)
-  address    String?
-  city       String?  @db.VarChar(100)
-  notes      String?
-  loyalty_points Int? @default(0)
-  total_orders    Int? @default(0)
-  total_spent     Decimal? @db.Decimal(12, 2)
+  id             BigInt    @id @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  phone          String?   @db.VarChar(50)
+  email          String?   @db.VarChar(255)
+  address        String?
+  city           String?   @db.VarChar(100)
+  notes          String?
+  loyalty_points Int?      @default(0)
+  total_orders   Int?      @default(0)
+  total_spent    Decimal?  @db.Decimal(12, 2)
   last_visit     DateTime?
   deleted_at     DateTime?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  orders     Order[]
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  orders         Order[]
 
   @@index([phone])
   @@index([email])
@@ -225,15 +227,15 @@ model Customer {
 }
 
 model Table {
-  id         BigInt   @id @default(autoincrement())
-  table_name String?  @db.VarChar(255)
-  capacity   Int?     @default(4)
-  location   String?  @db.VarChar(100)
-  is_active  Boolean  @default(true)
+  id         BigInt    @id @default(autoincrement())
+  table_name String?   @db.VarChar(255)
+  capacity   Int?      @default(4)
+  location   String?   @db.VarChar(100)
+  is_active  Boolean   @default(true)
   notes      String?
   deleted_at DateTime?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
   orders     Order[]
 
   @@index([is_active])
@@ -322,17 +324,17 @@ model StockItem {
 }
 
 model StockMovement {
-  id            BigInt      @id @default(autoincrement())
+  id            BigInt       @id @default(autoincrement())
   stock_item_id BigInt
   movement_type MovementType
   quantity      Int
   reference     String?
   notes         String?
   performed_by  BigInt?
-  cost_value    Decimal?    @db.Decimal(12, 2)
+  cost_value    Decimal?     @db.Decimal(12, 2)
   deleted_at    DateTime?
-  created_at    DateTime    @default(now())
-  stock_item    StockItem   @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
+  created_at    DateTime     @default(now())
+  stock_item    StockItem    @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
 
   @@index([stock_item_id])
   @@index([movement_type])
@@ -342,23 +344,23 @@ model StockMovement {
 }
 
 model InventoryCount {
-  id                  BigInt   @id @default(autoincrement())
+  id                  BigInt    @id @default(autoincrement())
   stock_item_id       BigInt
   expected_quantity   Int
   counted_quantity    Int
   variance            Int
-  variance_percentage  Decimal  @db.Decimal(10, 2)
+  variance_percentage Decimal   @db.Decimal(10, 2)
   counted_by          BigInt
-  location            String   @db.VarChar(100)
+  location            String    @db.VarChar(100)
   notes               String?
-  needs_approval      Boolean  @default(false)
+  needs_approval      Boolean   @default(false)
   approved_by         BigInt?
   approved_at         DateTime?
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
   stock_item          StockItem @relation(fields: [stock_item_id], references: [id], onDelete: Cascade)
-  counter             User     @relation(fields: [counted_by], references: [id])
-  approver            User?    @relation("InventoryApprover", fields: [approved_by], references: [id])
+  counter             User      @relation(fields: [counted_by], references: [id])
+  approver            User?     @relation("InventoryApprover", fields: [approved_by], references: [id])
 
   @@index([stock_item_id])
   @@index([counted_by])
@@ -376,7 +378,7 @@ model Payment {
   payment_status        PaymentStatus @default(PENDING)
   mpesa_receipt_number  String?       @db.VarChar(100)
   card_last_four        String?       @db.VarChar(4)
-  processed_by         BigInt?
+  processed_by          BigInt?
   failure_reason        String?
   refunded_amount       Decimal?      @db.Decimal(12, 2)
   refunded_at           DateTime?
@@ -453,23 +455,26 @@ model ProductionPlan {
 }
 
 model Rider {
-  id               BigInt     @id @default(autoincrement())
-  user_id          BigInt     @unique
-  phone            String     @db.VarChar(50)
-  license_number   String?    @db.VarChar(100)
-  vehicle_type     String?    @db.VarChar(50)
-  vehicle_plate    String?    @db.VarChar(50)
-  vehicle_model    String?    @db.VarChar(100)
-  is_available     Boolean    @default(true)
-  current_location String?
-  total_deliveries Int        @default(0)
-  total_earnings   Decimal?   @db.Decimal(12, 2)
-  rating           Decimal?   @db.Decimal(3, 2)
-  deleted_at       DateTime?
-  created_at       DateTime   @default(now())
-  updated_at       DateTime   @updatedAt
-  deliveries       Delivery[]
-  user             User       @relation(fields: [user_id], references: [id])
+  id                BigInt     @id @default(autoincrement())
+  user_id           BigInt     @unique
+  phone             String     @db.VarChar(50)
+  license_number    String?    @db.VarChar(100)
+  vehicle_type      String?    @db.VarChar(50)
+  vehicle_plate     String?    @db.VarChar(50)
+  vehicle_model     String?    @db.VarChar(100)
+  is_available      Boolean    @default(true)
+  current_location  String?
+  current_latitude  Float?
+  current_longitude Float?
+  last_location_at  DateTime?
+  total_deliveries  Int        @default(0)
+  total_earnings    Decimal?   @db.Decimal(12, 2)
+  rating            Decimal?   @db.Decimal(3, 2)
+  deleted_at        DateTime?
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+  deliveries        Delivery[]
+  user              User       @relation(fields: [user_id], references: [id])
 
   @@index([user_id])
   @@index([is_available])
@@ -478,36 +483,68 @@ model Rider {
 }
 
 model Delivery {
-  id                  BigInt         @id @default(autoincrement())
-  order_id            BigInt         @unique
-  rider_id            BigInt
-  status              DeliveryStatus @default(ASSIGNED)
-  pickup_address      String?
-  delivery_address    String
-  delivery_notes      String?
-  customer_name       String?
-  customer_phone      String?        @db.VarChar(50)
-  distance_km         Float?
-  delivery_fee        Decimal?       @db.Decimal(12, 2)
-  assigned_at         DateTime       @default(now())
-  picked_up_at        DateTime?
-  in_transit_at       DateTime?
-  delivered_at        DateTime?
-  cancelled_at        DateTime?
-  cancellation_reason String?
-  rating              Int?
-  feedback            String?
-  deleted_at          DateTime?
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-  order               Order          @relation(fields: [order_id], references: [id])
-  rider               Rider          @relation(fields: [rider_id], references: [id])
+  id                    BigInt          @id @default(autoincrement())
+  order_id              BigInt          @unique
+  rider_id              BigInt
+  status                DeliveryStatus  @default(ASSIGNED)
+  pickup_address        String?
+  delivery_address      String
+  delivery_notes        String?
+  customer_name         String?
+  customer_phone        String?         @db.VarChar(50)
+  distance_km           Float?
+  delivery_fee          Decimal?        @db.Decimal(12, 2)
+  estimated_delivery_at DateTime?
+  last_location         String?
+  last_latitude         Float?
+  last_longitude        Float?
+  last_location_at      DateTime?
+  delay_reason          String?
+  failed_attempts       Int             @default(0)
+  priority              Int             @default(0)
+  reassigned_at         DateTime?
+  reassigned_by         BigInt?
+  assigned_at           DateTime        @default(now())
+  picked_up_at          DateTime?
+  in_transit_at         DateTime?
+  delivered_at          DateTime?
+  cancelled_at          DateTime?
+  cancellation_reason   String?
+  rating                Int?
+  feedback              String?
+  deleted_at            DateTime?
+  created_at            DateTime        @default(now())
+  updated_at            DateTime        @updatedAt
+  order                 Order           @relation(fields: [order_id], references: [id])
+  rider                 Rider           @relation(fields: [rider_id], references: [id])
+  reassigner            User?           @relation("DeliveryReassigner", fields: [reassigned_by], references: [id])
+  events                DeliveryEvent[]
 
   @@index([order_id])
   @@index([rider_id])
   @@index([status])
+  @@index([estimated_delivery_at])
+  @@index([priority, status])
+  @@index([reassigned_by])
   @@index([deleted_at])
   @@map("deliveries")
+}
+
+model DeliveryEvent {
+  id          BigInt         @id @default(autoincrement())
+  delivery_id BigInt
+  status      DeliveryStatus
+  note        String?
+  recorded_by BigInt
+  created_at  DateTime       @default(now())
+
+  delivery Delivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
+  recorder User     @relation("DeliveryEventRecorder", fields: [recorded_by], references: [id])
+
+  @@index([delivery_id, created_at])
+  @@index([status])
+  @@index([recorded_by])
+  @@map("delivery_events")
 }
 
 model WasteDeclaration {
@@ -560,20 +597,20 @@ model FinanceTransaction {
 }
 
 model ContentPage {
-  id               BigInt   @id @default(autoincrement())
-  title            String   @db.VarChar(255)
-  slug             String   @unique @db.VarChar(255)
-  page_type        PageType @default(CUSTOM)
+  id               BigInt    @id @default(autoincrement())
+  title            String    @db.VarChar(255)
+  slug             String    @unique @db.VarChar(255)
+  page_type        PageType  @default(CUSTOM)
   content          String
-  is_published     Boolean  @default(false)
-  meta_title       String?  @db.VarChar(255)
+  is_published     Boolean   @default(false)
+  meta_title       String?   @db.VarChar(255)
   meta_description String?
-  featured_image   String?  @db.VarChar(500)
+  featured_image   String?   @db.VarChar(500)
   author_id        BigInt?
   published_at     DateTime?
   deleted_at       DateTime?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
 
   @@index([slug])
   @@index([is_published])

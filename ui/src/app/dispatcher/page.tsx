@@ -15,6 +15,9 @@ interface Rider {
   vehicle_plate?: string | null;
   is_available: boolean;
   current_location?: string | null;
+  current_latitude?: number | null;
+  current_longitude?: number | null;
+  last_location_at?: string | null;
   user?: {
     id: string;
     full_name: string;
@@ -35,6 +38,15 @@ interface Delivery {
   delivered_at?: string | null;
   cancelled_at?: string | null;
   cancellation_reason?: string | null;
+  estimated_delivery_at?: string | null;
+  last_location?: string | null;
+  last_latitude?: number | null;
+  last_longitude?: number | null;
+  last_location_at?: string | null;
+  delay_reason?: string | null;
+  failed_attempts?: number;
+  priority?: number;
+  reassigned_at?: string | null;
   rider?: Rider;
 }
 
@@ -78,6 +90,7 @@ export default function DispatcherDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [manualOrderId, setManualOrderId] = useState("");
   const [showManualOrder, setShowManualOrder] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   
   // Rider form state
   const [riderForm, setRiderForm] = useState({
@@ -146,16 +159,24 @@ export default function DispatcherDashboard() {
       setError(_err instanceof Error ? _err.message : "Failed to load dashboard data");
     } finally {
       setLoading(false);
+      setLastUpdated(new Date());
     }
   };
 
   useEffect(() => {
     fetchDashboardData();
 
-    // Disabled auto-refresh to prevent rate limiting - user can manually refresh
-    // const interval = setInterval(fetchDashboardData, 30000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(() => void fetchDashboardData(), 60000);
+    return () => clearInterval(interval);
   }, [statusFilter]);
+
+  const now = Date.now();
+  const delayedDeliveries = deliveries.filter((delivery) =>
+    delivery.estimated_delivery_at &&
+    new Date(delivery.estimated_delivery_at).getTime() < now &&
+    !["DELIVERED", "CANCELLED"].includes(delivery.status),
+  );
+  const priorityDeliveries = deliveries.filter((delivery) => (delivery.priority || 0) > 0);
 
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -266,6 +287,11 @@ export default function DispatcherDashboard() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Manage rider assignments and track delivery status
             </p>
+            {lastUpdated && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Auto-refreshing every 60 seconds · Updated {lastUpdated.toLocaleTimeString()}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -291,6 +317,29 @@ export default function DispatcherDashboard() {
             <p className="text-red-800 dark:text-red-200">{error}</p>
           </div>
         )}
+
+        {/* Control tower alerts */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`rounded-lg border p-4 ${delayedDeliveries.length > 0 ? "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30" : "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30"}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Delivery alerts</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{delayedDeliveries.length}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {delayedDeliveries.length ? "Overdue deliveries need attention" : "No overdue deliveries"}
+            </p>
+          </div>
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Priority queue</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{priorityDeliveries.length}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">High-priority active deliveries</p>
+          </div>
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Rider locations</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+              {riders.filter((rider) => rider.last_location_at || rider.current_location).length}/{riders.length}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Riders reporting a location</p>
+          </div>
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -471,6 +520,9 @@ export default function DispatcherDashboard() {
                       Assigned At
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      ETA / Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -496,6 +548,15 @@ export default function DispatcherDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {new Date(delivery.assigned_at).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {delivery.estimated_delivery_at ? (
+                          <div>ETA: {new Date(delivery.estimated_delivery_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+                        ) : <div>ETA not set</div>}
+                        <div className="max-w-[180px] truncate" title={delivery.last_location || delivery.rider?.current_location || "No location reported"}>
+                          {delivery.last_location || delivery.rider?.current_location || "No location reported"}
+                        </div>
+                        {delivery.delay_reason && <div className="text-amber-600">Delay: {delivery.delay_reason}</div>}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex gap-2">
