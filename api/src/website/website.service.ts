@@ -21,9 +21,13 @@ export class WebsiteService {
       homepage,
       menu_highlights: menuHighlights,
       contact_info: {
-        phone: '+254 700 000 000',
+        phone: '+254 701 616385',
         email: 'info@meatlovers.co.ke',
-        location: 'Nairobi, Kenya',
+        location: 'Moi Avenue, Agriculture House, Mezzanine Floor, Nairobi CBD, Kenya',
+        hours: 'Monday - Sunday: 05:00 - 23:00',
+        kitchen_hours: 'Kitchen closes at 22:30',
+        holiday_hours: '12:00 - 22:00',
+        whatsapp: 'https://wa.me/254701616385?text=Hello%20Meatlovers%2C%20I%27d%20like%20to%20book%20a%20table%20for',
       },
     };
   }

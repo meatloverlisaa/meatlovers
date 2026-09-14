@@ -370,10 +370,14 @@ async function main() {
         'Get in touch for orders, catering enquiries, reservations, and delivery in Nairobi.',
       content: JSON.stringify({
         title: 'Contact Us',
-        description: 'Ask about orders, catering, reservations or delivery',
-        phone: '+254 700 000 000',
-        email: 'orders@meatlovers.local',
-        location: 'Meat Lovers restaurant, Nairobi',
+        description: 'We\'d love to hear from you. Book a table or ask us anything',
+        phone: '+254 701 616385',
+        email: 'info@meatlovers.co.ke',
+        location: 'Moi Avenue, Agriculture House, Mezzanine Floor, Nairobi CBD, Kenya',
+        hours: 'Monday - Sunday: 05:00 - 23:00',
+        kitchen_hours: 'Kitchen closes at 22:30',
+        holiday_hours: '12:00 - 22:00',
+        whatsapp: 'https://wa.me/254701616385?text=Hello%20Meatlovers%2C%20I%27d%20like%20to%20book%20a%20table%20for',
       }),
     },
   ];

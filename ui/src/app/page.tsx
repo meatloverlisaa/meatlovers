@@ -477,22 +477,32 @@ export default function Home() {
           <div>
             <p className="text-sm font-semibold uppercase text-red-800">Contact</p>
             <h2 className="mt-3 text-3xl font-black text-zinc-950 sm:text-4xl">
-              Ask about orders, catering, reservations or delivery
+              We&apos;d love to hear from you. Book a table or ask us anything
             </h2>
             <div className="mt-8 space-y-4 text-zinc-700">
               <p>
-                Phone:{" "}
-                <a className="font-bold text-zinc-950" href="tel:+254700000000">
-                  +254 700 000 000
+                <span className="font-semibold text-zinc-950">Visit Us:</span>{" "}
+                Moi Avenue, Agriculture House, Mezzanine Floor, Nairobi CBD, Kenya
+              </p>
+              <p>
+                <span className="font-semibold text-zinc-950">Call Us:</span>{" "}
+                <a className="font-bold text-zinc-950" href="tel:+254701616385">
+                  +254 701 616385
                 </a>
               </p>
               <p>
-                Email:{" "}
-                <a className="font-bold text-zinc-950" href="mailto:orders@meatlovers.local">
-                  orders@meatlovers.local
+                <span className="font-semibold text-zinc-950">Email Us:</span>{" "}
+                <a className="font-bold text-zinc-950" href="mailto:info@meatlovers.co.ke">
+                  info@meatlovers.co.ke
                 </a>
               </p>
-              <p>Location: Meat Lovers restaurant, Nairobi</p>
+              <p>
+                <span className="font-semibold text-zinc-950">Opening Hours:</span>{" "}
+                Monday - Sunday: 05:00 - 23:00
+              </p>
+              <p className="text-sm text-zinc-600">
+                Kitchen closes at 22:30 · Holidays: 12:00 - 22:00
+              </p>
             </div>
             {/* Reservation CTA → RESERVATION */}
             <button
@@ -501,6 +511,17 @@ export default function Home() {
             >
               Make a Reservation
             </button>
+            <a
+              href="https://wa.me/254701616385?text=Hello%20Meatlovers%2C%20I%27d%20like%20to%20book%20a%20table%20for"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center justify-center rounded-md border border-green-700 px-5 py-3 text-sm font-bold text-green-800 transition hover:bg-green-50"
+            >
+              Chat on WhatsApp →
+            </a>
+            <p className="mt-4 text-sm text-zinc-600">
+              ⏱ We respond within 30 minutes during operating hours.
+            </p>
             <div className="mt-8 aspect-[16/10] overflow-hidden rounded-lg border border-zinc-200 bg-stone-100">
               <iframe
                 title="Meat Lovers map"
