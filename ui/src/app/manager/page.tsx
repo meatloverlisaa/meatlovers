@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { apiRequest } from "@/lib/api";
+import { apiRequest, arrayResponse } from "@/lib/api";
 
 type DashboardStats = {
   activeOrders: number;
@@ -23,15 +23,16 @@ type ManagerOrder = {
 async function fetchManagerStats(): Promise<DashboardStats> {
   try {
     // Make requests sequentially to avoid rate limiting
-    const orders = await apiRequest<ManagerOrder[]>("/orders", { cache: "no-store" });
+    const ordersPayload = await apiRequest<unknown>("/orders", { cache: "no-store" });
+    const orders = arrayResponse<ManagerOrder>(ordersPayload);
     
     // Add a small delay between requests to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    const stockData = await apiRequest<unknown[]>("/stock/reorder-alerts", { cache: "no-store" });
+    const stockPayload = await apiRequest<unknown>("/stock/reorder-alerts", { cache: "no-store" });
     
     // Ensure orders is an array
-    const stockAlerts: unknown[] = Array.isArray(stockData) ? stockData : [];
+    const stockAlerts = arrayResponse<unknown>(stockPayload);
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());

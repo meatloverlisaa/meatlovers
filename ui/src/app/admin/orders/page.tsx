@@ -34,9 +34,23 @@ const statusColors: Record<OrderStatus, string> = {
   PAID: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900/30 dark:text-zinc-200",
 };
 
+type OrdersResponse = Order[] | { data: Order[] };
+
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
   const endpoint = status ? `/orders?status=${status}` : "/orders";
-  return apiRequest<Order[]>(endpoint, { cache: "no-store" });
+  const response = await apiRequest<OrdersResponse>(endpoint, { cache: "no-store" });
+
+  // The list endpoint returns { data, pagination }, while older endpoints
+  // may return the array directly.
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+
+  throw new Error("Invalid orders response from the server");
 }
 
 async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<void> {

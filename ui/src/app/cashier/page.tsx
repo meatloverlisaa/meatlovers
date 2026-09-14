@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { apiRequest } from "@/lib/api";
+import { apiRequest, arrayResponse } from "@/lib/api";
 
 type OrderStatus = "SERVED" | "PAID";
 
@@ -27,10 +27,12 @@ type CashierStats = {
 async function fetchCashierStats(): Promise<CashierStats> {
   try {
     // Fetch orders
-    const orders = await apiRequest<Order[]>("/orders", { cache: "no-store" });
+    const ordersPayload = await apiRequest<unknown>("/orders", { cache: "no-store" });
+    const orders = arrayResponse<Order>(ordersPayload);
     
     // Fetch payments
-    const payments = await apiRequest<any[]>("/payments", { cache: "no-store" });
+    const paymentsPayload = await apiRequest<unknown>("/payments", { cache: "no-store" });
+    const payments = arrayResponse<any>(paymentsPayload);
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -59,9 +61,8 @@ async function fetchCashierStats(): Promise<CashierStats> {
 }
 
 async function fetchPendingOrders(): Promise<Order[]> {
-  const data = await apiRequest<Order[]>("/orders?status=SERVED", { cache: "no-store" });
-  // Ensure we always return an array
-  return Array.isArray(data) ? data : [];
+  const payload = await apiRequest<unknown>("/orders?status=SERVED", { cache: "no-store" });
+  return arrayResponse<Order>(payload);
 }
 
 function StatCard({ 

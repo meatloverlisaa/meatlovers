@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
-import { apiRequest } from "@/lib/api";
+import { apiRequest, arrayResponse } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
@@ -30,7 +30,8 @@ type Order = {
 async function fetchOrders(status?: OrderStatus, retryCount = 0): Promise<Order[]> {
   const endpoint = status ? `/orders/all?status=${status}` : "/orders/all";
   try {
-    return await apiRequest<Order[]>(endpoint, { cache: "no-store" });
+    const payload = await apiRequest<unknown>(endpoint, { cache: "no-store" });
+    return arrayResponse<Order>(payload);
   } catch (error) {
     if (error instanceof Error && error.message.includes("429") && retryCount < 5) {
       const delay = Math.pow(2, retryCount) * 2000;
