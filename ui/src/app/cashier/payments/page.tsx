@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { apiRequest } from "@/lib/api";
+import { getAuthHeader } from "@/lib/auth";
 
 type PaymentMethod = "CASH" | "M-PESA" | "CARD" | "BANK_TRANSFER";
 type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
