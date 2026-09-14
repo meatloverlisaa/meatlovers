@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { apiRequest } from "@/lib/api";
+import { getAuthHeader } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/api-config";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 

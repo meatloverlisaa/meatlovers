@@ -4,7 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "env": {
-    "BACKEND_API_URL": "@backend-api-url",
-    "NEXT_PUBLIC_API_URL": "@backend-api-url"
+    "NEXT_PUBLIC_API_URL": "https://meatlovers.onrender.com",
+    "BACKEND_API_URL": "https://meatlovers.onrender.com"
   }
 }
