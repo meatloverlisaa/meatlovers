@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { getAuthHeader } from "@/lib/auth";
-import { getApiBaseUrl } from "@/lib/api-config";
+import { apiRequest } from "@/lib/api";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
 
@@ -29,32 +28,15 @@ type Order = {
 
 const statusColors: Record<OrderStatus, string> = {
   PENDING: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-200",
-  PREPARING: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-200",
+  PREPARING: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   READY: "bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-200",
-  SERVED: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/30 dark:text-purple-200",
+  SERVED: "bg-red-100 text-red-800 border-red-200 dark:bg-zinc-950/30 dark:text-red-200",
   PAID: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-900/30 dark:text-zinc-200",
 };
 
 async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  const baseUrl = getApiBaseUrl();
-  const url = status ? `${baseUrl}/orders?status=${status}` : `${baseUrl}/orders`;
-
-  const res = await fetch(url, { 
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeader(),
-    },
-  });
-  
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error(`Failed to fetch orders: 429 - Rate limit exceeded. Please wait before refreshing.`);
-    }
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const payload: unknown = await res.json();
+  const endpoint = status ? `/orders?status=${status}` : "/orders";
+  const payload = await apiRequest<unknown>(endpoint, { cache: "no-store" });
   if (Array.isArray(payload)) {
     return payload as Order[];
   }

@@ -52,19 +52,19 @@ export default function AccountantLayout({
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-blue-900/50 bg-slate-900/95 backdrop-blur-sm transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-800 bg-[#09090B] transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-blue-900/50 px-6">
-          <IconRenderer icon="package" className="h-6 w-6 text-white" />
+        <div className="flex h-16 items-center gap-3 border-b border-zinc-800 px-6">
+          <IconRenderer icon="package" className="h-6 w-6 text-red-500" />
           <div>
             <p className="font-black text-white">Meat Lovers</p>
-            <p className="text-xs text-blue-400">Accountant Portal</p>
+            <p className="text-xs text-zinc-400">Accountant Portal</p>
           </div>
         </div>
 
@@ -78,8 +78,8 @@ export default function AccountantLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
-                    : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                    ? "bg-red-700 text-white"
+                    : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -90,20 +90,20 @@ export default function AccountantLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="border-t border-blue-900/50 p-4">
+        <div className="border-t border-zinc-800 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600/20 font-bold text-blue-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
               {user?.full_name?.charAt(0) || "A"}
             </div>
             <div className="flex-1">
               <p className="text-sm font-bold text-white">{user?.full_name || "Accountant"}</p>
-              <p className="text-xs text-slate-400">{user?.role || "ACCOUNTANT"}</p>
+              <p className="text-xs text-zinc-400">{user?.role || "ACCOUNTANT"}</p>
             </div>
           </div>
           <div className="space-y-1">
             <Link
               href="/accountant/profile"
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-blue-300 hover:bg-blue-900/20 rounded-lg transition"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-white rounded-lg transition"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -112,7 +112,7 @@ export default function AccountantLayout({
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-400 hover:bg-red-900/20 rounded-lg transition"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-950/40 rounded-lg transition"
             >
               <ArrowRightOnRectangleIcon className="h-5 w-5" />
               Logout
@@ -124,7 +124,7 @@ export default function AccountantLayout({
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-zinc-950/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -132,10 +132,10 @@ export default function AccountantLayout({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 border-b border-blue-900/50 bg-slate-900/95 backdrop-blur-sm px-4 lg:hidden">
+        <header className="flex h-16 items-center gap-4 border-b border-zinc-800 bg-[#09090B] px-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="rounded-lg border border-blue-800/50 p-2 text-slate-300 hover:bg-slate-800/50"
+            className="rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white"
           >
             <svg
               className="h-6 w-6"
@@ -152,7 +152,7 @@ export default function AccountantLayout({
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <IconRenderer icon="package" className="h-5 w-5 text-white" />
+            <IconRenderer icon="package" className="h-5 w-5 text-red-500" />
             <span className="font-black text-white">Meat Lovers</span>
           </div>
         </header>

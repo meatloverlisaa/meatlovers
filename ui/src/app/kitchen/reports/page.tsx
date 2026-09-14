@@ -282,11 +282,11 @@ export default function KitchenReportsPage() {
       SPOILED: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200",
       BURNT: "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200",
       CONTAMINATED:
-        "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200",
+        "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200",
       EXPIRED:
         "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200",
       DROPPED:
-        "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200",
+        "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200",
       OVERPRODUCTION:
         "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200",
       OTHER: "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200",
@@ -374,11 +374,11 @@ export default function KitchenReportsPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
-                  <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-6">
+                  <div className="text-sm font-medium text-red-700 dark:text-red-300">
                     In Progress
                   </div>
-                  <div className="mt-2 text-3xl font-bold text-blue-900 dark:text-blue-50">
+                  <div className="mt-2 text-3xl font-bold text-red-900 dark:text-zinc-50">
                     {reportData.orders.total - reportData.orders.completed}
                   </div>
                 </div>
@@ -473,11 +473,11 @@ export default function KitchenReportsPage() {
                     {reportData.production.completed}
                   </div>
                 </div>
-                <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
-                  <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-6">
+                  <div className="text-sm font-medium text-red-700 dark:text-red-300">
                     In Progress
                   </div>
-                  <div className="mt-2 text-3xl font-bold text-blue-900 dark:text-blue-50">
+                  <div className="mt-2 text-3xl font-bold text-red-900 dark:text-zinc-50">
                     {reportData.production.inProgress}
                   </div>
                 </div>
@@ -514,11 +514,11 @@ export default function KitchenReportsPage() {
                     {reportData.recipes.active}
                   </div>
                 </div>
-                <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
-                  <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-6">
+                  <div className="text-sm font-medium text-red-700 dark:text-red-300">
                     Avg Recipe Cost
                   </div>
-                  <div className="mt-2 text-2xl font-bold text-blue-900 dark:text-blue-50">
+                  <div className="mt-2 text-2xl font-bold text-red-900 dark:text-zinc-50">
                     {formatCurrency(reportData.recipes.avgCost)}
                   </div>
                 </div>
@@ -564,10 +564,10 @@ export default function KitchenReportsPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
+            <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-6">
               <div className="flex items-start gap-3">
                 <svg
-                  className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+                  className="w-6 h-6 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -579,7 +579,7 @@ export default function KitchenReportsPage() {
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
+                <div className="flex-1 text-sm text-red-900 dark:text-zinc-100">
                   <p className="font-semibold mb-2">Report Insights</p>
                   <ul className="space-y-1 list-disc list-inside">
                     <li>

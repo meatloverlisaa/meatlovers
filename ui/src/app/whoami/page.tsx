@@ -29,10 +29,10 @@ export default function WhoAmIPage() {
           <h1 className="text-3xl font-bold text-red-400 mb-4">Not Logged In</h1>
           <p className="text-gray-300 mb-6">You are not currently authenticated.</p>
           <div className="space-y-3">
-            <Link href="/admin/login" className="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+            <Link href="/admin/login" className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800">
               Admin Login
             </Link>
-            <Link href="/storekeeper/login" className="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700">
+            <Link href="/storekeeper/login" className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800">
               Storekeeper Login
             </Link>
             <Link href="/hr/login" className="block w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
@@ -99,9 +99,9 @@ export default function WhoAmIPage() {
             <div className="flex justify-between items-center border-b border-gray-700 pb-3">
               <span className="text-gray-400 font-semibold">Role:</span>
               <span className={`text-lg font-black px-4 py-2 rounded-full ${
-                user.role === 'STOREKEEPER' ? 'bg-purple-600 text-white' :
+                user.role === 'STOREKEEPER' ? 'bg-red-700 text-white' :
                 user.role === 'HR' ? 'bg-green-600 text-white' :
-                user.role === 'ADMIN' ? 'bg-blue-600 text-white' :
+                user.role === 'ADMIN' ? 'bg-red-700 text-white' :
                 'bg-gray-600 text-white'
               }`}>
                 {user.role}
@@ -122,7 +122,7 @@ export default function WhoAmIPage() {
         <div className="space-y-3">
           <Link 
             href={dashboardUrl}
-            className="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 text-center font-bold transition"
+            className="block w-full bg-red-700 text-white py-3 rounded-lg hover:bg-red-800 text-center font-bold transition"
           >
             Go to My Dashboard ({user.role})
           </Link>

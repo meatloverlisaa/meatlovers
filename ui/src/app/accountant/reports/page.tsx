@@ -161,11 +161,11 @@ export default function AccountantReports() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Finance Reports</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">Finance Reports</h1>
           <p className="mt-2 text-sm text-slate-400">
             Generate and download financial reports
           </p>
@@ -173,25 +173,25 @@ export default function AccountantReports() {
 
         {/* Summary Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Total Reports
             </p>
             <p className="mt-2 text-3xl font-black text-white">{summary.totalReports}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Ready
             </p>
             <p className="mt-2 text-3xl font-black text-green-400">{summary.readyReports}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Generating
             </p>
             <p className="mt-2 text-3xl font-black text-yellow-400">{summary.generatingReports}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Failed
             </p>
@@ -207,7 +207,7 @@ export default function AccountantReports() {
               onClick={() => setSelectedCategory(category)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 selectedCategory === category
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
               }`}
             >
@@ -217,30 +217,30 @@ export default function AccountantReports() {
         </div>
 
         {/* Quick Generate */}
-        <div className="mb-6 rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+        <div className="mb-6 rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
           <h3 className="mb-4 text-lg font-semibold text-white">Quick Generate</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <button
               onClick={() => generateReport("DAILY", "SALES")}
-              className="rounded-lg border border-blue-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-900/30"
+              className="rounded-lg border border-red-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-900/30"
             >
               Daily Sales
             </button>
             <button
               onClick={() => generateReport("WEEKLY", "EXPENSES")}
-              className="rounded-lg border border-blue-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-900/30"
+              className="rounded-lg border border-red-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-900/30"
             >
               Weekly Expenses
             </button>
             <button
               onClick={() => generateReport("MONTHLY", "PROFIT_LOSS")}
-              className="rounded-lg border border-blue-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-900/30"
+              className="rounded-lg border border-red-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-900/30"
             >
               Monthly P&L
             </button>
             <button
               onClick={() => generateReport("QUARTERLY", "TAX")}
-              className="rounded-lg border border-blue-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-900/30"
+              className="rounded-lg border border-red-800/50 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-900/30"
             >
               Quarterly Tax
             </button>
@@ -248,7 +248,7 @@ export default function AccountantReports() {
         </div>
 
         {/* Reports List */}
-        <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 shadow-sm">
+        <div className="rounded-xl border border-red-900/50 bg-slate-900/80 shadow-sm">
           <div className="border-b border-slate-700 px-5 py-4">
             <h3 className="text-lg font-semibold text-white">Reports</h3>
           </div>

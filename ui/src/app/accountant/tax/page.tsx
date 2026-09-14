@@ -138,18 +138,18 @@ export default function AccountantTax() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PAID": return "bg-green-900/30 text-green-400 border-green-700/50";
-      case "PENDING": return "bg-blue-900/30 text-blue-400 border-blue-700/50";
+      case "PENDING": return "bg-zinc-900/30 text-red-500 border-red-800/50";
       case "OVERDUE": return "bg-red-900/30 text-red-400 border-red-700/50";
-      case "FILED": return "bg-purple-900/30 text-purple-400 border-purple-700/50";
+      case "FILED": return "bg-red-950/30 text-red-500 border-red-700/50";
       default: return "bg-slate-700/30 text-slate-400 border-slate-600/50";
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "VAT": return "text-blue-400";
+      case "VAT": return "text-red-500";
       case "INCOME_TAX": return "text-green-400";
-      case "PAYROLL_TAX": return "text-purple-400";
+      case "PAYROLL_TAX": return "text-red-500";
       case "EXCISE_DUTY": return "text-orange-400";
       default: return "text-slate-400";
     }
@@ -160,11 +160,11 @@ export default function AccountantTax() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Tax Management</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">Tax Management</h1>
           <p className="mt-2 text-sm text-slate-400">
             Track and manage tax obligations
           </p>
@@ -172,7 +172,7 @@ export default function AccountantTax() {
 
         {/* Summary Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Total Liability
             </p>
@@ -180,15 +180,15 @@ export default function AccountantTax() {
               KSh {summary.totalTaxLiability.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Pending
             </p>
-            <p className="mt-2 text-3xl font-black text-blue-400">
+            <p className="mt-2 text-3xl font-black text-red-500">
               KSh {summary.pendingTax.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Paid
             </p>
@@ -196,7 +196,7 @@ export default function AccountantTax() {
               KSh {summary.paidTax.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Overdue
             </p>
@@ -204,7 +204,7 @@ export default function AccountantTax() {
               KSh {summary.overdueTax.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Next Due Date
             </p>
@@ -222,7 +222,7 @@ export default function AccountantTax() {
               onClick={() => setSelectedType(type)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 selectedType === type
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
               }`}
             >
@@ -232,7 +232,7 @@ export default function AccountantTax() {
         </div>
 
         {/* Tax Records */}
-        <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 shadow-sm">
+        <div className="rounded-xl border border-red-900/50 bg-slate-900/80 shadow-sm">
           <div className="border-b border-slate-700 px-5 py-4">
             <h3 className="text-lg font-semibold text-white">Tax Records</h3>
           </div>
@@ -286,7 +286,7 @@ export default function AccountantTax() {
                       {record.status === "PENDING" && (
                         <button
                           onClick={() => markAsPaid(record.id)}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                          className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-800"
                         >
                           Mark Paid
                         </button>

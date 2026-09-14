@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { apiRequest, arrayResponse } from "@/lib/api";
 
 type DashboardStats = {
   activeOrders: number;
@@ -20,40 +21,18 @@ type ManagerOrder = {
 };
 
 async function fetchManagerStats(): Promise<DashboardStats> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  
   try {
-    // Get auth token from localStorage
-    const token = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token')) : null;
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    
     // Make requests sequentially to avoid rate limiting
-    const ordersRes = await fetch(`${baseUrl}/orders`, { 
-      cache: "no-store",
-      headers 
-    });
+    const ordersPayload = await apiRequest<unknown>("/orders", { cache: "no-store" });
+    const orders = arrayResponse<ManagerOrder>(ordersPayload);
     
     // Add a small delay between requests to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    const stockRes = await fetch(`${baseUrl}/stock/reorder-alerts`, { 
-      cache: "no-store",
-      headers 
-    });
-    
-    const ordersData = ordersRes.ok ? await ordersRes.json() : [];
-    const stockData = stockRes.ok ? await stockRes.json() : [];
+    const stockPayload = await apiRequest<unknown>("/stock/reorder-alerts", { cache: "no-store" });
     
     // Ensure orders is an array
-    const orders: ManagerOrder[] = Array.isArray(ordersData) ? ordersData : [];
-    const stockAlerts: unknown[] = Array.isArray(stockData) ? stockData : [];
+    const stockAlerts = arrayResponse<unknown>(stockPayload);
     
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());

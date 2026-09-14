@@ -345,8 +345,8 @@ export default function AdminDashboard() {
   
   const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([
     { label: "Today's Revenue", value: "KSh 0", icon: "money", color: "bg-emerald-100", trend: "neutral" },
-    { label: "Open Orders", value: "0", icon: "clipboard", color: "bg-blue-100", trend: "neutral" },
-    { label: "New Leads", value: "0", icon: "inbox", color: "bg-purple-100", trend: "neutral" },
+    { label: "Open Orders", value: "0", icon: "clipboard", color: "bg-red-100", trend: "neutral" },
+    { label: "New Leads", value: "0", icon: "inbox", color: "bg-red-100", trend: "neutral" },
     { label: "Stock Alerts", value: "0", icon: "warning", color: "bg-red-100", trend: "neutral" },
   ]);
 

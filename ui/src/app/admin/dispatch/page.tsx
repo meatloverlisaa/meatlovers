@@ -140,11 +140,11 @@ export default function DispatchPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "bg-blue-100 text-blue-800";
+        return "bg-red-100 text-red-800";
       case "PICKED_UP":
         return "bg-yellow-100 text-yellow-800";
       case "IN_TRANSIT":
-        return "bg-purple-100 text-purple-800";
+        return "bg-red-100 text-red-800";
       case "DELIVERED":
         return "bg-green-100 text-green-800";
       case "CANCELLED":
@@ -186,7 +186,7 @@ export default function DispatchPage() {
               <div className="text-sm text-gray-600">Total Deliveries</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-2xl font-bold text-blue-600">{summary.assigned}</div>
+              <div className="text-2xl font-bold text-red-700">{summary.assigned}</div>
               <div className="text-sm text-gray-600">Assigned</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
@@ -194,7 +194,7 @@ export default function DispatchPage() {
               <div className="text-sm text-gray-600">Picked Up</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-2xl font-bold text-purple-600">{summary.inTransit}</div>
+              <div className="text-2xl font-bold text-red-700">{summary.inTransit}</div>
               <div className="text-sm text-gray-600">In Transit</div>
             </div>
             <div className="bg-white rounded-lg shadow p-6">

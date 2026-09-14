@@ -42,7 +42,7 @@ function ConversionAnalytics({ analytics }: { analytics: Analytics }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Conversion Rate
           </p>
-          <p className="mt-2 text-4xl font-bold text-blue-600 dark:text-blue-400">
+          <p className="mt-2 text-4xl font-bold text-red-700 dark:text-red-400">
             {analytics.conversion_rate}%
           </p>
           <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Converted / Total</p>
@@ -61,7 +61,7 @@ function ConversionAnalytics({ analytics }: { analytics: Analytics }) {
                 </span>
                 <div className="flex-1 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700">
                   <div
-                    className="h-full rounded-full bg-blue-600 transition-all"
+                    className="h-full rounded-full bg-red-700 transition-all"
                     style={{ width: `${(item.count / barMax) * 100}%` }}
                   />
                 </div>
@@ -186,7 +186,7 @@ function PageList({
                   <div className="flex gap-2">
                     <button
                       onClick={() => onEdit(page)}
-                      className="px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                      className="px-3 py-1 text-xs font-semibold text-red-700 dark:text-red-400 hover:underline"
                     >
                       Edit
                     </button>
@@ -347,7 +347,7 @@ export default function SuperAdminCMS() {
                 setEditingPage(null);
                 setShowEditor(true);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
             >
               + New Page
             </button>
@@ -362,14 +362,14 @@ export default function SuperAdminCMS() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition ${
                 activeTab === tab.id
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  ? "border-red-700 text-red-700 dark:text-red-400"
                   : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
               <IconRenderer icon={tab.icon} className="w-5 h-5" />
               {tab.label}
               {tab.id === "leads" && newLeadsCount > 0 && (
-                <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-xs font-bold">
+                <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-full text-xs font-bold">
                   {newLeadsCount}
                 </span>
               )}

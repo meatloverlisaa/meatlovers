@@ -175,7 +175,7 @@ export default function StorekeeperDashboard() {
       change: "+8 this week",
       trend: "up",
       icon: "package",
-      color: "bg-blue-100 dark:bg-blue-900/20",
+      color: "bg-red-100 dark:bg-zinc-900/20",
     },
     {
       label: "Low Stock",
@@ -193,7 +193,7 @@ export default function StorekeeperDashboard() {
       label: "Pending Orders",
       value: summary.pendingOrders,
       icon: "inbox",
-      color: "bg-purple-100 dark:bg-purple-900/20",
+      color: "bg-red-100 dark:bg-red-950/20",
     },
   ];
 
@@ -208,13 +208,13 @@ export default function StorekeeperDashboard() {
       label: "Check Stock",
       icon: "package",
       href: "/storekeeper/stock",
-      color: "bg-blue-50 dark:bg-blue-900/20",
+      color: "bg-red-50 dark:bg-zinc-900/20",
     },
     {
       label: "Order Supplies",
       icon: "cart",
       href: "/storekeeper/suppliers/order",
-      color: "bg-purple-50 dark:bg-purple-900/20",
+      color: "bg-red-50 dark:bg-red-950/20",
     },
     {
       label: "Stock Report",
@@ -231,7 +231,7 @@ export default function StorekeeperDashboard() {
       case "MEDIUM":
         return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200";
       case "LOW":
-        return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "border-red-200 bg-red-50 text-red-800 dark:border-zinc-800 dark:bg-zinc-900/20 dark:text-red-200";
     }
   };
 
@@ -242,7 +242,7 @@ export default function StorekeeperDashboard() {
       case "warning":
         return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200";
       case "info":
-        return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "border-red-200 bg-red-50 text-red-800 dark:border-zinc-800 dark:bg-zinc-900/20 dark:text-red-200";
     }
   };
 
@@ -251,9 +251,9 @@ export default function StorekeeperDashboard() {
       case "PURCHASE":
         return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200";
       case "TRANSFER":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200";
+        return "bg-red-100 text-red-800 dark:bg-zinc-900/20 dark:text-red-200";
       case "USAGE":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-200";
+        return "bg-red-100 text-red-800 dark:bg-red-950/20 dark:text-red-200";
       case "WASTE":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200";
     }
@@ -291,7 +291,7 @@ export default function StorekeeperDashboard() {
           </div>
           <button
             onClick={fetchDashboardData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
             Refresh
           </button>
@@ -394,7 +394,7 @@ export default function StorekeeperDashboard() {
                     </p>
                     <Link
                       href={task.action.href}
-                      className="inline-block px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      className="inline-block px-3 py-1.5 text-xs font-bold bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
                     >
                       {task.action.label}
                     </Link>

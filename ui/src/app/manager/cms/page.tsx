@@ -12,8 +12,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
 // Status badge for leads
 function LeadStatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    NEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
-    CONTACTED: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+    NEW: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
+    CONTACTED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
     QUALIFIED: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
     CONVERTED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
     LOST: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",

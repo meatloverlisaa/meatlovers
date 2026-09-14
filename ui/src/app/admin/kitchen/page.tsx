@@ -189,10 +189,10 @@ export default function KitchenOperationsSummary() {
         <DelayedOrdersList orders={delayedOrders} />
         <ChefActivityTimeline activities={activities} />
 
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 p-6">
+        <div className="rounded-xl border border-red-200 dark:border-zinc-900/50 bg-red-50 dark:bg-red-900/20 p-6">
           <div className="flex items-start gap-3">
             <svg
-              className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+              className="w-6 h-6 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -204,7 +204,7 @@ export default function KitchenOperationsSummary() {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
+            <div className="flex-1 text-sm text-red-900 dark:text-zinc-100">
               <p className="font-semibold mb-2">Kitchen Oversight Guide</p>
               <ul className="space-y-1 list-disc list-inside">
                 <li>Monitor average prep times to identify bottlenecks</li>

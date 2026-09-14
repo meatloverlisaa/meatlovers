@@ -167,11 +167,11 @@ export default function AccountantReconciliation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Reconciliation Tools</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">Reconciliation Tools</h1>
           <p className="mt-2 text-sm text-slate-400">
             Match and reconcile financial transactions
           </p>
@@ -179,31 +179,31 @@ export default function AccountantReconciliation() {
 
         {/* Summary Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Total Items
             </p>
             <p className="mt-2 text-3xl font-black text-white">{summary.totalItems}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Matched
             </p>
             <p className="mt-2 text-3xl font-black text-green-400">{summary.matchedItems}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Unmatched
             </p>
             <p className="mt-2 text-3xl font-black text-red-400">{summary.unmatchedItems}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Partial
             </p>
             <p className="mt-2 text-3xl font-black text-yellow-400">{summary.partialItems}</p>
           </div>
-          <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-5 shadow-sm">
+          <div className="rounded-xl border border-red-900/50 bg-slate-900/80 p-5 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Total Variance
             </p>
@@ -221,7 +221,7 @@ export default function AccountantReconciliation() {
               onClick={() => setSelectedStatus(status)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 selectedStatus === status
-                  ? "bg-blue-600 text-white"
+                  ? "bg-red-700 text-white"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
               }`}
             >
@@ -231,7 +231,7 @@ export default function AccountantReconciliation() {
         </div>
 
         {/* Reconciliation Items */}
-        <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 shadow-sm">
+        <div className="rounded-xl border border-red-900/50 bg-slate-900/80 shadow-sm">
           <div className="border-b border-slate-700 px-5 py-4">
             <h3 className="text-lg font-semibold text-white">Reconciliation Items</h3>
           </div>
@@ -283,7 +283,7 @@ export default function AccountantReconciliation() {
                       {item.status !== "MATCHED" && (
                         <button
                           onClick={() => reconcileItem(item.id, item.expectedAmount)}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                          className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-800"
                         >
                           Mark Matched
                         </button>

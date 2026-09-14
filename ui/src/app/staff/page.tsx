@@ -24,7 +24,7 @@ export default function StaffDashboardPage() {
           href="/pos"
           className="p-6 rounded-xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-start gap-4"
         >
-          <div className="p-3 rounded-lg bg-blue-600/20 text-blue-400">
+          <div className="p-3 rounded-lg bg-red-700/20 text-red-500">
             <ShoppingBagIcon className="w-8 h-8" />
           </div>
           <div>
@@ -50,7 +50,7 @@ export default function StaffDashboardPage() {
           href="/bar"
           className="p-6 rounded-xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-start gap-4"
         >
-          <div className="p-3 rounded-lg bg-purple-600/20 text-purple-400">
+          <div className="p-3 rounded-lg bg-red-700/20 text-red-500">
             <BeakerIcon className="w-8 h-8" />
           </div>
           <div>

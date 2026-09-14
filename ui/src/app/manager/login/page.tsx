@@ -30,11 +30,11 @@ export default function ManagerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-slate-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="rounded-xl border border-blue-900/50 bg-slate-900/80 p-8 shadow-lg">
+        <div className="rounded-xl border border-zinc-900/50 bg-slate-900/80 p-8 shadow-lg">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
               Manager Portal
             </h1>
             <p className="mt-2 text-sm text-slate-400">
@@ -58,7 +58,7 @@ export default function ManagerLogin() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-blue-900/50 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-lg border border-zinc-900/50 bg-slate-800/50 px-4 py-3 text-white placeholder-slate-400 focus:border-red-700 focus:outline-none focus:ring-2 focus:ring-red-700/20"
                 placeholder="manager@restaurant.com"
                 required
               />
@@ -74,7 +74,7 @@ export default function ManagerLogin() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-blue-900/50 bg-slate-800/50 px-4 py-3 pr-12 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-lg border border-zinc-900/50 bg-slate-800/50 px-4 py-3 pr-12 text-white placeholder-slate-400 focus:border-red-700 focus:outline-none focus:ring-2 focus:ring-red-700/20"
                   placeholder="••••••••"
                   required
                 />
@@ -101,7 +101,7 @@ export default function ManagerLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-lg bg-red-700 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>

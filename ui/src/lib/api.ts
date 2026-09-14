@@ -21,6 +21,25 @@ export class APIError extends Error {
   }
 }
 
+/**
+ * Normalize endpoints that may return either a raw array or an object with
+ * the array under a data-like property.
+ */
+export function arrayResponse<T>(payload: unknown, property = 'data'): T[] {
+  if (Array.isArray(payload)) {
+    return payload as T[];
+  }
+
+  if (payload && typeof payload === 'object') {
+    const value = (payload as Record<string, unknown>)[property];
+    if (Array.isArray(value)) {
+      return value as T[];
+    }
+  }
+
+  return [];
+}
+
 interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
   skipAuthRefresh?: boolean;

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
-import { getAuthHeader } from "@/lib/auth";
+import { apiRequest, arrayResponse } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type OrderStatus = "PENDING" | "PREPARING" | "READY" | "SERVED" | "PAID";
@@ -28,47 +28,25 @@ type Order = {
 };
 
 async function fetchOrders(status?: OrderStatus, retryCount = 0): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  const url = status ? `${API_BASE}/orders/all?status=${status}` : `${API_BASE}/orders/all`;
-  
-  const res = await fetch(url, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-
-  // Handle rate limiting with exponential backoff
-  if (res.status === 429) {
-    if (retryCount < 5) {
-      const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s, 16s, 32s
+  const endpoint = status ? `/orders/all?status=${status}` : "/orders/all";
+  try {
+    const payload = await apiRequest<unknown>(endpoint, { cache: "no-store" });
+    return arrayResponse<Order>(payload);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("429") && retryCount < 5) {
+      const delay = Math.pow(2, retryCount) * 2000;
       await new Promise(resolve => setTimeout(resolve, delay));
       return fetchOrders(status, retryCount + 1);
     }
-    throw new Error(`Rate limit exceeded. Please wait a moment and try again.`);
+    throw error;
   }
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-
-  const data = await res.json();
-  // Ensure we always return an array
-  return Array.isArray(data) ? data : [];
 }
 
 async function settleOrder(orderId: string): Promise<void> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+  await apiRequest(`/orders/${orderId}/status`, {
     method: "PATCH",
-    headers: { 
-      "Content-Type": "application/json",
-      ...getAuthHeader(),
-    },
     body: JSON.stringify({ status: "PAID" }),
   });
-
-  if (!res.ok) {
-    throw new Error(`Failed to settle order: ${res.status}`);
-  }
 }
 
 export default function CashierOrdersPage() {

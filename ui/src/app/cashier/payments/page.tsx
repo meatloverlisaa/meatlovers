@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { apiRequest } from "@/lib/api";
 import { getAuthHeader } from "@/lib/auth";
 
 type PaymentMethod = "CASH" | "M-PESA" | "CARD" | "BANK_TRANSFER";
@@ -33,32 +34,12 @@ type Order = {
 };
 
 async function fetchPayments(): Promise<Payment[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/payments/settlement/summary`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch payments: ${res.status}`);
-  }
-  
-  const data = await res.json();
+  const data = await apiRequest<{ payments?: Payment[] }>("/payments/settlement/summary", { cache: "no-store" });
   return data.payments || [];
 }
 
 async function fetchOrders(): Promise<Order[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
-  const res = await fetch(`${API_BASE}/orders/all?status=SERVED`, { 
-    cache: "no-store",
-    headers: getAuthHeader(),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders: ${res.status}`);
-  }
-  
-  const data = await res.json();
+  const data = await apiRequest<Order[]>("/orders/all?status=SERVED", { cache: "no-store" });
   return Array.isArray(data) ? data : [];
 }
 
@@ -261,8 +242,8 @@ export default function CashierPaymentsPage() {
   const getPaymentMethodColor = (method: string) => {
     switch (method) {
       case "CASH": return "bg-green-100 text-green-800 border-green-200";
-      case "M-PESA": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "CARD": return "bg-purple-100 text-purple-800 border-purple-200";
+      case "M-PESA": return "bg-red-100 text-red-800 border-red-200";
+      case "CARD": return "bg-red-100 text-red-800 border-red-200";
       case "BANK_TRANSFER": return "bg-amber-100 text-amber-800 border-amber-200";
       default: return "bg-zinc-100 text-zinc-800 border-zinc-200";
     }

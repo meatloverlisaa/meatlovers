@@ -92,7 +92,7 @@ function getStatusColor(status: OrderStatus): string {
     case "PENDING":
       return "bg-amber-500 text-white";
     case "PREPARING":
-      return "bg-blue-500 text-white";
+      return "bg-red-500 text-white";
     case "READY":
       return "bg-emerald-500 text-white";
     default:
@@ -105,7 +105,7 @@ function getStatusBg(status: OrderStatus): string {
     case "PENDING":
       return "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800";
     case "PREPARING":
-      return "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
+      return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-zinc-800";
     case "READY":
       return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
     default:
@@ -269,7 +269,7 @@ export default function KitchenMonitoringScreen() {
             <div className="text-xs text-slate-500 dark:text-slate-400">Pending</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-500">{summary.preparing}</div>
+            <div className="text-3xl font-bold text-red-500">{summary.preparing}</div>
             <div className="text-xs text-slate-500 dark:text-slate-400">Preparing</div>
           </div>
           <div className="text-center">
@@ -343,7 +343,7 @@ export default function KitchenMonitoringScreen() {
                     onClick={() => handleStatusUpdate(id, order.status)}
                     className={`w-full py-3 rounded-lg font-bold text-white transition ${
                       nextStatus === "PREPARING" 
-                        ? "bg-blue-500 hover:bg-blue-600" 
+                        ? "bg-red-500 hover:bg-red-700" 
                         : "bg-emerald-500 hover:bg-emerald-600"
                     }`}
                   >

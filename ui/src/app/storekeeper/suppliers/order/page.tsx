@@ -211,7 +211,7 @@ export default function SupplierOrderPage() {
                       supplierName: supplier?.name || '',
                     }));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   required
                 >
                   <option value="">Select a supplier</option>
@@ -230,7 +230,7 @@ export default function SupplierOrderPage() {
                   type="date"
                   value={order.deliveryDate}
                   onChange={(e) => setOrder(prev => ({ ...prev, deliveryDate: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   required
                 />
               </div>
@@ -241,7 +241,7 @@ export default function SupplierOrderPage() {
                 <textarea
                   value={order.notes}
                   onChange={(e) => setOrder(prev => ({ ...prev, notes: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-700 focus:border-transparent"
                   placeholder="Special instructions, delivery address, etc."
                   rows={3}
                 />
@@ -259,7 +259,7 @@ export default function SupplierOrderPage() {
               <button
                 type="button"
                 onClick={addItem}
-                className="px-3 py-1.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                className="px-3 py-1.5 text-sm font-semibold bg-red-700 hover:bg-red-700 text-white rounded-lg transition"
               >
                 Add Item
               </button>
@@ -354,7 +354,7 @@ export default function SupplierOrderPage() {
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
                 <div className="flex items-center gap-4">
                   <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Amount:</span>
-                  <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <span className="text-2xl font-bold text-red-700 dark:text-red-400">
                     KSh {totalAmount.toFixed(2)}
                   </span>
                 </div>

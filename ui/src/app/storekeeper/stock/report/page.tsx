@@ -197,8 +197,8 @@ export default function StockReportPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Items</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{stats.total}</p>
               </div>
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <IconRenderer icon="package" className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                <IconRenderer icon="package" className="w-6 h-6 text-red-700 dark:text-red-400" />
               </div>
             </div>
           </div>
@@ -249,14 +249,14 @@ export default function StockReportPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by product name, SKU, or location..."
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-700 focus:border-transparent"
               />
             </div>
             <div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-700 focus:border-transparent"
               >
                 <option value="ALL">All Status</option>
                 <option value="NORMAL">Normal</option>
@@ -266,7 +266,7 @@ export default function StockReportPage() {
             </div>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 hover:bg-red-700 text-white font-semibold rounded-lg transition flex items-center gap-2"
             >
               <IconRenderer icon="document" className="w-4 h-4" />
               Export CSV
