@@ -574,6 +574,16 @@ export default function DispatcherDashboard() {
                         <div className="max-w-[180px] truncate" title={delivery.last_location || delivery.rider?.current_location || "No location reported"}>
                           {delivery.last_location || delivery.rider?.current_location || "No location reported"}
                         </div>
+                        {(delivery.last_latitude != null && delivery.last_longitude != null) && (
+                          <a
+                            href={`https://www.openstreetmap.org/?mlat=${delivery.last_latitude}&mlon=${delivery.last_longitude}#map=16/${delivery.last_latitude}/${delivery.last_longitude}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            View on map
+                          </a>
+                        )}
                         {delivery.delay_reason && <div className="text-amber-600">Delay: {delivery.delay_reason}</div>}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">

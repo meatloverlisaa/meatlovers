@@ -30,6 +30,9 @@ describe('DeliveriesService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    deliveryEvent: {
+      create: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -363,6 +366,7 @@ describe('DeliveriesService', () => {
             delivery_address: '123 Main St',
             delivery_notes: 'Call on arrival',
             status: 'ASSIGNED',
+            estimated_delivery_at: expect.any(Date),
           },
           include: {
             order: {
@@ -514,6 +518,41 @@ describe('DeliveriesService', () => {
             delivered_at: expect.any(Date),
           },
           include: expect.any(Object),
+        });
+      });
+
+      it('should record a delivery event with the authenticated user', async () => {
+        const mockDelivery = {
+          id: BigInt(1),
+          order_id: BigInt(1),
+          rider_id: BigInt(1),
+          status: 'ASSIGNED',
+          assigned_at: new Date(),
+        };
+        const updatedDelivery = { ...mockDelivery, status: 'PICKED_UP' };
+
+        mockPrismaService.delivery.findUnique.mockResolvedValue(mockDelivery);
+        mockPrismaService.delivery.update.mockResolvedValue(updatedDelivery);
+        mockPrismaService.deliveryEvent.create.mockResolvedValue({
+          id: BigInt(1),
+          delivery_id: BigInt(1),
+          status: 'PICKED_UP',
+          recorded_by: BigInt(7),
+        });
+
+        await service.updateDeliveryStatus(
+          '1',
+          { status: 'PICKED_UP', note: 'Collected from kitchen' },
+          '7',
+        );
+
+        expect(mockPrismaService.deliveryEvent.create).toHaveBeenCalledWith({
+          data: {
+            delivery_id: BigInt(1),
+            status: 'PICKED_UP',
+            note: 'Collected from kitchen',
+            recorded_by: BigInt(7),
+          },
         });
       });
 
