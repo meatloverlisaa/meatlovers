@@ -143,6 +143,17 @@ export class DeliveriesService {
         ...(updateRiderDto.current_location !== undefined && {
           current_location: updateRiderDto.current_location,
         }),
+        ...(updateRiderDto.current_latitude !== undefined && {
+          current_latitude: updateRiderDto.current_latitude,
+        }),
+        ...(updateRiderDto.current_longitude !== undefined && {
+          current_longitude: updateRiderDto.current_longitude,
+        }),
+        ...((updateRiderDto.current_location !== undefined ||
+          updateRiderDto.current_latitude !== undefined ||
+          updateRiderDto.current_longitude !== undefined) && {
+          last_location_at: new Date(),
+        }),
         ...(updateRiderDto.is_available !== undefined && {
           is_available: updateRiderDto.is_available,
         }),
@@ -153,6 +164,10 @@ export class DeliveriesService {
     });
 
     return updatedRider;
+  }
+
+  async updateRiderLocation(id: string, updateRiderDto: UpdateRiderDto) {
+    return this.updateRider(id, updateRiderDto);
   }
 
   async removeRider(id: string) {
@@ -215,6 +230,9 @@ export class DeliveriesService {
         delivery_address: createDeliveryDto.delivery_address,
         delivery_notes: createDeliveryDto.delivery_notes,
         status: 'ASSIGNED',
+        estimated_delivery_at: new Date(
+          Date.now() + (order.estimated_time ?? 45) * 60 * 1000,
+        ),
       },
       include: {
         order: {
@@ -328,7 +346,7 @@ export class DeliveriesService {
     });
   }
 
-  async updateDelivery(id: string, updateDeliveryDto: UpdateDeliveryDto) {
+  async updateDelivery(id: string, updateDeliveryDto: UpdateDeliveryDto, recordedBy?: string) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
     });
@@ -337,19 +355,28 @@ export class DeliveriesService {
       throw new NotFoundException('Delivery not found');
     }
 
+    const data: any = {
+      ...(updateDeliveryDto.pickup_address !== undefined && { pickup_address: updateDeliveryDto.pickup_address }),
+      ...(updateDeliveryDto.delivery_address !== undefined && { delivery_address: updateDeliveryDto.delivery_address }),
+      ...(updateDeliveryDto.delivery_notes !== undefined && { delivery_notes: updateDeliveryDto.delivery_notes }),
+      ...(updateDeliveryDto.priority !== undefined && { priority: updateDeliveryDto.priority }),
+      ...(updateDeliveryDto.estimated_delivery_at !== undefined && { estimated_delivery_at: new Date(updateDeliveryDto.estimated_delivery_at) }),
+      ...(updateDeliveryDto.delay_reason !== undefined && { delay_reason: updateDeliveryDto.delay_reason }),
+      ...(updateDeliveryDto.distance_km !== undefined && { distance_km: updateDeliveryDto.distance_km }),
+    };
+
+    if (updateDeliveryDto.rider_id !== undefined && BigInt(updateDeliveryDto.rider_id) !== delivery.rider_id) {
+      const rider = await this.prisma.rider.findUnique({ where: { id: BigInt(updateDeliveryDto.rider_id) } });
+      if (!rider) throw new NotFoundException('Rider not found');
+      if (!rider.is_available) throw new BadRequestException('Rider is not available');
+      data.rider_id = BigInt(updateDeliveryDto.rider_id);
+      data.reassigned_at = new Date();
+      if (recordedBy) data.reassigned_by = BigInt(recordedBy);
+    }
+
     const updatedDelivery = await this.prisma.delivery.update({
       where: { id: BigInt(id) },
-      data: {
-        ...(updateDeliveryDto.pickup_address !== undefined && {
-          pickup_address: updateDeliveryDto.pickup_address,
-        }),
-        ...(updateDeliveryDto.delivery_address !== undefined && {
-          delivery_address: updateDeliveryDto.delivery_address,
-        }),
-        ...(updateDeliveryDto.delivery_notes !== undefined && {
-          delivery_notes: updateDeliveryDto.delivery_notes,
-        }),
-      },
+      data,
       include: {
         order: {
           include: {
@@ -370,6 +397,7 @@ export class DeliveriesService {
   async updateDeliveryStatus(
     id: string,
     updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+    recordedBy?: string,
   ) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
@@ -413,6 +441,8 @@ export class DeliveriesService {
       updateData.picked_up_at = new Date();
     } else if (updateDeliveryStatusDto.status === 'DELIVERED') {
       updateData.delivered_at = new Date();
+    } else if (updateDeliveryStatusDto.status === 'IN_TRANSIT') {
+      updateData.in_transit_at = new Date();
     } else if (updateDeliveryStatusDto.status === 'CANCELLED') {
       updateData.cancelled_at = new Date();
       updateData.cancellation_reason =
@@ -435,6 +465,17 @@ export class DeliveriesService {
         },
       },
     });
+
+    if (recordedBy) {
+      await this.prisma.deliveryEvent.create({
+        data: {
+          delivery_id: BigInt(id),
+          status: updateDeliveryStatusDto.status as any,
+          note: updateDeliveryStatusDto.note ?? updateDeliveryStatusDto.cancellation_reason,
+          recorded_by: BigInt(recordedBy),
+        },
+      });
+    }
 
     // Create rider settlement when delivery is completed
     if (updateDeliveryStatusDto.status === 'DELIVERED' && delivery.status !== 'DELIVERED') {

@@ -91,6 +91,7 @@ export default function DispatcherDashboard() {
   const [manualOrderId, setManualOrderId] = useState("");
   const [showManualOrder, setShowManualOrder] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [reassigningDeliveryId, setReassigningDeliveryId] = useState<string | null>(null);
   
   // Rider form state
   const [riderForm, setRiderForm] = useState({
@@ -238,6 +239,23 @@ export default function DispatcherDashboard() {
       fetchDashboardData();
     } catch (_err) {
       setError(_err instanceof Error ? _err.message : "Failed to update status");
+    }
+  };
+
+  const handleReassign = async (deliveryId: string, riderId: string) => {
+    if (!riderId) return;
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        body: JSON.stringify({ rider_id: riderId }),
+      });
+      if (!res.ok) throw new Error("Failed to reassign delivery");
+      setReassigningDeliveryId(null);
+      await fetchDashboardData();
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to reassign delivery");
     }
   };
 
@@ -593,6 +611,32 @@ export default function DispatcherDashboard() {
                                 Cancel
                               </button>
                             )}
+                          {delivery.status !== "DELIVERED" && delivery.status !== "CANCELLED" && (
+                            reassigningDeliveryId === delivery.id ? (
+                              <select
+                                autoFocus
+                                defaultValue=""
+                                onChange={(event) => void handleReassign(delivery.id, event.target.value)}
+                                className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-xs bg-white dark:bg-gray-700"
+                              >
+                                <option value="">Reassign to…</option>
+                                {availableRiders
+                                  .filter((rider) => rider.id !== delivery.rider?.id)
+                                  .map((rider) => (
+                                    <option key={rider.id} value={rider.id}>
+                                      {rider.user?.full_name || rider.phone}
+                                    </option>
+                                  ))}
+                              </select>
+                            ) : (
+                              <button
+                                onClick={() => setReassigningDeliveryId(delivery.id)}
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900"
+                              >
+                                Reassign
+                              </button>
+                            )
+                          )}
                         </div>
                       </td>
                     </tr>

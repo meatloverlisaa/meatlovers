@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type';
 import { DeliveriesService } from './deliveries.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
@@ -52,6 +54,12 @@ export class RidersController {
   @Roles(...DISPATCH_ROLES)
   updateRider(@Param('id') id: string, @Body() updateRiderDto: UpdateRiderDto) {
     return this.deliveriesService.updateRider(id, updateRiderDto);
+  }
+
+  @Patch(':id/location')
+  @Roles(...DISPATCH_ROLES)
+  updateRiderLocation(@Param('id') id: string, @Body() updateRiderDto: UpdateRiderDto) {
+    return this.deliveriesService.updateRiderLocation(id, updateRiderDto);
   }
 
   @Delete(':id')
@@ -109,8 +117,9 @@ export class DeliveriesController {
   updateDelivery(
     @Param('id') id: string,
     @Body() updateDeliveryDto: UpdateDeliveryDto,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return this.deliveriesService.updateDelivery(id, updateDeliveryDto);
+    return this.deliveriesService.updateDelivery(id, updateDeliveryDto, req.user?.sub);
   }
 
   @Patch(':id/status')
@@ -118,10 +127,12 @@ export class DeliveriesController {
   updateDeliveryStatus(
     @Param('id') id: string,
     @Body() updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.deliveriesService.updateDeliveryStatus(
       id,
       updateDeliveryStatusDto,
+      req.user?.sub,
     );
   }
 

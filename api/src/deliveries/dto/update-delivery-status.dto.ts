@@ -8,4 +8,8 @@ export class UpdateDeliveryStatusDto {
   @IsString()
   @IsOptional()
   cancellation_reason?: string;
+
+  @IsString()
+  @IsOptional()
+  note?: string;
 }

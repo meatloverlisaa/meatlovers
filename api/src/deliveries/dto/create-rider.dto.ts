@@ -23,4 +23,10 @@ export class CreateRiderDto {
   @IsString()
   @IsOptional()
   current_location?: string;
+
+  @IsOptional()
+  current_latitude?: number;
+
+  @IsOptional()
+  current_longitude?: number;
 }
