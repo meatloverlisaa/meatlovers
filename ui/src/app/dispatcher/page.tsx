@@ -576,6 +576,68 @@ export default function DispatcherDashboard() {
           </div>
         </div>
 
+        {/* Rider Location Overview */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Rider Locations ({riders.length})
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                View the latest location reported by each rider.
+              </p>
+            </div>
+            <Link
+              href="/dispatcher/rider-location"
+              className="text-sm font-semibold text-emerald-600 hover:underline"
+            >
+              Open location client
+            </Link>
+          </div>
+          {riders.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400 text-center py-6">
+              No riders have been added yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {riders.map((rider) => {
+                const locationState = getRiderLocationState(rider);
+                const hasCoordinates = rider.current_latitude != null && rider.current_longitude != null;
+                return (
+                  <div key={rider.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {rider.user?.full_name || "Unknown rider"}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{rider.phone}</div>
+                      </div>
+                      <span className={`text-xs font-semibold ${locationState.className}`}>
+                        {locationState.label}
+                      </span>
+                    </div>
+                    <div className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+                      {rider.current_location || "No location description reported"}
+                    </div>
+                    {hasCoordinates ? (
+                      <a
+                        href={`https://www.openstreetmap.org/?mlat=${rider.current_latitude}&mlon=${rider.current_longitude}#map=16/${rider.current_latitude}/${rider.current_longitude}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+                      >
+                        View rider on map
+                      </a>
+                    ) : (
+                      <div className="mt-2 text-xs text-gray-500">GPS coordinates not available</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         {/* Available Riders */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
