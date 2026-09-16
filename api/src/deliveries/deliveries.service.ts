@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
@@ -118,6 +119,15 @@ export class DeliveriesService {
     return rider;
   }
 
+  async findRiderByUserId(userId: string) {
+    const rider = await this.prisma.rider.findUnique({
+      where: { user_id: BigInt(userId) },
+      include: { user: true },
+    });
+    if (!rider) throw new NotFoundException('No rider profile is linked to this account');
+    return rider;
+  }
+
   async updateRider(id: string, updateRiderDto: UpdateRiderDto) {
     const rider = await this.prisma.rider.findUnique({
       where: { id: BigInt(id) },
@@ -166,7 +176,12 @@ export class DeliveriesService {
     return updatedRider;
   }
 
-  async updateRiderLocation(id: string, updateRiderDto: UpdateRiderDto) {
+  async updateRiderLocation(id: string, updateRiderDto: UpdateRiderDto, userId?: string) {
+    const rider = await this.prisma.rider.findUnique({ where: { id: BigInt(id) } });
+    if (!rider) throw new NotFoundException('Rider not found');
+    if (userId && rider.user_id !== BigInt(userId)) {
+      throw new ForbiddenException('You can only update your own rider location');
+    }
     return this.updateRider(id, updateRiderDto);
   }
 
@@ -338,6 +353,20 @@ export class DeliveriesService {
     }
 
     return delivery;
+  }
+
+  async findDeliveryEvents(id: string) {
+    const delivery = await this.prisma.delivery.findUnique({
+      where: { id: BigInt(id) },
+      select: { id: true },
+    });
+    if (!delivery) throw new NotFoundException('Delivery not found');
+
+    return this.prisma.deliveryEvent.findMany({
+      where: { delivery_id: BigInt(id) },
+      include: { recorder: { select: { id: true, full_name: true, role: true } } },
+      orderBy: { created_at: 'asc' },
+    });
   }
 
   async findByOrderId(orderId: string) {

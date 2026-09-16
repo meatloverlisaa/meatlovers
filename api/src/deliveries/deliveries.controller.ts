@@ -45,6 +45,12 @@ export class RidersController {
     return this.deliveriesService.findAvailableRiders();
   }
 
+  @Get('me')
+  @Roles(...DISPATCH_ROLES)
+  findMyRiderProfile(@Req() req: AuthenticatedRequest) {
+    return this.deliveriesService.findRiderByUserId(req.user.sub);
+  }
+
   @Get(':id')
   @Roles(...DISPATCH_ROLES)
   findOneRider(@Param('id') id: string) {
@@ -59,8 +65,12 @@ export class RidersController {
 
   @Patch(':id/location')
   @Roles(...DISPATCH_ROLES)
-  updateRiderLocation(@Param('id') id: string, @Body() updateRiderDto: UpdateRiderDto) {
-    return this.deliveriesService.updateRiderLocation(id, updateRiderDto);
+  updateRiderLocation(
+    @Param('id') id: string,
+    @Body() updateRiderDto: UpdateRiderDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.deliveriesService.updateRiderLocation(id, updateRiderDto, req.user.sub);
   }
 
   @Delete(':id')
@@ -114,6 +124,12 @@ export class DeliveriesController {
       throw new BadRequestException('destinationLat and destinationLng must be valid numbers');
     }
     return this.deliveriesService.getRouteEstimate(id, lat, lng);
+  }
+
+  @Get(':id/events')
+  @Roles(...DISPATCH_ROLES)
+  findDeliveryEvents(@Param('id') id: string) {
+    return this.deliveriesService.findDeliveryEvents(id);
   }
 
   @Get('order/:orderId')

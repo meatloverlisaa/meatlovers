@@ -32,13 +32,21 @@ async function main() {
 
   const rider = await prisma.rider.upsert({
     where: { user_id: riderUser.id },
-    update: { is_available: true, current_location: 'Meat Lovers staging kitchen' },
+    update: {
+      is_available: true,
+      current_location: 'Meat Lovers staging kitchen',
+      current_latitude: -1.2864,
+      current_longitude: 36.8172,
+      last_location_at: new Date(),
+    },
     create: {
       user_id: riderUser.id,
       phone: riderUser.phone ?? '+254700009999',
       vehicle_type: 'Motorcycle',
       vehicle_plate: 'STAGING-01',
       current_location: 'Meat Lovers staging kitchen',
+      current_latitude: -1.2864,
+      current_longitude: 36.8172,
     },
   });
 
@@ -65,6 +73,8 @@ async function main() {
       status: 'ASSIGNED',
       pickup_address: 'Meat Lovers staging kitchen',
       delivery_address: 'Dispatcher staging address',
+      delivery_latitude: -1.2921,
+      delivery_longitude: 36.8219,
       customer_name: 'Dispatcher Staging Customer',
       customer_phone: '+254700009998',
       delivery_notes: 'DISPATCHER_STAGING_TEST',

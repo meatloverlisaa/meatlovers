@@ -62,6 +62,14 @@ interface DeliverySummary {
   activeRiders: number;
 }
 
+interface DeliveryEvent {
+  id: string;
+  status: string;
+  note?: string | null;
+  created_at: string;
+  recorder?: { full_name: string; role: string };
+}
+
 export default function DispatcherDashboard() {
   useRequireAuth(['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'DISPATCHER']);
   
@@ -97,6 +105,8 @@ export default function DispatcherDashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [reassigningDeliveryId, setReassigningDeliveryId] = useState<string | null>(null);
   const [routeEstimates, setRouteEstimates] = useState<Record<string, { distance_km: number; duration_minutes: number }>>({});
+  const [eventHistory, setEventHistory] = useState<Record<string, DeliveryEvent[]>>({});
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   
   // Rider form state
   const [riderForm, setRiderForm] = useState({
@@ -287,6 +297,23 @@ export default function DispatcherDashboard() {
       setRouteEstimates((current) => ({ ...current, [delivery.id]: data }));
     } catch (_err) {
       setError(_err instanceof Error ? _err.message : "Unable to calculate route");
+    }
+  };
+
+  const handleEventHistory = async (deliveryId: string) => {
+    if (selectedHistoryId === deliveryId) {
+      setSelectedHistoryId(null);
+      return;
+    }
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}/events`, { headers: getAuthHeader() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Unable to load delivery history");
+      setEventHistory((current) => ({ ...current, [deliveryId]: data.data || data || [] }));
+      setSelectedHistoryId(deliveryId);
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Unable to load delivery history");
     }
   };
 
@@ -699,6 +726,12 @@ export default function DispatcherDashboard() {
                               </button>
                             )
                           )}
+                          <button
+                            onClick={() => void handleEventHistory(delivery.id)}
+                            className="text-purple-600 dark:text-purple-400 hover:text-purple-900"
+                          >
+                            {selectedHistoryId === delivery.id ? "Hide history" : "History"}
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -708,6 +741,31 @@ export default function DispatcherDashboard() {
             </div>
           )}
         </div>
+
+        {selectedHistoryId && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Delivery Event History · #{selectedHistoryId}
+            </h2>
+            {(eventHistory[selectedHistoryId] || []).length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">No events recorded yet.</p>
+            ) : (
+              <ol className="border-l border-purple-200 dark:border-purple-800 space-y-4 pl-5">
+                {eventHistory[selectedHistoryId].map((event) => (
+                  <li key={event.id} className="relative">
+                    <span className="absolute -left-[25px] top-1 h-3 w-3 rounded-full bg-purple-600" />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-gray-900 dark:text-white">{event.status.replace("_", " ")}</span>
+                      <span className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{event.note || "No note"}</p>
+                    {event.recorder && <p className="text-xs text-gray-500">Recorded by {event.recorder.full_name} ({event.recorder.role})</p>}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        )}
 
         {/* Assign Delivery Modal */}
         {showAssignModal && (
