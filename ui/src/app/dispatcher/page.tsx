@@ -34,8 +34,6 @@ interface Delivery {
   status: "ASSIGNED" | "PICKED_UP" | "IN_TRANSIT" | "DELIVERED" | "FAILED" | "CANCELLED";
   pickup_address?: string | null;
   delivery_address: string;
-  delivery_latitude?: number | null;
-  delivery_longitude?: number | null;
   delivery_notes?: string | null;
   assigned_at: string;
   picked_up_at?: string | null;
@@ -98,8 +96,6 @@ export default function DispatcherDashboard() {
   const [pickupAddress, setPickupAddress] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
-  const [deliveryLatitude, setDeliveryLatitude] = useState("");
-  const [deliveryLongitude, setDeliveryLongitude] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [pendingOrders, setPendingOrders] = useState<any[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -107,7 +103,6 @@ export default function DispatcherDashboard() {
   const [showManualOrder, setShowManualOrder] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [reassigningDeliveryId, setReassigningDeliveryId] = useState<string | null>(null);
-  const [routeEstimates, setRouteEstimates] = useState<Record<string, { distance_km: number; duration_minutes: number }>>({});
   const [eventHistory, setEventHistory] = useState<Record<string, DeliveryEvent[]>>({});
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   
@@ -258,8 +253,6 @@ export default function DispatcherDashboard() {
           rider_id: selectedRiderId,
           pickup_address: pickupAddress || undefined,
           delivery_address: deliveryAddress,
-          delivery_latitude: deliveryLatitude ? Number(deliveryLatitude) : undefined,
-          delivery_longitude: deliveryLongitude ? Number(deliveryLongitude) : undefined,
           delivery_notes: deliveryNotes || undefined,
         }),
       });
@@ -272,8 +265,6 @@ export default function DispatcherDashboard() {
       setPickupAddress("");
       setDeliveryAddress("");
       setDeliveryNotes("");
-      setDeliveryLatitude("");
-      setDeliveryLongitude("");
       setSelectedOrder(null);
       fetchDashboardData();
     } catch (_err) {
@@ -345,17 +336,6 @@ export default function DispatcherDashboard() {
     }
   };
 
-  const handleRouteEstimate = async (delivery: Delivery) => {
-    try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${API_BASE}/deliveries/${delivery.id}/route`, { headers: getAuthHeader() });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Unable to calculate route");
-      setRouteEstimates((current) => ({ ...current, [delivery.id]: data }));
-    } catch (_err) {
-      setError(_err instanceof Error ? _err.message : "Unable to calculate route");
-    }
-  };
 
   const handleEventHistory = async (deliveryId: string) => {
     if (selectedHistoryId === deliveryId) {
@@ -716,17 +696,6 @@ export default function DispatcherDashboard() {
                           </a>
                         )}
                         {delivery.delay_reason && <div className="text-amber-600">Delay: {delivery.delay_reason}</div>}
-                        {delivery.delivery_latitude != null && delivery.delivery_longitude != null && (
-                          routeEstimates[delivery.id] ? (
-                            <div className="text-indigo-600">
-                              ETA: {routeEstimates[delivery.id].duration_minutes} min · {routeEstimates[delivery.id].distance_km} km
-                            </div>
-                          ) : (
-                            <button onClick={() => void handleRouteEstimate(delivery)} className="text-indigo-600 hover:underline">
-                              Calculate route ETA
-                            </button>
-                          )
-                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex gap-2">
@@ -968,16 +937,6 @@ export default function DispatcherDashboard() {
                         rows={3}
                         placeholder="Enter delivery notes"
                       />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destination latitude</label>
-                        <input type="number" step="any" value={deliveryLatitude} onChange={(e) => setDeliveryLatitude(e.target.value)} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2" placeholder="-1.2864" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destination longitude</label>
-                        <input type="number" step="any" value={deliveryLongitude} onChange={(e) => setDeliveryLongitude(e.target.value)} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2" placeholder="36.8172" />
-                      </div>
                     </div>
                   </div>
                   <div className="flex gap-3 mt-6">
