@@ -13,6 +13,7 @@ type NavItem = {
 
 const navigationItems: NavItem[] = [
   { href: "/dispatcher", label: "Dispatcher Dashboard", icon: "chart" },
+  { href: "/dispatcher/riders", label: "Riders", icon: "users" },
   { href: "/dispatcher/rider-location", label: "Rider Location Client", icon: "location" },
 ];
 
