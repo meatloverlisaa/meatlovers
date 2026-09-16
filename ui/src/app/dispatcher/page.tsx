@@ -178,6 +178,16 @@ export default function DispatcherDashboard() {
     !["DELIVERED", "CANCELLED"].includes(delivery.status),
   );
   const priorityDeliveries = deliveries.filter((delivery) => (delivery.priority || 0) > 0);
+  const getRiderLocationState = (rider: Rider) => {
+    if (!rider.last_location_at) {
+      return { label: "Location time unavailable", className: "text-gray-500 dark:text-gray-400" };
+    }
+    const ageMinutes = Math.floor((now - new Date(rider.last_location_at).getTime()) / 60000);
+    if (ageMinutes >= 10) {
+      return { label: `Offline · ${ageMinutes}m ago`, className: "text-red-600 dark:text-red-400" };
+    }
+    return { label: `Online · ${ageMinutes}m ago`, className: "text-emerald-600 dark:text-emerald-400" };
+  };
 
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -502,6 +512,9 @@ export default function DispatcherDashboard() {
                       Location: {rider.current_location}
                     </div>
                   )}
+                  <div className={`text-xs font-semibold mt-2 ${getRiderLocationState(rider).className}`}>
+                    {getRiderLocationState(rider).label}
+                  </div>
                 </div>
               ))}
             </div>

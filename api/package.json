@@ -25,6 +25,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
+    "dispatcher:staging-data": "ts-node scripts/create-dispatcher-staging-data.ts",
+    "dispatcher:verify-events": "ts-node scripts/verify-dispatcher-events.ts",
     "prisma:studio": "prisma studio",
     "scan:auth": "ts-node -r tsconfig-paths/register src/auth/cli/scan-authorization.ts",
     "auth:test": "ts-node -r tsconfig-paths/register src/auth/cli/test-authorization.ts",
