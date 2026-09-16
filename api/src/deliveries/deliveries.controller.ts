@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type';
 import { DeliveriesService } from './deliveries.service';
@@ -98,6 +99,21 @@ export class DeliveriesController {
   @Roles(...DISPATCH_ROLES)
   findOneDelivery(@Param('id') id: string) {
     return this.deliveriesService.findOneDelivery(id);
+  }
+
+  @Get(':id/route')
+  @Roles(...DISPATCH_ROLES)
+  getRouteEstimate(
+    @Param('id') id: string,
+    @Query('destinationLat') destinationLat: string,
+    @Query('destinationLng') destinationLng: string,
+  ) {
+    const lat = Number(destinationLat);
+    const lng = Number(destinationLng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      throw new BadRequestException('destinationLat and destinationLng are required');
+    }
+    return this.deliveriesService.getRouteEstimate(id, lat, lng);
   }
 
   @Get('order/:orderId')

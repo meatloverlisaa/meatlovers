@@ -170,6 +170,38 @@ export class DeliveriesService {
     return this.updateRider(id, updateRiderDto);
   }
 
+  async getRouteEstimate(id: string, destinationLat: number, destinationLng: number) {
+    const delivery = await this.prisma.delivery.findUnique({
+      where: { id: BigInt(id) },
+      include: { rider: true },
+    });
+
+    if (!delivery) throw new NotFoundException('Delivery not found');
+    if (delivery.rider.current_latitude == null || delivery.rider.current_longitude == null) {
+      throw new BadRequestException('Rider location is not available for route calculation');
+    }
+
+    const origin = `${delivery.rider.current_longitude},${delivery.rider.current_latitude}`;
+    const destination = `${destinationLng},${destinationLat}`;
+    const response = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${origin};${destination}?overview=false`,
+    );
+    if (!response.ok) throw new BadRequestException('Route provider is unavailable');
+
+    const payload = (await response.json()) as {
+      code?: string;
+      routes?: Array<{ distance: number; duration: number }>;
+    };
+    const route = payload.routes?.[0];
+    if (payload.code !== 'Ok' || !route) throw new BadRequestException('No route found');
+
+    return {
+      provider: 'OSRM',
+      distance_km: Number((route.distance / 1000).toFixed(2)),
+      duration_minutes: Math.ceil(route.duration / 60),
+    };
+  }
+
   async removeRider(id: string) {
     const rider = await this.prisma.rider.findUnique({
       where: { id: BigInt(id) },
