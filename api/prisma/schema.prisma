@@ -489,6 +489,8 @@ model Delivery {
   status                DeliveryStatus  @default(ASSIGNED)
   pickup_address        String?
   delivery_address      String
+  delivery_latitude     Float?
+  delivery_longitude    Float?
   delivery_notes        String?
   customer_name         String?
   customer_phone        String?         @db.VarChar(50)

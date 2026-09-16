@@ -170,19 +170,24 @@ export class DeliveriesService {
     return this.updateRider(id, updateRiderDto);
   }
 
-  async getRouteEstimate(id: string, destinationLat: number, destinationLng: number) {
+  async getRouteEstimate(id: string, destinationLat?: number, destinationLng?: number) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
       include: { rider: true },
     });
 
     if (!delivery) throw new NotFoundException('Delivery not found');
+    const targetLat = destinationLat ?? delivery.delivery_latitude;
+    const targetLng = destinationLng ?? delivery.delivery_longitude;
+    if (targetLat == null || targetLng == null) {
+      throw new BadRequestException('Delivery destination coordinates are not available');
+    }
     if (delivery.rider.current_latitude == null || delivery.rider.current_longitude == null) {
       throw new BadRequestException('Rider location is not available for route calculation');
     }
 
     const origin = `${delivery.rider.current_longitude},${delivery.rider.current_latitude}`;
-    const destination = `${destinationLng},${destinationLat}`;
+    const destination = `${targetLng},${targetLat}`;
     const response = await fetch(
       `https://router.project-osrm.org/route/v1/driving/${origin};${destination}?overview=false`,
     );
@@ -260,6 +265,8 @@ export class DeliveriesService {
         rider_id: BigInt(createDeliveryDto.rider_id),
         pickup_address: createDeliveryDto.pickup_address,
         delivery_address: createDeliveryDto.delivery_address,
+        delivery_latitude: createDeliveryDto.delivery_latitude,
+        delivery_longitude: createDeliveryDto.delivery_longitude,
         delivery_notes: createDeliveryDto.delivery_notes,
         status: 'ASSIGNED',
         estimated_delivery_at: new Date(
@@ -390,6 +397,8 @@ export class DeliveriesService {
     const data: any = {
       ...(updateDeliveryDto.pickup_address !== undefined && { pickup_address: updateDeliveryDto.pickup_address }),
       ...(updateDeliveryDto.delivery_address !== undefined && { delivery_address: updateDeliveryDto.delivery_address }),
+      ...(updateDeliveryDto.delivery_latitude !== undefined && { delivery_latitude: updateDeliveryDto.delivery_latitude }),
+      ...(updateDeliveryDto.delivery_longitude !== undefined && { delivery_longitude: updateDeliveryDto.delivery_longitude }),
       ...(updateDeliveryDto.delivery_notes !== undefined && { delivery_notes: updateDeliveryDto.delivery_notes }),
       ...(updateDeliveryDto.priority !== undefined && { priority: updateDeliveryDto.priority }),
       ...(updateDeliveryDto.estimated_delivery_at !== undefined && { estimated_delivery_at: new Date(updateDeliveryDto.estimated_delivery_at) }),

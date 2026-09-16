@@ -105,13 +105,13 @@ export class DeliveriesController {
   @Roles(...DISPATCH_ROLES)
   getRouteEstimate(
     @Param('id') id: string,
-    @Query('destinationLat') destinationLat: string,
-    @Query('destinationLng') destinationLng: string,
+    @Query('destinationLat') destinationLat?: string,
+    @Query('destinationLng') destinationLng?: string,
   ) {
-    const lat = Number(destinationLat);
-    const lng = Number(destinationLng);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      throw new BadRequestException('destinationLat and destinationLng are required');
+    const lat = destinationLat === undefined ? undefined : Number(destinationLat);
+    const lng = destinationLng === undefined ? undefined : Number(destinationLng);
+    if ((lat !== undefined && !Number.isFinite(lat)) || (lng !== undefined && !Number.isFinite(lng))) {
+      throw new BadRequestException('destinationLat and destinationLng must be valid numbers');
     }
     return this.deliveriesService.getRouteEstimate(id, lat, lng);
   }
