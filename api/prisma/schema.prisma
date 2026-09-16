@@ -457,6 +457,7 @@ model ProductionPlan {
 model Rider {
   id                BigInt     @id @default(autoincrement())
   user_id           BigInt     @unique
+  created_by        BigInt?
   phone             String     @db.VarChar(50)
   license_number    String?    @db.VarChar(100)
   vehicle_type      String?    @db.VarChar(50)
@@ -510,6 +511,7 @@ model Delivery {
   picked_up_at          DateTime?
   in_transit_at         DateTime?
   delivered_at          DateTime?
+  failed_at             DateTime?
   cancelled_at          DateTime?
   cancellation_reason   String?
   rating                Int?
@@ -1284,6 +1286,7 @@ enum DeliveryStatus {
   PICKED_UP
   IN_TRANSIT
   DELIVERED
+  FAILED
   CANCELLED
 }
 

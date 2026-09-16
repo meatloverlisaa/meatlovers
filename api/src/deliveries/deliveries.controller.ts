@@ -9,7 +9,10 @@ import {
   Query,
   Req,
   BadRequestException,
+  Sse,
 } from '@nestjs/common';
+import type { MessageEvent } from '@nestjs/common';
+import { map } from 'rxjs/operators';
 import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type';
 import { DeliveriesService } from './deliveries.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
@@ -29,8 +32,11 @@ export class RidersController {
 
   @Post()
   @Roles(...DISPATCH_ROLES)
-  createRider(@Body() createRiderDto: CreateRiderDto) {
-    return this.deliveriesService.createRider(createRiderDto);
+  createRider(
+    @Body() createRiderDto: CreateRiderDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.deliveriesService.createRider(createRiderDto, req.user.sub);
   }
 
   @Get()
@@ -105,6 +111,14 @@ export class DeliveriesController {
     return this.deliveriesService.getDeliverySummary(startDate, endDate);
   }
 
+  @Sse('stream')
+  @Roles(...DISPATCH_ROLES)
+  streamDeliveryUpdates(): import('rxjs').Observable<MessageEvent> {
+    return this.deliveriesService.getLiveUpdates().pipe(
+      map((data) => ({ type: data.type, data })),
+    );
+  }
+
   @Get(':id')
   @Roles(...DISPATCH_ROLES)
   findOneDelivery(@Param('id') id: string) {
@@ -166,6 +180,12 @@ export class DeliveriesController {
       updateDeliveryStatusDto,
       req.user?.sub,
     );
+  }
+
+  @Post(':id/retry')
+  @Roles(...DISPATCH_ROLES)
+  retryDelivery(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.deliveriesService.retryDelivery(id, req.user.sub);
   }
 
   @Delete(':id')

@@ -15,17 +15,36 @@ import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
 import { FinanceService } from '../finance/finance.service';
 import { AuditLogService } from '../auth/audit-log.service';
+import { Observable, Subject } from 'rxjs';
+
+export interface DeliveryLiveUpdate {
+  type: 'delivery.status' | 'delivery.retry' | 'rider.location';
+  deliveryId?: string;
+  riderId?: string;
+  status?: string;
+  occurredAt: string;
+}
 
 @Injectable()
 export class DeliveriesService {
+  private readonly liveUpdates = new Subject<DeliveryLiveUpdate>();
+
   constructor(
     private prisma: PrismaService,
     private financeService: FinanceService,
     private auditLogService: AuditLogService,
   ) {}
 
+  getLiveUpdates(): Observable<DeliveryLiveUpdate> {
+    return this.liveUpdates.asObservable();
+  }
+
+  private publishLiveUpdate(update: Omit<DeliveryLiveUpdate, 'occurredAt'>) {
+    this.liveUpdates.next({ ...update, occurredAt: new Date().toISOString() });
+  }
+
   // Rider Management
-  async createRider(createRiderDto: CreateRiderDto) {
+  async createRider(createRiderDto: CreateRiderDto, createdBy?: string) {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: BigInt(createRiderDto.user_id) },
@@ -58,11 +77,46 @@ export class DeliveriesService {
       },
     });
 
-    return rider;
+    if (createdBy) {
+      await this.prisma.$executeRawUnsafe(
+        'UPDATE riders SET created_by = $1 WHERE id = $2',
+        BigInt(createdBy),
+        rider.id,
+      );
+    }
+
+    return (await this.attachRiderCreator([rider]))[0];
+  }
+
+  private async attachRiderCreator<T extends { id: bigint }>(riders: T[]) {
+    if (!riders.length) return riders;
+    if (typeof (this.prisma as any).$queryRawUnsafe !== 'function') return riders;
+    const ids = riders.map((rider) => rider.id.toString()).join(',');
+    const creators = await this.prisma.$queryRawUnsafe<Array<{
+      rider_id: bigint;
+      created_by: bigint | null;
+      creator_name: string | null;
+      creator_email: string | null;
+    }>>(
+      `SELECT r.id AS rider_id, r.created_by, u.full_name AS creator_name, u.email AS creator_email
+       FROM riders r LEFT JOIN users u ON u.id = r.created_by WHERE r.id IN (${ids})`,
+    );
+    const byRider = new Map(creators.map((creator) => [creator.rider_id.toString(), creator]));
+    return riders.map((rider) => {
+      const creator = byRider.get(rider.id.toString());
+      if (!creator) return rider;
+      return {
+        ...rider,
+        created_by: creator?.created_by?.toString() ?? null,
+        created_by_user: creator?.creator_name
+          ? { full_name: creator.creator_name, email: creator.creator_email }
+          : null,
+      };
+    });
   }
 
   async findAllRiders() {
-    return this.prisma.rider.findMany({
+    const riders = await this.prisma.rider.findMany({
       include: {
         user: true,
         deliveries: {
@@ -79,10 +133,11 @@ export class DeliveriesService {
         },
       },
     });
+    return this.attachRiderCreator(riders);
   }
 
   async findAvailableRiders() {
-    return this.prisma.rider.findMany({
+    const riders = await this.prisma.rider.findMany({
       where: {
         is_available: true,
       },
@@ -90,6 +145,7 @@ export class DeliveriesService {
         user: true,
       },
     });
+    return this.attachRiderCreator(riders);
   }
 
   async findOneRider(id: string) {
@@ -182,7 +238,9 @@ export class DeliveriesService {
     if (userId && rider.user_id !== BigInt(userId)) {
       throw new ForbiddenException('You can only update your own rider location');
     }
-    return this.updateRider(id, updateRiderDto);
+    const updatedRider = await this.updateRider(id, updateRiderDto);
+    this.publishLiveUpdate({ type: 'rider.location', riderId: id });
+    return updatedRider;
   }
 
   async getRouteEstimate(id: string, destinationLat?: number, destinationLng?: number) {
@@ -206,19 +264,48 @@ export class DeliveriesService {
     const response = await fetch(
       `https://router.project-osrm.org/route/v1/driving/${origin};${destination}?overview=false`,
     );
-    if (!response.ok) throw new BadRequestException('Route provider is unavailable');
+    if (!response.ok) {
+      return this.fallbackRouteEstimate(
+        delivery.rider.current_latitude,
+        delivery.rider.current_longitude,
+        targetLat,
+        targetLng,
+      );
+    }
 
     const payload = (await response.json()) as {
       code?: string;
       routes?: Array<{ distance: number; duration: number }>;
     };
     const route = payload.routes?.[0];
-    if (payload.code !== 'Ok' || !route) throw new BadRequestException('No route found');
+    if (payload.code !== 'Ok' || !route) {
+      return this.fallbackRouteEstimate(
+        delivery.rider.current_latitude,
+        delivery.rider.current_longitude,
+        targetLat,
+        targetLng,
+      );
+    }
 
     return {
       provider: 'OSRM',
       distance_km: Number((route.distance / 1000).toFixed(2)),
       duration_minutes: Math.ceil(route.duration / 60),
+    };
+  }
+
+  private fallbackRouteEstimate(originLat: number, originLng: number, targetLat: number, targetLng: number) {
+    const radians = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = radians(targetLat - originLat);
+    const dLng = radians(targetLng - originLng);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(radians(originLat)) * Math.cos(radians(targetLat)) * Math.sin(dLng / 2) ** 2;
+    const distance = earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return {
+      provider: 'HAVERSINE_FALLBACK',
+      distance_km: Number(distance.toFixed(2)),
+      duration_minutes: Math.ceil((distance / 25) * 60),
     };
   }
 
@@ -494,6 +581,7 @@ export class DeliveriesService {
       'PICKED_UP',
       'IN_TRANSIT',
       'DELIVERED',
+      'FAILED',
       'CANCELLED',
     ];
     if (!validStatuses.includes(updateDeliveryStatusDto.status)) {
@@ -517,6 +605,10 @@ export class DeliveriesService {
       updateData.cancelled_at = new Date();
       updateData.cancellation_reason =
         updateDeliveryStatusDto.cancellation_reason;
+    } else if (updateDeliveryStatusDto.status === 'FAILED') {
+      updateData.failed_at = new Date();
+      updateData.failed_attempts = { increment: 1 };
+      updateData.cancellation_reason = updateDeliveryStatusDto.cancellation_reason;
     }
 
     const updatedDelivery = await this.prisma.delivery.update({
@@ -546,6 +638,12 @@ export class DeliveriesService {
         },
       });
     }
+
+    this.publishLiveUpdate({
+      type: 'delivery.status',
+      deliveryId: id,
+      status: updateDeliveryStatusDto.status,
+    });
 
     // Create rider settlement when delivery is completed
     if (updateDeliveryStatusDto.status === 'DELIVERED' && delivery.status !== 'DELIVERED') {
@@ -590,6 +688,38 @@ export class DeliveriesService {
     }
 
     return updatedDelivery;
+  }
+
+  async retryDelivery(id: string, recordedBy?: string) {
+    const delivery = await this.prisma.delivery.findUnique({ where: { id: BigInt(id) } });
+    if (!delivery) throw new NotFoundException('Delivery not found');
+    if ((delivery.status as string) !== 'FAILED' && delivery.status !== 'CANCELLED') {
+      throw new BadRequestException('Only failed or cancelled deliveries can be retried');
+    }
+
+    const updated = await this.prisma.delivery.update({
+      where: { id: BigInt(id) },
+      data: {
+        status: 'ASSIGNED',
+        assigned_at: new Date(),
+        cancelled_at: null,
+        cancellation_reason: null,
+        estimated_delivery_at: new Date(Date.now() + 45 * 60 * 1000),
+      },
+      include: { rider: { include: { user: true } }, order: true },
+    });
+    if (recordedBy) {
+      await this.prisma.deliveryEvent.create({
+        data: {
+          delivery_id: BigInt(id),
+          status: 'ASSIGNED',
+          note: 'Delivery retry scheduled',
+          recorded_by: BigInt(recordedBy),
+        },
+      });
+    }
+    this.publishLiveUpdate({ type: 'delivery.retry', deliveryId: id, status: 'ASSIGNED' });
+    return updated;
   }
 
   async removeDelivery(id: string) {

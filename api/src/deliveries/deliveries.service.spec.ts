@@ -120,6 +120,36 @@ describe('DeliveriesService', () => {
         expect(mockPrismaService.rider.create).toHaveBeenCalled();
       });
 
+      it('returns the staff member who added the rider', async () => {
+        const createRiderDto = { user_id: '2', phone: '+254700000002' };
+        const mockRider = {
+          id: BigInt(2),
+          user_id: BigInt(2),
+          phone: createRiderDto.phone,
+          user: { id: BigInt(2), full_name: 'New Rider' },
+        };
+        mockPrismaService.user.findUnique.mockResolvedValue({ id: BigInt(2) });
+        mockPrismaService.rider.findUnique.mockResolvedValue(null);
+        mockPrismaService.rider.create.mockResolvedValue(mockRider);
+        (mockPrismaService as any).$executeRawUnsafe = jest.fn().mockResolvedValue(1);
+        (mockPrismaService as any).$queryRawUnsafe = jest.fn().mockResolvedValue([{
+          rider_id: BigInt(2),
+          created_by: BigInt(7),
+          creator_name: 'Elizabeth Macharia',
+          creator_email: 'elizabeth@example.com',
+        }]);
+
+        const result = await service.createRider(createRiderDto, '7');
+
+        expect(result).toEqual(expect.objectContaining({
+          created_by: '7',
+          created_by_user: {
+            full_name: 'Elizabeth Macharia',
+            email: 'elizabeth@example.com',
+          },
+        }));
+      });
+
       it('should throw NotFoundException if user does not exist', async () => {
         const createRiderDto = {
           user_id: '999',
