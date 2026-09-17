@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
@@ -14,17 +15,36 @@ import { UpdateDeliveryDto } from './dto/update-delivery.dto';
 import { UpdateDeliveryStatusDto } from './dto/update-delivery-status.dto';
 import { FinanceService } from '../finance/finance.service';
 import { AuditLogService } from '../auth/audit-log.service';
+import { Observable, Subject } from 'rxjs';
+
+export interface DeliveryLiveUpdate {
+  type: 'delivery.status' | 'delivery.retry' | 'rider.location';
+  deliveryId?: string;
+  riderId?: string;
+  status?: string;
+  occurredAt: string;
+}
 
 @Injectable()
 export class DeliveriesService {
+  private readonly liveUpdates = new Subject<DeliveryLiveUpdate>();
+
   constructor(
     private prisma: PrismaService,
     private financeService: FinanceService,
     private auditLogService: AuditLogService,
   ) {}
 
+  getLiveUpdates(): Observable<DeliveryLiveUpdate> {
+    return this.liveUpdates.asObservable();
+  }
+
+  private publishLiveUpdate(update: Omit<DeliveryLiveUpdate, 'occurredAt'>) {
+    this.liveUpdates.next({ ...update, occurredAt: new Date().toISOString() });
+  }
+
   // Rider Management
-  async createRider(createRiderDto: CreateRiderDto) {
+  async createRider(createRiderDto: CreateRiderDto, createdBy?: string) {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: BigInt(createRiderDto.user_id) },
@@ -57,11 +77,46 @@ export class DeliveriesService {
       },
     });
 
-    return rider;
+    if (createdBy) {
+      await this.prisma.$executeRawUnsafe(
+        'UPDATE riders SET created_by = $1 WHERE id = $2',
+        BigInt(createdBy),
+        rider.id,
+      );
+    }
+
+    return (await this.attachRiderCreator([rider]))[0];
+  }
+
+  private async attachRiderCreator<T extends { id: bigint }>(riders: T[]) {
+    if (!riders.length) return riders;
+    if (typeof (this.prisma as any).$queryRawUnsafe !== 'function') return riders;
+    const ids = riders.map((rider) => rider.id.toString()).join(',');
+    const creators = await this.prisma.$queryRawUnsafe<Array<{
+      rider_id: bigint;
+      created_by: bigint | null;
+      creator_name: string | null;
+      creator_email: string | null;
+    }>>(
+      `SELECT r.id AS rider_id, r.created_by, u.full_name AS creator_name, u.email AS creator_email
+       FROM riders r LEFT JOIN users u ON u.id = r.created_by WHERE r.id IN (${ids})`,
+    );
+    const byRider = new Map(creators.map((creator) => [creator.rider_id.toString(), creator]));
+    return riders.map((rider) => {
+      const creator = byRider.get(rider.id.toString());
+      if (!creator) return rider;
+      return {
+        ...rider,
+        created_by: creator?.created_by?.toString() ?? null,
+        created_by_user: creator?.creator_name
+          ? { full_name: creator.creator_name, email: creator.creator_email }
+          : null,
+      };
+    });
   }
 
   async findAllRiders() {
-    return this.prisma.rider.findMany({
+    const riders = await this.prisma.rider.findMany({
       include: {
         user: true,
         deliveries: {
@@ -78,10 +133,11 @@ export class DeliveriesService {
         },
       },
     });
+    return this.attachRiderCreator(riders);
   }
 
   async findAvailableRiders() {
-    return this.prisma.rider.findMany({
+    const riders = await this.prisma.rider.findMany({
       where: {
         is_available: true,
       },
@@ -89,6 +145,7 @@ export class DeliveriesService {
         user: true,
       },
     });
+    return this.attachRiderCreator(riders);
   }
 
   async findOneRider(id: string) {
@@ -118,6 +175,15 @@ export class DeliveriesService {
     return rider;
   }
 
+  async findRiderByUserId(userId: string) {
+    const rider = await this.prisma.rider.findUnique({
+      where: { user_id: BigInt(userId) },
+      include: { user: true },
+    });
+    if (!rider) throw new NotFoundException('No rider profile is linked to this account');
+    return rider;
+  }
+
   async updateRider(id: string, updateRiderDto: UpdateRiderDto) {
     const rider = await this.prisma.rider.findUnique({
       where: { id: BigInt(id) },
@@ -143,6 +209,17 @@ export class DeliveriesService {
         ...(updateRiderDto.current_location !== undefined && {
           current_location: updateRiderDto.current_location,
         }),
+        ...(updateRiderDto.current_latitude !== undefined && {
+          current_latitude: updateRiderDto.current_latitude,
+        }),
+        ...(updateRiderDto.current_longitude !== undefined && {
+          current_longitude: updateRiderDto.current_longitude,
+        }),
+        ...((updateRiderDto.current_location !== undefined ||
+          updateRiderDto.current_latitude !== undefined ||
+          updateRiderDto.current_longitude !== undefined) && {
+          last_location_at: new Date(),
+        }),
         ...(updateRiderDto.is_available !== undefined && {
           is_available: updateRiderDto.is_available,
         }),
@@ -153,6 +230,83 @@ export class DeliveriesService {
     });
 
     return updatedRider;
+  }
+
+  async updateRiderLocation(id: string, updateRiderDto: UpdateRiderDto, userId?: string) {
+    const rider = await this.prisma.rider.findUnique({ where: { id: BigInt(id) } });
+    if (!rider) throw new NotFoundException('Rider not found');
+    if (userId && rider.user_id !== BigInt(userId)) {
+      throw new ForbiddenException('You can only update your own rider location');
+    }
+    const updatedRider = await this.updateRider(id, updateRiderDto);
+    this.publishLiveUpdate({ type: 'rider.location', riderId: id });
+    return updatedRider;
+  }
+
+  async getRouteEstimate(id: string, destinationLat?: number, destinationLng?: number) {
+    const delivery = await this.prisma.delivery.findUnique({
+      where: { id: BigInt(id) },
+      include: { rider: true },
+    });
+
+    if (!delivery) throw new NotFoundException('Delivery not found');
+    const targetLat = destinationLat ?? delivery.delivery_latitude;
+    const targetLng = destinationLng ?? delivery.delivery_longitude;
+    if (targetLat == null || targetLng == null) {
+      throw new BadRequestException('Delivery destination coordinates are not available');
+    }
+    if (delivery.rider.current_latitude == null || delivery.rider.current_longitude == null) {
+      throw new BadRequestException('Rider location is not available for route calculation');
+    }
+
+    const origin = `${delivery.rider.current_longitude},${delivery.rider.current_latitude}`;
+    const destination = `${targetLng},${targetLat}`;
+    const response = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${origin};${destination}?overview=false`,
+    );
+    if (!response.ok) {
+      return this.fallbackRouteEstimate(
+        delivery.rider.current_latitude,
+        delivery.rider.current_longitude,
+        targetLat,
+        targetLng,
+      );
+    }
+
+    const payload = (await response.json()) as {
+      code?: string;
+      routes?: Array<{ distance: number; duration: number }>;
+    };
+    const route = payload.routes?.[0];
+    if (payload.code !== 'Ok' || !route) {
+      return this.fallbackRouteEstimate(
+        delivery.rider.current_latitude,
+        delivery.rider.current_longitude,
+        targetLat,
+        targetLng,
+      );
+    }
+
+    return {
+      provider: 'OSRM',
+      distance_km: Number((route.distance / 1000).toFixed(2)),
+      duration_minutes: Math.ceil(route.duration / 60),
+    };
+  }
+
+  private fallbackRouteEstimate(originLat: number, originLng: number, targetLat: number, targetLng: number) {
+    const radians = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = radians(targetLat - originLat);
+    const dLng = radians(targetLng - originLng);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(radians(originLat)) * Math.cos(radians(targetLat)) * Math.sin(dLng / 2) ** 2;
+    const distance = earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return {
+      provider: 'HAVERSINE_FALLBACK',
+      distance_km: Number(distance.toFixed(2)),
+      duration_minutes: Math.ceil((distance / 25) * 60),
+    };
   }
 
   async removeRider(id: string) {
@@ -213,8 +367,13 @@ export class DeliveriesService {
         rider_id: BigInt(createDeliveryDto.rider_id),
         pickup_address: createDeliveryDto.pickup_address,
         delivery_address: createDeliveryDto.delivery_address,
+        delivery_latitude: createDeliveryDto.delivery_latitude,
+        delivery_longitude: createDeliveryDto.delivery_longitude,
         delivery_notes: createDeliveryDto.delivery_notes,
         status: 'ASSIGNED',
+        estimated_delivery_at: new Date(
+          Date.now() + (order.estimated_time ?? 45) * 60 * 1000,
+        ),
       },
       include: {
         order: {
@@ -283,6 +442,20 @@ export class DeliveriesService {
     return delivery;
   }
 
+  async findDeliveryEvents(id: string) {
+    const delivery = await this.prisma.delivery.findUnique({
+      where: { id: BigInt(id) },
+      select: { id: true },
+    });
+    if (!delivery) throw new NotFoundException('Delivery not found');
+
+    return this.prisma.deliveryEvent.findMany({
+      where: { delivery_id: BigInt(id) },
+      include: { recorder: { select: { id: true, full_name: true, role: true } } },
+      orderBy: { created_at: 'asc' },
+    });
+  }
+
   async findByOrderId(orderId: string) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { order_id: BigInt(orderId) },
@@ -328,7 +501,7 @@ export class DeliveriesService {
     });
   }
 
-  async updateDelivery(id: string, updateDeliveryDto: UpdateDeliveryDto) {
+  async updateDelivery(id: string, updateDeliveryDto: UpdateDeliveryDto, recordedBy?: string) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
     });
@@ -337,19 +510,30 @@ export class DeliveriesService {
       throw new NotFoundException('Delivery not found');
     }
 
+    const data: any = {
+      ...(updateDeliveryDto.pickup_address !== undefined && { pickup_address: updateDeliveryDto.pickup_address }),
+      ...(updateDeliveryDto.delivery_address !== undefined && { delivery_address: updateDeliveryDto.delivery_address }),
+      ...(updateDeliveryDto.delivery_latitude !== undefined && { delivery_latitude: updateDeliveryDto.delivery_latitude }),
+      ...(updateDeliveryDto.delivery_longitude !== undefined && { delivery_longitude: updateDeliveryDto.delivery_longitude }),
+      ...(updateDeliveryDto.delivery_notes !== undefined && { delivery_notes: updateDeliveryDto.delivery_notes }),
+      ...(updateDeliveryDto.priority !== undefined && { priority: updateDeliveryDto.priority }),
+      ...(updateDeliveryDto.estimated_delivery_at !== undefined && { estimated_delivery_at: new Date(updateDeliveryDto.estimated_delivery_at) }),
+      ...(updateDeliveryDto.delay_reason !== undefined && { delay_reason: updateDeliveryDto.delay_reason }),
+      ...(updateDeliveryDto.distance_km !== undefined && { distance_km: updateDeliveryDto.distance_km }),
+    };
+
+    if (updateDeliveryDto.rider_id !== undefined && BigInt(updateDeliveryDto.rider_id) !== delivery.rider_id) {
+      const rider = await this.prisma.rider.findUnique({ where: { id: BigInt(updateDeliveryDto.rider_id) } });
+      if (!rider) throw new NotFoundException('Rider not found');
+      if (!rider.is_available) throw new BadRequestException('Rider is not available');
+      data.rider_id = BigInt(updateDeliveryDto.rider_id);
+      data.reassigned_at = new Date();
+      if (recordedBy) data.reassigned_by = BigInt(recordedBy);
+    }
+
     const updatedDelivery = await this.prisma.delivery.update({
       where: { id: BigInt(id) },
-      data: {
-        ...(updateDeliveryDto.pickup_address !== undefined && {
-          pickup_address: updateDeliveryDto.pickup_address,
-        }),
-        ...(updateDeliveryDto.delivery_address !== undefined && {
-          delivery_address: updateDeliveryDto.delivery_address,
-        }),
-        ...(updateDeliveryDto.delivery_notes !== undefined && {
-          delivery_notes: updateDeliveryDto.delivery_notes,
-        }),
-      },
+      data,
       include: {
         order: {
           include: {
@@ -370,6 +554,7 @@ export class DeliveriesService {
   async updateDeliveryStatus(
     id: string,
     updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+    recordedBy?: string,
   ) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: BigInt(id) },
@@ -396,6 +581,7 @@ export class DeliveriesService {
       'PICKED_UP',
       'IN_TRANSIT',
       'DELIVERED',
+      'FAILED',
       'CANCELLED',
     ];
     if (!validStatuses.includes(updateDeliveryStatusDto.status)) {
@@ -413,10 +599,16 @@ export class DeliveriesService {
       updateData.picked_up_at = new Date();
     } else if (updateDeliveryStatusDto.status === 'DELIVERED') {
       updateData.delivered_at = new Date();
+    } else if (updateDeliveryStatusDto.status === 'IN_TRANSIT') {
+      updateData.in_transit_at = new Date();
     } else if (updateDeliveryStatusDto.status === 'CANCELLED') {
       updateData.cancelled_at = new Date();
       updateData.cancellation_reason =
         updateDeliveryStatusDto.cancellation_reason;
+    } else if (updateDeliveryStatusDto.status === 'FAILED') {
+      updateData.failed_at = new Date();
+      updateData.failed_attempts = { increment: 1 };
+      updateData.cancellation_reason = updateDeliveryStatusDto.cancellation_reason;
     }
 
     const updatedDelivery = await this.prisma.delivery.update({
@@ -434,6 +626,23 @@ export class DeliveriesService {
           },
         },
       },
+    });
+
+    if (recordedBy) {
+      await this.prisma.deliveryEvent.create({
+        data: {
+          delivery_id: BigInt(id),
+          status: updateDeliveryStatusDto.status as any,
+          note: updateDeliveryStatusDto.note ?? updateDeliveryStatusDto.cancellation_reason,
+          recorded_by: BigInt(recordedBy),
+        },
+      });
+    }
+
+    this.publishLiveUpdate({
+      type: 'delivery.status',
+      deliveryId: id,
+      status: updateDeliveryStatusDto.status,
     });
 
     // Create rider settlement when delivery is completed
@@ -479,6 +688,38 @@ export class DeliveriesService {
     }
 
     return updatedDelivery;
+  }
+
+  async retryDelivery(id: string, recordedBy?: string) {
+    const delivery = await this.prisma.delivery.findUnique({ where: { id: BigInt(id) } });
+    if (!delivery) throw new NotFoundException('Delivery not found');
+    if ((delivery.status as string) !== 'FAILED' && delivery.status !== 'CANCELLED') {
+      throw new BadRequestException('Only failed or cancelled deliveries can be retried');
+    }
+
+    const updated = await this.prisma.delivery.update({
+      where: { id: BigInt(id) },
+      data: {
+        status: 'ASSIGNED',
+        assigned_at: new Date(),
+        cancelled_at: null,
+        cancellation_reason: null,
+        estimated_delivery_at: new Date(Date.now() + 45 * 60 * 1000),
+      },
+      include: { rider: { include: { user: true } }, order: true },
+    });
+    if (recordedBy) {
+      await this.prisma.deliveryEvent.create({
+        data: {
+          delivery_id: BigInt(id),
+          status: 'ASSIGNED',
+          note: 'Delivery retry scheduled',
+          recorded_by: BigInt(recordedBy),
+        },
+      });
+    }
+    this.publishLiveUpdate({ type: 'delivery.retry', deliveryId: id, status: 'ASSIGNED' });
+    return updated;
   }
 
   async removeDelivery(id: string) {

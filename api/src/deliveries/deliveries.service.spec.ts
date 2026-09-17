@@ -30,6 +30,9 @@ describe('DeliveriesService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    deliveryEvent: {
+      create: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -115,6 +118,36 @@ describe('DeliveriesService', () => {
           where: { id: BigInt(1) },
         });
         expect(mockPrismaService.rider.create).toHaveBeenCalled();
+      });
+
+      it('returns the staff member who added the rider', async () => {
+        const createRiderDto = { user_id: '2', phone: '+254700000002' };
+        const mockRider = {
+          id: BigInt(2),
+          user_id: BigInt(2),
+          phone: createRiderDto.phone,
+          user: { id: BigInt(2), full_name: 'New Rider' },
+        };
+        mockPrismaService.user.findUnique.mockResolvedValue({ id: BigInt(2) });
+        mockPrismaService.rider.findUnique.mockResolvedValue(null);
+        mockPrismaService.rider.create.mockResolvedValue(mockRider);
+        (mockPrismaService as any).$executeRawUnsafe = jest.fn().mockResolvedValue(1);
+        (mockPrismaService as any).$queryRawUnsafe = jest.fn().mockResolvedValue([{
+          rider_id: BigInt(2),
+          created_by: BigInt(7),
+          creator_name: 'Elizabeth Macharia',
+          creator_email: 'elizabeth@example.com',
+        }]);
+
+        const result = await service.createRider(createRiderDto, '7');
+
+        expect(result).toEqual(expect.objectContaining({
+          created_by: '7',
+          created_by_user: {
+            full_name: 'Elizabeth Macharia',
+            email: 'elizabeth@example.com',
+          },
+        }));
       });
 
       it('should throw NotFoundException if user does not exist', async () => {
@@ -363,6 +396,7 @@ describe('DeliveriesService', () => {
             delivery_address: '123 Main St',
             delivery_notes: 'Call on arrival',
             status: 'ASSIGNED',
+            estimated_delivery_at: expect.any(Date),
           },
           include: {
             order: {
@@ -514,6 +548,41 @@ describe('DeliveriesService', () => {
             delivered_at: expect.any(Date),
           },
           include: expect.any(Object),
+        });
+      });
+
+      it('should record a delivery event with the authenticated user', async () => {
+        const mockDelivery = {
+          id: BigInt(1),
+          order_id: BigInt(1),
+          rider_id: BigInt(1),
+          status: 'ASSIGNED',
+          assigned_at: new Date(),
+        };
+        const updatedDelivery = { ...mockDelivery, status: 'PICKED_UP' };
+
+        mockPrismaService.delivery.findUnique.mockResolvedValue(mockDelivery);
+        mockPrismaService.delivery.update.mockResolvedValue(updatedDelivery);
+        mockPrismaService.deliveryEvent.create.mockResolvedValue({
+          id: BigInt(1),
+          delivery_id: BigInt(1),
+          status: 'PICKED_UP',
+          recorded_by: BigInt(7),
+        });
+
+        await service.updateDeliveryStatus(
+          '1',
+          { status: 'PICKED_UP', note: 'Collected from kitchen' },
+          '7',
+        );
+
+        expect(mockPrismaService.deliveryEvent.create).toHaveBeenCalledWith({
+          data: {
+            delivery_id: BigInt(1),
+            status: 'PICKED_UP',
+            note: 'Collected from kitchen',
+            recorded_by: BigInt(7),
+          },
         });
       });
 

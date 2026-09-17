@@ -18,6 +18,8 @@ interface Rider {
   current_latitude?: number | null;
   current_longitude?: number | null;
   last_location_at?: string | null;
+  created_by?: string | null;
+  created_by_user?: { full_name?: string | null; email?: string | null } | null;
   user?: {
     id: string;
     full_name: string;
@@ -29,7 +31,7 @@ interface Delivery {
   id: string;
   order_id: string;
   rider_id: string;
-  status: "ASSIGNED" | "PICKED_UP" | "IN_TRANSIT" | "DELIVERED" | "CANCELLED";
+  status: "ASSIGNED" | "PICKED_UP" | "IN_TRANSIT" | "DELIVERED" | "FAILED" | "CANCELLED";
   pickup_address?: string | null;
   delivery_address: string;
   delivery_notes?: string | null;
@@ -37,6 +39,7 @@ interface Delivery {
   picked_up_at?: string | null;
   delivered_at?: string | null;
   cancelled_at?: string | null;
+  failed_at?: string | null;
   cancellation_reason?: string | null;
   estimated_delivery_at?: string | null;
   last_location?: string | null;
@@ -58,6 +61,14 @@ interface DeliverySummary {
   delivered: number;
   cancelled: number;
   activeRiders: number;
+}
+
+interface DeliveryEvent {
+  id: string;
+  status: string;
+  note?: string | null;
+  created_at: string;
+  recorder?: { full_name: string; role: string };
 }
 
 export default function DispatcherDashboard() {
@@ -91,6 +102,9 @@ export default function DispatcherDashboard() {
   const [manualOrderId, setManualOrderId] = useState("");
   const [showManualOrder, setShowManualOrder] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [reassigningDeliveryId, setReassigningDeliveryId] = useState<string | null>(null);
+  const [eventHistory, setEventHistory] = useState<Record<string, DeliveryEvent[]>>({});
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   
   // Rider form state
   const [riderForm, setRiderForm] = useState({
@@ -166,17 +180,63 @@ export default function DispatcherDashboard() {
   useEffect(() => {
     fetchDashboardData();
 
-    const interval = setInterval(() => void fetchDashboardData(), 60000);
-    return () => clearInterval(interval);
+    const controller = new AbortController();
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+    const connectLiveUpdates = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/deliveries/stream`, {
+          headers: { Accept: "text/event-stream", ...getAuthHeader() },
+          signal: controller.signal,
+        });
+        if (!response.ok || !response.body) return;
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (!controller.signal.aborted) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split("\n\n");
+          buffer = events.pop() || "";
+          for (const event of events) {
+            const dataLine = event.split("\n").find((line) => line.startsWith("data:"));
+            if (dataLine) void fetchDashboardData();
+          }
+        }
+      } catch (streamError) {
+        if (!controller.signal.aborted) {
+          console.warn("Live dispatcher updates unavailable; periodic refresh remains active.", streamError);
+        }
+      }
+    };
+
+    void connectLiveUpdates();
+    const fallbackRefresh = setInterval(() => void fetchDashboardData(), 300000);
+    return () => {
+      controller.abort();
+      clearInterval(fallbackRefresh);
+    };
   }, [statusFilter]);
 
   const now = Date.now();
   const delayedDeliveries = deliveries.filter((delivery) =>
     delivery.estimated_delivery_at &&
     new Date(delivery.estimated_delivery_at).getTime() < now &&
-    !["DELIVERED", "CANCELLED"].includes(delivery.status),
+    !["DELIVERED", "FAILED", "CANCELLED"].includes(delivery.status),
   );
   const priorityDeliveries = deliveries.filter((delivery) => (delivery.priority || 0) > 0);
+  const getRiderLocationState = (rider: Rider) => {
+    if (!rider.last_location_at) {
+      return { label: "Location time unavailable", className: "text-gray-500 dark:text-gray-400" };
+    }
+    const ageMinutes = Math.floor((now - new Date(rider.last_location_at).getTime()) / 60000);
+    if (ageMinutes >= 10) {
+      return { label: `Offline · ${ageMinutes}m ago`, className: "text-red-600 dark:text-red-400" };
+    }
+    return { label: `Online · ${ageMinutes}m ago`, className: "text-emerald-600 dark:text-emerald-400" };
+  };
 
   const handleAssignDelivery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,7 +290,10 @@ export default function DispatcherDashboard() {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({
+          status: newStatus,
+          ...(newStatus === "FAILED" ? { cancellation_reason: window.prompt("Why did this delivery fail?") || "Delivery attempt failed" } : {}),
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to update status");
@@ -238,6 +301,56 @@ export default function DispatcherDashboard() {
       fetchDashboardData();
     } catch (_err) {
       setError(_err instanceof Error ? _err.message : "Failed to update status");
+    }
+  };
+
+  const handleRetry = async (deliveryId: string) => {
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}/retry`, {
+        method: "POST",
+        headers: getAuthHeader(),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to retry delivery");
+      await fetchDashboardData();
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to retry delivery");
+    }
+  };
+
+  const handleReassign = async (deliveryId: string, riderId: string) => {
+    if (!riderId) return;
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        body: JSON.stringify({ rider_id: riderId }),
+      });
+      if (!res.ok) throw new Error("Failed to reassign delivery");
+      setReassigningDeliveryId(null);
+      await fetchDashboardData();
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Failed to reassign delivery");
+    }
+  };
+
+
+  const handleEventHistory = async (deliveryId: string) => {
+    if (selectedHistoryId === deliveryId) {
+      setSelectedHistoryId(null);
+      return;
+    }
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/deliveries/${deliveryId}/events`, { headers: getAuthHeader() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Unable to load delivery history");
+      setEventHistory((current) => ({ ...current, [deliveryId]: data.data || data || [] }));
+      setSelectedHistoryId(deliveryId);
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : "Unable to load delivery history");
     }
   };
 
@@ -253,6 +366,8 @@ export default function DispatcherDashboard() {
         return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200";
       case "CANCELLED":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200";
+      case "FAILED":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-200";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-200";
     }
@@ -289,11 +404,24 @@ export default function DispatcherDashboard() {
             </p>
             {lastUpdated && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                Auto-refreshing every 60 seconds · Updated {lastUpdated.toLocaleTimeString()}
+                Live updates enabled · Fallback refresh every 5 minutes · Updated {lastUpdated.toLocaleTimeString()}
               </p>
             )}
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/dispatcher/riders"
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              Riders
+            </Link>
+            <Link
+              href="/dispatcher/rider-location"
+              className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+            >
+              <IconRenderer icon="location" className="h-4 w-4" />
+              Rider Location Client
+            </Link>
             <Link
               href="/dispatcher/profile"
               className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -441,6 +569,7 @@ export default function DispatcherDashboard() {
                 <option value="PICKED_UP">Picked Up</option>
                 <option value="IN_TRANSIT">In Transit</option>
                 <option value="DELIVERED">Delivered</option>
+                <option value="FAILED">Failed</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
@@ -451,6 +580,68 @@ export default function DispatcherDashboard() {
               Assign Delivery
             </button>
           </div>
+        </div>
+
+        {/* Rider Location Overview */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Rider Locations ({riders.length})
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                View the latest location reported by each rider.
+              </p>
+            </div>
+            <Link
+              href="/dispatcher/rider-location"
+              className="text-sm font-semibold text-emerald-600 hover:underline"
+            >
+              Open location client
+            </Link>
+          </div>
+          {riders.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400 text-center py-6">
+              No riders have been added yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {riders.map((rider) => {
+                const locationState = getRiderLocationState(rider);
+                const hasCoordinates = rider.current_latitude != null && rider.current_longitude != null;
+                return (
+                  <div key={rider.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {rider.user?.full_name || "Unknown rider"}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{rider.phone}</div>
+                      </div>
+                      <span className={`text-xs font-semibold ${locationState.className}`}>
+                        {locationState.label}
+                      </span>
+                    </div>
+                    <div className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+                      {rider.current_location || "No location description reported"}
+                    </div>
+                    {hasCoordinates ? (
+                      <a
+                        href={`https://www.openstreetmap.org/?mlat=${rider.current_latitude}&mlon=${rider.current_longitude}#map=16/${rider.current_latitude}/${rider.current_longitude}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+                      >
+                        View rider on map
+                      </a>
+                    ) : (
+                      <div className="mt-2 text-xs text-gray-500">GPS coordinates not available</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Available Riders */}
@@ -484,6 +675,12 @@ export default function DispatcherDashboard() {
                       Location: {rider.current_location}
                     </div>
                   )}
+                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Added by: {rider.created_by_user?.full_name || rider.created_by || "Not recorded"}
+                  </div>
+                  <div className={`text-xs font-semibold mt-2 ${getRiderLocationState(rider).className}`}>
+                    {getRiderLocationState(rider).label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -556,6 +753,16 @@ export default function DispatcherDashboard() {
                         <div className="max-w-[180px] truncate" title={delivery.last_location || delivery.rider?.current_location || "No location reported"}>
                           {delivery.last_location || delivery.rider?.current_location || "No location reported"}
                         </div>
+                        {(delivery.last_latitude != null && delivery.last_longitude != null) && (
+                          <a
+                            href={`https://www.openstreetmap.org/?mlat=${delivery.last_latitude}&mlon=${delivery.last_longitude}#map=16/${delivery.last_latitude}/${delivery.last_longitude}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            View on map
+                          </a>
+                        )}
                         {delivery.delay_reason && <div className="text-amber-600">Delay: {delivery.delay_reason}</div>}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -584,7 +791,24 @@ export default function DispatcherDashboard() {
                               Mark Delivered
                             </button>
                           )}
+                          {delivery.status !== "DELIVERED" && delivery.status !== "FAILED" && delivery.status !== "CANCELLED" && (
+                            <button
+                              onClick={() => handleStatusUpdate(delivery.id, "FAILED")}
+                              className="text-orange-600 dark:text-orange-400 hover:text-orange-900"
+                            >
+                              Mark Failed
+                            </button>
+                          )}
+                          {(delivery.status === "FAILED" || delivery.status === "CANCELLED") && (
+                            <button
+                              onClick={() => void handleRetry(delivery.id)}
+                              className="text-blue-600 dark:text-blue-400 hover:text-blue-900"
+                            >
+                              Retry delivery
+                            </button>
+                          )}
                           {delivery.status !== "DELIVERED" &&
+                            delivery.status !== "FAILED" &&
                             delivery.status !== "CANCELLED" && (
                               <button
                                 onClick={() => handleStatusUpdate(delivery.id, "CANCELLED")}
@@ -593,6 +817,38 @@ export default function DispatcherDashboard() {
                                 Cancel
                               </button>
                             )}
+                          {delivery.status !== "DELIVERED" && delivery.status !== "FAILED" && delivery.status !== "CANCELLED" && (
+                            reassigningDeliveryId === delivery.id ? (
+                              <select
+                                autoFocus
+                                defaultValue=""
+                                onChange={(event) => void handleReassign(delivery.id, event.target.value)}
+                                className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-xs bg-white dark:bg-gray-700"
+                              >
+                                <option value="">Reassign to…</option>
+                                {availableRiders
+                                  .filter((rider) => rider.id !== delivery.rider?.id)
+                                  .map((rider) => (
+                                    <option key={rider.id} value={rider.id}>
+                                      {rider.user?.full_name || rider.phone}
+                                    </option>
+                                  ))}
+                              </select>
+                            ) : (
+                              <button
+                                onClick={() => setReassigningDeliveryId(delivery.id)}
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900"
+                              >
+                                Reassign
+                              </button>
+                            )
+                          )}
+                          <button
+                            onClick={() => void handleEventHistory(delivery.id)}
+                            className="text-purple-600 dark:text-purple-400 hover:text-purple-900"
+                          >
+                            {selectedHistoryId === delivery.id ? "Hide history" : "History"}
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -602,6 +858,31 @@ export default function DispatcherDashboard() {
             </div>
           )}
         </div>
+
+        {selectedHistoryId && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Delivery Event History · #{selectedHistoryId}
+            </h2>
+            {(eventHistory[selectedHistoryId] || []).length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">No events recorded yet.</p>
+            ) : (
+              <ol className="border-l border-purple-200 dark:border-purple-800 space-y-4 pl-5">
+                {eventHistory[selectedHistoryId].map((event) => (
+                  <li key={event.id} className="relative">
+                    <span className="absolute -left-[25px] top-1 h-3 w-3 rounded-full bg-purple-600" />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-gray-900 dark:text-white">{event.status.replace("_", " ")}</span>
+                      <span className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{event.note || "No note"}</p>
+                    {event.recorder && <p className="text-xs text-gray-500">Recorded by {event.recorder.full_name} ({event.recorder.role})</p>}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        )}
 
         {/* Assign Delivery Modal */}
         {showAssignModal && (
@@ -736,6 +1017,8 @@ export default function DispatcherDashboard() {
                         setPickupAddress("");
                         setDeliveryAddress("");
                         setDeliveryNotes("");
+                        setDeliveryLatitude("");
+                        setDeliveryLongitude("");
                         setSelectedOrder(null);
                       }}
                       className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
