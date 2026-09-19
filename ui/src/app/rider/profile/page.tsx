@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api-config";
 import { getAuthHeader } from "@/lib/auth";
 
 type Profile = { full_name?: string; email?: string; phone?: string; role?: string };
 
 export default function RiderProfilePage() {
+  const { logout } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -75,7 +77,7 @@ export default function RiderProfilePage() {
     <main className="min-h-screen bg-zinc-50 px-5 py-8 text-zinc-950">
       <div className="mx-auto max-w-2xl">
         <Link href="/rider" className="text-sm font-bold text-red-700">← Back to route</Link>
-        <div className="mt-5 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-red-700">Rider account</p><h1 className="mt-2 text-3xl font-black">Profile</h1></div><span className="rounded-full bg-zinc-200 px-3 py-1 text-xs font-black">{profile?.role || "RIDER"}</span></div>
+        <div className="mt-5 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-red-700">Rider account</p><h1 className="mt-2 text-3xl font-black">Profile</h1></div><div className="flex items-center gap-2"><span className="rounded-full bg-zinc-200 px-3 py-1 text-xs font-black">{profile?.role || "RIDER"}</span><button onClick={() => void logout()} className="rounded-xl bg-zinc-950 px-3 py-2 text-xs font-black text-white hover:bg-zinc-800">Log out</button></div></div>
         {error && <p className="mt-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
         {message && <p className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">{message}</p>}
         <form onSubmit={updateProfile} className="mt-6 space-y-5 rounded-2xl bg-white p-6 shadow-sm">

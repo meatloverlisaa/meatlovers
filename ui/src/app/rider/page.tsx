@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { IconRenderer } from "@/components/ui/IconRenderer";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { getAuthHeader } from "@/lib/auth";
 import { getApiBaseUrl } from "@/lib/api-config";
@@ -10,6 +11,7 @@ type TaskState = "accepted" | "arrived" | "delivered";
 
 export default function RiderPage() {
   useRequireAuth(["RIDER"]);
+  const { logout } = useAuth();
   const [taskState, setTaskState] = useState<TaskState>("accepted");
   const [offline, setOffline] = useState(false);
   const [queued, setQueued] = useState(0);
@@ -61,7 +63,7 @@ export default function RiderPage() {
   return (
     <main className="min-h-screen bg-[#f7f7f5] text-zinc-950 sm:flex sm:justify-center">
       <div className="relative flex min-h-screen w-full max-w-md flex-col bg-white shadow-xl sm:border-x sm:border-zinc-200">
-        <header className="flex items-center justify-between border-b border-zinc-100 px-5 py-4"><div><p className="text-[10px] font-black uppercase tracking-[0.18em] text-red-700">Meat Lovers</p><h1 className="mt-0.5 text-lg font-black">My route</h1></div><div className="flex items-center gap-2"><span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold ${offline ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}><i className={`h-1.5 w-1.5 rounded-full ${offline ? "bg-amber-500" : "bg-emerald-500"}`} />{offline ? `Offline${queued ? ` · ${queued} queued` : ""}` : "Online"}</span><button className="rounded-full bg-zinc-100 p-2"><IconRenderer icon="user" className="h-5 w-5" /></button></div></header>
+        <header className="flex items-center justify-between border-b border-zinc-100 px-5 py-4"><div><p className="text-[10px] font-black uppercase tracking-[0.18em] text-red-700">Meat Lovers</p><h1 className="mt-0.5 text-lg font-black">My route</h1></div><div className="flex items-center gap-2"><span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold ${offline ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}><i className={`h-1.5 w-1.5 rounded-full ${offline ? "bg-amber-500" : "bg-emerald-500"}`} />{offline ? `Offline${queued ? ` · ${queued} queued` : ""}` : "Online"}</span><a href="/rider/profile" className="rounded-full bg-zinc-100 p-2" aria-label="Open rider profile"><IconRenderer icon="user" className="h-5 w-5" /></a><button onClick={() => void logout()} className="rounded-xl border border-zinc-200 px-2.5 py-2 text-[10px] font-black text-zinc-600 hover:bg-zinc-50">Log out</button></div></header>
 
         <div className="flex border-b border-zinc-100 px-5"><button onClick={() => setTab("route")} className={`border-b-2 px-2 py-3 text-xs font-black ${tab === "route" ? "border-red-700 text-red-700" : "border-transparent text-zinc-400"}`}>Current route</button><button onClick={() => setTab("earnings")} className={`border-b-2 px-2 py-3 text-xs font-black ${tab === "earnings" ? "border-red-700 text-red-700" : "border-transparent text-zinc-400"}`}>My earnings</button></div>
 
