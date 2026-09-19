@@ -1,34 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-
-// Dynamically import map components to avoid SSR issues
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-
-const Marker = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Marker),
-  { ssr: false }
-);
-
-const Popup = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Popup),
-  { ssr: false }
-);
-
-const Circle = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Circle),
-  { ssr: false }
-);
 
 type City = {
   name: string;
@@ -57,15 +30,15 @@ const kenyaCities: City[] = [
 
 export default function KenyaMap() {
   const [mapReady, setMapReady] = useState(false);
-  const [customIcon, setCustomIcon] = useState<any>(null);
+  const [MapComponents, setMapComponents] = useState<any>(null);
 
   useEffect(() => {
-    setMapReady(true);
-    
-    // Fix Leaflet default marker icon issue
-    if (typeof window !== "undefined") {
-      const L = require("leaflet");
-      
+    // Dynamically import all map components
+    Promise.all([
+      import("react-leaflet"),
+      import("leaflet"),
+    ]).then(([reactLeaflet, L]) => {
+      // Fix Leaflet default marker icon issue
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -83,11 +56,19 @@ export default function KenyaMap() {
         shadowSize: [41, 41],
       });
 
-      setCustomIcon(capitalIcon);
-    }
+      setMapComponents({
+        MapContainer: reactLeaflet.MapContainer,
+        TileLayer: reactLeaflet.TileLayer,
+        Marker: reactLeaflet.Marker,
+        Popup: reactLeaflet.Popup,
+        Circle: reactLeaflet.Circle,
+        capitalIcon,
+      });
+      setMapReady(true);
+    });
   }, []);
 
-  if (!mapReady) {
+  if (!mapReady || !MapComponents) {
     return (
       <div className="flex h-[600px] items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
         <div className="text-center">
@@ -97,6 +78,8 @@ export default function KenyaMap() {
       </div>
     );
   }
+
+  const { MapContainer, TileLayer, Marker, Popup, Circle, capitalIcon } = MapComponents;
 
   // Kenya's center coordinates
   const kenyaCenter: [number, number] = [-0.023559, 37.906193];
@@ -133,7 +116,7 @@ export default function KenyaMap() {
           <Marker
             key={city.name}
             position={[city.lat, city.lng]}
-            icon={city.type === "capital" && customIcon ? customIcon : undefined}
+            icon={city.type === "capital" ? capitalIcon : undefined}
           >
             <Popup>
               <div className="text-center">
