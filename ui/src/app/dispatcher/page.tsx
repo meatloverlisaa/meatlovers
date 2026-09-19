@@ -247,38 +247,42 @@ export default function DispatcherDashboard() {
 
   return (
     <div className="min-h-full bg-[#f4f5f7] text-zinc-950">
-      <header className="flex min-h-[76px] items-center justify-between border-b border-zinc-200 bg-white px-5 py-4 lg:px-8">
-        <div>
-          <div className="flex items-center gap-3"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" /><p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Live operations</p><span className="text-xs text-zinc-400">Updated {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></div>
-          <h1 className="mt-1 text-2xl font-black tracking-tight">Dispatch command center</h1>
+      <header className="sticky top-0 z-40 flex min-h-[76px] items-center justify-between border-b border-zinc-200 bg-white/95 backdrop-blur-sm px-5 py-4 shadow-sm lg:px-8 transition-all duration-300">
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Live operations</p>
+            <span className="text-xs text-zinc-400">Updated {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+          </div>
+          <h1 className="mt-1 text-2xl font-black tracking-tight bg-gradient-to-r from-zinc-950 to-zinc-700 bg-clip-text text-transparent">Dispatch command center</h1>
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-1">
+          <div className="flex gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-1 transition-all duration-300 hover:border-zinc-300">
             <button
               onClick={() => setViewMode("map")}
-              className={`rounded-md px-3 py-1.5 text-xs font-bold transition ${
-                viewMode === "map" ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-600 hover:text-zinc-950"
+              className={`rounded-md px-3 py-1.5 text-xs font-bold transition-all duration-300 ${
+                viewMode === "map" ? "bg-white text-zinc-950 shadow-sm scale-105" : "text-zinc-600 hover:text-zinc-950 hover:bg-white/50"
               }`}
             >
-              <IconRenderer icon="location" className="mr-1.5 inline h-3.5 w-3.5" />
-              Map View
+              <IconRenderer icon="location" className="mr-1.5 inline h-3.5 w-3.5 transition-transform duration-300" />
+              <span className="hidden sm:inline">Map View</span>
             </button>
             <button
               onClick={() => setViewMode("kitchen")}
-              className={`rounded-md px-3 py-1.5 text-xs font-bold transition ${
-                viewMode === "kitchen" ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-600 hover:text-zinc-950"
+              className={`rounded-md px-3 py-1.5 text-xs font-bold transition-all duration-300 ${
+                viewMode === "kitchen" ? "bg-white text-zinc-950 shadow-sm scale-105" : "text-zinc-600 hover:text-zinc-950 hover:bg-white/50"
               }`}
             >
-              <IconRenderer icon="chart" className="mr-1.5 inline h-3.5 w-3.5" />
-              Kitchen View
+              <IconRenderer icon="chart" className="mr-1.5 inline h-3.5 w-3.5 transition-transform duration-300" />
+              <span className="hidden sm:inline">Kitchen View</span>
             </button>
           </div>
           {viewMode === "map" && (
-            <button onClick={() => setOrders((current) => current.map((order) => order.state === "Unassigned" ? { ...order, state: "Assigned", rider: "Auto-routed", color: "#f59e0b" } : order))} className="hidden items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 sm:flex"><IconRenderer icon="trending" className="h-4 w-4" /> Auto-route nearby</button>
+            <button onClick={() => setOrders((current) => current.map((order) => order.state === "Unassigned" ? { ...order, state: "Assigned", rider: "Auto-routed", color: "#f59e0b" } : order))} className="hidden items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all duration-300 hover:bg-red-700 hover:shadow-lg hover:scale-105 sm:flex"><IconRenderer icon="trending" className="h-4 w-4" /> Auto-route nearby</button>
           )}
-          <button className="rounded-xl border border-zinc-200 bg-white p-2.5 text-zinc-600 hover:bg-zinc-50" aria-label="Notifications"><IconRenderer icon="alert" className="h-5 w-5" /></button>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-700 text-sm font-black text-white">JD</div>
+          <button className="rounded-xl border border-zinc-200 bg-white p-2.5 text-zinc-600 transition-all duration-300 hover:bg-zinc-50 hover:border-zinc-300 hover:shadow-sm" aria-label="Notifications"><IconRenderer icon="alert" className="h-5 w-5" /></button>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-700 text-sm font-black text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-110 cursor-pointer">JD</div>
         </div>
       </header>
 
@@ -286,32 +290,32 @@ export default function DispatcherDashboard() {
         // Kitchen Dispatch View
         <div>
           {/* Fleet Status Banner */}
-          <div className="border-b border-zinc-200 bg-white px-6 py-4">
+          <div className="border-b border-zinc-200 bg-white px-6 py-4 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2">
+              <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 transition-all duration-300 hover:shadow-md hover:scale-105 hover:border-zinc-300">
                 <span className="text-sm font-bold text-zinc-600">Total Riders:</span>
-                <span className="text-lg font-black text-zinc-950">{totalKitchenRiders}</span>
+                <span className="text-lg font-black text-zinc-950 transition-all duration-300">{totalKitchenRiders}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2">
-                <IconRenderer icon="check" className="h-4 w-4 text-emerald-700" />
+              <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 transition-all duration-300 hover:shadow-md hover:scale-105 hover:border-emerald-300">
+                <IconRenderer icon="check" className="h-4 w-4 text-emerald-700 animate-pulse" />
                 <span className="text-sm font-bold text-emerald-700">Available:</span>
-                <span className="text-lg font-black text-emerald-700">{availableRiders}</span>
+                <span className="text-lg font-black text-emerald-700 transition-all duration-300">{availableRiders}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2">
+              <div className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 transition-all duration-300 hover:shadow-md hover:scale-105 hover:border-blue-300">
                 <IconRenderer icon="truck" className="h-4 w-4 text-blue-700" />
                 <span className="text-sm font-bold text-blue-700">On Delivery:</span>
-                <span className="text-lg font-black text-blue-700">{onDelivery}</span>
+                <span className="text-lg font-black text-blue-700 transition-all duration-300">{onDelivery}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2">
+              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 transition-all duration-300 hover:shadow-md hover:scale-105 hover:border-red-300">
                 <IconRenderer icon="clock" className="h-4 w-4 text-red-700" />
                 <span className="text-sm font-bold text-red-700">On Break:</span>
-                <span className="text-lg font-black text-red-700">{onBreak}</span>
+                <span className="text-lg font-black text-red-700 transition-all duration-300">{onBreak}</span>
               </div>
             </div>
             {pendingOrders > 0 && (
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <IconRenderer icon="alert" className="h-5 w-5 text-amber-600" />
-                <div>
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-500 hover:shadow-md transition-all">
+                <IconRenderer icon="alert" className="h-5 w-5 text-amber-600 animate-bounce" />
+                <div className="flex-1">
                   <p className="font-bold text-amber-900">{pendingOrders} Order{pendingOrders > 1 ? "s" : ""} Waiting for Pickup</p>
                   <p className="text-xs text-amber-700">Assign riders to ready orders to avoid delays</p>
                 </div>
@@ -323,10 +327,10 @@ export default function DispatcherDashboard() {
           <div className="grid grid-cols-1 gap-6 p-6 xl:grid-cols-[1fr_380px]">
             {/* Order Lanes */}
             <div className="space-y-6">{/* Preparing Lane */}
-              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg animate-in fade-in slide-in-from-left-4 duration-500">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-amber-200">
                       <IconRenderer icon="clock" className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
@@ -334,11 +338,15 @@ export default function DispatcherDashboard() {
                       <p className="text-xs text-zinc-500">Orders being prepared</p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-700">{preparingOrders.length}</span>
+                  <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-700 transition-all duration-300 hover:scale-110">{preparingOrders.length}</span>
                 </div>
                 <div className="space-y-3">
-                  {preparingOrders.map((order) => (
-                    <div key={order.id} className="rounded-xl border border-amber-200 bg-amber-50/50 p-4">
+                  {preparingOrders.map((order, index) => (
+                    <div 
+                      key={order.id} 
+                      className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 transition-all duration-300 hover:shadow-md hover:scale-[1.02] hover:border-amber-300 cursor-pointer animate-in fade-in slide-in-from-left-2"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
@@ -364,24 +372,30 @@ export default function DispatcherDashboard() {
               </section>
 
               {/* Ready Lane */}
-              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: "200ms" }}>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <IconRenderer icon="check" className="h-5 w-5 text-emerald-600" />
+                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-emerald-200">
+                      <IconRenderer icon="check" className="h-5 w-5 text-emerald-600 animate-pulse" />
                     </div>
                     <div>
                       <h2 className="font-black text-zinc-950">Ready for Dispatch</h2>
                       <p className="text-xs text-zinc-500">On the counter, waiting for rider</p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-700">{readyOrders.length}</span>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-700 transition-all duration-300 hover:scale-110 animate-pulse">{readyOrders.length}</span>
                 </div>
                 <div className="space-y-3">
-                  {readyOrders.map((order) => {
+                  {readyOrders.map((order, index) => {
                     const clusterInfo = getClusterInfo(order);
                     return (
-                      <div key={order.id} className={`rounded-xl border p-4 ${order.cluster ? "border-blue-300 bg-blue-50/50 shadow-sm" : "border-emerald-200 bg-emerald-50/50"} ${selectedKitchenOrder === order.id ? "ring-2 ring-emerald-500" : ""}`}>
+                      <div 
+                        key={order.id} 
+                        className={`rounded-xl border p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer animate-in fade-in slide-in-from-left-2 ${
+                          order.cluster ? "border-blue-300 bg-blue-50/50 shadow-sm hover:border-blue-400" : "border-emerald-200 bg-emerald-50/50 hover:border-emerald-300"
+                        } ${selectedKitchenOrder === order.id ? "ring-2 ring-emerald-500 scale-[1.02] shadow-lg" : ""}`}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
@@ -399,18 +413,18 @@ export default function DispatcherDashboard() {
                           <p className="text-xs font-semibold text-zinc-600">Items:</p>
                           <p className="text-xs text-zinc-500">{order.items.join(", ")}</p>
                         </div>
-                        <div className="mt-3 flex gap-2">
+                        <div className="mt-3 flex gap-2 animate-in fade-in duration-300">
                           {selectedKitchenOrder === order.id ? (
                             <>
-                              <select value={assignRiderId} onChange={(e) => setAssignRiderId(e.target.value)} className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm">
+                              <select value={assignRiderId} onChange={(e) => setAssignRiderId(e.target.value)} className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm transition-all duration-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                                 <option value="">Select Rider...</option>
                                 {kitchenRiders.filter((r) => r.status === "IN_KITCHEN").sort((a, b) => (a.queuePosition || 99) - (b.queuePosition || 99)).map((rider) => (<option key={rider.id} value={rider.id}>{rider.name} (Queue #{rider.queuePosition})</option>))}
                               </select>
-                              <button onClick={() => assignRiderId && handleAssignKitchenOrder(order.id, assignRiderId)} disabled={!assignRiderId} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50">Confirm</button>
-                              <button onClick={() => { setSelectedKitchenOrder(null); setAssignRiderId(""); }} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-50">Cancel</button>
+                              <button onClick={() => assignRiderId && handleAssignKitchenOrder(order.id, assignRiderId)} disabled={!assignRiderId} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-700 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">Confirm</button>
+                              <button onClick={() => { setSelectedKitchenOrder(null); setAssignRiderId(""); }} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-bold text-zinc-700 transition-all duration-300 hover:bg-zinc-50 hover:border-zinc-400">Cancel</button>
                             </>
                           ) : (
-                            <button onClick={() => setSelectedKitchenOrder(order.id)} className="flex-1 rounded-lg bg-zinc-950 px-4 py-2 text-sm font-bold text-white hover:bg-red-700"><IconRenderer icon="user" className="mr-2 inline h-4 w-4" />Assign Rider</button>
+                            <button onClick={() => setSelectedKitchenOrder(order.id)} className="flex-1 rounded-lg bg-zinc-950 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-red-700 hover:shadow-lg hover:scale-105"><IconRenderer icon="user" className="mr-2 inline h-4 w-4" />Assign Rider</button>
                           )}
                         </div>
                       </div>
@@ -421,10 +435,10 @@ export default function DispatcherDashboard() {
               </section>
 
               {/* Out for Delivery Lane */}
-              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: "400ms" }}>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-blue-200">
                       <IconRenderer icon="truck" className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
@@ -432,11 +446,15 @@ export default function DispatcherDashboard() {
                       <p className="text-xs text-zinc-500">En route to customers</p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700">{outForDeliveryOrders.length}</span>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700 transition-all duration-300 hover:scale-110">{outForDeliveryOrders.length}</span>
                 </div>
                 <div className="space-y-3">
-                  {outForDeliveryOrders.map((order) => (
-                    <div key={order.id} className="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
+                  {outForDeliveryOrders.map((order, index) => (
+                    <div 
+                      key={order.id} 
+                      className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 transition-all duration-300 hover:shadow-md hover:scale-[1.02] hover:border-blue-300 cursor-pointer animate-in fade-in slide-in-from-left-2"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
                       <div className="flex items-start justify-between">
                         <div>
                           <span className="font-black text-zinc-950">{order.orderNumber}</span>
@@ -458,16 +476,28 @@ export default function DispatcherDashboard() {
 
             {/* Riders Directory */}
             <aside className="space-y-4">
-              <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg sticky top-24 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="font-black text-zinc-950">Employed Riders</h2>
-                  <span className="text-xs text-zinc-500">{totalKitchenRiders} on shift</span>
+                  <span className="text-xs text-zinc-500 transition-all duration-300 hover:scale-110">{totalKitchenRiders} on shift</span>
                 </div>
-                <div className="space-y-3">
-                  {kitchenRiders.map((rider) => (
-                    <div key={rider.id} className={`rounded-xl border p-4 ${rider.status === "IN_KITCHEN" ? "border-emerald-200 bg-emerald-50/50" : rider.status === "EN_ROUTE" ? "border-blue-200 bg-blue-50/50" : "border-red-200 bg-red-50/50"}`}>
+                <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-zinc-100">
+                  {kitchenRiders.map((rider, index) => (
+                    <div 
+                      key={rider.id} 
+                      className={`rounded-xl border p-4 transition-all duration-300 hover:shadow-md hover:scale-[1.02] cursor-pointer animate-in fade-in slide-in-from-right-2 ${
+                        rider.status === "IN_KITCHEN" ? "border-emerald-200 bg-emerald-50/50 hover:border-emerald-300" : 
+                        rider.status === "EN_ROUTE" ? "border-blue-200 bg-blue-50/50 hover:border-blue-300" : 
+                        "border-red-200 bg-red-50/50 hover:border-red-300"
+                      }`}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
                       <div className="flex items-start gap-3">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-black text-white ${rider.status === "IN_KITCHEN" ? "bg-emerald-500" : rider.status === "EN_ROUTE" ? "bg-blue-500" : "bg-red-500"}`}>{rider.name.charAt(0)}</div>
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-black text-white transition-all duration-300 hover:scale-110 ${
+                          rider.status === "IN_KITCHEN" ? "bg-emerald-500 shadow-lg shadow-emerald-500/50" : 
+                          rider.status === "EN_ROUTE" ? "bg-blue-500 shadow-lg shadow-blue-500/50" : 
+                          "bg-red-500 shadow-lg shadow-red-500/50"
+                        }`}>{rider.name.charAt(0)}</div>
                         <div className="flex-1">
                           <p className="font-bold text-zinc-950">{rider.name}</p>
                           <div className="mt-1 flex items-center gap-2 text-xs">
@@ -480,17 +510,17 @@ export default function DispatcherDashboard() {
                             <span className={`text-sm font-black ${rider.cashHeld > 0 ? "text-amber-600" : "text-emerald-600"}`}>KES {rider.cashHeld.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                           {rider.cashHeld > 0 && (
-                            <div className="mt-2">
+                            <div className="mt-2 animate-in fade-in duration-300">
                               {showReconcile === rider.id ? (
-                                <div className="space-y-2">
-                                  <input type="number" step="0.01" value={reconcileAmount} onChange={(e) => setReconcileAmount(e.target.value)} placeholder="Enter actual amount" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm" />
+                                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                  <input type="number" step="0.01" value={reconcileAmount} onChange={(e) => setReconcileAmount(e.target.value)} placeholder="Enter actual amount" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm transition-all duration-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
                                   <div className="flex gap-2">
-                                    <button onClick={() => handleReconcile(rider.id)} className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700">Confirm</button>
-                                    <button onClick={() => { setShowReconcile(null); setReconcileAmount(""); }} className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-50">Cancel</button>
+                                    <button onClick={() => handleReconcile(rider.id)} className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-emerald-700 hover:shadow-lg hover:scale-105">Confirm</button>
+                                    <button onClick={() => { setShowReconcile(null); setReconcileAmount(""); }} className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-xs font-bold text-zinc-700 transition-all duration-300 hover:bg-zinc-50 hover:border-zinc-400">Cancel</button>
                                   </div>
                                 </div>
                               ) : (
-                                <button onClick={() => setShowReconcile(rider.id)} className="w-full rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100"><IconRenderer icon="dollar" className="inline h-3 w-3 mr-1" />Reconcile Cash</button>
+                                <button onClick={() => setShowReconcile(rider.id)} className="w-full rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 transition-all duration-300 hover:bg-amber-100 hover:shadow-md hover:scale-105"><IconRenderer icon="dollar" className="inline h-3 w-3 mr-1" />Reconcile Cash</button>
                               )}
                             </div>
                           )}
