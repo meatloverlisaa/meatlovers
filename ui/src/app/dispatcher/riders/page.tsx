@@ -56,7 +56,26 @@ export default function DispatcherRidersPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 dark:bg-gray-900">
-      <div className="mx-auto max-w-7xl space-y-6">
+      {/* Mobile-only message - Hide page on mobile */}
+      <div className="flex items-center justify-center min-h-[70vh] lg:hidden">
+        <div className="max-w-md text-center p-6">
+          <div className="mb-4">
+            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Desktop Only</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            The Riders page is only available on desktop devices. Please use a larger screen to access this feature.
+          </p>
+          <Link href="/dispatcher" className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
+
+      {/* Desktop content - Hidden on mobile */}
+      <div className="hidden lg:block mx-auto max-w-7xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Riders</h1>
