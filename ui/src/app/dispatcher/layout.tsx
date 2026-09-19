@@ -1,21 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { IconRenderer } from "@/components/ui/IconRenderer";
 import { useAuth } from "@/contexts/AuthContext";
-type NavItem = {
-  href: string;
-  label: string;
-  icon: string;
-};
-
-const navigationItems: NavItem[] = [
-  { href: "/dispatcher", label: "Dispatcher Dashboard", icon: "chart" },
-  { href: "/dispatcher/riders", label: "Riders", icon: "users" },
-  { href: "/dispatcher/rider-location", label: "Rider Location Client", icon: "location" },
-];
 
 // ─── Dispatcher Layout Component ─────────────────────────────────────────────────
 export default function DispatcherLayout({
@@ -23,141 +8,11 @@ export default function DispatcherLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout } = useAuth();
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
-  };
-
-  const userRole = user?.role || "DISPATCHER";
-
-  const isActive = (href: string) => {
-    if (href === "/dispatcher") return pathname === "/dispatcher";
-    return pathname?.startsWith(href);
-  };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-zinc-800 bg-[#09090B] transition-transform duration-300 lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-zinc-800 px-6">
-          <IconRenderer icon="chart" className="w-6 h-6 text-red-500" />
-          <div>
-            <p className="font-black text-white">Meat Lovers</p>
-            <p className="text-xs text-zinc-400">Dispatcher Portal</p>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-1">
-            {navigationItems.map((item) => {
-              // Hide Riders link on mobile (only show on lg screens and up)
-              const isRidersPage = item.href === "/dispatcher/riders";
-              const linkClassName = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-                isActive(item.href)
-                  ? "bg-red-700 text-white"
-                  : "text-zinc-400 hover:bg-zinc-900 hover:text-white"
-              } ${isRidersPage ? "hidden lg:flex" : ""}`;
-              
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={linkClassName}
-                >
-                  <IconRenderer icon={item.icon} className="w-5 h-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-
-        {/* User Profile */}
-        <div className="border-t border-zinc-800 p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-700 font-bold text-white">
-              {user?.full_name?.charAt(0) || 'D'}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-white">{user?.full_name || 'Dispatcher'}</p>
-              <p className="text-xs text-zinc-400">{userRole}</p>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <Link
-              href="/dispatcher/profile"
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-white rounded-lg transition"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              My Profile
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-950/40 rounded-lg transition"
-              title="Logout"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-zinc-950/50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Mobile header */}
-        <header className="flex h-16 items-center gap-4 border-b border-zinc-200 bg-white px-4 lg:hidden">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="rounded-lg border border-zinc-300 p-2 text-zinc-700 hover:bg-zinc-50"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <div className="flex items-center gap-2">
-            <IconRenderer icon="truck" className="h-5 w-5 text-zinc-950" />
-            <span className="font-black text-zinc-950">Dispatcher Portal</span>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
-      </div>
+    <div className="h-screen overflow-hidden bg-stone-50">
+      {/* Page content - Full width, no sidebar */}
+      <main className="h-full overflow-y-auto">{children}</main>
     </div>
   );
 }

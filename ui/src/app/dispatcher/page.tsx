@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { getAuthHeader } from "@/lib/auth";
 import { IconRenderer } from "@/components/ui/IconRenderer";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Tab = "Unassigned" | "Assigned" | "Active" | "Delayed" | "Completed";
 type OrderStatus = "PREPARING" | "READY" | "OUT_FOR_DELIVERY";
@@ -122,6 +124,7 @@ const statusClasses: Record<Rider["status"], string> = { idle: "bg-emerald-500",
 
 export default function DispatcherDashboard() {
   useRequireAuth(["SUPER_ADMIN", "ADMIN", "MANAGER", "DISPATCHER"]);
+  const { user, logout } = useAuth();
   const [tab, setTab] = useState<Tab>("Unassigned");
   const [orders, setOrders] = useState<Order[]>(demoOrders);
   const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>(demoKitchenOrders);
@@ -282,7 +285,35 @@ export default function DispatcherDashboard() {
             <button onClick={() => setOrders((current) => current.map((order) => order.state === "Unassigned" ? { ...order, state: "Assigned", rider: "Auto-routed", color: "#f59e0b" } : order))} className="hidden items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all duration-300 hover:bg-red-700 hover:shadow-lg hover:scale-105 sm:flex"><IconRenderer icon="trending" className="h-4 w-4" /> Auto-route nearby</button>
           )}
           <button className="rounded-xl border border-zinc-200 bg-white p-2.5 text-zinc-600 transition-all duration-300 hover:bg-zinc-50 hover:border-zinc-300 hover:shadow-sm" aria-label="Notifications"><IconRenderer icon="alert" className="h-5 w-5" /></button>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-700 text-sm font-black text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-110 cursor-pointer">JD</div>
+          
+          {/* User Profile Dropdown */}
+          <div className="relative group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-700 text-sm font-black text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-110 cursor-pointer">
+              {user?.full_name?.charAt(0) || 'D'}
+            </div>
+            
+            {/* Dropdown Menu */}
+            <div className="absolute right-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+              <div className="rounded-xl border border-zinc-200 bg-white shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="px-4 py-3 border-b border-zinc-200">
+                  <p className="text-sm font-bold text-zinc-950">{user?.full_name || 'Dispatcher'}</p>
+                  <p className="text-xs text-zinc-500">{user?.role || 'DISPATCHER'}</p>
+                </div>
+                <div className="p-2">
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      window.location.href = '/dispatcher/login';
+                    }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300"
+                  >
+                    <IconRenderer icon="alert" className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
