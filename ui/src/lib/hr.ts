@@ -12,6 +12,7 @@ export const STAFF_ROLES = [
   "DISPATCHER",
   "ACCOUNTANT",
   "HR",
+  "RIDER",
 ] as const;
 
 export const EMPLOYMENT_TYPES = ["PERMANENT", "CONTRACT", "PART_TIME", "CASUAL", "PROBATION"] as const;
@@ -34,6 +35,11 @@ export type EmployeeProfile = {
   probation_end_date?: string | null;
   contract_end_date?: string | null;
   notes?: string | null;
+  license_number?: string | null;
+  vehicle_type?: string | null;
+  vehicle_plate?: string | null;
+  vehicle_model?: string | null;
+  current_location?: string | null;
 };
 
 export type Employee = {
@@ -44,6 +50,15 @@ export type Employee = {
   role: string;
   is_active: boolean;
   employee_profile?: EmployeeProfile | null;
+  rider?: {
+    id: string | number;
+    phone: string;
+    license_number?: string | null;
+    vehicle_type?: string | null;
+    vehicle_plate?: string | null;
+    vehicle_model?: string | null;
+    current_location?: string | null;
+  } | null;
 };
 
 export type EmployeeDocument = {
@@ -357,4 +372,3 @@ export function deleteDocument(id: string | number) {
     method: "DELETE",
   });
 }
-

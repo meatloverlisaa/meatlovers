@@ -463,6 +463,15 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   ],
 
   // ====================
+  // RIDER - Own delivery workflow
+  // ====================
+  RIDER: [
+    { resource: Resource.DELIVERIES, actions: [Action.READ, Action.UPDATE] },
+    { resource: Resource.RIDERS, actions: [Action.READ, Action.UPDATE] },
+    { resource: Resource.DASHBOARD, actions: [Action.READ] },
+  ],
+
+  // ====================
   // ACCOUNTANT - Financial Operations
   // ====================
   ACCOUNTANT: [

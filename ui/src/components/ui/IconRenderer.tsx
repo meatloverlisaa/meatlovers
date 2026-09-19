@@ -36,6 +36,7 @@ import {
   MapPinIcon,
   TruckIcon,
   PlusIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
 // Mapping of emoji/icon types to Heroicons components
@@ -180,6 +181,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   '📍': MapPinIcon,
   'location': MapPinIcon,
   'pin': MapPinIcon,
+  'search': MagnifyingGlassIcon,
 };
 
 interface IconRendererProps {

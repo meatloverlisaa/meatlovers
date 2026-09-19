@@ -1196,6 +1196,7 @@ enum Role {
   DISPATCHER
   ACCOUNTANT
   HR
+  RIDER
 }
 
 enum EmploymentType {

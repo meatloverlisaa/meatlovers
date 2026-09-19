@@ -53,6 +53,7 @@ export default function RoleGuard({ allowedRoles, children, redirectTo }: RoleGu
           WAITER: "/pos/profile",
           CASHIER: "/cashier/profile",
           DISPATCHER: "/dispatcher/profile",
+          RIDER: "/rider",
         };
 
         const correctPath = roleToPath[data.role] || redirectTo || "/profile";

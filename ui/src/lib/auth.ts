@@ -137,6 +137,7 @@ export const getDashboardRoute = (role: string): string => {
     DISPATCHER: '/dispatcher',
     ACCOUNTANT: '/accountant',
     HR: '/hr',
+    RIDER: '/rider',
   };
 
   return roleRoutes[role] || '/';
@@ -158,6 +159,7 @@ export const getLoginRoute = (role: string): string => {
     DISPATCHER: '/dispatcher/login',
     ACCOUNTANT: '/accountant/login',
     HR: '/hr/login',
+    RIDER: '/rider/login',
   };
 
   return roleRoutes[role] || '/admin/login';

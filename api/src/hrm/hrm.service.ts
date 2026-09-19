@@ -145,8 +145,17 @@ export class HrmService {
       skills,
       notes,
       profile_photo_url,
+      license_number,
+      vehicle_type,
+      vehicle_plate,
+      vehicle_model,
+      current_location,
       ...userData
     } = createEmployeeDto;
+
+    if (userData.role === Role.RIDER && !userData.phone) {
+      throw new BadRequestException('A phone number is required for a rider account');
+    }
 
     // Create user with employee profile
     const user = await this.prisma.user.create({
@@ -202,9 +211,24 @@ export class HrmService {
             profile_photo_url,
           },
         },
+        ...(userData.role === Role.RIDER
+          ? {
+              rider: {
+                create: {
+                  phone: userData.phone as string,
+                  license_number,
+                  vehicle_type,
+                  vehicle_plate,
+                  vehicle_model,
+                  current_location,
+                },
+              },
+            }
+          : {}),
       },
       include: {
         employee_profile: true,
+        rider: true,
       },
     });
 
@@ -445,9 +469,15 @@ export class HrmService {
       skills,
       notes,
       profile_photo_url,
+      license_number,
+      vehicle_type,
+      vehicle_plate,
+      vehicle_model,
+      current_location,
       ...rawUserData
     } = updateEmployeeDto;
     const userData: Prisma.UserUpdateInput = { ...rawUserData };
+    const effectiveRole = rawUserData.role ?? employee.role;
 
     // Prepare profile update data
     const profileUpdateData: Prisma.EmployeeProfileUpdateInput = {};
@@ -537,9 +567,34 @@ export class HrmService {
                 update: profileUpdateData,
               }
             : undefined,
+        ...(effectiveRole === Role.RIDER
+          ? {
+              rider: {
+                upsert: {
+                  create: {
+                    phone: (rawUserData.phone ?? employee.phone) as string,
+                    license_number,
+                    vehicle_type,
+                    vehicle_plate,
+                    vehicle_model,
+                    current_location,
+                  },
+                  update: {
+                    ...(rawUserData.phone !== undefined && { phone: rawUserData.phone }),
+                    ...(license_number !== undefined && { license_number }),
+                    ...(vehicle_type !== undefined && { vehicle_type }),
+                    ...(vehicle_plate !== undefined && { vehicle_plate }),
+                    ...(vehicle_model !== undefined && { vehicle_model }),
+                    ...(current_location !== undefined && { current_location }),
+                  },
+                },
+              },
+            }
+          : {}),
       },
       include: {
         employee_profile: true,
+        rider: true,
       },
     });
 

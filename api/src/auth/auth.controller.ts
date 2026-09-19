@@ -74,6 +74,7 @@ export class AuthController {
     Role.DISPATCHER,
     Role.ACCOUNTANT,
     Role.HR,
+    Role.RIDER,
   )
   async getProfile(@Request() req: AuthenticatedRequest) {
     return this.authService.getProfile(req.user.sub);
@@ -97,6 +98,7 @@ export class AuthController {
     Role.DISPATCHER,
     Role.ACCOUNTANT,
     Role.HR,
+    Role.RIDER,
   )
   async updateProfile(
     @Request() req: AuthenticatedRequest,
@@ -123,6 +125,7 @@ export class AuthController {
     Role.DISPATCHER,
     Role.ACCOUNTANT,
     Role.HR,
+    Role.RIDER,
   )
   @HttpCode(HttpStatus.OK)
   async changePassword(
@@ -207,6 +210,7 @@ export class AuthController {
     Role.DISPATCHER,
     Role.ACCOUNTANT,
     Role.HR,
+    Role.RIDER,
   )
   @HttpCode(HttpStatus.OK)
   async logout(

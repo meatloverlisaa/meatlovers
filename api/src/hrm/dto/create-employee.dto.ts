@@ -190,4 +190,25 @@ export class CreateEmployeeDto {
   @IsString()
   @IsOptional()
   profile_photo_url?: string;
+
+  // Rider account and fleet profile fields. These are used when role = RIDER.
+  @IsString()
+  @IsOptional()
+  license_number?: string;
+
+  @IsString()
+  @IsOptional()
+  vehicle_type?: string;
+
+  @IsString()
+  @IsOptional()
+  vehicle_plate?: string;
+
+  @IsString()
+  @IsOptional()
+  vehicle_model?: string;
+
+  @IsString()
+  @IsOptional()
+  current_location?: string;
 }

@@ -29,6 +29,7 @@ export function middleware(request: NextRequest) {
     { pattern: /^\/bar(?!\/login)/, loginPath: '/bar/login' },
     { pattern: /^\/kitchen(?!\/login)/, loginPath: '/kitchen/login' },
     { pattern: /^\/pos(?!\/login)/, loginPath: '/pos/login' },
+    { pattern: /^\/rider(?!\/login)/, loginPath: '/rider/login' },
   ];
   
   // Check if current path matches any protected route

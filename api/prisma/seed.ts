@@ -151,6 +151,47 @@ async function main() {
     console.log('  ↳ Dispatcher user already exists');
   }
 
+  // ─── seed_rider_user_and_profile ────────────────────────────────────────
+  const riderPassword = await bcrypt.hash('Rider@1234', 10);
+  const riderUser = await prisma.user.upsert({
+    where: { email: 'rider@meatlovers.com' },
+    update: {
+      role: 'RIDER',
+      is_active: true,
+      password_hash: riderPassword,
+    },
+    create: {
+      full_name: 'Demo Rider',
+      email: 'rider@meatlovers.com',
+      phone: '+254700000011',
+      role: 'RIDER',
+      password_hash: riderPassword,
+      is_active: true,
+    },
+  });
+  await prisma.rider.upsert({
+    where: { user_id: riderUser.id },
+    update: {
+      phone: riderUser.phone || '+254700000011',
+      vehicle_type: 'Motorcycle',
+      vehicle_plate: 'KDA 011A',
+      current_location: 'Kilimani',
+      is_available: true,
+    },
+    create: {
+      user_id: riderUser.id,
+      phone: riderUser.phone || '+254700000011',
+      license_number: 'DL-DEMO-011',
+      vehicle_type: 'Motorcycle',
+      vehicle_plate: 'KDA 011A',
+      current_location: 'Kilimani',
+      is_available: true,
+    },
+  });
+  console.log('  ✓ Rider user/profile ready');
+  console.log('    Email: rider@meatlovers.com');
+  console.log('    Password: Rider@1234');
+
   // ─── seed_accountant_user ────────────────────────────────────────────────
   const existingAccountant = await prisma.user.findFirst({
     where: { email: 'accountant@meatlovers.com' }

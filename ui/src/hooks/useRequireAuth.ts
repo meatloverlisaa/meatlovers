@@ -16,6 +16,10 @@ export function useRequireAuth(allowedRoles?: string[]) {
 
   useEffect(() => {
     if (!isLoading) {
+      if (pathname.endsWith('/login')) {
+        return;
+      }
+
       if (!user) {
         // Not authenticated, redirect to appropriate login based on current path
         let loginRoute = '/admin/login'; // default
@@ -41,6 +45,8 @@ export function useRequireAuth(allowedRoles?: string[]) {
           loginRoute = '/cashier/login';
         } else if (pathname.startsWith('/pos')) {
           loginRoute = '/pos/login';
+        } else if (pathname.startsWith('/rider')) {
+          loginRoute = '/rider/login';
         }
         
         router.push(loginRoute);

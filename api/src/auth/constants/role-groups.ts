@@ -102,6 +102,8 @@ export const DISPATCH_ROLES = [
   Role.DISPATCHER,
 ] as const;
 
+export const RIDER_ROLES = [Role.RIDER] as const;
+
 export const CRM_ROLES = [Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER] as const;
 
 export const HR_ROLES = [

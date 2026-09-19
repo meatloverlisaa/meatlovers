@@ -184,6 +184,36 @@ export class DeliveriesService {
     return rider;
   }
 
+  async findDeliveriesByUserId(userId: string) {
+    const rider = await this.prisma.rider.findUnique({
+      where: { user_id: BigInt(userId) },
+      select: { id: true },
+    });
+    if (!rider) throw new NotFoundException('No rider profile is linked to this account');
+    return this.findByRiderId(rider.id.toString());
+  }
+
+  async updateRiderDeliveryStatus(
+    id: string,
+    updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+    userId: string,
+  ) {
+    const rider = await this.prisma.rider.findUnique({
+      where: { user_id: BigInt(userId) },
+      select: { id: true },
+    });
+    if (!rider) throw new NotFoundException('No rider profile is linked to this account');
+    const delivery = await this.prisma.delivery.findUnique({
+      where: { id: BigInt(id) },
+      select: { rider_id: true },
+    });
+    if (!delivery) throw new NotFoundException('Delivery not found');
+    if (delivery.rider_id !== rider.id) {
+      throw new ForbiddenException('You can only update your own deliveries');
+    }
+    return this.updateDeliveryStatus(id, updateDeliveryStatusDto, userId);
+  }
+
   async updateRider(id: string, updateRiderDto: UpdateRiderDto) {
     const rider = await this.prisma.rider.findUnique({
       where: { id: BigInt(id) },

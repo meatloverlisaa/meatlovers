@@ -20,6 +20,9 @@ export function EmployeeForm({ employee }: Props) {
     emergency_contact_phone: profile?.emergency_contact_phone ?? empty, emergency_contact_relationship: profile?.emergency_contact_relationship ?? empty,
     bank_name: profile?.bank_name ?? empty, bank_account_name: profile?.bank_account_name ?? empty, bank_account_number: profile?.bank_account_number ?? empty,
     probation_end_date: profile?.probation_end_date?.slice(0, 10) ?? empty, contract_end_date: profile?.contract_end_date?.slice(0, 10) ?? empty, notes: profile?.notes ?? empty,
+    license_number: employee?.rider?.license_number ?? empty, vehicle_type: employee?.rider?.vehicle_type ?? empty,
+    vehicle_plate: employee?.rider?.vehicle_plate ?? empty, vehicle_model: employee?.rider?.vehicle_model ?? empty,
+    current_location: employee?.rider?.current_location ?? empty,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +56,16 @@ export function EmployeeForm({ employee }: Props) {
           <label className={labelClass}>{employee ? "New password (optional)" : "Temporary password"}<input required={!employee} minLength={8} type="password" value={form.password} onChange={(e) => set("password", e.target.value)} className={fieldClass} /></label>
         </div>
       </section>
+      {form.role === "RIDER" && <section className="rounded-xl border border-amber-900/60 bg-zinc-900 p-5 shadow-sm">
+        <h2 className="text-lg font-black text-white">Rider and vehicle setup</h2><p className="mt-1 text-sm text-zinc-400">This creates the linked rider profile used by dispatch and the mobile rider app.</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <label className={labelClass}>Driving licence number<input value={form.license_number} onChange={(e) => set("license_number", e.target.value)} className={fieldClass} /></label>
+          <label className={labelClass}>Vehicle type<input value={form.vehicle_type} onChange={(e) => set("vehicle_type", e.target.value)} placeholder="Motorcycle" className={fieldClass} /></label>
+          <label className={labelClass}>Vehicle plate<input value={form.vehicle_plate} onChange={(e) => set("vehicle_plate", e.target.value)} placeholder="KDA 123A" className={fieldClass} /></label>
+          <label className={labelClass}>Vehicle model<input value={form.vehicle_model} onChange={(e) => set("vehicle_model", e.target.value)} className={fieldClass} /></label>
+          <label className={labelClass}>Base / current location<input value={form.current_location} onChange={(e) => set("current_location", e.target.value)} placeholder="Kilimani" className={fieldClass} /></label>
+        </div>
+      </section>}
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm">
         <h2 className="text-lg font-black text-white">Employment details</h2>

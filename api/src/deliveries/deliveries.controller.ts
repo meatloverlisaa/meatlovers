@@ -24,6 +24,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import {
   DISPATCH_ROLES,
   MANAGEMENT_ROLES,
+  RIDER_ROLES,
 } from '../auth/constants/role-groups';
 
 @Controller('riders')
@@ -52,9 +53,29 @@ export class RidersController {
   }
 
   @Get('me')
-  @Roles(...DISPATCH_ROLES)
+  @Roles(...DISPATCH_ROLES, ...RIDER_ROLES)
   findMyRiderProfile(@Req() req: AuthenticatedRequest) {
     return this.deliveriesService.findRiderByUserId(req.user.sub);
+  }
+
+  @Get('me/deliveries')
+  @Roles(...RIDER_ROLES)
+  findMyDeliveries(@Req() req: AuthenticatedRequest) {
+    return this.deliveriesService.findDeliveriesByUserId(req.user.sub);
+  }
+
+  @Patch('delivery/:id/status')
+  @Roles(...RIDER_ROLES)
+  updateMyDeliveryStatus(
+    @Param('id') id: string,
+    @Body() updateDeliveryStatusDto: UpdateDeliveryStatusDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.deliveriesService.updateRiderDeliveryStatus(
+      id,
+      updateDeliveryStatusDto,
+      req.user.sub,
+    );
   }
 
   @Get(':id')
@@ -70,7 +91,7 @@ export class RidersController {
   }
 
   @Patch(':id/location')
-  @Roles(...DISPATCH_ROLES)
+  @Roles(...DISPATCH_ROLES, ...RIDER_ROLES)
   updateRiderLocation(
     @Param('id') id: string,
     @Body() updateRiderDto: UpdateRiderDto,
