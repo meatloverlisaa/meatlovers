@@ -25,6 +25,8 @@ type KitchenOrder = {
   estimatedDelivery?: string;
   priority: "high" | "normal";
   cluster?: string[];
+  paymentStatus: "PAID" | "UNPAID" | "COD";
+  paymentVerified?: boolean;
 };
 type Rider = { id: string; name: string; initials: string; status: "idle" | "moving" | "delayed"; battery: number; load: string; shift: string; x: number; y: number; location?: string };
 type KitchenRider = {
@@ -56,6 +58,8 @@ const demoKitchenOrders: KitchenOrder[] = [
     prepCountdown: 8,
     items: ["2x Burger Meal", "1x Fries", "2x Soda"],
     priority: "high",
+    paymentStatus: "PAID",
+    paymentVerified: true,
   },
   {
     id: "2",
@@ -67,6 +71,8 @@ const demoKitchenOrders: KitchenOrder[] = [
     prepCountdown: 12,
     items: ["1x Pizza Large", "1x Garlic Bread"],
     priority: "normal",
+    paymentStatus: "COD",
+    paymentVerified: true,
   },
   {
     id: "3",
@@ -79,6 +85,8 @@ const demoKitchenOrders: KitchenOrder[] = [
     items: ["1x Steak Meal", "1x Salad", "1x Juice"],
     priority: "high",
     cluster: ["ML-1042", "ML-1045"],
+    paymentStatus: "UNPAID",
+    paymentVerified: false,
   },
   {
     id: "4",
@@ -91,6 +99,8 @@ const demoKitchenOrders: KitchenOrder[] = [
     items: ["2x Chicken Wings", "1x Coleslaw"],
     priority: "normal",
     cluster: ["ML-1042", "ML-1045"],
+    paymentStatus: "PAID",
+    paymentVerified: true,
   },
   {
     id: "5",
@@ -103,6 +113,8 @@ const demoKitchenOrders: KitchenOrder[] = [
     estimatedDelivery: "15 mins",
     items: ["1x Family Platter"],
     priority: "normal",
+    paymentStatus: "COD",
+    paymentVerified: true,
   },
 ];
 
@@ -154,19 +166,27 @@ export default function DispatcherDashboard() {
   const outForDeliveryOrders = kitchenOrders.filter((o) => o.status === "OUT_FOR_DELIVERY");
 
   const handleAssignKitchenOrder = (orderId: string, riderId: string) => {
+    const order = kitchenOrders.find((o) => o.id === orderId);
     const rider = kitchenRiders.find((r) => r.id === riderId);
-    if (!rider) return;
+    
+    if (!rider || !order) return;
+
+    // Check payment verification for non-COD orders
+    if (order.paymentStatus === "UNPAID" && !order.paymentVerified) {
+      alert("⚠️ Payment must be verified before assigning rider!\n\nPlease confirm payment has been received before dispatching this order.");
+      return;
+    }
 
     setKitchenOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
+      prev.map((o) =>
+        o.id === orderId
           ? {
-              ...order,
+              ...o,
               status: "OUT_FOR_DELIVERY",
               assignedRider: rider.name,
               estimatedDelivery: "20 mins",
             }
-          : order
+          : o
       )
     );
 
@@ -180,6 +200,16 @@ export default function DispatcherDashboard() {
 
     setSelectedKitchenOrder(null);
     setAssignRiderId("");
+  };
+
+  const handleVerifyPayment = (orderId: string) => {
+    setKitchenOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId
+          ? { ...order, paymentVerified: true, paymentStatus: "PAID" }
+          : order
+      )
+    );
   };
 
   const handleReconcile = (riderId: string) => {
@@ -429,10 +459,27 @@ export default function DispatcherDashboard() {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-black text-zinc-950">{order.orderNumber}</span>
                               {order.priority === "high" && <span className="rounded bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">HIGH PRIORITY</span>}
                               {order.cluster && <span className="rounded bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700"><IconRenderer icon="link" className="inline h-3 w-3" /> CLUSTER</span>}
+                              
+                              {/* Payment Status Badge */}
+                              {order.paymentStatus === "PAID" && order.paymentVerified && (
+                                <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                                  <IconRenderer icon="check" className="inline h-3 w-3 mr-0.5" />PAID
+                                </span>
+                              )}
+                              {order.paymentStatus === "COD" && (
+                                <span className="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                                  <IconRenderer icon="dollar" className="inline h-3 w-3 mr-0.5" />COD
+                                </span>
+                              )}
+                              {order.paymentStatus === "UNPAID" && !order.paymentVerified && (
+                                <span className="rounded bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 animate-pulse">
+                                  <IconRenderer icon="alert" className="inline h-3 w-3 mr-0.5" />UNPAID
+                                </span>
+                              )}
                             </div>
                             <p className="mt-1 text-sm font-semibold text-zinc-700">{order.customerName}</p>
                             <p className="text-xs text-zinc-500">{order.deliveryAddress} • {order.area}</p>
@@ -444,6 +491,27 @@ export default function DispatcherDashboard() {
                           <p className="text-xs font-semibold text-zinc-600">Items:</p>
                           <p className="text-xs text-zinc-500">{order.items.join(", ")}</p>
                         </div>
+
+                        {/* Payment Verification Warning for Unpaid Orders */}
+                        {order.paymentStatus === "UNPAID" && !order.paymentVerified && (
+                          <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 animate-in fade-in duration-300">
+                            <div className="flex items-start gap-2">
+                              <IconRenderer icon="alert" className="h-5 w-5 text-red-600 mt-0.5 animate-pulse" />
+                              <div className="flex-1">
+                                <p className="text-sm font-bold text-red-900">Payment Required</p>
+                                <p className="text-xs text-red-700 mt-0.5">Order must be paid before dispatch to rider</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => handleVerifyPayment(order.id)}
+                              className="mt-3 w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-700 hover:shadow-lg hover:scale-105"
+                            >
+                              <IconRenderer icon="check" className="inline h-4 w-4 mr-2" />
+                              Confirm Payment Received
+                            </button>
+                          </div>
+                        )}
+
                         <div className="mt-3 flex gap-2 animate-in fade-in duration-300">
                           {selectedKitchenOrder === order.id ? (
                             <>
